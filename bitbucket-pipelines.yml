@@ -1,0 +1,9 @@
+image: maven:3-jdk-10-slim
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - maven
+        script:
+          - mvn --batch-mode verify
