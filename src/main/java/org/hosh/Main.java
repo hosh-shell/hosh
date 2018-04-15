@@ -16,7 +16,7 @@ public class Main {
                 .terminal(terminal)
                 .build();
 
-        System.out.println("Hosh v.0");
+        System.out.println("Hosh v." + Version.readVersion());
         System.out.println("Running on Java " + System.getProperty("java.version"));
         while (true) {
             try {
