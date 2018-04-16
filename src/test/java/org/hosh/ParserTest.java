@@ -9,7 +9,6 @@ public class ParserTest {
         Parser.parse("git");
         Parser.parse("git status");
         Parser.parse("git commit --amend");
-
     }
 
     @Test(expected = Parser.ParseError.class)

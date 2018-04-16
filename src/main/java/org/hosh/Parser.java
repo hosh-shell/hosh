@@ -11,8 +11,7 @@ import org.hosh.antlr4.HoshParser;
 /** Facade for ANTLR4 */
 public class Parser {
 
-
-    public static void parse(String input) {
+    public static HoshParser.ProgramContext parse(String input) {
         HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         HoshParser parser = new HoshParser(tokens);
@@ -23,7 +22,8 @@ public class Parser {
                 throw new ParseError("line " + line + ":" + charPositionInLine + " " + msg);
             }
         });
-        parser.program();
+        HoshParser.ProgramContext program = parser.program();
+        return program;
     }
 
     public static class ParseError extends RuntimeException {
