@@ -35,7 +35,6 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <version>4.7.1</version>
                 <configuration>
-                    <atn>true</atn>
                     <visitor>true</visitor>
                     <treatWarningsAsErrors>true</treatWarningsAsErrors>
                 </configuration>
