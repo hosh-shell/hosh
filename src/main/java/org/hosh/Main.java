@@ -1,6 +1,7 @@
 package org.hosh;
 
 import org.hosh.antlr4.HoshParser;
+import org.hosh.modules.FileSystemModule;
 import org.hosh.modules.TerminalModule;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -20,7 +21,8 @@ public class Main {
                 .terminal(terminal)
                 .build();
         CommandRegistry commandRegistry = new SimpleCommandRegistry();
-        new TerminalModule().beforeStart(commandRegistry);
+        new TerminalModule().beforeStart(commandRegistry); // TODO: discover all modules
+        new FileSystemModule().beforeStart(commandRegistry);
         System.out.println("Hosh v." + Version.readVersion());
         System.out.println("Running on Java " + System.getProperty("java.version"));
         while (true) {
@@ -28,7 +30,7 @@ public class Main {
                 String line = lineReader.readLine("hosh> ");
                 HoshParser.ProgramContext programContext = Parser.parse(line);
                 programContext.stmt().forEach(stmt -> {
-                    String commandName = stmt.ID(0).getSymbol().getText();
+                    String commandName = stmt.ID().get(0).getSymbol().getText();
                     Optional<Command> search = commandRegistry.search(commandName);
                     if (search.isPresent()) {
                         search.get().run(terminal, new ArrayList<>());
