@@ -19,11 +19,6 @@ public class SimpleCommandRegistry implements CommandRegistry {
     }
 
     @Override
-    public void unregisterCommand(String name) {
-        commandsByName.remove(name);
-    }
-
-    @Override
     public Optional<Command> search(String name) {
         Class<? extends Command> commandClass = commandsByName.get(name);
         return Optional.ofNullable(commandClass).map(commandFactory::create);

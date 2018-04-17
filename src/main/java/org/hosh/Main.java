@@ -1,8 +1,6 @@
 package org.hosh;
 
 import org.hosh.antlr4.HoshParser;
-import org.hosh.modules.FileSystemModule;
-import org.hosh.modules.TerminalModule;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -25,7 +23,7 @@ public class Main {
         CommandRegistry commandRegistry = new SimpleCommandRegistry(commandFactory);
         ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
         for (Module module : modules) {
-            module.beforeStart(commandRegistry);
+            module.onStartup(commandRegistry);
         }
         System.out.println("Hosh v." + Version.readVersion());
         System.out.println("Running on Java " + System.getProperty("java.version"));

@@ -12,14 +12,9 @@ import java.util.List;
 public class TerminalModule implements Module {
 
     @Override
-    public void beforeStart(CommandRegistry commandRegistry) {
+    public void onStartup(CommandRegistry commandRegistry) {
         commandRegistry.registerCommand("clear", Clear.class);
         commandRegistry.registerCommand("bell", Bell.class);
-    }
-
-    @Override
-    public void afterExit(CommandRegistry commandRegistry) {
-        commandRegistry.unregisterCommand("clear");
     }
 
     public static class Clear implements Command, TerminalAware {
