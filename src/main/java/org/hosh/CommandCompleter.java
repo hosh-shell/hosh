@@ -20,5 +20,5 @@ public class CommandCompleter implements Completer {
     public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
         candidates.addAll(commandRegistry.commandNames().stream().map(Candidate::new).collect(Collectors.toList()));
     }
-    
+
 }

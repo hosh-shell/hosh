@@ -1,16 +1,19 @@
 package org.hosh;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@NotThreadSafe
 public class SimpleCommandRegistry implements CommandRegistry {
 
     private final Map<String, Class<? extends Command>> commandsByName = new HashMap<>();
     private final CommandFactory commandFactory;
 
-    public SimpleCommandRegistry(CommandFactory commandFactory) {
+    public SimpleCommandRegistry(@Nonnull CommandFactory commandFactory) {
         this.commandFactory = commandFactory;
     }
 
