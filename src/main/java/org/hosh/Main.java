@@ -12,6 +12,7 @@ import org.jline.terminal.TerminalBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.ServiceLoader;
 
 public class Main {
 
@@ -22,8 +23,10 @@ public class Main {
                 .build();
         CommandFactory commandFactory = new CommandFactory(terminal);
         CommandRegistry commandRegistry = new SimpleCommandRegistry(commandFactory);
-        new TerminalModule().beforeStart(commandRegistry); // TODO: discover all modules
-        new FileSystemModule().beforeStart(commandRegistry);
+        ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
+        for (Module module : modules) {
+            module.beforeStart(commandRegistry);
+        }
         System.out.println("Hosh v." + Version.readVersion());
         System.out.println("Running on Java " + System.getProperty("java.version"));
         while (true) {
@@ -45,6 +48,5 @@ public class Main {
                 System.err.println(e.getMessage());
             }
         }
-
     }
 }
