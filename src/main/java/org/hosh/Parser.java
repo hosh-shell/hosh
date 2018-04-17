@@ -22,8 +22,7 @@ public class Parser {
                 throw new ParseError("line " + line + ":" + charPositionInLine + " " + msg);
             }
         });
-        HoshParser.ProgramContext program = parser.program();
-        return program;
+        return parser.program();
     }
 
     public static class ParseError extends RuntimeException {

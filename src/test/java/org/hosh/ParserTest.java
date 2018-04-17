@@ -11,7 +11,7 @@ public class ParserTest {
         Parser.parse("git commit --amend");
     }
 
-    @Test(expected = Parser.ParseError.class)
+    @Test
     public void empty() {
         Parser.parse("");
     }
