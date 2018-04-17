@@ -16,11 +16,12 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         Terminal terminal = TerminalBuilder.terminal();
-        LineReader lineReader = LineReaderBuilder.builder()
-                .terminal(terminal)
-                .build();
         CommandFactory commandFactory = new CommandFactory(terminal);
         CommandRegistry commandRegistry = new SimpleCommandRegistry(commandFactory);
+        LineReader lineReader = LineReaderBuilder.builder()
+                .terminal(terminal)
+                .completer(new CommandCompleter(commandRegistry))
+                .build();
         ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
         for (Module module : modules) {
             module.onStartup(commandRegistry);
@@ -47,4 +48,6 @@ public class Main {
             }
         }
     }
+
+
 }

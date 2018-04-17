@@ -1,5 +1,6 @@
 package org.hosh;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -22,5 +23,10 @@ public class SimpleCommandRegistry implements CommandRegistry {
     public Optional<Command> search(String name) {
         Class<? extends Command> commandClass = commandsByName.get(name);
         return Optional.ofNullable(commandClass).map(commandFactory::create);
+    }
+
+    @Override
+    public Collection<String> commandNames() {
+        return commandsByName.keySet();
     }
 }
