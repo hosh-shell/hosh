@@ -30,7 +30,7 @@ public class FileSystemModule implements Module {
         public void run(List<String> args) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get("."))) {
                 for (Path path : stream) {
-                    System.out.println(path.getFileName());
+                    System.out.println(path.getFileName() + " " + Files.size(path));
                 }
             } catch (IOException e) {
                 System.err.println(e.getMessage());
