@@ -3,11 +3,9 @@ package org.hosh.modules;
 import org.hosh.Command;
 import org.hosh.CommandRegistry;
 import org.hosh.Module;
-import org.jline.terminal.Terminal;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,8 +15,8 @@ public class FileSystemModule implements Module {
 
     @Override
     public void beforeStart(CommandRegistry commandRegistry) {
-        commandRegistry.registerCommand("ls", new ListFiles());
-        commandRegistry.registerCommand("cwd", new CurrentWorkDirectory());
+        commandRegistry.registerCommand("ls", ListFiles.class);
+        commandRegistry.registerCommand("cwd", CurrentWorkDirectory.class);
     }
 
     @Override
@@ -26,10 +24,10 @@ public class FileSystemModule implements Module {
 
     }
 
-    private static class ListFiles implements Command {
+    public static class ListFiles implements Command {
 
         @Override
-        public void run(Terminal terminal, List<String> args) {
+        public void run(List<String> args) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get("."))) {
                 for (Path path : stream) {
                     System.out.println(path.getFileName());
@@ -40,10 +38,10 @@ public class FileSystemModule implements Module {
         }
     }
 
-    private class CurrentWorkDirectory implements Command {
+    public static class CurrentWorkDirectory implements Command {
 
         @Override
-        public void run(Terminal terminal, List<String> args) {
+        public void run(List<String> args) {
             System.out.println(Paths.get(".").toAbsolutePath().normalize().toString());
         }
     }

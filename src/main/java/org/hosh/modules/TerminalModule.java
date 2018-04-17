@@ -3,6 +3,7 @@ package org.hosh.modules;
 import org.hosh.Command;
 import org.hosh.CommandRegistry;
 import org.hosh.Module;
+import org.hosh.TerminalAware;
 import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
 
@@ -12,8 +13,8 @@ public class TerminalModule implements Module {
 
     @Override
     public void beforeStart(CommandRegistry commandRegistry) {
-        commandRegistry.registerCommand("clear", new Clear());
-        commandRegistry.registerCommand("bell", new Bell());
+        commandRegistry.registerCommand("clear", Clear.class);
+        commandRegistry.registerCommand("bell", Bell.class);
     }
 
     @Override
@@ -21,19 +22,32 @@ public class TerminalModule implements Module {
         commandRegistry.unregisterCommand("clear");
     }
 
-    static class Clear implements Command {
+    public static class Clear implements Command, TerminalAware {
+
+        private Terminal terminal;
 
         @Override
-        public void run(Terminal terminal, List<String> args) {
+        public void setTerminal(Terminal terminal) {
+            this.terminal = terminal;
+        }
+
+        @Override
+        public void run(List<String> args) {
             terminal.puts(InfoCmp.Capability.clear_screen);
             terminal.flush();
         }
     }
 
-    static class Bell implements Command {
+    public static class Bell implements Command, TerminalAware {
+
+        private Terminal terminal;
 
         @Override
-        public void run(Terminal terminal, List<String> args) {
+        public void setTerminal(Terminal terminal) {
+            this.terminal = terminal;
+        }
+        @Override
+        public void run(List<String> args) {
             terminal.puts(InfoCmp.Capability.bell);
             terminal.flush();
         }

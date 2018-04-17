@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface CommandRegistry {
 
-    void registerCommand(String name, Command command);
+    void registerCommand(String name, Class<? extends Command> command);
 
     void unregisterCommand(String name);
 

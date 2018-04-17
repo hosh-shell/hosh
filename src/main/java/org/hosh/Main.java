@@ -20,7 +20,8 @@ public class Main {
         LineReader lineReader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 .build();
-        CommandRegistry commandRegistry = new SimpleCommandRegistry();
+        CommandFactory commandFactory = new CommandFactory(terminal);
+        CommandRegistry commandRegistry = new SimpleCommandRegistry(commandFactory);
         new TerminalModule().beforeStart(commandRegistry); // TODO: discover all modules
         new FileSystemModule().beforeStart(commandRegistry);
         System.out.println("Hosh v." + Version.readVersion());
@@ -33,7 +34,7 @@ public class Main {
                     String commandName = stmt.ID().get(0).getSymbol().getText();
                     Optional<Command> search = commandRegistry.search(commandName);
                     if (search.isPresent()) {
-                        search.get().run(terminal, new ArrayList<>());
+                        search.get().run(new ArrayList<>());
                     } else {
                         System.err.println("command not found");
                     }

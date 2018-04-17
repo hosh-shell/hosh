@@ -6,10 +6,15 @@ import java.util.Optional;
 
 public class SimpleCommandRegistry implements CommandRegistry {
 
-    private final Map<String, Command> commandsByName = new HashMap<>();
+    private final Map<String, Class<? extends Command>> commandsByName = new HashMap<>();
+    private final CommandFactory commandFactory;
+
+    public SimpleCommandRegistry(CommandFactory commandFactory) {
+        this.commandFactory = commandFactory;
+    }
 
     @Override
-    public void registerCommand(String name, Command command) {
+    public void registerCommand(String name, Class<? extends Command> command) {
         commandsByName.put(name, command);
     }
 
@@ -20,6 +25,7 @@ public class SimpleCommandRegistry implements CommandRegistry {
 
     @Override
     public Optional<Command> search(String name) {
-        return Optional.ofNullable(commandsByName.get(name));
+        Class<? extends Command> commandClass = commandsByName.get(name);
+        return Optional.ofNullable(commandClass).map(commandFactory::create);
     }
 }
