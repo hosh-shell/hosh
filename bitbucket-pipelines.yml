@@ -7,3 +7,4 @@ pipelines:
           - maven
         script:
           - mvn --batch-mode verify
+          - ls -lh target/hosh.jar
