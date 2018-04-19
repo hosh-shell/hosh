@@ -4,10 +4,12 @@ import org.hosh.antlr4.HoshParser;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -19,7 +21,11 @@ public class Main {
         CommandFactory commandFactory = new CommandFactory(terminal);
         CommandRegistry commandRegistry = new SimpleCommandRegistry(commandFactory);
         LineReader lineReader = LineReaderBuilder.builder()
+                .appName("hosh")
                 .terminal(terminal)
+                .history(new DefaultHistory())
+                .variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
+                .variable(LineReader.HISTORY_FILE_SIZE, "1000")
                 .completer(new CommandCompleter(commandRegistry))
                 .build();
         ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
