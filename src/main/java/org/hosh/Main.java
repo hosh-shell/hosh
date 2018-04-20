@@ -32,7 +32,7 @@ public class Main {
         for (Module module : modules) {
             module.onStartup(commandRegistry);
         }
-        System.out.println("Hosh v." + Version.readVersion());
+        System.out.println("hosh v." + Version.readVersion());
         System.out.println("Running on Java " + System.getProperty("java.version"));
         while (true) {
             try {
