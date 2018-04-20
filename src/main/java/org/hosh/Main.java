@@ -1,5 +1,7 @@
 package org.hosh;
 
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.hosh.antlr4.HoshParser;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -11,8 +13,10 @@ import org.jline.terminal.TerminalBuilder;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -42,7 +46,8 @@ public class Main {
                     String commandName = stmt.ID().get(0).getSymbol().getText();
                     Optional<Command> search = commandRegistry.search(commandName);
                     if (search.isPresent()) {
-                        search.get().run(new ArrayList<>());
+                        List<String> commandArgs = stmt.ID().stream().skip(1).map(TerminalNode::getSymbol).map(Token::getText).collect(Collectors.toList());
+                        search.get().run(commandArgs);
                     } else {
                         System.err.println("command not found");
                     }

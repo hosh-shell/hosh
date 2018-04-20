@@ -13,8 +13,12 @@ import java.util.List;
 
 public class FileSystemModule implements Module {
 
+    // XXX: probably this will be needed by several subsystems (i.e. prompt, process handling)
+    private static Path currentWorkingDirectory = Paths.get(".");
+
     @Override
     public void onStartup(CommandRegistry commandRegistry) {
+        commandRegistry.registerCommand("cd", ChangeDirectory.class);
         commandRegistry.registerCommand("ls", ListFiles.class);
         commandRegistry.registerCommand("cwd", CurrentWorkDirectory.class);
     }
@@ -23,7 +27,7 @@ public class FileSystemModule implements Module {
 
         @Override
         public void run(List<String> args) {
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get("."))) {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(FileSystemModule.currentWorkingDirectory)) {
                 for (Path path : stream) {
                     System.out.println(path.getFileName() + " " + Files.size(path));
                 }
@@ -37,8 +41,20 @@ public class FileSystemModule implements Module {
 
         @Override
         public void run(List<String> args) {
-            System.out.println(Paths.get(".").toAbsolutePath().normalize().toString());
+            System.out.println(FileSystemModule.currentWorkingDirectory.toAbsolutePath().normalize().toString());
         }
     }
 
+    public static class ChangeDirectory implements Command {
+
+        @Override
+        public void run(List<String> args) {
+            if (args.size() < 1) {
+                System.err.println("missing path");
+                return;
+            }
+            FileSystemModule.currentWorkingDirectory = Paths.get(args.get(0));
+        }
+
+    }
 }
