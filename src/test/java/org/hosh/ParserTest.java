@@ -6,9 +6,9 @@ public class ParserTest {
 
     @Test
     public void usage() {
-        Parser.parse("git");
-        Parser.parse("git status");
-        Parser.parse("git commit --amend");
+        Parser.parse("git\n");
+        Parser.parse("git status\n");
+        Parser.parse("git commit --amend\n");
     }
 
     @Test

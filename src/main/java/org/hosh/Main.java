@@ -44,7 +44,7 @@ public class Main {
         while (true) {
             try {
                 String line = lineReader.readLine("hosh> ");
-                HoshParser.ProgramContext programContext = Parser.parse(line);
+                HoshParser.ProgramContext programContext = Parser.parse(line + '\n');
                 programContext.stmt().forEach(stmt -> {
                     String commandName = stmt.ID().get(0).getSymbol().getText();
                     Optional<Command> search = commandRegistry.search(commandName);
