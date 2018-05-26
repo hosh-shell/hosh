@@ -12,7 +12,6 @@ import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -21,6 +20,10 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        if (args.length == 1 && args[0].equals("--version")) {
+            System.out.println("hosh v." + Version.readVersion());
+            System.exit(0);
+        }
         Terminal terminal = TerminalBuilder.terminal();
         CommandFactory commandFactory = new CommandFactory(terminal);
         CommandRegistry commandRegistry = new SimpleCommandRegistry(commandFactory);
