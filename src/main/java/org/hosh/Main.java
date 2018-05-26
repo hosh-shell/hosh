@@ -9,6 +9,7 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import picocli.CommandLine;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -20,7 +21,12 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        if (args.length == 1 && args[0].equals("--version")) {
+        Options options = CommandLine.populateCommand(new Options(), args);
+        if (options.helpRequested) {
+            CommandLine.usage(options, System.out);
+            System.exit(0);
+        }
+        if (options.version) {
             System.out.println("hosh v." + Version.readVersion());
             System.exit(0);
         }
@@ -61,6 +67,16 @@ public class Main {
                 System.err.println(e.getMessage());
             }
         }
+    }
+
+    public static class Options {
+
+        @CommandLine.Option(names = { "-v", "--version" }, description = "print version information and exit")
+        boolean version;
+
+        @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
+        private boolean helpRequested = false;
+
     }
 
 
