@@ -132,14 +132,14 @@
                 <version>2.2.4</version>
                 <executions>
                     <execution>
-                        <id>get-the-git-infos</id>
+                        <id>get-the-git-info</id>
                         <goals>
                             <goal>revision</goal>
                         </goals>
                         <phase>generate-sources</phase>
                     </execution>
                     <execution>
-                        <id>validate-the-git-infos</id>
+                        <id>validate-the-git-info</id>
                         <goals>
                             <goal>validateRevision</goal>
                         </goals>

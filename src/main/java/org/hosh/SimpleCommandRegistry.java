@@ -18,7 +18,7 @@ public class SimpleCommandRegistry implements CommandRegistry {
     }
 
     @Override
-    public void registerCommand(String name, Class<? extends Command> command) {
+    public void registerCommand(@Nonnull String name, Class<? extends Command> command) {
         commandsByName.put(name, command);
     }
 

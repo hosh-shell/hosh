@@ -1,13 +1,14 @@
 package org.hosh;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Optional;
 
 public interface CommandRegistry {
 
-    void registerCommand(String name, Class<? extends Command> command);
+    void registerCommand(@Nonnull String name, @Nonnull Class<? extends Command> command);
 
-    Optional<Command> search(String name);
+    Optional<Command> search(@Nonnull String name);
 
     Collection<String> commandNames();
 }

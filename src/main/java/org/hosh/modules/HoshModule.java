@@ -4,6 +4,7 @@ import org.hosh.Command;
 import org.hosh.CommandRegistry;
 import org.hosh.Module;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -13,7 +14,7 @@ import java.util.TimeZone;
 public class HoshModule implements Module {
 
     @Override
-    public void onStartup(CommandRegistry commandRegistry) {
+    public void onStartup(@Nonnull CommandRegistry commandRegistry) {
         commandRegistry.registerCommand("version", Version.class);
         commandRegistry.registerCommand("env", Env.class);
         commandRegistry.registerCommand("info", Info.class);

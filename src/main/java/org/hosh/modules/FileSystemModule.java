@@ -4,6 +4,7 @@ import org.hosh.Command;
 import org.hosh.CommandRegistry;
 import org.hosh.Module;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ public class FileSystemModule implements Module {
     private static Path currentWorkingDirectory = Paths.get(".");
 
     @Override
-    public void onStartup(CommandRegistry commandRegistry) {
+    public void onStartup(@Nonnull CommandRegistry commandRegistry) {
         commandRegistry.registerCommand("cd", ChangeDirectory.class);
         commandRegistry.registerCommand("ls", ListFiles.class);
         commandRegistry.registerCommand("cwd", CurrentWorkDirectory.class);

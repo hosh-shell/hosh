@@ -7,12 +7,13 @@ import org.hosh.TerminalAware;
 import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 public class TerminalModule implements Module {
 
     @Override
-    public void onStartup(CommandRegistry commandRegistry) {
+    public void onStartup(@Nonnull CommandRegistry commandRegistry) {
         commandRegistry.registerCommand("clear", Clear.class);
         commandRegistry.registerCommand("bell", Bell.class);
     }
