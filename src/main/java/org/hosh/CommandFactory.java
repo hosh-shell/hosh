@@ -20,7 +20,7 @@ public class CommandFactory {
 
     private Command createCommand(Class<? extends Command> commandClass) {
         try {
-            return commandClass.newInstance();
+            return commandClass.getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException ex) {
             throw new RuntimeException(ex);
         }
