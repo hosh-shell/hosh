@@ -16,4 +16,13 @@ public class ParserTest {
         Parser.parse("");
     }
 
+    @Test
+    public void comments() {
+        Parser.parse("#\n");
+        Parser.parse("#\r\n");
+        Parser.parse("# comment\n");
+        Parser.parse("# comment\r\n");
+        Parser.parse("# comment\r\n  # comment\n");
+    }
+
 }
