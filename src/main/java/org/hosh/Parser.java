@@ -16,10 +16,4 @@ public class Parser {
 
     }
 
-    public static class ParseError extends RuntimeException {
-
-        public ParseError(String message) {
-            super(message);
-        }
-    }
 }
