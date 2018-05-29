@@ -12,6 +12,7 @@ import org.jline.terminal.TerminalBuilder;
 import picocli.CommandLine;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class Main {
             System.exit(0);
         }
         if (options.version) {
-            System.out.println("hosh v." + Version.readVersion());
+            showVersion(System.out);
             System.exit(0);
         }
         Terminal terminal = TerminalBuilder.terminal();
@@ -45,8 +46,7 @@ public class Main {
         for (Module module : modules) {
             module.onStartup(commandRegistry);
         }
-        System.out.println("hosh v." + Version.readVersion());
-        System.out.println("Running on Java " + System.getProperty("java.version"));
+        showVersion(System.out);
         while (true) {
             try {
                 String line = lineReader.readLine("hosh> ");
@@ -67,6 +67,11 @@ public class Main {
                 System.err.println(e.getMessage());
             }
         }
+    }
+
+    private static void showVersion(PrintStream printStream) throws IOException {
+        printStream.println("hosh v" + Version.readVersion());
+        printStream.println("Running on Java " + System.getProperty("java.version"));
     }
 
     public static class Options {
