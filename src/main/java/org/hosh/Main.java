@@ -22,14 +22,19 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Options options = CommandLine.populateCommand(new Options(), args);
-        if (options.helpRequested) {
-            CommandLine.usage(options, System.out);
-            System.exit(0);
-        }
-        if (options.version) {
-            showVersion(System.out);
-            System.exit(0);
+        try {
+            Options options = CommandLine.populateCommand(new Options(), args);
+            if (options.helpRequested) {
+                CommandLine.usage(options, System.out);
+                System.exit(0);
+            }
+            if (options.version) {
+                showVersion(System.out);
+                System.exit(0);
+            }
+        } catch (CommandLine.PicocliException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
         }
         Terminal terminal = TerminalBuilder.terminal();
         CommandFactory commandFactory = new CommandFactory(terminal);
@@ -76,10 +81,10 @@ public class Main {
 
     public static class Options {
 
-        @CommandLine.Option(names = { "-v", "--version" }, description = "print version information and exit")
+        @CommandLine.Option(names = {"-v", "--version"}, description = "print version information and exit")
         boolean version;
 
-        @CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
+        @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "display a help message")
         private boolean helpRequested = false;
 
     }
