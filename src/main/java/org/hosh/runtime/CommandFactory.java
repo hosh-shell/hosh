@@ -24,7 +24,7 @@ public class CommandFactory {
         try {
             return commandClass.getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalArgumentException("cannot instantiate command using default empty costructor", ex);
         }
     }
 }
