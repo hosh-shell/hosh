@@ -1,11 +1,10 @@
 package org.hosh.modules;
 
-import org.hosh.Command;
-import org.hosh.CommandRegistry;
-import org.hosh.Module;
+import org.hosh.spi.Command;
+import org.hosh.runtime.CommandRegistry;
+import org.hosh.spi.Module;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -15,22 +14,9 @@ public class HoshModule implements Module {
 
     @Override
     public void onStartup(@Nonnull CommandRegistry commandRegistry) {
-        commandRegistry.registerCommand("version", Version.class);
         commandRegistry.registerCommand("env", Env.class);
         commandRegistry.registerCommand("info", Info.class);
         commandRegistry.registerCommand("exit", Exit.class);
-    }
-
-    public static class Version implements Command {
-
-        @Override
-        public void run(List<String> args) {
-            try {
-                System.out.println(org.hosh.Version.readVersion());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     public static class Env implements Command {

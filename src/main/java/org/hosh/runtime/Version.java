@@ -1,4 +1,4 @@
-package org.hosh;
+package org.hosh.runtime;
 
 import java.io.IOException;
 import java.io.InputStream;

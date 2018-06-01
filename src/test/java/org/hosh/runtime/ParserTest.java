@@ -1,6 +1,6 @@
-package org.hosh;
+package org.hosh.runtime;
 
-import org.hosh.Parser.ParseError;
+import org.hosh.runtime.Parser.ParseError;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

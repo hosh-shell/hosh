@@ -1,10 +1,10 @@
-package org.hosh;
+package org.hosh.spi;
 
+import org.hosh.spi.AlphaNumericStringComparator;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class AlphaNumericStringComparatorTest {

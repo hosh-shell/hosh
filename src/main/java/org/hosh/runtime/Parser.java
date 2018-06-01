@@ -1,4 +1,4 @@
-package org.hosh;
+package org.hosh.runtime;
 
 import org.antlr.v4.runtime.*;
 import org.hosh.antlr4.HoshLexer;

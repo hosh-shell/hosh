@@ -1,4 +1,4 @@
-package org.hosh;
+package org.hosh.spi;
 
 import java.util.Comparator;
 import java.util.regex.Matcher;

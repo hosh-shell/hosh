@@ -1,5 +1,7 @@
-package org.hosh;
+package org.hosh.runtime;
 
+import org.hosh.spi.Command;
+import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 
 public class CommandFactory {

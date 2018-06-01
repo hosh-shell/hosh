@@ -1,4 +1,4 @@
-package org.hosh;
+package org.hosh.runtime;
 
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;

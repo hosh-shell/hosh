@@ -1,9 +1,9 @@
 package org.hosh.modules;
 
-import org.hosh.Command;
-import org.hosh.CommandRegistry;
-import org.hosh.Module;
-import org.hosh.TerminalAware;
+import org.hosh.spi.Command;
+import org.hosh.runtime.CommandRegistry;
+import org.hosh.spi.Module;
+import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
 
