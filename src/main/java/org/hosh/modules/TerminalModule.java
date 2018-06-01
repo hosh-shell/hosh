@@ -1,7 +1,7 @@
 package org.hosh.modules;
 
 import org.hosh.spi.Command;
-import org.hosh.runtime.CommandRegistry;
+import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.Module;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;

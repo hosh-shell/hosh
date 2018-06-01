@@ -1,6 +1,7 @@
 package org.hosh.runtime;
 
 import org.hosh.spi.Command;
+import org.hosh.spi.CommandRegistry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;

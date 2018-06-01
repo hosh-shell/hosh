@@ -1,5 +1,6 @@
 package org.hosh.runtime;
 
+import org.hosh.spi.CommandRegistry;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;

@@ -1,6 +1,4 @@
-package org.hosh.runtime;
-
-import org.hosh.spi.Command;
+package org.hosh.spi;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
