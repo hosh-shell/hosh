@@ -1,7 +1,5 @@
 package org.hosh.runtime;
 
-import org.hosh.runtime.CommandFactory;
-import org.hosh.runtime.CommandRegistry;
 import org.hosh.spi.Command;
 
 import javax.annotation.Nonnull;
