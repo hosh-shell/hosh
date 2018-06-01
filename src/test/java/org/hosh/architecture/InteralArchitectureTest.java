@@ -7,6 +7,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.*;
 
 /**
  * Enforcing general dependencies of the project:
@@ -20,6 +21,8 @@ public class InteralArchitectureTest {
 	public void properModulesDependencies() {
 		JavaClasses importedClasses = new ClassFileImporter().importPackages("org.hosh");
 
+		slices().matching("org.hosh").should().beFreeOfCycles();
+		
 		classes()
 			.that().resideInAPackage("..modules..")
 			.should().accessClassesThat().resideInAnyPackage("..spi..", "java..")
@@ -35,5 +38,7 @@ public class InteralArchitectureTest {
 			.should().accessClassesThat().resideInAPackage("..runtime..")
 			.check(importedClasses);
 	}
+
+
 
 }
