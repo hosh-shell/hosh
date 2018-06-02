@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// TODO: add tests for interactive usage + non-iteractive usage
 public class HoshIT {
 
     @Test

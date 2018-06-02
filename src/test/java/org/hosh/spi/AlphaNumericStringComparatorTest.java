@@ -1,13 +1,12 @@
 package org.hosh.spi;
 
 import org.hosh.spi.AlphaNumericStringComparator;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-// TODO: use assertj
 public class AlphaNumericStringComparatorTest {
 
     @Test
@@ -16,8 +15,7 @@ public class AlphaNumericStringComparatorTest {
 
         input.sort(new AlphaNumericStringComparator());
 
-        List<String> expected = Arrays.asList("1", "2", "10", "20");
-        Assert.assertEquals(expected, input);
+        assertThat(input).containsExactly("1", "2", "10", "20");
     }
 
       @Test
@@ -26,8 +24,7 @@ public class AlphaNumericStringComparatorTest {
 
         input.sort(new AlphaNumericStringComparator());
 
-        List<String> expected = Arrays.asList("1.0", "1.1", "1.2", "1.3");
-        Assert.assertEquals(expected, input);
+        assertThat(input).containsExactly("1.0", "1.1", "1.2", "1.3");
     }
 
     @Test
@@ -36,8 +33,7 @@ public class AlphaNumericStringComparatorTest {
 
         input.sort(new AlphaNumericStringComparator());
 
-        List<String> expected = Arrays.asList("foo1", "foo2", "foo10", "foo20");
-        Assert.assertEquals(expected, input);
+        assertThat(input).containsExactly("foo1", "foo2", "foo10", "foo20");
     }
 
     @Test
@@ -46,8 +42,7 @@ public class AlphaNumericStringComparatorTest {
 
         input.sort(new AlphaNumericStringComparator());
 
-        List<String> expected = Arrays.asList("", "", "", "");
-        Assert.assertEquals(expected, input);
+        assertThat(input).containsExactly("", "", "", "");
     }
 
     @Test
@@ -56,8 +51,7 @@ public class AlphaNumericStringComparatorTest {
 
         input.sort(new AlphaNumericStringComparator());
 
-        List<String> expected = Arrays.asList("a", "a", "a", "a");
-        Assert.assertEquals(expected, input);
+        assertThat(input).containsExactly("a", "a", "a", "a");
     }
 
     @Test
@@ -66,8 +60,7 @@ public class AlphaNumericStringComparatorTest {
 
         input.sort(new AlphaNumericStringComparator());
 
-        List<String> expected = Arrays.asList("a1", "a1a", "a1aa", "a1aaa");
-        Assert.assertEquals(expected, input);
+        assertThat(input).containsExactly("a1", "a1a", "a1aa", "a1aaa");
     }
     
     @Test
@@ -76,8 +69,7 @@ public class AlphaNumericStringComparatorTest {
 
         input.sort(new AlphaNumericStringComparator());
 
-        List<String> expected = Arrays.asList("20180601", "20180602", "20180603", "20180604");
-        Assert.assertEquals(expected, input);
+        assertThat(input).containsExactly("20180601", "20180602", "20180603", "20180604");
     }
 
 }
