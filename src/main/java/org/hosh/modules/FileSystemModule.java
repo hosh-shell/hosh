@@ -3,6 +3,8 @@ package org.hosh.modules;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.Module;
+import org.hosh.spi.State;
+import org.hosh.spi.StateAware;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -14,10 +16,6 @@ import java.util.List;
 
 public class FileSystemModule implements Module {
 
-	// XXX: probably this will be needed by several subsystems (i.e. prompt, process
-	// handling)
-	private static Path currentWorkingDirectory = Paths.get(".");
-
 	@Override
 	public void onStartup(@Nonnull CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("cd", ChangeDirectory.class);
@@ -25,11 +23,17 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("cwd", CurrentWorkDirectory.class);
 	}
 
-	public static class ListFiles implements Command {
-
+	public static class ListFiles implements Command, StateAware {
+		
+		private State state;
+		
+		public void setState(State state) {
+			this.state = state;
+		}
+		
 		@Override
 		public void run(List<String> args) {
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(FileSystemModule.currentWorkingDirectory)) {
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(state.getCwd())) {
 				for (Path path : stream) {
 					System.out.println(path.getFileName() + " " + Files.size(path));
 				}
@@ -39,23 +43,35 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	public static class CurrentWorkDirectory implements Command {
+	public static class CurrentWorkDirectory implements Command, StateAware {
 
+		private State state;
+		
+		public void setState(State state) {
+			this.state = state;
+		}
+		
 		@Override
 		public void run(List<String> args) {
-			System.out.println(FileSystemModule.currentWorkingDirectory.toAbsolutePath().normalize().toString());
+			System.out.println(state.toString());
 		}
 	}
 
-	public static class ChangeDirectory implements Command {
+	public static class ChangeDirectory implements Command, StateAware {
 
+		private State state;
+		
+		public void setState(State state) {
+			this.state = state;
+		}
+		
 		@Override
 		public void run(List<String> args) {
 			if (args.size() < 1) {
 				System.err.println("missing path");
 				return;
 			}
-			FileSystemModule.currentWorkingDirectory = Paths.get(args.get(0));
+			state.setCwd(Paths.get(state.getCwd().toString(), args.get(0)));
 		}
 
 	}

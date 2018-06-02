@@ -7,6 +7,7 @@ import org.hosh.runtime.*;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.Module;
+import org.hosh.spi.State;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
@@ -39,8 +40,9 @@ public class Main {
 			System.err.println(e.getMessage());
 			System.exit(1);
 		}
+		State state = new State();
 		Terminal terminal = TerminalBuilder.terminal();
-		CommandFactory commandFactory = new CommandFactory(terminal);
+		CommandFactory commandFactory = new CommandFactory(terminal, state);
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(commandFactory);
 		LineReader lineReader = LineReaderBuilder.builder().appName("hosh").terminal(terminal)
 				.history(new DefaultHistory())
