@@ -68,5 +68,15 @@ public class AlphaNumericStringComparatorTest {
         List<String> expected = Arrays.asList("a1", "a1a", "a1aa", "a1aaa");
         Assert.assertEquals(expected, input);
     }
+    
+    @Test
+    public void sortDates() {
+        List<String> input = Arrays.asList("20180604", "20180603", "20180602", "20180601");
+
+        input.sort(new AlphaNumericStringComparator());
+
+        List<String> expected = Arrays.asList("20180601", "20180602", "20180603", "20180604");
+        Assert.assertEquals(expected, input);
+    }
 
 }
