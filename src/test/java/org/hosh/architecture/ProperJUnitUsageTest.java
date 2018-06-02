@@ -3,7 +3,6 @@ package org.hosh.architecture;
 import org.junit.Ignore;
 import org.junit.Test;
 
-
 public class ProperJUnitUsageTest {
 
 	@Ignore

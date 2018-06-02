@@ -12,40 +12,41 @@ import java.util.List;
 
 public class TerminalModule implements Module {
 
-    @Override
-    public void onStartup(@Nonnull CommandRegistry commandRegistry) {
-        commandRegistry.registerCommand("clear", Clear.class);
-        commandRegistry.registerCommand("bell", Bell.class);
-    }
+	@Override
+	public void onStartup(@Nonnull CommandRegistry commandRegistry) {
+		commandRegistry.registerCommand("clear", Clear.class);
+		commandRegistry.registerCommand("bell", Bell.class);
+	}
 
-    public static class Clear implements Command, TerminalAware {
+	public static class Clear implements Command, TerminalAware {
 
-        private Terminal terminal;
+		private Terminal terminal;
 
-        @Override
-        public void setTerminal(Terminal terminal) {
-            this.terminal = terminal;
-        }
+		@Override
+		public void setTerminal(Terminal terminal) {
+			this.terminal = terminal;
+		}
 
-        @Override
-        public void run(List<String> args) {
-            terminal.puts(InfoCmp.Capability.clear_screen);
-            terminal.flush();
-        }
-    }
+		@Override
+		public void run(List<String> args) {
+			terminal.puts(InfoCmp.Capability.clear_screen);
+			terminal.flush();
+		}
+	}
 
-    public static class Bell implements Command, TerminalAware {
+	public static class Bell implements Command, TerminalAware {
 
-        private Terminal terminal;
+		private Terminal terminal;
 
-        @Override
-        public void setTerminal(Terminal terminal) {
-            this.terminal = terminal;
-        }
-        @Override
-        public void run(List<String> args) {
-            terminal.puts(InfoCmp.Capability.bell);
-            terminal.flush();
-        }
-    }
+		@Override
+		public void setTerminal(Terminal terminal) {
+			this.terminal = terminal;
+		}
+
+		@Override
+		public void run(List<String> args) {
+			terminal.puts(InfoCmp.Capability.bell);
+			terminal.flush();
+		}
+	}
 }

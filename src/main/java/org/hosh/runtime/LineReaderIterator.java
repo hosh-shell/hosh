@@ -11,7 +11,7 @@ public class LineReaderIterator implements Iterator<String> {
 	private final String prompt = "hosh> ";
 	private final LineReader lineReader;
 	private String nextLine;
-	
+
 	public LineReaderIterator(LineReader lineReader) {
 		this.lineReader = lineReader;
 	}
@@ -19,7 +19,7 @@ public class LineReaderIterator implements Iterator<String> {
 	@Override
 	public boolean hasNext() {
 		if (nextLine == null) {
-			try {			
+			try {
 				nextLine = lineReader.readLine(prompt);
 			} catch (EndOfFileException e) {
 				return false;
@@ -34,5 +34,5 @@ public class LineReaderIterator implements Iterator<String> {
 		nextLine = null;
 		return line;
 	}
-	
+
 }

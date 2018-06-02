@@ -12,42 +12,42 @@ import java.util.TimeZone;
 
 public class HoshModule implements Module {
 
-    @Override
-    public void onStartup(@Nonnull CommandRegistry commandRegistry) {
-        commandRegistry.registerCommand("env", Env.class);
-        commandRegistry.registerCommand("info", Info.class);
-        commandRegistry.registerCommand("exit", Exit.class);
-    }
+	@Override
+	public void onStartup(@Nonnull CommandRegistry commandRegistry) {
+		commandRegistry.registerCommand("env", Env.class);
+		commandRegistry.registerCommand("info", Info.class);
+		commandRegistry.registerCommand("exit", Exit.class);
+	}
 
-    public static class Env implements Command {
+	public static class Env implements Command {
 
-        @Override
-        public void run(List<String> args) {
-            Map<String, String> env = System.getenv();
-            for (Map.Entry<String, String> entry : env.entrySet()) {
-                System.out.printf("%s = %s%n", entry.getKey(), entry.getValue());
-            }
-        }
+		@Override
+		public void run(List<String> args) {
+			Map<String, String> env = System.getenv();
+			for (Map.Entry<String, String> entry : env.entrySet()) {
+				System.out.printf("%s = %s%n", entry.getKey(), entry.getValue());
+			}
+		}
 
-    }
+	}
 
-    public static class Info implements Command {
+	public static class Info implements Command {
 
-        @Override
-        public void run(List<String> args) {
-            System.out.printf("locale = %s%n", Locale.getDefault());
-            System.out.printf("timezone = %s%n", TimeZone.getDefault().getID());
-        }
+		@Override
+		public void run(List<String> args) {
+			System.out.printf("locale = %s%n", Locale.getDefault());
+			System.out.printf("timezone = %s%n", TimeZone.getDefault().getID());
+		}
 
-    }
+	}
 
-    public static class Exit implements Command {
+	public static class Exit implements Command {
 
-        @Override
-        public void run(List<String> args) {
-            System.exit(0);
-        }
+		@Override
+		public void run(List<String> args) {
+			System.exit(0);
+		}
 
-    }
+	}
 
 }
