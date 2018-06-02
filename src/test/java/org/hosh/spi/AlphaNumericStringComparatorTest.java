@@ -9,67 +9,67 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AlphaNumericStringComparatorTest {
 
-    @Test
-    public void sortIntegers() {
-        List<String> input = Arrays.asList("2", "20", "10", "1");
+	@Test
+	public void sortIntegers() {
+		List<String> input = Arrays.asList("2", "20", "10", "1");
 
-        input.sort(new AlphaNumericStringComparator());
+		input.sort(new AlphaNumericStringComparator());
 
-        assertThat(input).containsExactly("1", "2", "10", "20");
-    }
+		assertThat(input).containsExactly("1", "2", "10", "20");
+	}
 
-      @Test
-    public void sortDoubles() {
-        List<String> input = Arrays.asList("1.0", "1.3", "1.2", "1.1");
+	@Test
+	public void sortDoubles() {
+		List<String> input = Arrays.asList("1.0", "1.3", "1.2", "1.1");
 
-        input.sort(new AlphaNumericStringComparator());
+		input.sort(new AlphaNumericStringComparator());
 
-        assertThat(input).containsExactly("1.0", "1.1", "1.2", "1.3");
-    }
+		assertThat(input).containsExactly("1.0", "1.1", "1.2", "1.3");
+	}
 
-    @Test
-    public void sortWithNumberSuffix() {
-        List<String> input = Arrays.asList("foo2", "foo20", "foo10", "foo1");
+	@Test
+	public void sortWithNumberSuffix() {
+		List<String> input = Arrays.asList("foo2", "foo20", "foo10", "foo1");
 
-        input.sort(new AlphaNumericStringComparator());
+		input.sort(new AlphaNumericStringComparator());
 
-        assertThat(input).containsExactly("foo1", "foo2", "foo10", "foo20");
-    }
+		assertThat(input).containsExactly("foo1", "foo2", "foo10", "foo20");
+	}
 
-    @Test
-    public void sortEmpty() {
-        List<String> input = Arrays.asList("", "", "", "");
+	@Test
+	public void sortEmpty() {
+		List<String> input = Arrays.asList("", "", "", "");
 
-        input.sort(new AlphaNumericStringComparator());
+		input.sort(new AlphaNumericStringComparator());
 
-        assertThat(input).containsExactly("", "", "", "");
-    }
+		assertThat(input).containsExactly("", "", "", "");
+	}
 
-    @Test
-    public void sortEquals() {
-        List<String> input = Arrays.asList("a", "a", "a", "a");
+	@Test
+	public void sortEquals() {
+		List<String> input = Arrays.asList("a", "a", "a", "a");
 
-        input.sort(new AlphaNumericStringComparator());
+		input.sort(new AlphaNumericStringComparator());
 
-        assertThat(input).containsExactly("a", "a", "a", "a");
-    }
+		assertThat(input).containsExactly("a", "a", "a", "a");
+	}
 
-    @Test
-    public void sortDifferentLengths() {
-        List<String> input = Arrays.asList("a1a", "a1", "a1aaa", "a1aa");
+	@Test
+	public void sortDifferentLengths() {
+		List<String> input = Arrays.asList("a1a", "a1", "a1aaa", "a1aa");
 
-        input.sort(new AlphaNumericStringComparator());
+		input.sort(new AlphaNumericStringComparator());
 
-        assertThat(input).containsExactly("a1", "a1a", "a1aa", "a1aaa");
-    }
-    
-    @Test
-    public void sortDates() {
-        List<String> input = Arrays.asList("20180604", "20180603", "20180602", "20180601");
+		assertThat(input).containsExactly("a1", "a1a", "a1aa", "a1aaa");
+	}
 
-        input.sort(new AlphaNumericStringComparator());
+	@Test
+	public void sortDates() {
+		List<String> input = Arrays.asList("20180604", "20180603", "20180602", "20180601");
 
-        assertThat(input).containsExactly("20180601", "20180602", "20180603", "20180604");
-    }
+		input.sort(new AlphaNumericStringComparator());
+
+		assertThat(input).containsExactly("20180601", "20180602", "20180603", "20180604");
+	}
 
 }

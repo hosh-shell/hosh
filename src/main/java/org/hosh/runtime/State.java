@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hosh.spi.Command;
+import org.hosh.spi.Module;
 
 /**
  * Internal state of the shell.
@@ -18,6 +19,7 @@ import org.hosh.spi.Command;
  * - completer can use it to help the user to autocomplete commands
  * - to distribute read-only configuration to every component
  */
+@SuppressWarnings("unused")
 public class State {
 
 	// version of hosh, cannot be change
