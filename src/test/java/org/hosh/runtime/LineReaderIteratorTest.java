@@ -8,7 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.BDDMockito.*;
-import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.*;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class LineReaderIteratorTest {
@@ -51,6 +54,6 @@ public class LineReaderIteratorTest {
 		given(lineReader.readLine("hosh> ")).willThrow(new EndOfFileException("simulated EOF"));
 
 		assertThat(sut.hasNext()).isFalse();
-		assertThat(sut.next()).isEqualTo(null); // TODO: it could be more strict
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> sut.next());
 	}
 }

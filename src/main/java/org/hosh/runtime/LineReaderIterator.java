@@ -1,6 +1,7 @@
 package org.hosh.runtime;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -22,6 +23,7 @@ public class LineReaderIterator implements Iterator<String> {
 			try {
 				nextLine = lineReader.readLine(prompt);
 			} catch (EndOfFileException e) {
+				nextLine = null;
 				return false;
 			}
 		}
@@ -30,9 +32,13 @@ public class LineReaderIterator implements Iterator<String> {
 
 	@Override
 	public String next() {
-		String line = nextLine;
-		nextLine = null;
-		return line;
+		if (nextLine == null) {
+			throw new NoSuchElementException();
+		} else {
+			String line = nextLine;
+			nextLine = null;
+			return line;
+		}
 	}
 
 }
