@@ -24,13 +24,13 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class ListFiles implements Command, StateAware {
-		
+
 		private State state;
-		
+
 		public void setState(State state) {
 			this.state = state;
 		}
-		
+
 		@Override
 		public void run(List<String> args) {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(state.getCwd())) {
@@ -46,32 +46,38 @@ public class FileSystemModule implements Module {
 	public static class CurrentWorkDirectory implements Command, StateAware {
 
 		private State state;
-		
+
 		public void setState(State state) {
 			this.state = state;
 		}
-		
+
 		@Override
 		public void run(List<String> args) {
-			System.out.println(state.toString());
+			System.out.println(state.getCwd().toString());
 		}
 	}
 
 	public static class ChangeDirectory implements Command, StateAware {
 
 		private State state;
-		
+
 		public void setState(State state) {
 			this.state = state;
 		}
-		
+
 		@Override
 		public void run(List<String> args) {
 			if (args.size() < 1) {
 				System.err.println("missing path");
 				return;
 			}
-			state.setCwd(Paths.get(state.getCwd().toString(), args.get(0)));
+			Path newCwd = Paths.get(state.getCwd().toString(), args.get(0));
+			if (Files.isDirectory(newCwd)) {
+				state.setCwd(newCwd);
+			} else {
+				System.err.println("not a directory");
+				return;
+			}
 		}
 
 	}

@@ -5,7 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-// TODO: asserts
+// TODO: missing asserts
 public class ParserTest {
 
 	@Test
@@ -13,6 +13,7 @@ public class ParserTest {
 		Parser.parse("git\n");
 		Parser.parse("git status\n");
 		Parser.parse("git commit --amend\n");
+		Parser.parse("cd ..\n");
 	}
 
 	@Test

@@ -17,7 +17,7 @@ public class State {
 
 	// current working directory
 	private Path cwd;
-	
+
 	public State() {
 		setCwd(Paths.get("."));
 	}
@@ -34,4 +34,7 @@ public class State {
 		return commands;
 	}
 
+	public Map<String, Module> getModules() {
+		return modules;
+	}
 }
