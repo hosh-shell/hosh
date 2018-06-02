@@ -56,9 +56,10 @@ public class Main {
             module.onStartup(commandRegistry);
         }
         showVersion(System.out);
-        while (true) {
+        LineReaderIterator lineIterator = new LineReaderIterator(lineReader);
+        while (lineIterator.hasNext()) {
             try {
-                String line = lineReader.readLine("hosh> ");
+                String line = lineIterator.next();
                 HoshParser.ProgramContext programContext = Parser.parse(line + '\n');
                 programContext.stmt().forEach(stmt -> {
                     String commandName = stmt.ID().get(0).getSymbol().getText();
@@ -70,8 +71,6 @@ public class Main {
                         System.err.println("command not found");
                     }
                 });
-            } catch (EndOfFileException e) {
-                break;
             } catch (Parser.ParseError e) {
                 System.err.println(e.getMessage());
             }

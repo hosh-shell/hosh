@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
+// TODO: use assertj
 public class AlphaNumericStringComparatorTest {
 
     @Test
