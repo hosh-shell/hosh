@@ -54,27 +54,35 @@ public class Main {
         for (Module module : modules) {
             module.onStartup(commandRegistry);
         }
-        showVersion(System.out);
+        repl(commandRegistry, lineReader);
+    }
+
+	private static void repl(CommandRegistry commandRegistry, LineReader lineReader) throws IOException {
+		showVersion(System.out);
         LineReaderIterator lineIterator = new LineReaderIterator(lineReader);
         while (lineIterator.hasNext()) {
-            try {
-                String line = lineIterator.next();
-                HoshParser.ProgramContext programContext = Parser.parse(line + '\n');
-                programContext.stmt().forEach(stmt -> {
-                    String commandName = stmt.ID().get(0).getSymbol().getText();
-                    Optional<Command> search = commandRegistry.search(commandName);
-                    if (search.isPresent()) {
-                        List<String> commandArgs = stmt.ID().stream().skip(1).map(TerminalNode::getSymbol).map(Token::getText).collect(Collectors.toList());
-                        search.get().run(commandArgs);
-                    } else {
-                        System.err.println("command not found");
-                    }
-                });
-            } catch (Parser.ParseError e) {
-                System.err.println(e.getMessage());
-            }
+        	String line = lineIterator.next();
+            executeLine(commandRegistry, line);
         }
-    }
+	}
+
+	private static void executeLine(CommandRegistry commandRegistry, String line) {
+		try {
+		    HoshParser.ProgramContext programContext = Parser.parse(line + '\n');
+		    programContext.stmt().forEach(stmt -> {
+		        String commandName = stmt.ID().get(0).getSymbol().getText();
+		        Optional<Command> search = commandRegistry.search(commandName);
+		        if (search.isPresent()) {
+		            List<String> commandArgs = stmt.ID().stream().skip(1).map(TerminalNode::getSymbol).map(Token::getText).collect(Collectors.toList());
+		            search.get().run(commandArgs);
+		        } else {
+		            System.err.println("command not found");
+		        }
+		    });
+		} catch (Parser.ParseError e) {
+		    System.err.println(e.getMessage());
+		}
+	}
 
     private static void showVersion(PrintStream printStream) throws IOException {
         printStream.println("hosh v" + Version.readVersion());
@@ -90,6 +98,5 @@ public class Main {
         private boolean helpRequested = false;
 
     }
-
 
 }
