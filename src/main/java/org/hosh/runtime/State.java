@@ -1,34 +1,68 @@
 package org.hosh.runtime;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import org.hosh.spi.Command;
-import org.hosh.spi.Module;
+import javax.annotation.Nonnull;
 
 /**
- * Internal state of the shell.
+ * Internal state of the shell:
+ * <ul>
+ *   <li>can be read freely</li>
+ *   <li>can be modified only via controlled side-effecting actions</li>
+ * </ul>
  * 
- * - can be read freely - can be modified only via controlled side-effecting
- * actions
- *
- * The state can be passed freely to components: - modules (e.g. help module)
- * can use to produce some documentation or to change current working directory
- * - completer can use it to help the user to autocomplete commands - to
- * distribute read-only configuration to every component
+ * The state can be passed freely to components:
+ * <ul> 
+ *   <li>modules (e.g. help module)</li>
+ *   <li>can use to produce some documentation or to change current working directory</li>
+ * 	 <li>completer can use it to help the user to auto-complete commands</li>
+ * 	 <li>distribute read-only configuration to every component</li>
+ * </ul>
  */
-@SuppressWarnings("unused")
 public class State {
 
-	// version of hosh, cannot be change
-	private final String version = "1.0";
+	// version of hosh, cannot be changed
+	public static final String VERSION = "hosh.version";
+	// current working directory, can be varied independently from Java property
+	// user.dir
+	public static final String CWD = "hosh.cwd";
+	// commands registered
+	public static final String COMMANDS = "hosh.commands";
 
-	// current working directory
-	private final Path cwd = Paths.get(".");
+	private final ConcurrentMap<String, Object> state = new ConcurrentHashMap<>();
 
-	private final Map<String, Command> commands = new HashMap<>();
-	private final Map<String, Module> modules = new HashMap<>();
+	@Override
+	public String toString() {
+		return String.format("State[data=%s]", state);
+	}
+
+	@FunctionalInterface
+	public interface Reader<T> {
+
+		T get();
+
+	}
+
+	@FunctionalInterface
+	public interface Writer<T> {
+
+		void set(T newValue);
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Reader<T> registerReader(@Nonnull String key, @Nonnull T value) {
+		Objects.requireNonNull(key);
+		Objects.requireNonNull(value);
+		state.put(key, value); // TODO: check for duplicates?
+		return () -> (T) state.get(key);
+	}
+	
+	public <T> Writer<T> registerWriter(@Nonnull String key) {
+		Objects.requireNonNull(key);
+		return (newValue) -> state.put(key, newValue);
+	}
 
 }
