@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.BDDMockito.*;
-
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
@@ -24,7 +23,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void oneLine() throws Exception {
-		given(lineReader.readLine("hosh> ")).willReturn("1");
+		given(lineReader.readLine(anyString())).willReturn("1");
 
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("1");
@@ -32,7 +31,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void twoLines() throws Exception {
-		given(lineReader.readLine("hosh> ")).willReturn("1", "2");
+		given(lineReader.readLine(anyString())).willReturn("1", "2");
 
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("1");
@@ -42,7 +41,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void hasNextIsIdempotent() throws Exception {
-		given(lineReader.readLine("hosh> ")).willReturn("1");
+		given(lineReader.readLine(anyString())).willReturn("1");
 
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.hasNext()).isTrue(); // second call
@@ -51,7 +50,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void stopsAtEOF() throws Exception {
-		given(lineReader.readLine("hosh> ")).willThrow(new EndOfFileException("simulated EOF"));
+		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
 
 		assertThat(sut.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> sut.next());

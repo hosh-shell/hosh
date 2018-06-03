@@ -3,6 +3,7 @@ package org.hosh.spi;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -12,6 +13,8 @@ import java.util.Map;
  * E.g. listing files of a directory produces a stream of records with name, size, permissions.
  * The user can select a subset of these keys (e.g. name) and then it can be presented to the screen.
  * 
+ * TODO: emit a special record at the start to provide column names 
+ * TODO: type safety by using actual Java classes
  */
 @NotThreadSafe
 public class  Record {
@@ -19,7 +22,7 @@ public class  Record {
     private final Map<String, Object> data;
 
     private Record(Map<String, Object> data) {
-        this.data = new HashMap<>(data);
+        this.data = new LinkedHashMap<>(data);
     }
 
     public static Record copy(@Nonnull Record record) {
@@ -27,7 +30,7 @@ public class  Record {
     }
 
     public static Record empty() {
-        return new Record(new HashMap<>());
+        return new Record(new HashMap<>(0));
     }
 
     public Record add(@Nonnull String key, @Nonnull Object value) {

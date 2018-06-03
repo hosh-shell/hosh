@@ -1,5 +1,6 @@
 package org.hosh.modules;
 
+import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.Module;
@@ -28,7 +29,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public void run(List<String> args) {
+		public void run(List<String> args, Channel out, Channel err) {
 			terminal.puts(InfoCmp.Capability.clear_screen);
 			terminal.flush();
 		}
@@ -44,7 +45,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public void run(List<String> args) {
+		public void run(List<String> args, Channel out, Channel err) {
 			terminal.puts(InfoCmp.Capability.bell);
 			terminal.flush();
 		}

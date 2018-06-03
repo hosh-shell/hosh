@@ -1,8 +1,10 @@
 package org.hosh.modules;
 
+import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.Module;
+import org.hosh.spi.Record;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -22,10 +24,10 @@ public class HoshModule implements Module {
 	public static class Env implements Command {
 
 		@Override
-		public void run(List<String> args) {
+		public void run(List<String> args, Channel out, Channel err) {
 			Map<String, String> env = System.getenv();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
-				System.out.printf("%s = %s%n", entry.getKey(), entry.getValue());
+				out.send(Record.empty().add(entry.getKey(), entry.getValue()));
 			}
 		}
 
@@ -34,9 +36,9 @@ public class HoshModule implements Module {
 	public static class Info implements Command {
 
 		@Override
-		public void run(List<String> args) {
-			System.out.printf("locale = %s%n", Locale.getDefault());
-			System.out.printf("timezone = %s%n", TimeZone.getDefault().getID());
+		public void run(List<String> args, Channel out, Channel err) {
+			out.send(Record.empty().add("timezone", TimeZone.getDefault().getID()));
+			out.send(Record.empty().add("locale", Locale.getDefault()));
 		}
 
 	}
@@ -44,7 +46,7 @@ public class HoshModule implements Module {
 	public static class Exit implements Command {
 
 		@Override
-		public void run(List<String> args) {
+		public void run(List<String> args, Channel out, Channel err) {
 			System.exit(0);
 		}
 

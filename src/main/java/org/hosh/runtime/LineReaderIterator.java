@@ -5,11 +5,17 @@ import java.util.NoSuchElementException;
 
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
+import org.jline.utils.AttributedStringBuilder;
+import org.jline.utils.AttributedStyle;
 
 public class LineReaderIterator implements Iterator<String> {
 
 	// TODO: must read the current prompt from the global state
-	private final String prompt = "hosh> ";
+	private final String prompt = new AttributedStringBuilder()
+            .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
+            .append("hosh> ")
+            .style(AttributedStyle.DEFAULT)
+            .toAnsi();
 	private final LineReader lineReader;
 	private String nextLine;
 
