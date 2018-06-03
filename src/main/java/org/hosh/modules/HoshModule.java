@@ -21,6 +21,7 @@ public class HoshModule implements Module {
 		commandRegistry.registerCommand("exit", Exit.class);
 	}
 
+	// TODO: output here should be really key=value, actually only value is printed
 	public static class Env implements Command {
 
 		@Override

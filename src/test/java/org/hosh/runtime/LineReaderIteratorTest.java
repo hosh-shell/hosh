@@ -1,5 +1,6 @@
 package org.hosh.runtime;
 
+import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.junit.Test;
@@ -18,19 +19,23 @@ public class LineReaderIteratorTest {
 	@Mock
 	private LineReader lineReader;
 
+	@Mock
+	private State state;
+
 	@InjectMocks
 	private LineReaderIterator sut;
 
 	@Test
 	public void oneLine() throws Exception {
+		given(state.getPrompt()).willReturn("hosh> ");
 		given(lineReader.readLine(anyString())).willReturn("1");
-
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("1");
 	}
 
 	@Test
 	public void twoLines() throws Exception {
+		given(state.getPrompt()).willReturn("hosh> ");
 		given(lineReader.readLine(anyString())).willReturn("1", "2");
 
 		assertThat(sut.hasNext()).isTrue();
@@ -41,6 +46,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void hasNextIsIdempotent() throws Exception {
+		given(state.getPrompt()).willReturn("hosh> ");
 		given(lineReader.readLine(anyString())).willReturn("1");
 
 		assertThat(sut.hasNext()).isTrue();
@@ -50,6 +56,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void stopsAtEOF() throws Exception {
+		given(state.getPrompt()).willReturn("hosh> ");
 		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
 
 		assertThat(sut.hasNext()).isFalse();

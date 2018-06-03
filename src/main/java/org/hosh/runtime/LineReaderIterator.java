@@ -3,23 +3,18 @@ package org.hosh.runtime;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
-import org.jline.utils.AttributedStringBuilder;
-import org.jline.utils.AttributedStyle;
 
 public class LineReaderIterator implements Iterator<String> {
 
-	// TODO: must read the current prompt from the global state
-	private final String prompt = new AttributedStringBuilder()
-            .style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
-            .append("hosh> ")
-            .style(AttributedStyle.DEFAULT)
-            .toAnsi();
+	private final State state;
 	private final LineReader lineReader;
 	private String nextLine;
 
-	public LineReaderIterator(LineReader lineReader) {
+	public LineReaderIterator(State state, LineReader lineReader) {
+		this.state = state;
 		this.lineReader = lineReader;
 	}
 
@@ -27,7 +22,7 @@ public class LineReaderIterator implements Iterator<String> {
 	public boolean hasNext() {
 		if (nextLine == null) {
 			try {
-				nextLine = lineReader.readLine(prompt);
+				nextLine = lineReader.readLine(state.getPrompt());
 			} catch (EndOfFileException e) {
 				nextLine = null;
 				return false;

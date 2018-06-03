@@ -23,6 +23,7 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,10 @@ public class Main {
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) throws Exception {
+		String prompt = new AttributedStringBuilder().style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
+				.append("hosh> ").style(AttributedStyle.DEFAULT).toAnsi();
 		State state = new State();
+		state.setPrompt(prompt);
 		Terminal terminal = TerminalBuilder.terminal();
 		LineReader lineReader = LineReaderBuilder.builder().appName("hosh").terminal(terminal)
 				.history(new DefaultHistory())
@@ -44,20 +48,20 @@ public class Main {
 		for (Module module : modules) {
 			module.onStartup(commandRegistry);
 		}
+		LineReaderIterator read = new LineReaderIterator(state, lineReader);
 		CommandFactory commandFactory = new CommandFactory(state, terminal);
 		Compiler compiler = new Compiler(state, commandFactory);
 		Channel out = new ConsoleChannel(terminal, AttributedStyle.DEFAULT);
 		Channel err = new ConsoleChannel(terminal, AttributedStyle.DEFAULT.foreground(AttributedStyle.RED));
 		Interpreter interpreter = new Interpreter(out, err);
 		welcome(out);
-		repl(lineReader, compiler, interpreter, out, err);
+		repl(read, compiler, interpreter, out, err);
 	}
 
-	private static void repl(LineReader lineReader, Compiler compiler, Interpreter interpreter, Channel out,
+	private static void repl(LineReaderIterator read, Compiler compiler, Interpreter interpreter, Channel out,
 			Channel err) {
-		LineReaderIterator lineIterator = new LineReaderIterator(lineReader);
-		while (lineIterator.hasNext()) {
-			String line = lineIterator.next();
+		while (read.hasNext()) {
+			String line = read.next();
 			try {
 				Program program = compiler.compile(line);
 				interpreter.eval(program);

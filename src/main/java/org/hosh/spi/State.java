@@ -7,15 +7,15 @@ import java.util.Map;
 
 /**
  * Internal state of the shell.
- * 
- * TODO: add prompt
  */
 public class State {
 
+	// registered commands
 	private final Map<String, Class<? extends Command>> commands = new HashMap<>();
-
 	// current working directory
 	private Path cwd;
+	// current prompt
+	private String prompt;
 
 	public State() {
 		setCwd(Paths.get("."));
@@ -33,8 +33,16 @@ public class State {
 		return commands;
 	}
 
+	public String getPrompt() {
+		return prompt;
+	}
+
+	public void setPrompt(String prompt) {
+		this.prompt = prompt;
+	}
+
 	@Override
 	public String toString() {
-		return String.format("State[cwd=%s, commands=%s]", cwd, commands);
+		return String.format("State[cwd='%s', prompt='%s', commands=%s]", cwd, prompt, commands);
 	}
 }
