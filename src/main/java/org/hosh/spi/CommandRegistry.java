@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Optional;
 
-// TODO: break this interface by using State wisely
+// TODO: break this interface by using State wiselyc
 public interface CommandRegistry {
 
 	// TODO: used only by modules to register commands
