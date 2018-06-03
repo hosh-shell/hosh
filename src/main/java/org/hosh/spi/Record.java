@@ -5,6 +5,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Value object representing a mutable record of k/v pairs.
@@ -36,6 +38,11 @@ public class  Record {
     public Record add(@Nonnull String key, @Nonnull Object value) {
         data.put(key, value);
         return this;
+    }
+    
+    public Stream<String> values() {
+    	// TODO: toString() is subject to locale (e.g. numbers or dates)
+    	return data.values().stream().map(Objects::toString);
     }
     
     @SafeVarargs

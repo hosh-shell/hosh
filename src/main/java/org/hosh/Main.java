@@ -59,8 +59,8 @@ public class Main {
 				String commandName = stmt.ID().get(0).getSymbol().getText();
 				Optional<Command> search = commandRegistry.search(commandName);
 				if (search.isPresent()) {
-					Channel out = new ConsoleChannel(System.out);
-					Channel err = new ConsoleChannel(System.err);
+					Channel out = new ConsoleChannel(terminal);
+					Channel err = new ConsoleChannel(terminal);
 					List<String> commandArgs = stmt.ID().stream().skip(1).map(TerminalNode::getSymbol)
 							.map(Token::getText).collect(Collectors.toList());
 					search.get().run(commandArgs, out, err);

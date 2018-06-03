@@ -1,26 +1,24 @@
 package org.hosh.runtime;
 
-import java.io.PrintStream;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
+import org.jline.terminal.Terminal;
 
 public class ConsoleChannel implements Channel {
 
-	private final PrintStream ps;
+	private final Terminal terminal;
 
-	public ConsoleChannel(@Nonnull PrintStream ps) {
-		this.ps = ps;
+	public ConsoleChannel(@Nonnull Terminal terminal) {
+		this.terminal= terminal;
 	}
 
 	@Override
 	public void send(Record record) {
-		if (ps == System.err)
-			ps.println("\\u001b[31m" + record);
-		else 
-			ps.println(record);
+		terminal.writer().println(record.values().collect(Collectors.joining(" ")));
 	}
 
 }
