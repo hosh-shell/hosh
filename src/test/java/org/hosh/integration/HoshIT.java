@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-// TODO: add tests for interactive usage + non-iteractive usage
-@Ignore("getting a dumb terminal inside failsafe plugin")
+// TODO: add tests for interactive usage + non-interactive usage
+@Ignore("removed commmand line options")
 public class HoshIT {
 
 	@Test

@@ -16,8 +16,6 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
 
-import picocli.CommandLine;
-
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -28,22 +26,7 @@ import java.util.stream.Collectors;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		System.setProperty("picocli.ansi", "false");
 		Terminal terminal = TerminalBuilder.terminal();
-		try {
-			Options options = CommandLine.populateCommand(new Options(), args);
-			if (options.helpRequested) {
-				CommandLine.usage(options, System.out); // TODO: use ANSI codes
-				System.exit(0);
-			}
-			if (options.version) {
-				showVersion(terminal);
-				System.exit(0);
-			}
-		} catch (CommandLine.PicocliException e) {
-			writeRed(terminal, e.getMessage());
-			System.exit(1);
-		}
 		State state = new State();
 		CommandFactory commandFactory = new CommandFactory(terminal, state);
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(commandFactory);
@@ -102,16 +85,6 @@ public class Main {
 		writeGreen(terminal, "hosh v" + Version.readVersion());
 		writeGreen(terminal, "Running on Java " + System.getProperty("java.version"));
 		terminal.flush();
-	}
-
-	public static class Options {
-
-		@CommandLine.Option(names = { "-v", "--version" }, description = "print version information and exit")
-		boolean version;
-
-		@CommandLine.Option(names = { "-h", "--help" }, usageHelp = true, description = "display a help message")
-		private boolean helpRequested = false;
-
 	}
 
 }
