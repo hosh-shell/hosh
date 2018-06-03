@@ -6,7 +6,7 @@ import org.hosh.antlr4.HoshParser;
 
 /** Facade for ANTLR4 */
 public class Parser {
-
+	
 	public static HoshParser.ProgramContext parse(String input) {
 		HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
 		lexer.removeErrorListeners();

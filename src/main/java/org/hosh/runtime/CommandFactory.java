@@ -1,5 +1,7 @@
 package org.hosh.runtime;
 
+import javax.annotation.Nonnull;
+
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
@@ -11,21 +13,28 @@ public class CommandFactory {
 	private final Terminal terminal;
 	private final State state;
 	
-	public CommandFactory(Terminal terminal, State state) {
-		this.terminal = terminal;
+	public CommandFactory(@Nonnull State state, @Nonnull Terminal terminal) {
 		this.state = state;
+		this.terminal = terminal;
 	}
 
 	public Command create(Class<? extends Command> commandClass) {
 		Command command = createCommand(commandClass);
-		if (command instanceof TerminalAware) {
-			((TerminalAware) command).setTerminal(terminal);
-		}
+		handleTerminalAware(command);
+		handleStateAware(command);
+		return command;
+	}
+
+	private void handleStateAware(Command command) {
 		if (command instanceof StateAware) {
 			((StateAware) command).setState(state);
 		}
-		
-		return command;
+	}
+
+	private void handleTerminalAware(Command command) {
+		if (command instanceof TerminalAware) {
+			((TerminalAware) command).setTerminal(terminal);
+		}
 	}
 
 	private Command createCommand(Class<? extends Command> commandClass) {

@@ -12,8 +12,7 @@ import java.util.Map;
  */
 public class State {
 
-	private final Map<String, Command> commands = new HashMap<>();
-	private final Map<String, Module> modules = new HashMap<>();
+	private final Map<String, Class<? extends Command>> commands = new HashMap<>();
 
 	// current working directory
 	private Path cwd;
@@ -30,11 +29,12 @@ public class State {
 		return cwd;
 	}
 
-	public Map<String, Command> getCommands() {
+	public Map<String, Class<? extends Command>> getCommands() {
 		return commands;
 	}
 
-	public Map<String, Module> getModules() {
-		return modules;
+	@Override
+	public String toString() {
+		return String.format("State[cwd=%s, commands=%s]", cwd, commands);
 	}
 }

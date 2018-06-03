@@ -2,6 +2,7 @@ package org.hosh.runtime;
 
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
+import org.hosh.spi.State;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -13,26 +14,15 @@ import java.util.Optional;
 @NotThreadSafe
 public class SimpleCommandRegistry implements CommandRegistry {
 
-	private final Map<String, Class<? extends Command>> commandsByName = new HashMap<>();
-	private final CommandFactory commandFactory;
-
-	public SimpleCommandRegistry(@Nonnull CommandFactory commandFactory) {
-		this.commandFactory = commandFactory;
+	private final State state;
+	
+	public SimpleCommandRegistry(@Nonnull State state) {
+		this.state = state;
 	}
 
 	@Override
 	public void registerCommand(@Nonnull String name, @Nonnull Class<? extends Command> command) {
-		commandsByName.put(name, command);
+		state.getCommands().put(name, command);
 	}
 
-	@Override
-	public Optional<Command> search(@Nonnull String name) {
-		Class<? extends Command> commandClass = commandsByName.get(name);
-		return Optional.ofNullable(commandClass).map(commandFactory::create);
-	}
-
-	@Override
-	public Collection<String> commandNames() {
-		return commandsByName.keySet();
-	}
 }

@@ -1,25 +1,29 @@
 package org.hosh.runtime;
 
-import org.hosh.spi.CommandRegistry;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+
+import org.hosh.spi.State;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class CommandCompleter implements Completer {
 
-	private final CommandRegistry commandRegistry;
+	private final State state;
 
-	public CommandCompleter(CommandRegistry commandRegistry) {
-		this.commandRegistry = commandRegistry;
+	public CommandCompleter(@Nonnull State state) {
+		this.state = state;
 	}
 
 	@Override
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-		candidates.addAll(commandRegistry.commandNames().stream().map(Candidate::new).collect(Collectors.toList()));
+		Set<String> keySet = state.getCommands().keySet();
+		candidates.addAll(keySet.stream().map(Candidate::new).collect(Collectors.toList()));
 	}
 
 }
