@@ -24,8 +24,13 @@ import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Main {
+
+	// TODO: configure logger to log under hidden home directory
+	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) throws Exception {
 		State state = new State();
@@ -57,7 +62,7 @@ public class Main {
 				Program program = compiler.compile(line);
 				interpreter.eval(program);
 			} catch (RuntimeException e) {
-				// TODO: log exception
+				logger.info("caught exception for input: " + line, e);
 				err.send(Record.empty().add("message", e));
 			}
 		}
