@@ -58,7 +58,6 @@ public class Main {
 				interpreter.eval(program);
 			} catch (RuntimeException e) {
 				// TODO: log exception
-				e.printStackTrace();
 				err.send(Record.empty().add("message", e));
 			}
 		}
