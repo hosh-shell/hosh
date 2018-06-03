@@ -66,8 +66,8 @@ public class Main {
 				Program program = compiler.compile(line);
 				interpreter.eval(program);
 			} catch (RuntimeException e) {
-				logger.info("caught exception for input: " + line, e);
-				err.send(Record.empty().add("message", e));
+				logger.debug("caught exception for input: " + line, e);
+				err.send(Record.empty().add("message", e.getMessage()));
 			}
 		}
 	}

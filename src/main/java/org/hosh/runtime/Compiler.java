@@ -35,11 +35,11 @@ public class Compiler {
 
 	private Statement compileStatement(StmtContext stmt) {
 		String commandName = stmt.ID().get(0).getSymbol().getText();
-		Class<? extends Command> search = state.getCommands().get(commandName);
-		Command command = commandFactory.create(search);
-		if (search == null) {
+		Class<? extends Command> commandClass = state.getCommands().get(commandName);
+		if (commandClass == null) {
 			throw new CompileError("command not found");
 		}
+		Command command = commandFactory.create(commandClass);
 		List<String> commandArgs = compileArguments(stmt);
 		Statement statement = new Statement();
 		statement.setCommand(command);
