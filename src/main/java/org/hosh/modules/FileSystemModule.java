@@ -37,10 +37,10 @@ public class FileSystemModule implements Module {
 		public void run(List<String> args, Channel out, Channel err) {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(state.getCwd())) {
 				for (Path path : stream) {
-					out.send(Record.empty().add("name", path.getFileName()).add("size", Files.size(path)));
+					out.send(Record.of("name", path.getFileName()).add("size", Files.size(path)));
 				}
 			} catch (IOException e) {
-				err.send(Record.empty().add("message", e.getMessage()));
+				err.send(Record.of("message", e.getMessage()));
 			}
 		}
 	}
@@ -55,7 +55,7 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			out.send(Record.empty().add("cwd", state.getCwd().toString()));
+			out.send(Record.of("cwd", state.getCwd().toString()));
 		}
 	}
 
@@ -70,15 +70,15 @@ public class FileSystemModule implements Module {
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 			if (args.size() < 1) {
-				err.send(Record.empty().add("message", "missing path argument"));
+				err.send(Record.of("message", "missing path argument"));
 				return;
 			}
 			Path newCwd = Paths.get(state.getCwd().toString(), args.get(0));
 			if (Files.isDirectory(newCwd)) {
 				state.setCwd(newCwd);
-				out.send(Record.empty().add("message", "now in " + state.getCwd().toString()));
+				out.send(Record.of("message", "now in " + state.getCwd().toString()));
 			} else {
-				err.send(Record.empty().add("message", "not a directory"));
+				err.send(Record.of("message", "not a directory"));
 				return;
 			}
 		}

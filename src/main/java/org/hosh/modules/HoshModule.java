@@ -28,7 +28,7 @@ public class HoshModule implements Module {
 		public void run(List<String> args, Channel out, Channel err) {
 			Map<String, String> env = System.getenv();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
-				out.send(Record.empty().add(entry.getKey(), entry.getValue()));
+				out.send(Record.of(entry.getKey(), entry.getValue()));
 			}
 		}
 
@@ -38,8 +38,8 @@ public class HoshModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			out.send(Record.empty().add("timezone", TimeZone.getDefault().getID()));
-			out.send(Record.empty().add("locale", Locale.getDefault()));
+			out.send(Record.of("timezone", TimeZone.getDefault().getID()));
+			out.send(Record.of("locale", Locale.getDefault()));
 		}
 
 	}

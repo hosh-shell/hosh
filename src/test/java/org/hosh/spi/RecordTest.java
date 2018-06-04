@@ -7,7 +7,7 @@ public class RecordTest {
 
 	@Test
 	public void nonEmpty() {
-		Record a = Record.empty().add("key", 1);
+		Record a = Record.of("key", 1);
 		
 		assertThat(a.toString()).isEqualTo("Record[data={key=1}]");
 	}

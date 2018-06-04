@@ -66,14 +66,14 @@ public class Main {
 				interpreter.eval(program);
 			} catch (RuntimeException e) {
 				logger.debug("caught exception for input: " + line, e);
-				err.send(Record.empty().add("message", e.getMessage()));
+				err.send(Record.of("message", e.getMessage()));
 			}
 		}
 	}
 
 	private static void welcome(Channel out) throws IOException {
-		out.send(Record.empty().add("message", "hosh v" + Version.readVersion()));
-		out.send(Record.empty().add("message", "Running on Java " + System.getProperty("java.version")));
+		out.send(Record.of("message", "hosh v" + Version.readVersion()));
+		out.send(Record.of("message", "Running on Java " + System.getProperty("java.version")));
 	}
 
 }
