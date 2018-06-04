@@ -20,6 +20,7 @@ public class ConsoleChannel implements Channel {
 		this.terminal = terminal;
 		this.userStyle = new AttributedStringBuilder().style(userStyle).toAnsi(terminal);
 		this.defaultStyle = new AttributedStringBuilder().style(AttributedStyle.DEFAULT).toAnsi(terminal);
+		System.out.println(defaultStyle);
 	}
 
 	@Override

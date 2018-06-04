@@ -3,6 +3,8 @@ package org.hosh.runtime;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import javax.annotation.Nonnull;
+
 import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -13,7 +15,7 @@ public class LineReaderIterator implements Iterator<String> {
 	private final LineReader lineReader;
 	private String nextLine;
 
-	public LineReaderIterator(State state, LineReader lineReader) {
+	public LineReaderIterator(@Nonnull State state, @Nonnull LineReader lineReader) {
 		this.state = state;
 		this.lineReader = lineReader;
 	}

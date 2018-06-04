@@ -1,5 +1,7 @@
 package org.hosh.runtime;
 
+import javax.annotation.Nonnull;
+
 import org.antlr.v4.runtime.*;
 import org.hosh.antlr4.HoshLexer;
 import org.hosh.antlr4.HoshParser;
@@ -7,7 +9,7 @@ import org.hosh.antlr4.HoshParser;
 /** Facade for ANTLR4 */
 public class Parser {
 	
-	public static HoshParser.ProgramContext parse(String input) {
+	public static HoshParser.ProgramContext parse(@Nonnull String input) {
 		HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
 		lexer.removeErrorListeners();
 		lexer.addErrorListener(new CustomErrorListener());
@@ -19,6 +21,7 @@ public class Parser {
 	}
 
 	public static class ParseError extends RuntimeException {
+		
 		private static final long serialVersionUID = 1L;
 
 		public ParseError(String message) {

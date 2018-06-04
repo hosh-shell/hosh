@@ -1,6 +1,6 @@
-package org.hosh.spi;
+package org.hosh.runtime;
 
-import org.hosh.spi.AlphaNumericStringComparator;
+import org.hosh.runtime.AlphaNumericStringComparator;
 import org.junit.Test;
 
 import java.util.Arrays;

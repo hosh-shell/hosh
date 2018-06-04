@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.hosh.antlr4.HoshParser;
@@ -16,12 +18,12 @@ public class Compiler {
 	private final State state;
 	private final CommandFactory commandFactory;
 
-	public Compiler(State state, CommandFactory commandFactory) {
+	public Compiler(@Nonnull State state, @Nonnull CommandFactory commandFactory) {
 		this.state = state;
 		this.commandFactory = commandFactory;
 	}
 
-	public Program compile(String line) {
+	public Program compile(@Nonnull String line) {
 		HoshParser.ProgramContext programContext = Parser.parse(line + '\n');
 		Program program = new Program();
 		List<Statement> statements = new ArrayList<>();

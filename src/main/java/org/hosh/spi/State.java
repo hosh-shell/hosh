@@ -5,8 +5,13 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 /**
- * Internal state of the shell.
+ * The state of the shell: it has been modeled as explicit state, 
+ * this is effective a global variable.
+ * 
+ * TODO: redesign to make dataflow unidirectional (like redux)
  */
 public class State {
 
@@ -21,7 +26,7 @@ public class State {
 		setCwd(Paths.get("."));
 	}
 
-	public void setCwd(Path cwd) {
+	public void setCwd(@Nonnull Path cwd) {
 		this.cwd = cwd.normalize().toAbsolutePath();
 	}
 
@@ -37,7 +42,7 @@ public class State {
 		return prompt;
 	}
 
-	public void setPrompt(String prompt) {
+	public void setPrompt(@Nonnull String prompt) {
 		this.prompt = prompt;
 	}
 

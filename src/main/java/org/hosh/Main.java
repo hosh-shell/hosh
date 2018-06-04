@@ -52,14 +52,13 @@ public class Main {
 		CommandFactory commandFactory = new CommandFactory(state, terminal);
 		Compiler compiler = new Compiler(state, commandFactory);
 		Channel out = new ConsoleChannel(terminal, AttributedStyle.DEFAULT);
-		Channel err = new ConsoleChannel(terminal, AttributedStyle.DEFAULT.foreground(AttributedStyle.RED));
+		Channel err = new ConsoleChannel(terminal, AttributedStyle.DEFAULT.foreground(AttributedStyle.RED)); // TODO: not working
 		Interpreter interpreter = new Interpreter(out, err);
 		welcome(out);
-		repl(read, compiler, interpreter, out, err);
+		repl(read, compiler, interpreter, err);
 	}
 
-	private static void repl(LineReaderIterator read, Compiler compiler, Interpreter interpreter, Channel out,
-			Channel err) {
+	private static void repl(LineReaderIterator read, Compiler compiler, Interpreter interpreter, Channel err) {
 		while (read.hasNext()) {
 			String line = read.next();
 			try {
