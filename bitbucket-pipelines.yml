@@ -8,4 +8,3 @@ pipelines:
         script:
           - mvn --batch-mode verify
           - ls -lh target/dist/hosh.jar
-          - java -jar target/dist/hosh.jar  --version
