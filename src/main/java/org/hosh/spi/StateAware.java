@@ -6,5 +6,5 @@ import javax.annotation.Nonnull;
 public interface StateAware {
 
 	void setState(@Nonnull State state);
-	
+
 }

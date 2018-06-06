@@ -8,7 +8,7 @@ import org.hosh.antlr4.HoshParser;
 
 /** Facade for ANTLR4 */
 public class Parser {
-	
+
 	public static HoshParser.ProgramContext parse(@Nonnull String input) {
 		HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
 		lexer.removeErrorListeners();
@@ -21,7 +21,7 @@ public class Parser {
 	}
 
 	public static class ParseError extends RuntimeException {
-		
+
 		private static final long serialVersionUID = 1L;
 
 		public ParseError(String message) {

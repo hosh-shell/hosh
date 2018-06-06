@@ -12,7 +12,7 @@ public class CommandFactory {
 
 	private final Terminal terminal;
 	private final State state;
-	
+
 	public CommandFactory(@Nonnull State state, @Nonnull Terminal terminal) {
 		this.state = state;
 		this.terminal = terminal;

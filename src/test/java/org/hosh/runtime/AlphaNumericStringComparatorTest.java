@@ -71,7 +71,7 @@ public class AlphaNumericStringComparatorTest {
 
 		assertThat(input).containsExactly("20180601", "20180602", "20180603", "20180604");
 	}
-	
+
 	@Test
 	public void sortMisc() {
 		List<String> input = Arrays.asList("a.1", "1.a", "2.a", "b.1");

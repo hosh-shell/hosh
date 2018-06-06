@@ -11,7 +11,7 @@ import org.hosh.spi.State;
 public class SimpleCommandRegistry implements CommandRegistry {
 
 	private final State state;
-	
+
 	public SimpleCommandRegistry(@Nonnull State state) {
 		this.state = state;
 	}

@@ -16,7 +16,8 @@ import java.util.stream.Stream;
  * permissions. The user can select a subset of these keys (e.g. name) and then
  * it can be presented to the screen somehow.
  */
-// TODO: emit a special record at the start to provide column names and hint about size
+// TODO: emit a special record at the start to provide column names and hint
+// about size
 // TODO: type safety by using actual Java classes
 // TODO: should be immutable?
 @NotThreadSafe

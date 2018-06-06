@@ -52,7 +52,8 @@ public class Main {
 		CommandFactory commandFactory = new CommandFactory(state, terminal);
 		Compiler compiler = new Compiler(state, commandFactory);
 		Channel out = new ConsoleChannel(terminal, AttributedStyle.DEFAULT);
-		Channel err = new ConsoleChannel(terminal, AttributedStyle.DEFAULT.foreground(AttributedStyle.RED)); // TODO: not working
+		// TODO: err messages are not red :-( 
+		Channel err = new ConsoleChannel(terminal, AttributedStyle.DEFAULT.foreground(AttributedStyle.RED)); 
 		Interpreter interpreter = new Interpreter(out, err);
 		welcome(out);
 		repl(read, compiler, interpreter, err);
