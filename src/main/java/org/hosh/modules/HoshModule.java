@@ -5,11 +5,14 @@ import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
+import org.hosh.spi.State;
+import org.hosh.spi.StateAware;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 public class HoshModule implements Module {
@@ -19,6 +22,8 @@ public class HoshModule implements Module {
 		commandRegistry.registerCommand("env", Env.class);
 		commandRegistry.registerCommand("info", Info.class);
 		commandRegistry.registerCommand("exit", Exit.class);
+		commandRegistry.registerCommand("help", Help.class);
+
 	}
 
 	// TODO: output here should be really key=value, actually only value is printed
@@ -49,7 +54,7 @@ public class HoshModule implements Module {
 		// TODO: looks like we need to an argument parsing library
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			if (args.size() == 0) { 
+			if (args.size() == 0) {
 				System.exit(0);
 			} else if (args.size() == 1) {
 				String arg = args.get(0);
@@ -65,4 +70,23 @@ public class HoshModule implements Module {
 
 	}
 
+	// TODO: commands are not sorted by default (let's wait for "| sortBy key" syntax)
+	public static class Help implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public void run(List<String> args, Channel out, Channel err) {
+			Set<String> commands = state.getCommands().keySet();
+			for (String command : commands) {
+				out.send(Record.of("command", command));
+			}
+		}
+
+	}
 }
