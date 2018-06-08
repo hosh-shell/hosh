@@ -13,19 +13,22 @@ import org.jline.utils.AttributedStyle;
 public class ConsoleChannel implements Channel {
 
 	private final Terminal terminal;
-	private final String userStyle;
-	private final String defaultStyle;
+	private final int color;
 
-	public ConsoleChannel(@Nonnull Terminal terminal, @Nonnull AttributedStyle userStyle) {
+	public ConsoleChannel(@Nonnull Terminal terminal, int color) {
 		this.terminal = terminal;
-		this.userStyle = new AttributedStringBuilder().style(userStyle).toAnsi(terminal);
-		this.defaultStyle = new AttributedStringBuilder().style(AttributedStyle.DEFAULT).toAnsi(terminal);
-		System.out.println(defaultStyle);
+		this.color = color;
 	}
 
 	@Override
 	public void send(@Nonnull Record record) {
-		terminal.writer().println(record.values().collect(Collectors.joining(" ", userStyle, defaultStyle)));
+		String output = record.values().collect(Collectors.joining(" "));
+		terminal.writer().println(
+				new AttributedStringBuilder()
+						.style(AttributedStyle.DEFAULT.foreground(color))
+						.append(output)
+						.style(AttributedStyle.DEFAULT)
+						.toAnsi(terminal));
 	}
 
 }
