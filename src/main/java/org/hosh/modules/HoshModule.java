@@ -46,9 +46,21 @@ public class HoshModule implements Module {
 
 	public static class Exit implements Command {
 
+		// TODO: looks like we need to an argument parsing library
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			System.exit(0);
+			if (args.size() == 0) { 
+				System.exit(0);
+			} else if (args.size() == 1) {
+				String arg = args.get(0);
+				if (arg.matches("\\d{1,3}")) {
+					System.exit(Integer.parseInt(arg));
+				} else {
+					err.send(Record.of("error", "arg must be a number (0-999)"));
+				}
+			} else {
+				err.send(Record.of("error", "too many parameters"));
+			}
 		}
 
 	}
