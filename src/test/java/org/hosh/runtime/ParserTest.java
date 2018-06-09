@@ -14,6 +14,7 @@ public class ParserTest {
 		Parser.parse("git status\n");
 		Parser.parse("git commit --amend\n");
 		Parser.parse("cd ..\n");
+		Parser.parse("cd /tmp\n");
 	}
 
 	@Test
