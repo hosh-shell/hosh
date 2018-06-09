@@ -34,8 +34,9 @@ public class Main {
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) throws Exception {
-		Terminal terminal = TerminalBuilder.builder()
-				.system(false)
+		Terminal terminal = TerminalBuilder
+				.builder()
+				.system(true)
 				.build();
 		String prompt = new AttributedStringBuilder()
 				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
@@ -44,7 +45,8 @@ public class Main {
 				.toAnsi(terminal);
 		State state = new State();
 		state.setPrompt(prompt);
-		LineReader lineReader = LineReaderBuilder.builder()
+		LineReader lineReader = LineReaderBuilder
+				.builder()
 				.appName("hosh")
 				.history(new DefaultHistory())
 				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))

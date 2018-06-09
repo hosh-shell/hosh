@@ -25,7 +25,7 @@ public class RecordTest {
 	public void mutation() {
 		Record a = Record.empty();
 		Record b = Record.copy(a).add("key", 1);
-		
+
 		assertThat(a).isEqualTo(a);
 		assertThat(a).isNotEqualTo(b);
 	}
