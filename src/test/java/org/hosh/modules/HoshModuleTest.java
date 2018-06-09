@@ -33,29 +33,29 @@ public class HoshModuleTest {
 		private Channel err;
 
 		@InjectMocks
-		private Exit exit;
+		private Exit sut;
 
 		@Test
 		public void noArgs() {
 			expectedSystemExit.expectSystemExitWithStatus(0);
-			exit.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList(), out, err);
 		}
 
 		@Test
 		public void oneValidArg() {
 			expectedSystemExit.expectSystemExitWithStatus(1);
-			exit.run(Arrays.asList("1"), out, err);
+			sut.run(Arrays.asList("1"), out, err);
 		}
 
 		@Test
 		public void oneInvalidArg() {
-			exit.run(Arrays.asList("asd"), out, err);
+			sut.run(Arrays.asList("asd"), out, err);
 			then(err).should().send(Record.of("error", "arg must be a number (0-999)"));
 		}
 
 		@Test
 		public void twoArgs() {
-			exit.run(Arrays.asList("1", "2"), out, err);
+			sut.run(Arrays.asList("1", "2"), out, err);
 			then(err).should().send(Record.of("error", "too many parameters"));
 		}
 	}

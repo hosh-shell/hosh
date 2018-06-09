@@ -33,11 +33,13 @@ public class Record {
 	}
 
 	public static Record empty() {
-		return new Record(Collections.emptyMap());
+		return new Record(new LinkedHashMap<>(0));
 	}
 
 	public static Record of(@Nonnull String key, @Nonnull Object value) {
-		return new Record(Collections.singletonMap(key, value));
+		LinkedHashMap<String, Object> data = new LinkedHashMap<>(1);
+		data.put(key, value);
+		return new Record(data);
 	}
 
 	public Record add(@Nonnull String key, @Nonnull Object value) {

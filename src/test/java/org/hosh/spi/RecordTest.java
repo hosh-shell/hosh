@@ -50,4 +50,12 @@ public class RecordTest {
 		assertThat(b.toString()).isEqualTo("Record[data={test=1}]");
 	}
 
+	@Test
+	public void regressionBug() {
+		Record a = Record.of("name", "dir").add("size", "0");
+		Record b = Record.of("name", "dir").add("size", "0");
+
+		assertThat(a).isEqualTo(b);
+	}
+
 }
