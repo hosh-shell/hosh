@@ -53,6 +53,7 @@ public class Record {
 		return data.values().stream().map(Objects::toString);
 	}
 
+	// TODO: not used
 	@SafeVarargs
 	public final Record select(@Nonnull String... keys) {
 		Record result = Record.empty();
@@ -67,6 +68,21 @@ public class Record {
 	@Override
 	public String toString() {
 		return String.format("Record[data=%s]", data);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(data);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Record) {
+			Record that = (Record) obj;
+			return Objects.equals(this.data, that.data);
+		} else {
+			return false;
+		}
 	}
 
 }

@@ -34,15 +34,24 @@ public class Main {
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) throws Exception {
-		String prompt = new AttributedStringBuilder().style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
-				.append("hosh> ").style(AttributedStyle.DEFAULT).toAnsi();
+		Terminal terminal = TerminalBuilder.builder()
+				.system(false)
+				.build();
+		String prompt = new AttributedStringBuilder()
+				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
+				.append("hosh> ")
+				.style(AttributedStyle.DEFAULT)
+				.toAnsi(terminal);
 		State state = new State();
 		state.setPrompt(prompt);
-		Terminal terminal = TerminalBuilder.terminal();
-		LineReader lineReader = LineReaderBuilder.builder().appName("hosh").terminal(terminal)
+		LineReader lineReader = LineReaderBuilder.builder()
+				.appName("hosh")
 				.history(new DefaultHistory())
 				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
-				.variable(LineReader.HISTORY_FILE_SIZE, "1000").completer(new CommandCompleter(state)).build();
+				.variable(LineReader.HISTORY_FILE_SIZE, "1000")
+				.completer(new CommandCompleter(state))
+				.terminal(terminal)
+				.build();
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {
