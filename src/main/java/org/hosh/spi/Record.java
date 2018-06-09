@@ -1,6 +1,6 @@
 package org.hosh.spi;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -29,21 +29,21 @@ public class Record {
 	}
 
 	public static Record copy(@Nonnull Record record) {
-		return new Record(new LinkedHashMap<>(record.data));
+		return new Record(new HashMap<>(record.data));
 	}
 
 	public static Record empty() {
-		return new Record(new LinkedHashMap<>(0));
+		return new Record(new HashMap<>(0));
 	}
 
 	public static Record of(@Nonnull String key, @Nonnull Object value) {
-		LinkedHashMap<String, Object> data = new LinkedHashMap<>(1);
+		Map<String, Object> data = new HashMap<>(1);
 		data.put(key, value);
 		return new Record(data);
 	}
 
 	public Record add(@Nonnull String key, @Nonnull Object value) {
-		LinkedHashMap<String, Object> copy = new LinkedHashMap<>(data);
+		Map<String, Object> copy = new HashMap<>(data);
 		copy.put(key, value);
 		return new Record(copy);
 	}

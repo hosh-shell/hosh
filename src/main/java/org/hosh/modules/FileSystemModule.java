@@ -37,9 +37,11 @@ public class FileSystemModule implements Module {
 		public void run(List<String> args, Channel out, Channel err) {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(state.getCwd())) {
 				for (Path path : stream) {
-					Record entry = Record.of("name", path.getFileName());
+					String name = path.getFileName().toString();
+					Record entry = Record.of("name", name);
 					if (Files.isRegularFile(path)) {
-						entry = entry.add("size", Files.size(path));
+						long size = Files.size(path);
+						entry = entry.add("size", size);
 					}
 					out.send(entry);
 				}

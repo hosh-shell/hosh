@@ -80,7 +80,7 @@ public class FileSystemModuleTest {
 
 			sut.run(Arrays.asList(), out, err);
 
-			then(out).should().send(Record.of("name", "file").add("size", "0"));
+			then(out).should().send(Record.of("name", "file").add("size", 0L));
 			then(err).shouldHaveZeroInteractions();
 		}
 
