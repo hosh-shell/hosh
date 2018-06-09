@@ -6,19 +6,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RecordTest {
 
 	@Test
-	public void nonEmpty() {
+	public void copy() {
 		Record a = Record.of("key", 1);
+		Record b = Record.copy(a);
 
-		assertThat(a).isEqualTo(a);
-		assertThat(a.toString()).isEqualTo("Record[data={key=1}]");
+		assertThat(a).isEqualTo(b);
+		assertThat(a.hashCode()).isEqualTo(b.hashCode());
+		assertThat(a.toString()).isEqualTo(b.toString());
 	}
 
 	@Test
-	public void empty() {
+	public void valueObject() {
 		Record a = Record.empty();
+		Record b = a;
 
-		assertThat(a).isEqualTo(a);
-		assertThat(a.toString()).isEqualTo("Record[data={}]");
+		Record c = a.add("test", a);
+		assertThat(a).isEqualTo(b);
+		assertThat(a).isNotEqualTo(c);
+		assertThat(b).isNotEqualTo(c);
 	}
 
 	@Test
@@ -26,8 +31,23 @@ public class RecordTest {
 		Record a = Record.empty();
 		Record b = Record.copy(a).add("key", 1);
 
-		assertThat(a).isEqualTo(a);
 		assertThat(a).isNotEqualTo(b);
+		assertThat(a).isNotSameAs(b);
+	}
+
+	@Test
+	public void equality() {
+		Record a = Record.empty();
+
+		assertThat(a).isNotEqualTo("");
+	}
+
+	@Test
+	public void representation() {
+		Record a = Record.empty();
+		assertThat(a.toString()).isEqualTo("Record[data={}]");
+		Record b = a.add("test", 1);
+		assertThat(b.toString()).isEqualTo("Record[data={test=1}]");
 	}
 
 }

@@ -56,11 +56,11 @@ public class AlphaNumericStringComparatorTest {
 
 	@Test
 	public void sortDifferentLengths() {
-		List<String> input = Arrays.asList("a1a", "a1", "a1aaa", "a1aa");
+		List<String> input = Arrays.asList("", "a", "a1a", "a1", "a1aaa", "a1aa");
 
 		input.sort(new AlphaNumericStringComparator());
 
-		assertThat(input).containsExactly("a1", "a1a", "a1aa", "a1aaa");
+		assertThat(input).containsExactly("", "a", "a1", "a1a", "a1aa", "a1aaa");
 	}
 
 	@Test
@@ -80,5 +80,5 @@ public class AlphaNumericStringComparatorTest {
 
 		assertThat(input).containsExactly("1.a", "2.a", "a.1", "b.1");
 	}
-
+	
 }
