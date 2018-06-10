@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+// TODO: rename this module
 public class HoshModule implements Module {
 
 	@Override
@@ -58,6 +59,7 @@ public class HoshModule implements Module {
 			switch (args.size()) {
 				case 0:
 					System.exit(0);
+					break;
 				case 1:
 					String arg = args.get(0);
 					if (arg.matches("\\d{1,3}")) {
@@ -68,6 +70,7 @@ public class HoshModule implements Module {
 					break;
 				default:
 					err.send(Record.of("error", Values.ofText("too many parameters")));
+					break;
 			}
 		}
 

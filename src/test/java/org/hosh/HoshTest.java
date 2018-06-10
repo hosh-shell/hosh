@@ -24,9 +24,10 @@ public class HoshTest {
 	@Test
 	public void scriptWithExit() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
-		FileWriter script = new FileWriter(scriptPath);
-		script.write("exit 1\n");
-		script.flush();
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("exit 1\n");
+			script.flush();
+		}
 		expectedSystemExit.expectSystemExitWithStatus(1);
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 
@@ -35,10 +36,10 @@ public class HoshTest {
 	@Test
 	public void simpleScript() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
-		FileWriter script = new FileWriter(scriptPath);
-		script.write("ls" + "\n");
-		script.flush();
-
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("ls" + "\n");
+			script.flush();
+		}
 		expectedSystemExit.expectSystemExitWithStatus(0);
 
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });

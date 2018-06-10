@@ -26,11 +26,12 @@ public class HoshIT {
 				.command("java", "-jar", "target/dist/hosh.jar")
 				.redirectErrorStream(true)
 				.start();
-		BufferedWriter writer = new BufferedWriter(
-				new OutputStreamWriter(java.getOutputStream(), StandardCharsets.UTF_8));
-		writer.write("cwd\n");
-		writer.write("exit\n");
-		writer.flush();
+		try (BufferedWriter writer = new BufferedWriter(
+				new OutputStreamWriter(java.getOutputStream(), StandardCharsets.UTF_8))) {
+			writer.write("cwd\n");
+			writer.write("exit\n");
+			writer.flush();
+		}
 		int exitCode = java.waitFor();
 		assertThat(exitCode).isEqualTo(0);
 	}
@@ -38,10 +39,11 @@ public class HoshIT {
 	@Test
 	public void script() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
-		FileWriter script = new FileWriter(scriptPath);
-		script.write("cwd\n");
-		script.write("exit 1\n");
-		script.flush();
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("cwd\n");
+			script.write("exit 1\n");
+			script.flush();
+		}
 		Process java = new ProcessBuilder()
 				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
 				.redirectErrorStream(true)
@@ -52,5 +54,5 @@ public class HoshIT {
 		assertThat(output).contains("hosh v");
 		assertThat(exitCode).isEqualTo(1);
 	}
-	
+
 }
