@@ -7,6 +7,7 @@ import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
+import org.hosh.spi.Values;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -33,7 +34,7 @@ public class HoshModule implements Module {
 		public void run(List<String> args, Channel out, Channel err) {
 			Map<String, String> env = System.getenv();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
-				out.send(Record.of(entry.getKey(), entry.getValue()));
+				out.send(Record.of(entry.getKey(), Values.ofText(entry.getValue())));
 			}
 		}
 
@@ -43,8 +44,8 @@ public class HoshModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			out.send(Record.of("timezone", TimeZone.getDefault().getID()));
-			out.send(Record.of("locale", Locale.getDefault()));
+			out.send(Record.of("timezone", Values.ofText(TimeZone.getDefault().getID())));
+			out.send(Record.of("locale", Values.ofText(Locale.getDefault().getISO3Country())));
 		}
 
 	}
@@ -61,10 +62,10 @@ public class HoshModule implements Module {
 				if (arg.matches("\\d{1,3}")) {
 					System.exit(Integer.parseInt(arg));
 				} else {
-					err.send(Record.of("error", "arg must be a number (0-999)"));
+					err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
 				}
 			} else {
-				err.send(Record.of("error", "too many parameters"));
+				err.send(Record.of("error", Values.ofText("too many parameters")));
 			}
 		}
 
@@ -84,7 +85,7 @@ public class HoshModule implements Module {
 		public void run(List<String> args, Channel out, Channel err) {
 			Set<String> commands = state.getCommands().keySet();
 			for (String command : commands) {
-				out.send(Record.of("command", command));
+				out.send(Record.of("command", Values.ofText(command)));
 			}
 		}
 

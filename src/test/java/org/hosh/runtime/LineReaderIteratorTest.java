@@ -1,5 +1,12 @@
 package org.hosh.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+
+import java.util.NoSuchElementException;
+
 import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -8,10 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import static org.mockito.BDDMockito.*;
-import java.util.NoSuchElementException;
-
-import static org.assertj.core.api.Assertions.*;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class LineReaderIteratorTest {

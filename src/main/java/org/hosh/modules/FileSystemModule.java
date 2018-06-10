@@ -7,6 +7,8 @@ import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
+import org.hosh.spi.Values;
+import org.hosh.spi.Values.Unit;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -37,16 +39,16 @@ public class FileSystemModule implements Module {
 		public void run(List<String> args, Channel out, Channel err) {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(state.getCwd())) {
 				for (Path path : stream) {
-					String name = path.getFileName().toString();
-					Record entry = Record.of("name", name);
+					Record entry = Record.of("name", Values.ofPath(path.getFileName()));
 					if (Files.isRegularFile(path)) {
 						long size = Files.size(path);
-						entry = entry.add("size", size);
+						entry = entry.add("size", Values.ofSize(size, Unit.B));
 					}
 					out.send(entry);
 				}
 			} catch (IOException e) {
-				err.send(Record.of("message", e.getMessage()));
+				// TODO: logger or special value transporting errors?
+				err.send(Record.of("message", Values.ofText(e.getMessage())));
 			}
 		}
 	}
@@ -61,7 +63,7 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			out.send(Record.of("cwd", state.getCwd().toString()));
+			out.send(Record.of("cwd", Values.ofPath(state.getCwd())));
 		}
 	}
 
@@ -76,15 +78,14 @@ public class FileSystemModule implements Module {
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 			if (args.size() < 1) {
-				err.send(Record.of("message", "missing path argument"));
+				err.send(Record.of("message", Values.ofText("missing path argument")));
 				return;
 			}
 			Path newCwd = Paths.get(state.getCwd().toString(), args.get(0));
 			if (Files.isDirectory(newCwd)) {
 				state.setCwd(newCwd);
-				out.send(Record.of("message", "now in " + state.getCwd().toString()));
 			} else {
-				err.send(Record.of("message", "not a directory"));
+				err.send(Record.of("message", Values.ofText("not a directory")));
 				return;
 			}
 		}

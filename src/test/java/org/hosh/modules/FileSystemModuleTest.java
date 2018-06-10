@@ -4,18 +4,22 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.hosh.modules.FileSystemModule.ListFiles;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
+import org.hosh.spi.Values;
+import org.hosh.spi.Values.Unit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -69,7 +73,7 @@ public class FileSystemModuleTest {
 
 			sut.run(Arrays.asList(), out, err);
 
-			then(out).should().send(Record.of("name", "dir"));
+			then(out).should().send(Record.of("name", Values.ofPath(Paths.get("dir"))));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -80,8 +84,18 @@ public class FileSystemModuleTest {
 
 			sut.run(Arrays.asList(), out, err);
 
-			then(out).should().send(Record.of("name", "file").add("size", 0L));
+			then(out).should().send(Record.of("name", Values.ofPath(Paths.get("file"))).add("size", Values.ofSize(0, Unit.B)));
 			then(err).shouldHaveZeroInteractions();
+		}
+		
+		@Test
+		public void wrongCurrentDirectory() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.newFile().toPath());
+
+			sut.run(Arrays.asList(), out, err);
+
+			then(err).should().send(ArgumentMatchers.any());
+			then(out).shouldHaveZeroInteractions();
 		}
 
 	}

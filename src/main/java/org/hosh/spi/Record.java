@@ -1,10 +1,10 @@
 package org.hosh.spi;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -18,13 +18,12 @@ import javax.annotation.concurrent.ThreadSafe;
  * it can be presented to the screen somehow.
  */
 // TODO: emit a special record at the start to provide column names
-// TODO: type safety by using actual Java classes
 @ThreadSafe
 public class Record {
 
-	private final Map<String, Object> data;
+	private final Map<String, Value> data;
 
-	private Record(Map<String, Object> data) {
+	private Record(Map<String, Value> data) {
 		this.data = data;
 	}
 
@@ -36,21 +35,24 @@ public class Record {
 		return new Record(new HashMap<>(0));
 	}
 
-	public static Record of(@Nonnull String key, @Nonnull Object value) {
-		Map<String, Object> data = new HashMap<>(1);
+	public static Record of(@Nonnull String key, @Nonnull Value value) {
+		Map<String, Value> data = new HashMap<>(1);
 		data.put(key, value);
 		return new Record(data);
 	}
 
-	public Record add(@Nonnull String key, @Nonnull Object value) {
-		Map<String, Object> copy = new HashMap<>(data);
+	public Record add(@Nonnull String key, @Nonnull Value value) {
+		Map<String, Value> copy = new HashMap<>(data);
 		copy.put(key, value);
 		return new Record(copy);
 	}
 
-	public Stream<String> values() {
-		// TODO: toString() is subject to locale (e.g. numbers or dates)
-		return data.values().stream().map(Objects::toString);
+	public Collection<String> keys() {
+		return Collections.unmodifiableCollection(data.keySet());
+	}
+
+	public Collection<Value> values() {
+		return Collections.unmodifiableCollection(data.values());
 	}
 
 	@Override

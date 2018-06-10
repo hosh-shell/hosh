@@ -23,6 +23,7 @@ import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.SimpleChannel;
 import org.hosh.spi.State;
+import org.hosh.spi.Values;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
@@ -91,12 +92,12 @@ public class Main {
 			interpreter.eval(program);
 			System.exit(0);
 		} catch (IOException e) {
-			err.send(Record.of("message", "unable to load: " + path));
+			err.send(Record.of("message", Values.ofText("unable to load: " + path)));
 			logger.debug("caught exception for load: " + path, e);
 			System.exit(1);
 		} catch (Exception e) {
 			logger.debug("caught exception", e);
-			err.send(Record.of("message", e.getMessage()));
+			err.send(Record.of("message", Values.ofText(e.getMessage())));
 			System.exit(1);
 		}
 	}
@@ -109,15 +110,15 @@ public class Main {
 				interpreter.eval(program);
 			} catch (RuntimeException e) {
 				logger.debug("caught exception for input: " + line, e);
-				err.send(Record.of("message", e.getMessage()));
+				err.send(Record.of("message", Values.ofText(e.getMessage())));
 			}
 		}
 		System.exit(0);
 	}
 
 	private static void welcome(Channel out) throws IOException {
-		out.send(Record.of("message", "hosh v" + Version.readVersion()));
-		out.send(Record.of("message", "Running on Java " + System.getProperty("java.version")));
+		out.send(Record.of("message", Values.ofText("hosh v" + Version.readVersion())));
+		out.send(Record.of("message", Values.ofText("Running on Java " + System.getProperty("java.version"))));
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.hosh.modules.HoshModule.Exit;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
+import org.hosh.spi.Values;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -50,13 +51,13 @@ public class HoshModuleTest {
 		@Test
 		public void oneInvalidArg() {
 			sut.run(Arrays.asList("asd"), out, err);
-			then(err).should().send(Record.of("error", "arg must be a number (0-999)"));
+			then(err).should().send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
 		}
 
 		@Test
 		public void twoArgs() {
 			sut.run(Arrays.asList("1", "2"), out, err);
-			then(err).should().send(Record.of("error", "too many parameters"));
+			then(err).should().send(Record.of("error", Values.ofText("too many parameters")));
 		}
 	}
 

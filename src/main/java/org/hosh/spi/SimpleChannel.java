@@ -1,7 +1,7 @@
 package org.hosh.spi;
 
 import java.io.PrintStream;
-import java.util.stream.Collectors;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
@@ -15,7 +15,12 @@ public class SimpleChannel implements Channel {
 
 	@Override
 	public void send(Record record) {
-		st.println(record.values().collect(Collectors.joining(" ")));
+		StringBuilder output = new StringBuilder(); 
+		for (Value value : record.values()) {
+			value.append(output, Locale.getDefault());
+			output.append(" ");
+		}
+		st.append(output);
 	}
 
 }

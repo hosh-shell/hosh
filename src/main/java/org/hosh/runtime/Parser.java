@@ -9,6 +9,9 @@ import org.hosh.antlr4.HoshParser;
 /** Facade for ANTLR4 */
 public class Parser {
 
+	private Parser() {
+	}
+	
 	public static HoshParser.ProgramContext parse(@Nonnull String input) {
 		HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
 		lexer.removeErrorListeners();

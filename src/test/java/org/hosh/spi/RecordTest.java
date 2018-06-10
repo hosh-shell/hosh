@@ -1,13 +1,15 @@
 package org.hosh.spi;
 
-import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.hosh.spi.Values.Unit;
+import org.junit.Test;
 
 public class RecordTest {
 
 	@Test
 	public void copy() {
-		Record a = Record.of("key", 1);
+		Record a = Record.of("key", Values.ofText("a"));
 		Record b = Record.copy(a);
 
 		assertThat(a).isEqualTo(b);
@@ -20,7 +22,7 @@ public class RecordTest {
 		Record a = Record.empty();
 		Record b = a;
 
-		Record c = a.add("test", a);
+		Record c = a.add("test", Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
 		assertThat(a).isNotEqualTo(c);
 		assertThat(b).isNotEqualTo(c);
@@ -29,7 +31,7 @@ public class RecordTest {
 	@Test
 	public void mutation() {
 		Record a = Record.empty();
-		Record b = Record.copy(a).add("key", 1);
+		Record b = Record.copy(a).add("key", Values.ofText("a"));
 
 		assertThat(a).isNotEqualTo(b);
 		assertThat(a).isNotSameAs(b);
@@ -46,16 +48,8 @@ public class RecordTest {
 	public void representation() {
 		Record a = Record.empty();
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
-		Record b = a.add("test", 1);
-		assertThat(b.toString()).isEqualTo("Record[data={test=1}]");
-	}
-
-	@Test
-	public void regressionBug() {
-		Record a = Record.of("name", "dir").add("size", "0");
-		Record b = Record.of("name", "dir").add("size", "0");
-
-		assertThat(a).isEqualTo(b);
+		Record b = a.add("size", Values.ofSize(10, Unit.MB));
+		assertThat(b.toString()).isEqualTo("Record[data={size=Size[10MB]}]");
 	}
 
 }
