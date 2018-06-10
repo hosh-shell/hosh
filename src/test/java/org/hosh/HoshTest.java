@@ -1,5 +1,7 @@
 package org.hosh;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
 import java.io.FileWriter;
 
@@ -8,7 +10,6 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
-import static org.assertj.core.api.Assertions.*;
 
 public class HoshTest {
 
@@ -30,7 +31,6 @@ public class HoshTest {
 		}
 		expectedSystemExit.expectSystemExitWithStatus(1);
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
-
 	}
 
 	@Test
