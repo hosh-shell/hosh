@@ -1,5 +1,13 @@
 package org.hosh.modules;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+
+import javax.annotation.Nonnull;
+
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -8,13 +16,6 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
-
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
 
 public class SystemModule implements Module {
 
@@ -39,7 +40,7 @@ public class SystemModule implements Module {
 			for (Map.Entry<String, String> entry : env.entrySet()) {
 				Record record = Record.empty()
 						.add("key", Values.ofText(entry.getKey()))
-						.add("value",Values.ofText(entry.getValue()));
+						.add("value", Values.ofText(entry.getValue()));
 				out.send(record);
 			}
 		}
@@ -58,7 +59,6 @@ public class SystemModule implements Module {
 
 	public static class Exit implements Command {
 
-		// TODO: looks like we need to an argument parsing library
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 			switch (args.size()) {
@@ -81,8 +81,8 @@ public class SystemModule implements Module {
 
 	}
 
-	// TODO: commands are not sorted by default (let's wait for "| sortBy key"
-	// syntax)
+	// TODO: commands are not sorted by default
+	// (let's wait for "| sortBy key" syntax)
 	public static class Help implements Command, StateAware {
 
 		private State state;
@@ -94,6 +94,10 @@ public class SystemModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
+			if (!args.isEmpty()) {
+				err.send(Record.of("error", Values.ofText("expecting no parameters")));
+				return;
+			}
 			Set<String> commands = state.getCommands().keySet();
 			for (String command : commands) {
 				out.send(Record.of("command", Values.ofText(command)));

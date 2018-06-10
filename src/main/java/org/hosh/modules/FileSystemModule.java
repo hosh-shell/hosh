@@ -1,5 +1,14 @@
 package org.hosh.modules;
 
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -10,27 +19,20 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
 import org.hosh.spi.Values.Unit;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
 public class FileSystemModule implements Module {
 
 	@Override
 	public void onStartup(@Nonnull CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("cd", ChangeDirectory.class);
 		commandRegistry.registerCommand("ls", ListFiles.class);
-		commandRegistry.registerCommand("cwd", CurrentWorkDirectory.class);
+		commandRegistry.registerCommand("cwd", CurrentWorkingDirectory.class);
 	}
 
 	public static class ListFiles implements Command, StateAware {
 
 		private State state;
 
+		@Override
 		public void setState(State state) {
 			this.state = state;
 		}
@@ -53,16 +55,21 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	public static class CurrentWorkDirectory implements Command, StateAware {
+	public static class CurrentWorkingDirectory implements Command, StateAware {
 
 		private State state;
 
+		@Override
 		public void setState(State state) {
 			this.state = state;
 		}
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
+			if (!args.isEmpty()) {
+				err.send(Record.of("error", Values.ofText("expecting no parameters")));
+				return;
+			}
 			out.send(Record.of("cwd", Values.ofPath(state.getCwd())));
 		}
 	}
@@ -71,22 +78,29 @@ public class FileSystemModule implements Module {
 
 		private State state;
 
+		@Override
 		public void setState(State state) {
 			this.state = state;
 		}
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			if (args.size() < 1) {
-				err.send(Record.of("message", Values.ofText("missing path argument")));
-				return;
-			}
-			Path newCwd = Paths.get(state.getCwd().toString(), args.get(0));
-			if (Files.isDirectory(newCwd)) {
-				state.setCwd(newCwd);
-			} else {
-				err.send(Record.of("message", Values.ofText("not a directory")));
-				return;
+
+			switch (args.size()) {
+				case 0:
+					err.send(Record.of("error", Values.ofText("missing path argument")));
+					break;
+				case 1:
+					Path newCwd = Paths.get(state.getCwd().toString(), args.get(0));
+					if (Files.isDirectory(newCwd)) {
+						state.setCwd(newCwd);
+					} else {
+						err.send(Record.of("error", Values.ofText("not a directory")));
+					}
+					break;
+				default:
+					err.send(Record.of("error", Values.ofText("expecting one path argument")));
+					break;
 			}
 		}
 
