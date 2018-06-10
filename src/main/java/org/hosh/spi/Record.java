@@ -2,7 +2,7 @@ package org.hosh.spi;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,21 +28,21 @@ public class Record {
 	}
 
 	public static Record copy(@Nonnull Record record) {
-		return new Record(new HashMap<>(record.data));
+		return new Record(new LinkedHashMap<>(record.data));
 	}
 
 	public static Record empty() {
-		return new Record(new HashMap<>(0));
+		return new Record(new LinkedHashMap<>(0));
 	}
 
 	public static Record of(@Nonnull String key, @Nonnull Value value) {
-		Map<String, Value> data = new HashMap<>(1);
+		Map<String, Value> data = new LinkedHashMap<>(1);
 		data.put(key, value);
 		return new Record(data);
 	}
 
 	public Record add(@Nonnull String key, @Nonnull Value value) {
-		Map<String, Value> copy = new HashMap<>(data);
+		Map<String, Value> copy = new LinkedHashMap<>(data);
 		copy.put(key, value);
 		return new Record(copy);
 	}

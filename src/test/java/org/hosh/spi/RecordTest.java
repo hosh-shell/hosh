@@ -52,4 +52,13 @@ public class RecordTest {
 		assertThat(b.toString()).isEqualTo("Record[data={size=Size[10MB]}]");
 	}
 
+	@Test
+	public void retainInsertOrder() {
+		Value value = Values.ofText("value");
+		Value anotherValue = Values.ofText("another_value");
+		Record a = Record.empty().add("key", value).add("another_key", anotherValue);
+		assertThat(a.keys()).containsExactly("key", "another_key");
+		assertThat(a.values()).containsExactly(value, anotherValue);
+	}
+
 }
