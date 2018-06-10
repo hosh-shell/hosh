@@ -41,8 +41,6 @@ public class CompilerTest {
 		Program program = sut.compile("env");
 
 		assertThat(program.getStatements()).hasSize(1);
-		// TODO: report bug to assertJ
-		// assertThat(program.getStatements()).first().extracting(Statement::getCommand).isSameAs(command);
 		List<Statement> statements = program.getStatements();
 		assertThat(statements.get(0).getCommand()).isSameAs(command);
 		assertThat(statements.get(0).getArguments()).isEmpty();
