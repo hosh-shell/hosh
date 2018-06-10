@@ -37,11 +37,10 @@ public class HoshIT {
 	}
 
 	@Test
-	public void script() throws Exception {
+	public void scriptWithoutError() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
-			script.write("cwd\n");
-			script.write("exit 1\n");
+			script.write("ls" + "\n");
 			script.flush();
 		}
 		Process java = new ProcessBuilder()
@@ -51,7 +50,26 @@ public class HoshIT {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
 		String output = bufferedReader.lines().collect(Collectors.joining());
 		int exitCode = java.waitFor();
-		assertThat(output).contains("hosh v");
+		assertThat(output).contains("pom.xml");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
+	public void scriptWithError() throws Exception {
+		File scriptPath = temporaryFolder.newFile("test.hosh");
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("AAAAAAAAAAA" + "\n");
+			script.flush();
+		}
+		Process java = new ProcessBuilder()
+				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
+				.redirectErrorStream(true)
+				.start();
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
+		String output = bufferedReader.lines().collect(Collectors.joining());
+		int exitCode = java.waitFor();
+		System.out.println(output);
+		assertThat(output).contains("command not found");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
