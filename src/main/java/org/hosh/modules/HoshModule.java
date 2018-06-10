@@ -28,14 +28,14 @@ public class HoshModule implements Module {
 
 	}
 
-	// TODO: output here should be really key=value, actually only value is printed
 	public static class Env implements Command {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 			Map<String, String> env = System.getenv();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
-				out.send(Record.of(entry.getKey(), Values.ofText(entry.getValue())));
+				Record record = Record.of("key", Values.ofText(entry.getKey())).add("value", Values.ofText(entry.getValue()));
+				out.send(record);
 			}
 		}
 
