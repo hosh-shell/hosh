@@ -1,5 +1,6 @@
 package org.hosh.runtime;
 
+import java.util.Iterator;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -23,17 +24,21 @@ public class ConsoleChannel implements Channel {
 
 	@Override
 	public void send(@Nonnull Record record) {
-		StringBuilder output = new StringBuilder(); 
-		for (Value value : record.values()) {
+		StringBuilder output = new StringBuilder();
+		Iterator<Value> values = record.values().iterator();
+		while (values.hasNext()) {
+			Value value = values.next();
 			value.append(output, Locale.getDefault());
-			output.append(" ");
+			if (values.hasNext()) {
+				output.append(" ");
+			}
 		}
-		terminal.writer().println(
-				new AttributedStringBuilder()
-						.style(AttributedStyle.DEFAULT.foreground(color))
-						.append(output)
-						.style(AttributedStyle.DEFAULT)
-						.toAnsi(terminal));
+		String ansiString = new AttributedStringBuilder()
+				.style(AttributedStyle.DEFAULT.foreground(color))
+				.append(output)
+				.style(AttributedStyle.DEFAULT)
+				.toAnsi(terminal);
+		terminal.writer().println(ansiString);
 	}
 
 }
