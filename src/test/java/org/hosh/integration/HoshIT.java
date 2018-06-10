@@ -58,7 +58,7 @@ public class HoshIT {
 	public void scriptWithError() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
-			script.write("AAAAAAAAAAA" + "\n");
+			script.write("AAAAB" + "\n");
 			script.flush();
 		}
 		Process java = new ProcessBuilder()
@@ -66,10 +66,9 @@ public class HoshIT {
 				.redirectErrorStream(true)
 				.start();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
-		String output = bufferedReader.lines().collect(Collectors.joining());
+		String output = bufferedReader.lines().collect(Collectors.joining("\n"));
 		int exitCode = java.waitFor();
-		System.out.println(output);
-		assertThat(output).contains("command not found");
+		assertThat(output).contains("command not found: AAAAB");
 		assertThat(exitCode).isEqualTo(1);
 	}
 

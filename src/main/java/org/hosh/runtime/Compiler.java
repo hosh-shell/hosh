@@ -39,7 +39,7 @@ public class Compiler {
 		String commandName = stmt.ID().get(0).getSymbol().getText();
 		Class<? extends Command> commandClass = state.getCommands().get(commandName);
 		if (commandClass == null) {
-			throw new CompileError("command not found");
+			throw new CompileError("command not found: " + commandName);
 		}
 		Command command = commandFactory.create(commandClass);
 		List<String> commandArgs = compileArguments(stmt);
