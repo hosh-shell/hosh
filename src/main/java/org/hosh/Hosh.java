@@ -34,10 +34,11 @@ import org.jline.utils.AttributedStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Main {
+/** Main class */
+public class Hosh {
 
 	// TODO: configure logger to log under hidden home directory
-	private static final Logger logger = LoggerFactory.getLogger(Main.class);
+	private static final Logger logger = LoggerFactory.getLogger(Hosh.class);
 
 	public static void main(String[] args) throws Exception {
 		Terminal terminal = TerminalBuilder

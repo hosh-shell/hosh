@@ -10,7 +10,7 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
 import static org.assertj.core.api.Assertions.*;
 
-public class MainTest {
+public class HoshTest {
 
 	@Rule
 	public final ExpectedSystemExit expectedSystemExit = ExpectedSystemExit.none();
@@ -28,7 +28,7 @@ public class MainTest {
 		script.write("exit 1\n");
 		script.flush();
 		expectedSystemExit.expectSystemExitWithStatus(1);
-		Main.main(new String[] { scriptPath.getAbsolutePath() });
+		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 
 	}
 
@@ -41,7 +41,7 @@ public class MainTest {
 
 		expectedSystemExit.expectSystemExitWithStatus(0);
 
-		Main.main(new String[] { scriptPath.getAbsolutePath() });
+		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 
 		assertThat(systemOutRule.getLog()).containsOnlyOnce("pom.xml");
 	}

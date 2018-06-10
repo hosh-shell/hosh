@@ -173,7 +173,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>org.hosh.Main</mainClass>
+							<mainClass>org.hosh.Hosh</mainClass>
 						</manifest>
 					</archive>
 					<attach>false</attach>
