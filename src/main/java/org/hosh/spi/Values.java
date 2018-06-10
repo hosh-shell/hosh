@@ -15,16 +15,15 @@ public class Values {
 	public static Value ofText(@Nonnull String text) {
 		return new Text(text);
 	}
-	
+
 	public static Value ofSize(@Nonnegative long value, @Nonnull Unit unit) {
 		return new Size(value, unit);
 	}
 
-	public static Value ofPath(@Nonnull Path  path) {
+	public static Value ofPath(@Nonnull Path path) {
 		return new LocalPath(path);
 	}
 
-	
 	public enum Unit {
 		B, KB, MB, GB, TB
 	}
@@ -52,7 +51,7 @@ public class Values {
 
 		@Override
 		public String toString() {
-			return String.format("Text[]", text);
+			return String.format("Text[%s]", text);
 		}
 
 		@Override
@@ -127,14 +126,17 @@ public class Values {
 
 		@Override
 		public void append(Appendable appendable, Locale locale) {
-
+			try {
+				appendable.append(path.toString());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 
 		@Override
 		public String toString() {
 			return String.format("LocalPath[%s]", path);
 		}
-		
 
 		@Override
 		public boolean equals(Object obj) {
