@@ -55,23 +55,26 @@ public class HoshModule implements Module {
 		// TODO: looks like we need to an argument parsing library
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			if (args.size() == 0) {
-				System.exit(0);
-			} else if (args.size() == 1) {
-				String arg = args.get(0);
-				if (arg.matches("\\d{1,3}")) {
-					System.exit(Integer.parseInt(arg));
-				} else {
-					err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
-				}
-			} else {
-				err.send(Record.of("error", Values.ofText("too many parameters")));
+			switch (args.size()) {
+				case 0:
+					System.exit(0);
+				case 1:
+					String arg = args.get(0);
+					if (arg.matches("\\d{1,3}")) {
+						System.exit(Integer.parseInt(arg));
+					} else {
+						err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
+					}
+					break;
+				default:
+					err.send(Record.of("error", Values.ofText("too many parameters")));
 			}
 		}
 
 	}
 
-	// TODO: commands are not sorted by default (let's wait for "| sortBy key" syntax)
+	// TODO: commands are not sorted by default (let's wait for "| sortBy key"
+	// syntax)
 	public static class Help implements Command, StateAware {
 
 		private State state;
