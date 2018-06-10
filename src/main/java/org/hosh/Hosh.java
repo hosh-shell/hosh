@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 /** Main class */
 public class Hosh {
 
-	// TODO: configure logger to log under hidden home directory
 	private static final Logger logger = LoggerFactory.getLogger(Hosh.class);
 
 	public static void main(String[] args) throws Exception {
@@ -82,7 +81,6 @@ public class Hosh {
 			Interpreter interpreter = new Interpreter(out, err);
 			script(args[0], compiler, interpreter, err);
 		}
-
 	}
 
 	private static void script(String path, Compiler compiler, Interpreter interpreter, Channel err)
