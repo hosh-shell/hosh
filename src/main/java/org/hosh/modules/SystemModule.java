@@ -16,8 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-// TODO: rename this module
-public class HoshModule implements Module {
+public class SystemModule implements Module {
 
 	@Override
 	public void onStartup(@Nonnull CommandRegistry commandRegistry) {
@@ -32,9 +31,15 @@ public class HoshModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
+			if (!args.isEmpty()) {
+				err.send(Record.of("error", Values.ofText("expecting no parameters")));
+				return;
+			}
 			Map<String, String> env = System.getenv();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
-				Record record = Record.of("key", Values.ofText(entry.getKey())).add("value", Values.ofText(entry.getValue()));
+				Record record = Record.empty()
+						.add("key", Values.ofText(entry.getKey()))
+						.add("value",Values.ofText(entry.getValue()));
 				out.send(record);
 			}
 		}

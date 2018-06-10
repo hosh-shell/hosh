@@ -1,26 +1,37 @@
 package org.hosh.modules;
 
+import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.then;
 
+import java.io.IOException;
 import java.util.Arrays;
 
-import org.hosh.modules.HoshModule.Exit;
+import org.hosh.modules.SystemModule.Env;
+import org.hosh.modules.SystemModule.Exit;
+import org.hosh.runtime.Version;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(Suite.class)
-@SuiteClasses({ HoshModuleTest.ExitTest.class })
-public class HoshModuleTest {
+@SuiteClasses({ 
+	SystemModuleTest.ExitTest.class,
+	SystemModuleTest.EnvTest.class,
+})
+public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ExitTest {
@@ -30,6 +41,7 @@ public class HoshModuleTest {
 
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
 
@@ -60,5 +72,6 @@ public class HoshModuleTest {
 			then(err).should().send(Record.of("error", Values.ofText("too many parameters")));
 		}
 	}
+	
 
 }
