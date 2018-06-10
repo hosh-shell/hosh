@@ -49,7 +49,7 @@ public class HoshIT {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
 		String output = bufferedReader.lines().collect(Collectors.joining());
 		int exitCode = java.waitFor();
-		assertThat(output.contains("hosh v"));
+		assertThat(output).contains("hosh v");
 		assertThat(exitCode).isEqualTo(1);
 	}
 	
