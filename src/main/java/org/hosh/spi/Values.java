@@ -12,6 +12,9 @@ import javax.annotation.Nonnull;
 /** Built-in values. NB: concrete types are not exposed by purpose */
 public class Values {
 
+	private Values() {
+	}
+
 	public static Value ofText(@Nonnull String text) {
 		return new Text(text);
 	}
@@ -34,16 +37,16 @@ public class Values {
 	 */
 	private static class Text implements Value {
 
-		private final String text;
+		private final String value;
 
-		public Text(@Nonnull String text) {
-			this.text = text;
+		public Text(@Nonnull String value) {
+			this.value = value;
 		}
 
 		@Override
 		public void append(Appendable appendable, Locale locale) {
 			try {
-				appendable.append(text);
+				appendable.append(value);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -51,14 +54,14 @@ public class Values {
 
 		@Override
 		public String toString() {
-			return String.format("Text[%s]", text);
+			return String.format("Text[%s]", value);
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof Text) {
 				Text that = (Text) obj;
-				return Objects.equals(this.text, that.text);
+				return Objects.equals(this.value, that.value);
 			} else {
 				return false;
 			}
@@ -66,7 +69,7 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(text);
+			return Objects.hash(value);
 		}
 
 	}
@@ -79,7 +82,7 @@ public class Values {
 		private final long value;
 		private final Unit unit;
 
-		public Size(@Nonnegative long value, Unit unit) {
+		public Size(@Nonnegative long value, @Nonnull Unit unit) {
 			this.value = value;
 			this.unit = unit;
 		}
@@ -120,7 +123,7 @@ public class Values {
 
 		private final Path path;
 
-		public LocalPath(Path path) {
+		public LocalPath(@Nonnull Path path) {
 			this.path = path;
 		}
 
