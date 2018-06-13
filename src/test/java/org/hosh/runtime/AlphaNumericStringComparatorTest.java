@@ -1,11 +1,11 @@
 package org.hosh.runtime;
 
-import org.hosh.runtime.AlphaNumericStringComparator;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
-import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
 
 public class AlphaNumericStringComparatorTest {
 
@@ -80,5 +80,5 @@ public class AlphaNumericStringComparatorTest {
 
 		assertThat(input).containsExactly("1.a", "2.a", "a.1", "b.1");
 	}
-	
+
 }

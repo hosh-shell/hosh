@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.annotation.Nonnull;
-
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -20,7 +18,7 @@ import org.hosh.spi.Values;
 public class SystemModule implements Module {
 
 	@Override
-	public void onStartup(@Nonnull CommandRegistry commandRegistry) {
+	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("env", Env.class);
 		commandRegistry.registerCommand("info", Info.class);
 		commandRegistry.registerCommand("exit", Exit.class);

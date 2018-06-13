@@ -5,8 +5,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
-
 /**
  * The state of the shell: it has been modeled as explicit state, this is
  * effective a global variable.
@@ -26,7 +24,7 @@ public class State {
 		setCwd(Paths.get("."));
 	}
 
-	public void setCwd(@Nonnull Path cwd) {
+	public void setCwd(Path cwd) {
 		this.cwd = cwd.normalize().toAbsolutePath();
 	}
 
@@ -42,7 +40,7 @@ public class State {
 		return prompt;
 	}
 
-	public void setPrompt(@Nonnull String prompt) {
+	public void setPrompt(String prompt) {
 		this.prompt = prompt;
 	}
 

@@ -1,7 +1,5 @@
 package org.hosh.spi;
 
-import javax.annotation.Nonnull;
-
 /**
  * Handling of output of records
  * 
@@ -10,6 +8,6 @@ import javax.annotation.Nonnull;
  */
 public interface Channel {
 
-	void send(@Nonnull Record record);
+	void send(Record record);
 
 }

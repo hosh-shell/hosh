@@ -6,24 +6,25 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-
-/** Built-in values. NB: concrete types are not exposed by purpose */
+/**
+ * Built-in values to be used in Records.
+ *
+ * NB: actual value types are not exposed by purpose
+ */
 public class Values {
 
 	private Values() {
 	}
 
-	public static Value ofText(@Nonnull String text) {
+	public static Value ofText(String text) {
 		return new Text(text);
 	}
 
-	public static Value ofSize(@Nonnegative long value, @Nonnull Unit unit) {
+	public static Value ofSize(long value, Unit unit) {
 		return new Size(value, unit);
 	}
 
-	public static Value ofPath(@Nonnull Path path) {
+	public static Value ofPath(Path path) {
 		return new LocalPath(path);
 	}
 
@@ -39,7 +40,7 @@ public class Values {
 
 		private final String value;
 
-		public Text(@Nonnull String value) {
+		public Text(String value) {
 			this.value = value;
 		}
 
@@ -82,7 +83,7 @@ public class Values {
 		private final long value;
 		private final Unit unit;
 
-		public Size(@Nonnegative long value, @Nonnull Unit unit) {
+		public Size(long value, Unit unit) {
 			this.value = value;
 			this.unit = unit;
 		}
@@ -123,7 +124,7 @@ public class Values {
 
 		private final Path path;
 
-		public LocalPath(@Nonnull Path path) {
+		public LocalPath(Path path) {
 			this.path = path;
 		}
 

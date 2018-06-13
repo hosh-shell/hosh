@@ -1,6 +1,7 @@
 package org.hosh.runtime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import java.util.Collections;
@@ -63,7 +64,9 @@ public class CompilerTest {
 	public void commandNotRegistered() {
 		given(state.getCommands()).willReturn(Collections.singletonMap("env", Command.class));
 
-		assertThatThrownBy(() -> sut.compile("env2")).isInstanceOf(CompileError.class).hasMessage("command not found: env2");
+		assertThatThrownBy(() -> sut.compile("env2"))
+				.isInstanceOf(CompileError.class)
+				.hasMessage("command not found: env2");
 	}
 
 }

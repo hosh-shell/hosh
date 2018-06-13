@@ -1,7 +1,5 @@
 package org.hosh.runtime;
 
-import javax.annotation.Nonnull;
-
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
@@ -13,7 +11,7 @@ public class CommandFactory {
 	private final Terminal terminal;
 	private final State state;
 
-	public CommandFactory(@Nonnull State state, @Nonnull Terminal terminal) {
+	public CommandFactory(State state, Terminal terminal) {
 		this.state = state;
 		this.terminal = terminal;
 	}

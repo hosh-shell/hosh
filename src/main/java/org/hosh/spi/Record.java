@@ -6,19 +6,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * A value object representing a record of k/v pairs.
- * 
+ *
  * Records are created, modified and finally consumed to create pipelines. E.g.
  * listing files of a directory produces a stream of records with name, size,
  * permissions. The user can select a subset of these keys (e.g. name) and then
  * it can be presented to the screen somehow.
  */
 // TODO: emit a special record at the start to provide column names
-@ThreadSafe
 public class Record {
 
 	private final Map<String, Value> data;
@@ -27,7 +23,7 @@ public class Record {
 		this.data = data;
 	}
 
-	public static Record copy(@Nonnull Record record) {
+	public static Record copy(Record record) {
 		return new Record(new LinkedHashMap<>(record.data));
 	}
 
@@ -35,13 +31,13 @@ public class Record {
 		return new Record(new LinkedHashMap<>(0));
 	}
 
-	public static Record of(@Nonnull String key, @Nonnull Value value) {
+	public static Record of(String key, Value value) {
 		Map<String, Value> data = new LinkedHashMap<>(1);
 		data.put(key, value);
 		return new Record(data);
 	}
 
-	public Record add(@Nonnull String key, @Nonnull Value value) {
+	public Record add(String key, Value value) {
 		Map<String, Value> copy = new LinkedHashMap<>(data);
 		copy.put(key, value);
 		return new Record(copy);

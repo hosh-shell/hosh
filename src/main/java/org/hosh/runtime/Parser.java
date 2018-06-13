@@ -1,8 +1,10 @@
 package org.hosh.runtime;
 
-import javax.annotation.Nonnull;
-
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.hosh.antlr4.HoshLexer;
 import org.hosh.antlr4.HoshParser;
 
@@ -11,8 +13,8 @@ public class Parser {
 
 	private Parser() {
 	}
-	
-	public static HoshParser.ProgramContext parse(@Nonnull String input) {
+
+	public static HoshParser.ProgramContext parse(String input) {
 		HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
 		lexer.removeErrorListeners();
 		lexer.addErrorListener(new CustomErrorListener());

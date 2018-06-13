@@ -8,7 +8,7 @@ public class Version {
 
 	private Version() {
 	}
-	
+
 	// TODO: rename this class to VersionLoader, Version should be a value object
 	public static String readVersion() throws IOException {
 		try (InputStream is = Version.class.getResourceAsStream("/git.properties")) {

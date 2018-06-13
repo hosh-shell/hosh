@@ -7,8 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -22,7 +20,7 @@ import org.hosh.spi.Values.Unit;
 public class FileSystemModule implements Module {
 
 	@Override
-	public void onStartup(@Nonnull CommandRegistry commandRegistry) {
+	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("cd", ChangeDirectory.class);
 		commandRegistry.registerCommand("ls", ListFiles.class);
 		commandRegistry.registerCommand("cwd", CurrentWorkingDirectory.class);

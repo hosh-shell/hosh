@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-
 import org.hosh.spi.State;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
@@ -16,7 +14,7 @@ public class CommandCompleter implements Completer {
 
 	private final State state;
 
-	public CommandCompleter(@Nonnull State state) {
+	public CommandCompleter(State state) {
 		this.state = state;
 	}
 

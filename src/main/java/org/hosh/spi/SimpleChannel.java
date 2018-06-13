@@ -3,13 +3,11 @@ package org.hosh.spi;
 import java.io.PrintStream;
 import java.util.Locale;
 
-import javax.annotation.Nonnull;
-
 public class SimpleChannel implements Channel {
 
 	private final PrintStream printStream;
 
-	public SimpleChannel(@Nonnull PrintStream printStream) {
+	public SimpleChannel(PrintStream printStream) {
 		this.printStream = printStream;
 	}
 
