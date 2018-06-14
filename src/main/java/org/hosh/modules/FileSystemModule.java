@@ -15,7 +15,6 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
-import org.hosh.spi.Values.Unit;
 
 public class FileSystemModule implements Module {
 
@@ -42,7 +41,7 @@ public class FileSystemModule implements Module {
 					Record entry = Record.of("name", Values.ofPath(path.getFileName()));
 					if (Files.isRegularFile(path)) {
 						long size = Files.size(path);
-						entry = entry.add("size", Values.ofSize(size, Unit.B));
+						entry = entry.add("size", Values.ofHumanizedSize(size));
 					}
 					out.send(entry);
 				}

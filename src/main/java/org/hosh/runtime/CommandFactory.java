@@ -8,6 +8,7 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 
+// TODO: this could be removed by let the modules register actual command instances
 public class CommandFactory {
 
 	private final Terminal terminal;

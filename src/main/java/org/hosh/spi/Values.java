@@ -20,16 +20,32 @@ public class Values {
 		return new Text(text);
 	}
 
+	public enum Unit {
+		B, KB, MB, GB, TB
+	}
+
 	public static Value ofSize(long value, Unit unit) {
 		return new Size(value, unit);
 	}
 
-	public static Value ofPath(Path path) {
-		return new LocalPath(path);
+	/**
+	 * Select the appropriate unit for measuring bytes.
+	 */
+	public static Value ofHumanizedSize(long bytes) {
+		Unit[] pre = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
+		int k = 1024;
+		if (bytes < k) {
+			return ofSize(bytes, Unit.B);
+		}
+		int exp = (int) (Math.log(bytes) / Math.log(k));
+		Unit unit = pre[exp - 1];
+		long value = (long) (bytes / Math.pow(k, exp));
+		return ofSize(value, unit);
+
 	}
 
-	public enum Unit {
-		B, KB, MB, GB, TB
+	public static Value ofPath(Path path) {
+		return new LocalPath(path);
 	}
 
 	/**
@@ -84,6 +100,9 @@ public class Values {
 		private final Unit unit;
 
 		public Size(long value, Unit unit) {
+			if (value < 0) {
+				throw new IllegalArgumentException("negative size");
+			}
 			this.value = value;
 			this.unit = unit;
 		}
