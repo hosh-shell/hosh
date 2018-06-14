@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-// TODO: take this as example of overcomplicated tests
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CommandFactoryTest {
 
@@ -63,13 +62,21 @@ public class CommandFactoryTest {
 		then((TerminalAware) result).should().setTerminal(terminal);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidCommandClass() throws Exception {
+		sut.create(CommandWithNotEmptyConstructor.class);
+	}
+
 	static class SimpleCommand implements Command {
+
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 		}
+
 	}
 
 	static class TerminalCommand implements Command, TerminalAware {
+
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 		}
@@ -82,6 +89,7 @@ public class CommandFactoryTest {
 	}
 
 	static class StateCommand implements Command, StateAware {
+
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 		}
@@ -92,6 +100,7 @@ public class CommandFactoryTest {
 	}
 
 	static class TerminalStateCommand implements Command, StateAware, TerminalAware {
+
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 		}
@@ -106,22 +115,19 @@ public class CommandFactoryTest {
 		}
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void invalidCommandClass() throws Exception {
-		@SuppressWarnings("unused")
-		class CommandWithNotEmptyConstructor implements Command {
-			private final String name;
+	@SuppressWarnings("unused")
+	static class CommandWithNotEmptyConstructor implements Command {
 
-			public CommandWithNotEmptyConstructor(String name) {
-				this.name = name;
-			}
+		private final String name;
 
-			@Override
-			public void run(List<String> args, Channel out, Channel err) {
-			}
+		public CommandWithNotEmptyConstructor(String name) {
+			this.name = name;
 		}
 
-		sut.create(CommandWithNotEmptyConstructor.class);
+		@Override
+		public void run(List<String> args, Channel out, Channel err) {
+		}
+
 	}
 
 }
