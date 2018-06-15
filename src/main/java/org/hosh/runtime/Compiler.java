@@ -14,11 +14,9 @@ import org.hosh.spi.State;
 public class Compiler {
 
 	private final State state;
-	private final CommandFactory commandFactory;
 
-	public Compiler(State state, CommandFactory commandFactory) {
+	public Compiler(State state) {
 		this.state = state;
-		this.commandFactory = commandFactory;
 	}
 
 	public Program compile(String line) {
@@ -35,11 +33,10 @@ public class Compiler {
 
 	private Statement compileStatement(StmtContext stmt) {
 		String commandName = stmt.ID().get(0).getSymbol().getText();
-		Class<? extends Command> commandClass = state.getCommands().get(commandName);
-		if (commandClass == null) {
+		Command command = state.getCommands().get(commandName);
+		if (command == null) {
 			throw new CompileError("command not found: " + commandName);
 		}
-		Command command = commandFactory.create(commandClass);
 		List<String> commandArgs = compileArguments(stmt);
 		Statement statement = new Statement();
 		statement.setCommand(command);

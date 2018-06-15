@@ -25,9 +25,6 @@ public class CompilerTest {
 	@Mock
 	private State state;
 
-	@Mock
-	private CommandFactory commandFactory;
-
 	@Spy
 	private Command command;
 
@@ -36,8 +33,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandWithoutArguments() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("env", Command.class));
-		given(commandFactory.create(Command.class)).willReturn(command);
+		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
 
 		Program program = sut.compile("env");
 
@@ -49,8 +45,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandWithArguments() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("env", Command.class));
-		given(commandFactory.create(Command.class)).willReturn(command);
+		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
 
 		Program program = sut.compile("env --system");
 
@@ -62,7 +57,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandNotRegistered() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("env", Command.class));
+		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
 
 		assertThatThrownBy(() -> sut.compile("env2"))
 				.isInstanceOf(CompileError.class)

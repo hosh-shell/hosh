@@ -49,7 +49,7 @@ public class CommandCompleterTest {
 	@Test
 	public void oneCommand() {
 		List<Candidate> candidates = new ArrayList<>();
-		given(state.getCommands()).willReturn(Collections.singletonMap("cmd", command.getClass()));
+		given(state.getCommands()).willReturn(Collections.singletonMap("cmd", command));
 		sut.complete(lineReader, parsedLine, candidates);
 		then(lineReader).shouldHaveNoMoreInteractions();
 		then(parsedLine).shouldHaveNoMoreInteractions();

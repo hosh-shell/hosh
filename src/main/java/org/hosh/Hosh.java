@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.runtime.CommandCompleter;
-import org.hosh.runtime.CommandFactory;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
@@ -66,19 +65,17 @@ public class Hosh {
 			module.onStartup(commandRegistry);
 		}
 		LineReaderIterator read = new LineReaderIterator(state, lineReader);
-		CommandFactory commandFactory = new CommandFactory(state, terminal);
-		Compiler compiler = new Compiler(state, commandFactory);
-
+		Compiler compiler = new Compiler(state);
 		if (args.length == 0) {
 			Channel out = new ConsoleChannel(terminal, AttributedStyle.WHITE);
 			Channel err = new ConsoleChannel(terminal, AttributedStyle.RED);
-			Interpreter interpreter = new Interpreter(out, err);
+			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			welcome(out);
 			repl(read, compiler, interpreter, err);
 		} else {
 			Channel out = new SimpleChannel(System.out);
 			Channel err = new SimpleChannel(System.err);
-			Interpreter interpreter = new Interpreter(out, err);
+			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			script(args[0], compiler, interpreter, err);
 		}
 	}

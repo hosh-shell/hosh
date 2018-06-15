@@ -20,9 +20,9 @@ public class FileSystemModule implements Module {
 
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("cd", ChangeDirectory.class);
-		commandRegistry.registerCommand("ls", ListFiles.class);
-		commandRegistry.registerCommand("cwd", CurrentWorkingDirectory.class);
+		commandRegistry.registerCommand("cd", new ChangeDirectory());
+		commandRegistry.registerCommand("ls", new ListFiles());
+		commandRegistry.registerCommand("cwd", new CurrentWorkingDirectory());
 	}
 
 	public static class ListFiles implements Command, StateAware {

@@ -14,8 +14,8 @@ public class TerminalModule implements Module {
 
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("clear", Clear.class);
-		commandRegistry.registerCommand("bell", Bell.class);
+		commandRegistry.registerCommand("clear", new Clear());
+		commandRegistry.registerCommand("bell", new Bell());
 	}
 
 	public static class Clear implements Command, TerminalAware {

@@ -19,10 +19,10 @@ public class SystemModule implements Module {
 
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("env", Env.class);
-		commandRegistry.registerCommand("info", Info.class);
-		commandRegistry.registerCommand("exit", Exit.class);
-		commandRegistry.registerCommand("help", Help.class);
+		commandRegistry.registerCommand("env", new Env());
+		commandRegistry.registerCommand("info", new Info());
+		commandRegistry.registerCommand("exit", new Exit());
+		commandRegistry.registerCommand("help", new Help());
 
 	}
 

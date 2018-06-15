@@ -8,13 +8,13 @@ import java.util.Map;
 /**
  * The state of the shell: it has been modeled as explicit state, this is
  * effective a global variable.
- * 
+ *
  * TODO: redesign to make dataflow unidirectional (like redux)
  */
 public class State {
 
 	// registered commands
-	private final Map<String, Class<? extends Command>> commands = new HashMap<>();
+	private final Map<String, Command> commands = new HashMap<>();
 	// current working directory
 	private Path cwd;
 	// current prompt
@@ -32,7 +32,7 @@ public class State {
 		return cwd;
 	}
 
-	public Map<String, Class<? extends Command>> getCommands() {
+	public Map<String, Command> getCommands() {
 		return commands;
 	}
 
