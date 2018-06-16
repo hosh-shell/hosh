@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
+import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
 
@@ -22,15 +23,48 @@ public class HoshTest {
 	@Rule
 	public final SystemOutRule systemOutRule = new SystemOutRule();
 
+	@Rule
+	public final SystemErrRule systemErrRule = new SystemErrRule();
+
+	@Test
+	public void missingScript() throws Exception {
+		File scriptPath = temporaryFolder.newFile("test.hosh");
+		expectedSystemExit.expectSystemExit();
+
+		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
+
+		assertThat(systemOutRule.getLog()).isEmpty();
+		assertThat(systemErrRule.getLog()).contains("test.hosh");
+	}
+
+	@Test
+	public void scriptWithSyntaxError() throws Exception {
+		File scriptPath = temporaryFolder.newFile("test.hosh");
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("asd" + "\n");
+			script.flush();
+		}
+		expectedSystemExit.expectSystemExitWithStatus(1);
+
+		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
+
+		assertThat(systemOutRule.getLog()).isEmpty();
+		assertThat(systemErrRule.getLog()).contains("asd");
+	}
+
 	@Test
 	public void scriptWithExit() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
-			script.write("exit 1\n");
+			script.write("exit 1" + "\n");
 			script.flush();
 		}
 		expectedSystemExit.expectSystemExitWithStatus(1);
+
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
+
+		assertThat(systemOutRule.getLog()).containsOnlyOnce("pom.xml");
+		assertThat(systemErrRule.getLog()).isEmpty();
 	}
 
 	@Test
@@ -45,6 +79,7 @@ public class HoshTest {
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 
 		assertThat(systemOutRule.getLog()).containsOnlyOnce("pom.xml");
+		assertThat(systemErrRule.getLog()).isEmpty();
 	}
 
 }

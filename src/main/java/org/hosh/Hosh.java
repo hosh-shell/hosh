@@ -76,7 +76,8 @@ public class Hosh {
 			Channel out = new SimpleChannel(System.out);
 			Channel err = new SimpleChannel(System.err);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
-			script(args[0], compiler, interpreter, err);
+			String filePath = args[0];
+			script(filePath, compiler, interpreter, err);
 		}
 	}
 
