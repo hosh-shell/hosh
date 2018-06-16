@@ -60,8 +60,8 @@ public class SystemModuleTest {
 
 		@Test
 		public void oneValidArg() {
-			expectedSystemExit.expectSystemExitWithStatus(1);
-			sut.run(Arrays.asList("1"), out, err);
+			expectedSystemExit.expectSystemExitWithStatus(21);
+			sut.run(Arrays.asList("21"), out, err);
 		}
 
 		@Test
