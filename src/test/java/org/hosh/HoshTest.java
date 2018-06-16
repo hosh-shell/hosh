@@ -56,7 +56,7 @@ public class HoshTest {
 			@Override
 			public void checkAssertion() throws Exception {
 				assertThat(systemOutRule.getLog()).isEmpty();
-				assertThat(systemErrRule.getLog()).contains("command not found: asd");
+				assertThat(systemErrRule.getLog()).contains("line 1: unknown command asd");
 			}
 
 		});

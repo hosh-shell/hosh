@@ -33,15 +33,17 @@ public class Compiler {
 	}
 
 	private Statement compileStatement(StmtContext stmt) {
-		String commandName = stmt.ID().get(0).getSymbol().getText();
+		Token token = stmt.ID().get(0).getSymbol();
+		String commandName = token.getText();
 		Command command = state.getCommands().get(commandName);
 		if (command == null) {
-			throw new CompileError("command not found: " + commandName);
+			throw new CompileError("line " + token.getLine() + ": unknown command " + commandName);
 		}
 		List<String> commandArgs = compileArguments(stmt);
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
+		statement.setLineNumber(token.getLine());
 		return statement;
 	}
 
@@ -67,6 +69,7 @@ public class Compiler {
 
 		private Command command;
 		private List<String> arguments;
+		private int lineNumber;
 
 		public void setCommand(Command command) {
 			this.command = command;
@@ -82,6 +85,14 @@ public class Compiler {
 
 		public void setArguments(List<String> arguments) {
 			this.arguments = arguments;
+		}
+
+		public void setLineNumber(int lineNumber) {
+			this.lineNumber = lineNumber;
+		}
+
+		public int getLineNumber() {
+			return lineNumber;
 		}
 
 	}

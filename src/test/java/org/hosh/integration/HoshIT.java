@@ -68,7 +68,7 @@ public class HoshIT {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
 		String output = bufferedReader.lines().collect(Collectors.joining("\n"));
 		int exitCode = java.waitFor();
-		assertThat(output).contains("command not found: AAAAB");
+		assertThat(output).contains("line 1: unknown command AAAAB");
 		assertThat(exitCode).isEqualTo(1);
 	}
 

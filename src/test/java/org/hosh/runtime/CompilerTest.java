@@ -59,9 +59,9 @@ public class CompilerTest {
 	public void commandNotRegistered() {
 		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
 
-		assertThatThrownBy(() -> sut.compile("env2"))
+		assertThatThrownBy(() -> sut.compile("env\nenv\nenv2"))
 				.isInstanceOf(CompileError.class)
-				.hasMessage("command not found: env2");
+				.hasMessage("line 3: unknown command env2");
 	}
 
 }
