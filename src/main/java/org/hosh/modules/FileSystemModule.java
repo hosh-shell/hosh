@@ -92,7 +92,13 @@ public class FileSystemModule implements Module {
 					err.send(Record.of("error", Values.ofText("missing path argument")));
 					break;
 				case 1:
-					Path newCwd = Paths.get(state.getCwd().toString(), args.get(0));
+					Path arg = Paths.get(args.get(0));
+					final Path newCwd;
+					if (arg.isAbsolute()) {
+						newCwd = arg;
+					} else {
+						newCwd = Paths.get(state.getCwd().toString(), args.get(0));
+					}
 					if (Files.isDirectory(newCwd)) {
 						state.setCwd(newCwd);
 					} else {

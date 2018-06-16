@@ -143,7 +143,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneDirectoryArgument() throws IOException {
+		public void oneDirectoryRelativeArgument() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			File newFolder = temporaryFolder.newFolder("dir");
 			newFolder.mkdirs();
@@ -151,6 +151,18 @@ public class FileSystemModuleTest {
 			sut.run(Arrays.asList("dir"), out, err);
 
 			then(state).should().setCwd(newFolder.toPath().toAbsolutePath());
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void oneDirectoryAbsoluteArgument() throws IOException {
+			File newFolder = temporaryFolder.newFolder("dir");
+			newFolder.mkdirs();
+
+			sut.run(Arrays.asList(newFolder.toPath().toAbsolutePath().toString()), out, err);
+
+			then(state).should().setCwd(newFolder.toPath());
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}

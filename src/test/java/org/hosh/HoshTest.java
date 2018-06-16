@@ -89,6 +89,7 @@ public class HoshTest {
 	public void simpleScript() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("cd " + temporaryFolder.getRoot().getAbsolutePath() + "\n");
 			script.write("ls" + "\n");
 			script.flush();
 		}
@@ -97,7 +98,7 @@ public class HoshTest {
 
 			@Override
 			public void checkAssertion() throws Exception {
-				assertThat(systemOutRule.getLog()).containsOnlyOnce("pom.xml");
+				assertThat(systemOutRule.getLog()).contains("test.hosh");
 			}
 
 		});
