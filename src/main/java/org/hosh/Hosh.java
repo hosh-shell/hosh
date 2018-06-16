@@ -41,6 +41,7 @@ public class Hosh {
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
 		Logger logger = LoggerFactory.getLogger(Hosh.class);
+		logger.info("starting hosh {}", Version.readVersion());
 		Terminal terminal = TerminalBuilder
 				.builder()
 				.system(true)

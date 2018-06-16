@@ -3,11 +3,11 @@ package org.hosh.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
@@ -23,11 +23,10 @@ public class HoshIT {
 	@Test
 	public void interactive() throws Exception {
 		Process java = new ProcessBuilder()
-				.command("java", "-jar", "target/dist/hosh.jar")
+				.command("java", "-Duser.home=/tmp", "-jar", "target/dist/hosh.jar")
 				.redirectErrorStream(true)
 				.start();
-		try (BufferedWriter writer = new BufferedWriter(
-				new OutputStreamWriter(java.getOutputStream(), StandardCharsets.UTF_8))) {
+		try (Writer writer = new OutputStreamWriter(java.getOutputStream(), StandardCharsets.UTF_8)) {
 			writer.write("cwd\n");
 			writer.write("exit\n");
 			writer.flush();
@@ -44,7 +43,7 @@ public class HoshIT {
 			script.flush();
 		}
 		Process java = new ProcessBuilder()
-				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
+				.command("java", "-Duser.home=/tmp", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
 				.redirectErrorStream(true)
 				.start();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
@@ -62,7 +61,7 @@ public class HoshIT {
 			script.flush();
 		}
 		Process java = new ProcessBuilder()
-				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
+				.command("java", "-Duser.home=/tmp", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
 				.redirectErrorStream(true)
 				.start();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
