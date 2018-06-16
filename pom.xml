@@ -10,6 +10,23 @@
 	<url>https://bitbucket.org/dfa/hosh</url>
 	<name>hosh</name>
 	<description>The Human Oriented SHell</description>
+	<inceptionYear>2018</inceptionYear>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>dfa</id>
+			<name>Davide Angelocola</name>
+			<email>davide.angelocola+hosh@gmail.com</email>
+			<url>https://stackoverflow.com/users/89266/dfa</url>
+			<timezone>Europe/Zurich</timezone>
+		</developer>
+	</developers>
 	<scm>
 		<developerConnection>scm:git:.</developerConnection>
 		<tag>HEAD</tag>
@@ -224,8 +241,8 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>jdkinternals</goal> <!-- verify main classes -->
-							<goal>test-jdkinternals</goal> <!-- verify test classes -->
+							<goal>jdkinternals</goal>
+							<goal>test-jdkinternals</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -255,6 +272,9 @@
 						</goals>
 						<configuration>
 							<rules>
+								<requireMavenVersion>
+									<version>3.5.0</version>
+								</requireMavenVersion>
 								<requireNoRepositories />
 								<requireReleaseDeps />
 							</rules>
