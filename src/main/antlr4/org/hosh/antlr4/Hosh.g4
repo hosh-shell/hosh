@@ -1,19 +1,24 @@
 grammar Hosh;
 
 program
-    : stmt*
+    : stmt* 
     ;
 
 stmt
-    : ID ID* NEWLINE
+    : ID ID* eos
     ;
 
- ID
+eos
+	: NEWLINE
+	| EOF
+	;
+
+ID
     : ([a-zA-Z0-9] | '-' | '.' | '/') +
     ;
 
 NEWLINE
-    : '\n'
+    : '\r'? '\n'
     ;
 
 WS

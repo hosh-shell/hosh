@@ -15,6 +15,7 @@ public class ParserTest {
 
 	@Test
 	public void usage() {
+		sut.parse("git");
 		sut.parse("git\n");
 		sut.parse("git status\n");
 		sut.parse("git commit --amend\n");
@@ -26,6 +27,9 @@ public class ParserTest {
 	public void newlines() {
 		sut.parse("\n");
 		sut.parse("\n\n");
+		sut.parse("\r\n");
+		sut.parse("\r\n\n");
+		sut.parse("\n\r\n");
 	}
 
 	@Test
@@ -48,14 +52,6 @@ public class ParserTest {
 		expectedException.expectMessage("line 1:0: token recognition error at: '!'");
 
 		sut.parse("!");
-	}
-
-	@Test
-	public void syntaxError() {
-		expectedException.expect(ParseError.class);
-		expectedException.expectMessage("line 1:3: mismatched input");
-
-		sut.parse("sdf");
 	}
 
 }

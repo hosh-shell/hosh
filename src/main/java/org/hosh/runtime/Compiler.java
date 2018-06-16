@@ -21,7 +21,7 @@ public class Compiler {
 
 	public Program compile(String input) {
 		Parser parser = new Parser();
-		HoshParser.ProgramContext programContext = parser.parse(input + '\n'); // TODO: remove this
+		HoshParser.ProgramContext programContext = parser.parse(input);
 		Program program = new Program();
 		List<Statement> statements = new ArrayList<>();
 		for (StmtContext stmtContext : programContext.stmt()) {
