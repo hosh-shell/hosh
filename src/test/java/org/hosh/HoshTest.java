@@ -22,10 +22,10 @@ public class HoshTest {
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Rule
-	public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+	public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().mute();
 
 	@Rule
-	public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
+	public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().mute();
 
 	@Test
 	public void missingScript() throws Exception {
