@@ -98,7 +98,9 @@ public class SystemModuleTest {
 		@Test
 		public void noArgs() throws IOException {
 			environmentVariables.set("HOSH_VERSION", "1.0");
+
 			sut.run(Arrays.asList(), out, err);
+
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
 			Record record = Record.empty().add("key", Values.ofText("HOSH_VERSION")).add("value", Values.ofText("1.0"));
@@ -108,6 +110,7 @@ public class SystemModuleTest {
 		@Test
 		public void oneArg() {
 			sut.run(Arrays.asList("1"), out, err);
+
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting no parameters")));
 		}

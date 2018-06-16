@@ -7,6 +7,7 @@ import java.io.FileWriter;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.Assertion;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
@@ -21,20 +22,25 @@ public class HoshTest {
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Rule
-	public final SystemOutRule systemOutRule = new SystemOutRule();
+	public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
 
 	@Rule
-	public final SystemErrRule systemErrRule = new SystemErrRule();
+	public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
 
 	@Test
 	public void missingScript() throws Exception {
-		File scriptPath = temporaryFolder.newFile("test.hosh");
-		expectedSystemExit.expectSystemExit();
+		expectedSystemExit.expectSystemExitWithStatus(1);
+		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
 
-		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
+			@Override
+			public void checkAssertion() throws Exception {
+				assertThat(systemOutRule.getLog()).isEmpty();
+				assertThat(systemErrRule.getLog()).contains("unable to load: test.hosh");
+			}
 
-		assertThat(systemOutRule.getLog()).isEmpty();
-		assertThat(systemErrRule.getLog()).contains("test.hosh");
+		});
+
+		Hosh.main(new String[] { "test.hosh" });
 	}
 
 	@Test
@@ -45,11 +51,17 @@ public class HoshTest {
 			script.flush();
 		}
 		expectedSystemExit.expectSystemExitWithStatus(1);
+		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
+
+			@Override
+			public void checkAssertion() throws Exception {
+				assertThat(systemOutRule.getLog()).isEmpty();
+				assertThat(systemErrRule.getLog()).contains("command not found: asd");
+			}
+
+		});
 
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
-
-		assertThat(systemOutRule.getLog()).isEmpty();
-		assertThat(systemErrRule.getLog()).contains("asd");
 	}
 
 	@Test
@@ -59,12 +71,18 @@ public class HoshTest {
 			script.write("exit 1" + "\n");
 			script.flush();
 		}
+
 		expectedSystemExit.expectSystemExitWithStatus(1);
+		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
+
+			@Override
+			public void checkAssertion() throws Exception {
+				assertThat(systemOutRule.getLog()).isEmpty();
+			}
+
+		});
 
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
-
-		assertThat(systemOutRule.getLog()).containsOnlyOnce("pom.xml");
-		assertThat(systemErrRule.getLog()).isEmpty();
 	}
 
 	@Test
@@ -75,11 +93,16 @@ public class HoshTest {
 			script.flush();
 		}
 		expectedSystemExit.expectSystemExitWithStatus(0);
+		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
+
+			@Override
+			public void checkAssertion() throws Exception {
+				assertThat(systemOutRule.getLog()).containsOnlyOnce("pom.xml");
+			}
+
+		});
 
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
-
-		assertThat(systemOutRule.getLog()).containsOnlyOnce("pom.xml");
-		assertThat(systemErrRule.getLog()).isEmpty();
 	}
 
 }
