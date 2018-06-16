@@ -1,8 +1,7 @@
 grammar Hosh;
 
 program
-    : EOF
-    | stmt+ EOF
+    : stmt*
     ;
 
 stmt
@@ -10,7 +9,7 @@ stmt
     ;
 
  ID
-    : ([a-zA-Z0-9-] | '.' | '/') +
+    : ([a-zA-Z0-9] | '-' | '.' | '/') +
     ;
 
 NEWLINE

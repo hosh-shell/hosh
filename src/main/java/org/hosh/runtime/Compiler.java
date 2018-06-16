@@ -19,8 +19,9 @@ public class Compiler {
 		this.state = state;
 	}
 
-	public Program compile(String line) {
-		HoshParser.ProgramContext programContext = Parser.parse(line + '\n');
+	public Program compile(String input) {
+		Parser parser = new Parser();
+		HoshParser.ProgramContext programContext = parser.parse(input + '\n'); // TODO: remove this
 		Program program = new Program();
 		List<Statement> statements = new ArrayList<>();
 		for (StmtContext stmtContext : programContext.stmt()) {
