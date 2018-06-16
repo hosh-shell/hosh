@@ -8,8 +8,6 @@ import java.util.Map;
 /**
  * The state of the shell: it has been modeled as explicit state, this is
  * effective a global variable.
- *
- * TODO: redesign to make dataflow unidirectional (like redux)
  */
 public class State {
 

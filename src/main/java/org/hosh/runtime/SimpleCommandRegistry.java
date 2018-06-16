@@ -14,12 +14,14 @@ public class SimpleCommandRegistry implements CommandRegistry {
 		this.state = state;
 	}
 
-	// TODO: check for overwriting existing commands
 	@Override
 	public void registerCommand(String name, Command command) {
 		Objects.requireNonNull(name, "name cannot be null");
 		Objects.requireNonNull(command, "command cannot be null");
-		state.getCommands().put(name, command);
+		Command oldCommand = state.getCommands().putIfAbsent(name, command);
+		if (oldCommand != null) {
+			throw new IllegalArgumentException("command with same name already registered: " + name);
+		}
 	}
 
 }

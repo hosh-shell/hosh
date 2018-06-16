@@ -22,7 +22,7 @@ public class ValuesTest {
 		assertThat(a).isNotEqualTo(c);
 		assertThat(b).isNotEqualTo(c);
 		assertThat(a).isNotEqualTo("message");
-		assertThat(a.hashCode()).isEqualTo(b.hashCode());
+		assertThat(a).hasSameHashCodeAs(b);
 	}
 
 	@Test
@@ -37,7 +37,7 @@ public class ValuesTest {
 		assertThat(a).isNotEqualTo(c);
 		assertThat(b).isNotEqualTo(c);
 		assertThat(a).isNotEqualTo(42L);
-		assertThat(a.hashCode()).isEqualTo(b.hashCode());
+		assertThat(a).hasSameHashCodeAs(b);
 
 		assertThat(Values.ofHumanizedSize(0L)).hasToString("Size[0B]");
 		assertThat(Values.ofHumanizedSize(512L)).hasToString("Size[512B]");
@@ -68,7 +68,7 @@ public class ValuesTest {
 		assertThat(a).isNotEqualTo(c);
 		assertThat(b).isNotEqualTo(c);
 		assertThat(a).isNotEqualTo("message");
-		assertThat(a.hashCode()).isEqualTo(b.hashCode());
+		assertThat(a).hasSameHashCodeAs(b);
 	}
 
 }
