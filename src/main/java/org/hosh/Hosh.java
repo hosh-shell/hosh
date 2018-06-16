@@ -32,13 +32,15 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /** Main class */
 public class Hosh {
 
-	private static final Logger logger = LoggerFactory.getLogger(Hosh.class);
-
 	public static void main(String[] args) throws Exception {
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
+		Logger logger = LoggerFactory.getLogger(Hosh.class);
 		Terminal terminal = TerminalBuilder
 				.builder()
 				.system(true)
@@ -71,17 +73,17 @@ public class Hosh {
 			Channel err = new ConsoleChannel(terminal, AttributedStyle.RED);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			welcome(out);
-			repl(read, compiler, interpreter, err);
+			repl(read, compiler, interpreter, err, logger);
 		} else {
 			Channel out = new SimpleChannel(System.out);
 			Channel err = new SimpleChannel(System.err);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			String filePath = args[0];
-			script(filePath, compiler, interpreter, err);
+			script(filePath, compiler, interpreter, err, logger);
 		}
 	}
 
-	private static void script(String path, Compiler compiler, Interpreter interpreter, Channel err)
+	private static void script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger)
 			throws IOException {
 		try (Stream<String> lines = Files.lines(Paths.get(path), StandardCharsets.UTF_8)) {
 			String script = lines.collect(Collectors.joining("\n"));
@@ -99,7 +101,8 @@ public class Hosh {
 		}
 	}
 
-	private static void repl(LineReaderIterator read, Compiler compiler, Interpreter interpreter, Channel err) {
+	private static void repl(LineReaderIterator read, Compiler compiler, Interpreter interpreter, Channel err,
+			Logger logger) {
 		while (read.hasNext()) {
 			String line = read.next();
 			try {
