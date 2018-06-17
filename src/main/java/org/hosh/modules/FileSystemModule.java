@@ -1,7 +1,6 @@
 package org.hosh.modules;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -50,8 +49,7 @@ public class FileSystemModule implements Module {
 					out.send(entry);
 				}
 			} catch (IOException e) {
-				// TODO: logger or special value transporting errors?
-				err.send(Record.of("message", Values.ofText(e.getMessage())));
+				err.send(Record.of("exception", Values.ofText(e.getMessage())));
 			}
 		}
 	}
@@ -131,7 +129,7 @@ public class FileSystemModule implements Module {
 						path = Paths.get(state.getCwd().toString(), args.get(0));
 					}
 					if (Files.isRegularFile(path)) {
-						readLines(out, path);
+						readLines(path, out, err);
 					} else {
 						err.send(Record.of("error", Values.ofText("not readable file")));
 					}
@@ -142,13 +140,13 @@ public class FileSystemModule implements Module {
 			}
 		}
 
-		private void readLines(Channel out, Path path) {
+		private void readLines(Path path, Channel out, Channel err) {
 			try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
 				lines.forEach(line -> {
 					out.send(Record.of("line", Values.ofText(line)));
 				});
 			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				err.send(Record.of("exception", Values.ofText(e.getMessage())));
 			}
 		}
 
