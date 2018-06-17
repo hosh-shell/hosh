@@ -39,7 +39,8 @@ public class HoshIT {
 	public void scriptWithoutError() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
-			script.write("ls" + "\n");
+			script.write("cd " + temporaryFolder.getRoot().getAbsolutePath() + "\n");
+			script.write("cwd" + "\n");
 			script.flush();
 		}
 		Process java = new ProcessBuilder()
@@ -49,7 +50,7 @@ public class HoshIT {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
 		String output = bufferedReader.lines().collect(Collectors.joining());
 		int exitCode = java.waitFor();
-		assertThat(output).contains("pom.xml");
+		assertThat(output).contains(temporaryFolder.getRoot().getAbsolutePath());
 		assertThat(exitCode).isEqualTo(0);
 	}
 

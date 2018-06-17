@@ -1,7 +1,6 @@
 package org.hosh.spi;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +16,6 @@ public class State {
 	private Path cwd;
 	// current prompt
 	private String prompt;
-
-	public State() {
-		setCwd(Paths.get("."));
-	}
 
 	public void setCwd(Path cwd) {
 		this.cwd = cwd.normalize().toAbsolutePath();

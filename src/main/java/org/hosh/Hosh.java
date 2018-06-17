@@ -53,6 +53,7 @@ public class Hosh {
 				.toAnsi(terminal);
 		State state = new State();
 		state.setPrompt(prompt);
+		state.setCwd(Paths.get("."));
 		LineReader lineReader = LineReaderBuilder
 				.builder()
 				.appName("hosh")

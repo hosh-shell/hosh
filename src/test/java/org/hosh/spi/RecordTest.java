@@ -13,7 +13,7 @@ public class RecordTest {
 		Record b = Record.copy(a);
 
 		assertThat(a).isEqualTo(b);
-		assertThat(a.hashCode()).isEqualTo(b.hashCode());
+		assertThat(a).hasSameHashCodeAs(b);
 		assertThat(a.toString()).isEqualTo(b.toString());
 	}
 
