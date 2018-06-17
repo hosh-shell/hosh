@@ -1,10 +1,8 @@
 package org.hosh.modules;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -20,7 +18,6 @@ public class SystemModule implements Module {
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("env", new Env());
-		commandRegistry.registerCommand("info", new Info());
 		commandRegistry.registerCommand("exit", new Exit());
 		commandRegistry.registerCommand("help", new Help());
 
@@ -41,16 +38,6 @@ public class SystemModule implements Module {
 						.add("value", Values.ofText(entry.getValue()));
 				out.send(record);
 			}
-		}
-
-	}
-
-	public static class Info implements Command {
-
-		@Override
-		public void run(List<String> args, Channel out, Channel err) {
-			out.send(Record.of("timezone", Values.ofText(TimeZone.getDefault().getID())));
-			out.send(Record.of("locale", Values.ofText(Locale.getDefault().getISO3Country())));
 		}
 
 	}
