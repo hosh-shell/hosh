@@ -5,7 +5,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-// TODO: missing asserts
+// this test is for language explorations
+// by now no asserts are enforced
 public class ParserTest {
 
 	@Rule
@@ -44,6 +45,12 @@ public class ParserTest {
 		sut.parse("# comment\n");
 		sut.parse("# comment\r\n");
 		sut.parse("# comment\r\n  # comment\n");
+	}
+
+	@Test
+	public void pipelines() {
+		sut.parse("cat file.txt | grep /regexp/");
+		sut.parse("cat file.txt | grep /regexp/ | wc -l");
 	}
 
 	@Test

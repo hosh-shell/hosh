@@ -5,8 +5,10 @@ program
     ;
 
 stmt
-    : ID ID* eos
+    : ID+ eos
+    | ID+  '|' stmt
     ;
+
 
 eos
 	: NEWLINE
