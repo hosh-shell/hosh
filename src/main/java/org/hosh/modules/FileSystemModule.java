@@ -126,8 +126,11 @@ public class FileSystemModule implements Module {
 		public void run(List<String> args, Channel out, Channel err) {
 			switch (args.size()) {
 				case 1:
-					Path path = Paths.get(state.getCwd().toString(), args.get(0));
-					if (Files.isReadable(path)) {
+					Path path = Paths.get(args.get(0));
+					if (!path.isAbsolute()) {
+						path = Paths.get(state.getCwd().toString(), args.get(0));
+					}
+					if (Files.isRegularFile(path)) {
 						readLines(out, path);
 					} else {
 						err.send(Record.of("error", Values.ofText("not readable file")));

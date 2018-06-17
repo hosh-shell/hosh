@@ -43,7 +43,6 @@ public class Compiler {
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
-		statement.setLineNumber(token.getLine());
 		return statement;
 	}
 
@@ -69,7 +68,6 @@ public class Compiler {
 
 		private Command command;
 		private List<String> arguments;
-		private int lineNumber;
 
 		public void setCommand(Command command) {
 			this.command = command;
@@ -85,14 +83,6 @@ public class Compiler {
 
 		public void setArguments(List<String> arguments) {
 			this.arguments = arguments;
-		}
-
-		public void setLineNumber(int lineNumber) {
-			this.lineNumber = lineNumber;
-		}
-
-		public int getLineNumber() {
-			return lineNumber;
 		}
 
 	}

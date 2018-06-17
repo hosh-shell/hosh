@@ -4,10 +4,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import org.hosh.modules.FileSystemModule.Cat;
 import org.hosh.modules.FileSystemModule.ChangeDirectory;
 import org.hosh.modules.FileSystemModule.CurrentWorkingDirectory;
 import org.hosh.modules.FileSystemModule.ListFiles;
@@ -31,7 +33,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @SuiteClasses({
 		FileSystemModuleTest.ListTest.class,
 		FileSystemModuleTest.ChangeDirectoryTest.class,
-		FileSystemModuleTest.CurrentWorkingDirectoryTest.class
+		FileSystemModuleTest.CurrentWorkingDirectoryTest.class,
+		FileSystemModuleTest.CatTest.class
 })
 public class FileSystemModuleTest {
 
@@ -215,6 +218,83 @@ public class FileSystemModuleTest {
 			sut.run(Arrays.asList("asd"), out, err);
 
 			then(err).should().send(Record.of("error", Values.ofText("expecting no parameters")));
+			then(out).shouldHaveZeroInteractions();
+		}
+
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class CatTest {
+
+		@Rule
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock
+		private State state;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Cat sut;
+
+		@Test
+		public void emptyFile() throws IOException {
+			File newFile = temporaryFolder.newFile("data.txt");
+
+			sut.run(Arrays.asList(newFile.getAbsolutePath()), out, err);
+
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void nonEmptyFile() throws IOException {
+			File newFile = temporaryFolder.newFile("data.txt");
+			try (FileWriter writer = new FileWriter(newFile)) {
+				writer.write("a 1\n");
+				writer.write("b 2\n");
+			}
+
+			sut.run(Arrays.asList(newFile.getAbsolutePath()), out, err);
+
+			then(out).should().send(Record.of("line", Values.ofText("a 1")));
+			then(out).should().send(Record.of("line", Values.ofText("b 2")));
+			then(err).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void nonEmptyFileInCwd() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			File newFile = temporaryFolder.newFile("data.txt");
+			try (FileWriter writer = new FileWriter(newFile)) {
+				writer.write("a 1\n");
+			}
+
+			sut.run(Arrays.asList(newFile.getName()), out, err);
+
+			then(out).should().send(Record.of("line", Values.ofText("a 1")));
+			then(err).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void directory() throws IOException {
+			sut.run(Arrays.asList(temporaryFolder.getRoot().getAbsolutePath()), out, err);
+
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("not readable file")));
+		}
+
+		@Test
+		public void noArgs() {
+			sut.run(Arrays.asList(), out, err);
+
+			then(err).should().send(Record.of("error", Values.ofText("expecting one path argument")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
