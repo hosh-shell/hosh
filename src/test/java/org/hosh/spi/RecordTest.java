@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.hosh.spi.Values.Unit;
 import org.junit.Test;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 public class RecordTest {
 
 	@Test
@@ -38,13 +40,6 @@ public class RecordTest {
 	}
 
 	@Test
-	public void equality() {
-		Record a = Record.empty();
-
-		assertThat(a).isNotEqualTo("");
-	}
-
-	@Test
 	public void representation() {
 		Record a = Record.empty();
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
@@ -59,6 +54,11 @@ public class RecordTest {
 		Record a = Record.empty().add("key", value).add("another_key", anotherValue);
 		assertThat(a.keys()).containsExactly("key", "another_key");
 		assertThat(a.values()).containsExactly(value, anotherValue);
+	}
+
+	@Test
+	public void equalsContract() {
+		EqualsVerifier.forClass(Record.class).verify();
 	}
 
 }

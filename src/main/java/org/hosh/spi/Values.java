@@ -52,7 +52,7 @@ public class Values {
 	 * Generic text, make sure that text hasn't any number or date formatted without
 	 * the current locale.
 	 */
-	private static class Text implements Value {
+	static final class Text implements Value {
 
 		private final String value;
 
@@ -94,7 +94,7 @@ public class Values {
 	/**
 	 * Used to represent a size of a file, etc.
 	 */
-	private static class Size implements Value {
+	static final class Size implements Value {
 
 		private final long value;
 		private final Unit unit;
@@ -139,7 +139,7 @@ public class Values {
 
 	}
 
-	private static class LocalPath implements Value {
+	static final class LocalPath implements Value {
 
 		private final Path path;
 

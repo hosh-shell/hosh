@@ -15,7 +15,7 @@ import java.util.Objects;
  * it can be presented to the screen somehow.
  */
 // TODO: emit a special record at the start to provide column names
-public class Record {
+public final class Record {
 
 	private final Map<String, Value> data;
 
