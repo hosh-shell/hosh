@@ -37,11 +37,15 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 /** Main class */
 public class Hosh {
 
+	private Hosh() {
+	}
+
 	public static void main(String[] args) throws Exception {
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
 		Logger logger = LoggerFactory.getLogger(Hosh.class);
-		logger.info("starting hosh {}", Version.readVersion());
+		String version = Version.readVersion();
+		logger.info("starting hosh {}", version);
 		Terminal terminal = TerminalBuilder
 				.builder()
 				.system(true)
@@ -74,7 +78,7 @@ public class Hosh {
 			Channel out = new ConsoleChannel(terminal, AttributedStyle.WHITE);
 			Channel err = new ConsoleChannel(terminal, AttributedStyle.RED);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
-			welcome(out);
+			welcome(out, version);
 			repl(read, compiler, interpreter, err, logger);
 		} else {
 			Channel out = new SimpleChannel(System.out);
@@ -118,8 +122,8 @@ public class Hosh {
 		System.exit(0);
 	}
 
-	private static void welcome(Channel out) throws IOException {
-		out.send(Record.of("message", Values.ofText("hosh v" + Version.readVersion())));
+	private static void welcome(Channel out, String version) {
+		out.send(Record.of("message", Values.ofText("hosh v" + version)));
 		out.send(Record.of("message", Values.ofText("Running on Java " + System.getProperty("java.version"))));
 	}
 
