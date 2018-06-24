@@ -64,9 +64,15 @@ public class ValuesTest {
 		private Appendable appendable;
 
 		@Test
-		public void appendOk() throws IOException {
-			Values.ofSize(10, Unit.GB).append(appendable, Locale.getDefault());
-			then(appendable).should().append("10GB");
+		public void appendOkWithUkLocale() throws IOException {
+			Values.ofSize(10_000_000, Unit.B).append(appendable, Locale.UK);
+			then(appendable).should().append("10,000,000B");
+		}
+
+		@Test
+		public void appendOkWithItalianLocale() throws IOException {
+			Values.ofSize(10_000_000, Unit.B).append(appendable, Locale.ITALIAN);
+			then(appendable).should().append("10.000.000B");
 		}
 
 		@Test(expected = UncheckedIOException.class)

@@ -109,7 +109,7 @@ public class Values {
 
 		@Override
 		public void append(Appendable appendable, Locale locale) {
-			String formattedValue = String.format(locale, "%d%s", value, unit);
+			String formattedValue = String.format(locale, "%,d%s", value, unit);
 			try {
 				appendable.append(formattedValue);
 			} catch (IOException e) {
