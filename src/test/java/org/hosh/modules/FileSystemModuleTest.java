@@ -83,7 +83,7 @@ public class FileSystemModuleTest {
 
 			sut.run(Arrays.asList(), out, err);
 
-			then(out).should().send(Record.of("name", Values.ofPath(Paths.get("dir"))));
+			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("dir"))));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -95,7 +95,7 @@ public class FileSystemModuleTest {
 			sut.run(Arrays.asList(), out, err);
 
 			then(out).should()
-					.send(Record.of("name", Values.ofPath(Paths.get("file"))).add("size", Values.ofSize(0, Unit.B)));
+					.send(Record.of("name", Values.ofLocalPath(Paths.get("file"))).add("size", Values.ofSize(0, Unit.B)));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -209,7 +209,7 @@ public class FileSystemModuleTest {
 
 			sut.run(Arrays.asList(), out, err);
 
-			then(out).should().send(Record.of("cwd", Values.ofPath(temporaryFolder.getRoot().toPath())));
+			then(out).should().send(Record.of("cwd", Values.ofLocalPath(temporaryFolder.getRoot().toPath())));
 			then(err).shouldHaveZeroInteractions();
 		}
 

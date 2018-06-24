@@ -41,7 +41,7 @@ public class FileSystemModule implements Module {
 		public void run(List<String> args, Channel out, Channel err) {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(state.getCwd())) {
 				for (Path path : stream) {
-					Record entry = Record.of("name", Values.ofPath(path.getFileName()));
+					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));
 					if (Files.isRegularFile(path)) {
 						long size = Files.size(path);
 						entry = entry.add("size", Values.ofHumanizedSize(size));
@@ -69,7 +69,7 @@ public class FileSystemModule implements Module {
 				err.send(Record.of("error", Values.ofText("expecting no parameters")));
 				return;
 			}
-			out.send(Record.of("cwd", Values.ofPath(state.getCwd())));
+			out.send(Record.of("cwd", Values.ofLocalPath(state.getCwd())));
 		}
 	}
 

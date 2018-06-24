@@ -44,7 +44,7 @@ public class Values {
 
 	}
 
-	public static Value ofPath(Path path) {
+	public static Value ofLocalPath(Path path) {
 		return new LocalPath(path);
 	}
 
