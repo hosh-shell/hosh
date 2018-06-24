@@ -39,6 +39,7 @@ public class State {
 
 	@Override
 	public String toString() {
-		return String.format("State[cwd='%s', prompt='%s', commands=%s]", cwd, prompt, commands);
+		return String.format("State[cwd='%s',prompt='%s',commands=%s]", cwd, prompt, commands);
 	}
+
 }
