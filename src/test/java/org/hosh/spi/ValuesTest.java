@@ -55,6 +55,11 @@ public class ValuesTest {
 			EqualsVerifier.forClass(Values.Text.class).verify();
 		}
 
+		@Test
+		public void asString() {
+			assertThat(Values.ofText("aaa")).hasToString("Text[aaa]");
+		}
+
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -132,6 +137,11 @@ public class ValuesTest {
 		@Test
 		public void equalsContract() {
 			EqualsVerifier.forClass(Values.LocalPath.class).verify();
+		}
+
+		@Test
+		public void asString() {
+			assertThat(Values.ofLocalPath(Paths.get("dir", "file"))).hasToString("LocalPath[dir/file]");
 		}
 
 	}
