@@ -12,11 +12,11 @@ import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -25,11 +25,27 @@ public class CompilerTest {
 	@Mock
 	private State state;
 
-	@Spy
+	@Mock
 	private Command command;
 
 	@InjectMocks
 	private Compiler sut;
+
+	@Ignore("missing support for pipeline")
+	@Test
+	public void commandWithPipeline() {
+		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
+
+		Program program = sut.compile("env | env");
+
+		assertThat(program.getStatements()).hasSize(1);
+		List<Statement> statements = program.getStatements();
+		assertThat(statements).hasSize(2);
+		assertThat(statements.get(0).getCommand()).isSameAs(command);
+		assertThat(statements.get(0).getArguments()).isEmpty();
+		assertThat(statements.get(0).getCommand()).isSameAs(command);
+		assertThat(statements.get(0).getArguments()).isEmpty();
+	}
 
 	@Test
 	public void commandWithoutArguments() {

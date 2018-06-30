@@ -11,11 +11,11 @@ public class AlphaNumericStringComparatorTest {
 
 	@Test
 	public void sortLetters() {
-		List<String> input = Arrays.asList("b", "c", "a", "ad");
+		List<String> input = Arrays.asList("b", "c", "a", "ad", "a");
 
 		input.sort(new AlphaNumericStringComparator());
 
-		assertThat(input).containsExactly("a", "ad", "b", "c");
+		assertThat(input).containsExactly("a", "a", "ad", "b", "c");
 	}
 
 	@Test
