@@ -62,6 +62,11 @@ public class Compiler {
 			return statements;
 		}
 
+		@Override
+		public String toString() {
+			return String.format("Program[%s]", statements);
+		}
+
 	}
 
 	public static class Statement {
@@ -83,6 +88,11 @@ public class Compiler {
 
 		public void setArguments(List<String> arguments) {
 			this.arguments = arguments;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Statement[%s %s]", command.getClass().getSimpleName(), String.join("", arguments));
 		}
 
 	}
