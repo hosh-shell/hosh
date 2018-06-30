@@ -6,9 +6,8 @@ program
 
 stmt
     : ID+ eos
-    | ID+  '|' stmt
+    | ID+ '|' stmt
     ;
-
 
 eos
 	: NEWLINE
@@ -16,7 +15,7 @@ eos
 	;
 
 ID
-    : ([a-zA-Z0-9] | '-' | '.' | '/') +
+    : ([a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/') +
     ;
 
 NEWLINE
