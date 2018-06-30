@@ -10,6 +10,15 @@ import org.junit.Test;
 public class AlphaNumericStringComparatorTest {
 
 	@Test
+	public void sortLetters() {
+		List<String> input = Arrays.asList("b", "c", "a", "ad");
+
+		input.sort(new AlphaNumericStringComparator());
+
+		assertThat(input).containsExactly("a", "ad", "b", "c");
+	}
+
+	@Test
 	public void sortIntegers() {
 		List<String> input = Arrays.asList("2", "20", "10", "1");
 
