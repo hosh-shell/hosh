@@ -92,7 +92,7 @@ public class Compiler {
 
 		@Override
 		public String toString() {
-			return String.format("Statement[%s %s]", command.getClass().getSimpleName(), String.join("", arguments));
+			return String.format("Statement[class=%s,arguments=%s]", command.getClass().getCanonicalName(), arguments);
 		}
 
 	}
