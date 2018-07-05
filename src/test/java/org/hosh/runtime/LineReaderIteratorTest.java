@@ -30,7 +30,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void oneLine() throws Exception {
-		given(state.getPrompt()).willReturn("hosh> ");
+		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willReturn("1");
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("1");
@@ -38,7 +38,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void twoLines() throws Exception {
-		given(state.getPrompt()).willReturn("hosh> ");
+		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willReturn("1", "2");
 
 		assertThat(sut.hasNext()).isTrue();
@@ -49,7 +49,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void hasNextIsIdempotent() throws Exception {
-		given(state.getPrompt()).willReturn("hosh> ");
+		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willReturn("1");
 
 		assertThat(sut.hasNext()).isTrue();
@@ -59,7 +59,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void stopsAtEOF() throws Exception {
-		given(state.getPrompt()).willReturn("hosh> ");
+		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
 
 		assertThat(sut.hasNext()).isFalse();

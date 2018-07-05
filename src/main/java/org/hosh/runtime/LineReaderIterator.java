@@ -6,6 +6,8 @@ import java.util.NoSuchElementException;
 import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
+import org.jline.utils.AttributedStringBuilder;
+import org.jline.utils.AttributedStyle;
 
 public class LineReaderIterator implements Iterator<String> {
 
@@ -22,7 +24,7 @@ public class LineReaderIterator implements Iterator<String> {
 	public boolean hasNext() {
 		if (nextLine == null) {
 			try {
-				nextLine = lineReader.readLine(state.getPrompt());
+				nextLine = lineReader.readLine(computePrompt());
 			} catch (EndOfFileException e) {
 				nextLine = null;
 				return false;
@@ -40,6 +42,20 @@ public class LineReaderIterator implements Iterator<String> {
 			nextLine = null;
 			return line;
 		}
+	}
+
+	private String computePrompt() {
+		String prompt = new AttributedStringBuilder()
+				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
+				.append("hosh:")
+				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN))
+				.append("" + state.getId())
+				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
+				.append("> ")
+				.style(AttributedStyle.DEFAULT)
+				.toAnsi(lineReader.getTerminal());
+		return prompt;
+
 	}
 
 }

@@ -28,7 +28,6 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
-import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +49,8 @@ public class Hosh {
 				.builder()
 				.system(true)
 				.build();
-		String prompt = new AttributedStringBuilder()
-				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
-				.append("hosh> ")
-				.style(AttributedStyle.DEFAULT)
-				.toAnsi(terminal);
 		State state = new State();
-		state.setPrompt(prompt);
+		state.setId(1);
 		state.setCwd(Paths.get("."));
 		LineReader lineReader = LineReaderBuilder
 				.builder()
@@ -72,14 +66,13 @@ public class Hosh {
 		for (Module module : modules) {
 			module.onStartup(commandRegistry);
 		}
-		LineReaderIterator read = new LineReaderIterator(state, lineReader);
 		Compiler compiler = new Compiler(state);
 		if (args.length == 0) {
 			Channel out = new ConsoleChannel(terminal, AttributedStyle.WHITE);
 			Channel err = new ConsoleChannel(terminal, AttributedStyle.RED);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			welcome(out, version);
-			repl(read, compiler, interpreter, err, logger);
+			repl(state, lineReader, compiler, interpreter, err, logger);
 		} else {
 			Channel out = new SimpleChannel(System.out);
 			Channel err = new SimpleChannel(System.err);
@@ -107,9 +100,11 @@ public class Hosh {
 		}
 	}
 
-	private static void repl(LineReaderIterator read, Compiler compiler, Interpreter interpreter, Channel err,
-			Logger logger) {
+	private static void repl(State state, LineReader lineReader, Compiler compiler, Interpreter interpreter,
+			Channel err, Logger logger) {
+		LineReaderIterator read = new LineReaderIterator(state, lineReader);
 		while (read.hasNext()) {
+			state.setId(state.getId() + 1);
 			String line = read.next();
 			try {
 				Program program = compiler.compile(line);

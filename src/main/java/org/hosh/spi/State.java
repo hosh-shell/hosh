@@ -14,8 +14,8 @@ public class State {
 	private final Map<String, Command> commands = new HashMap<>();
 	// current working directory
 	private Path cwd;
-	// current prompt
-	private String prompt;
+	// current command id: used by the REPL
+	private int id;
 
 	public void setCwd(Path cwd) {
 		this.cwd = cwd.normalize().toAbsolutePath();
@@ -29,17 +29,17 @@ public class State {
 		return commands;
 	}
 
-	public String getPrompt() {
-		return prompt;
+	public void setId(int id) {
+		this.id = id;
 	}
 
-	public void setPrompt(String prompt) {
-		this.prompt = prompt;
+	public int getId() {
+		return id;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("State[cwd='%s',prompt='%s',commands=%s]", cwd, prompt, commands);
+		return String.format("State[cwd='%s',id=%s,commands=%s]", cwd, id, commands);
 	}
 
 }
