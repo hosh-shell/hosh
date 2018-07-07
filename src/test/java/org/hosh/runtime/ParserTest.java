@@ -1,6 +1,6 @@
 package org.hosh.runtime;
 
-import org.hosh.doc.BUG;
+import org.hosh.doc.Bug;
 import org.hosh.runtime.Parser.ParseError;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class ParserTest {
 		sut.parse("cd ${DIR}\n");
 	}
 
-	@BUG(description = "this produces is equivalent to 'cd ${DIR}' instead of 'cd${DIR}'")
+	@Bug(description = "this produces is equivalent to 'cd ${DIR}' instead of 'cd${DIR}'")
 	@Test
 	public void languageBug() {
 		sut.parse("cd${DIR}\n");

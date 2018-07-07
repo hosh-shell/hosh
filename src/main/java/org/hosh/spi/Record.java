@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.hosh.doc.TODO;
+import org.hosh.doc.Todo;
 
 /**
  * A value object representing a record of k/v pairs.
@@ -16,7 +16,7 @@ import org.hosh.doc.TODO;
  * permissions. The user can select a subset of these keys (e.g. name) and then
  * it can be presented to the screen somehow.
  */
-@TODO(description = "emit a special record at the start to provide column names")
+@Todo(description = "emit a special record at the start to provide column names")
 public final class Record {
 
 	private final Map<String, Value> data;

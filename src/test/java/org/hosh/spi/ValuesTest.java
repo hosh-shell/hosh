@@ -10,7 +10,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import org.hosh.doc.BUG;
+import org.hosh.doc.Bug;
 import org.hosh.spi.Values.Unit;
 import org.hosh.spi.ValuesTest.LocalPathValueTest;
 import org.hosh.spi.ValuesTest.SizeValueTest;
@@ -87,7 +87,7 @@ public class ValuesTest {
 			Values.ofSize(10, Unit.GB).append(appendable, Locale.getDefault());
 		}
 
-		@BUG(description = "should be 1.99MB, instead of 1")
+		@Bug(description = "should be 1.99MB, instead of 1")
 		@Test
 		public void humanizedSizeApproximation() {
 			assertThat(Values.ofHumanizedSize(1024L * 1024 * 2 - 1)).hasToString("Size[1MB]");
