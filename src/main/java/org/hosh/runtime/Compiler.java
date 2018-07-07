@@ -55,7 +55,7 @@ public class Compiler {
 				.collect(Collectors.toList());
 	}
 
-	// resolves $DIR by looking at variables for DIR
+	// resolves $DIR by looking for DIR in variables
 	private String resolveVariable(Token token) {
 		String id = token.getText();
 		if (id.startsWith("$")) {

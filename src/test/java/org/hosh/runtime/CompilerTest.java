@@ -48,7 +48,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWithVariableExapnsion() {
+	public void commandWithVariableExpansion() {
 		given(state.getCommands()).willReturn(Collections.singletonMap("cd", command));
 		given(state.getVariables()).willReturn(Collections.singletonMap("DIR", "/tmp"));
 
@@ -58,6 +58,19 @@ public class CompilerTest {
 		List<Statement> statements = program.getStatements();
 		assertThat(statements.get(0).getCommand()).isSameAs(command);
 		assertThat(statements.get(0).getArguments()).contains("/tmp");
+	}
+
+	@Test
+	public void commandWithVariableExpansionBug() {
+		given(state.getCommands()).willReturn(Collections.singletonMap("cd", command));
+		given(state.getVariables()).willReturn(Collections.singletonMap("DIR", "/tmp"));
+
+		Program program = sut.compile("cd$DIRaaa");
+
+		assertThat(program.getStatements()).hasSize(1);
+		List<Statement> statements = program.getStatements();
+		assertThat(statements.get(0).getCommand()).isSameAs(command);
+		assertThat(statements.get(0).getArguments()).contains("/tmp", "aaa");
 	}
 
 	@Test
