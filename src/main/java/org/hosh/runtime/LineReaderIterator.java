@@ -46,7 +46,7 @@ public class LineReaderIterator implements Iterator<String> {
 	}
 
 	private String computePrompt() {
-		String prompt = new AttributedStringBuilder()
+		return new AttributedStringBuilder()
 				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
 				.append("hosh:")
 				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN))
@@ -55,8 +55,6 @@ public class LineReaderIterator implements Iterator<String> {
 				.append("> ")
 				.style(AttributedStyle.DEFAULT)
 				.toAnsi(lineReader.getTerminal());
-		return prompt;
-
 	}
 
 }
