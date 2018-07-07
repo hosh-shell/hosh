@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
+import org.jline.reader.UserInterruptException;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 
@@ -25,7 +26,7 @@ public class LineReaderIterator implements Iterator<String> {
 		if (nextLine == null) {
 			try {
 				nextLine = lineReader.readLine(computePrompt());
-			} catch (EndOfFileException e) {
+			} catch (EndOfFileException | UserInterruptException e) {
 				nextLine = null;
 				return false;
 			}

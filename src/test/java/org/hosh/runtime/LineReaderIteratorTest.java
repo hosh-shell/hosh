@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
+import org.jline.reader.UserInterruptException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -65,4 +66,14 @@ public class LineReaderIteratorTest {
 		assertThat(sut.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> sut.next());
 	}
+
+	@Test
+	public void stopsAtINT() throws Exception {
+		given(state.getId()).willReturn(0);
+		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated CTRL-C"));
+
+		assertThat(sut.hasNext()).isFalse();
+		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> sut.next());
+	}
+
 }
