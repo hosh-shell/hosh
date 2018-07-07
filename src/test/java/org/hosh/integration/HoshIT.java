@@ -36,7 +36,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithoutError() throws Exception {
+	public void scriptWithCdAndCwd() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
 			script.write("cd " + temporaryFolder.getRoot().getAbsolutePath() + "\n");
@@ -55,7 +55,27 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithError() throws Exception {
+	public void scriptWithEchoEnv() throws Exception {
+		File scriptPath = temporaryFolder.newFile("test.hosh");
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("echo $OS_ENV_VARIABLE\n");
+			script.flush();
+		}
+		ProcessBuilder processBuilder = new ProcessBuilder();
+		processBuilder.environment().put("OS_ENV_VARIABLE", "hello world!");
+		Process java = processBuilder
+				.command("java", "-Duser.home=/tmp", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
+				.redirectErrorStream(true)
+				.start();
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
+		String output = bufferedReader.lines().collect(Collectors.joining());
+		int exitCode = java.waitFor();
+		assertThat(output).contains("hello world!");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
+	public void scriptWithUnknownCommand() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
 			script.write("AAAAB" + "\n");

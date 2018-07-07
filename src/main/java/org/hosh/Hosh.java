@@ -52,15 +52,7 @@ public class Hosh {
 		State state = new State();
 		state.setId(1);
 		state.setCwd(Paths.get("."));
-		LineReader lineReader = LineReaderBuilder
-				.builder()
-				.appName("hosh")
-				.history(new DefaultHistory())
-				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
-				.variable(LineReader.HISTORY_FILE_SIZE, "1000")
-				.completer(new CommandCompleter(state))
-				.terminal(terminal)
-				.build();
+		state.getVariables().putAll(System.getenv());
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {
@@ -68,6 +60,15 @@ public class Hosh {
 		}
 		Compiler compiler = new Compiler(state);
 		if (args.length == 0) {
+			LineReader lineReader = LineReaderBuilder
+					.builder()
+					.appName("hosh")
+					.history(new DefaultHistory())
+					.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
+					.variable(LineReader.HISTORY_FILE_SIZE, "1000")
+					.completer(new CommandCompleter(state))
+					.terminal(terminal)
+					.build();
 			Channel out = new ConsoleChannel(terminal, AttributedStyle.WHITE);
 			Channel err = new ConsoleChannel(terminal, AttributedStyle.RED);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);

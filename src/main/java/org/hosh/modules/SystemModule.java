@@ -17,12 +17,24 @@ public class SystemModule implements Module {
 
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
+		commandRegistry.registerCommand("echo", new Echo());
 		commandRegistry.registerCommand("env", new Env());
 		commandRegistry.registerCommand("exit", new Exit());
 		commandRegistry.registerCommand("help", new Help());
 
 	}
 
+	public static class Echo implements Command {
+
+		@Override
+		public void run(List<String> args, Channel out, Channel err) {
+			Record record = Record.of("text", Values.ofText(String.join(" ", args)));
+			out.send(record);
+		}
+
+	}
+
+	// TODO: this is the original OS variables, but they are immutable in java
 	public static class Env implements Command {
 
 		@Override

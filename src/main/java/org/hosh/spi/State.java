@@ -10,6 +10,8 @@ import java.util.Map;
  */
 public class State {
 
+	// variables
+	private final Map<String, String> variables = new HashMap<>();
 	// registered commands
 	private final Map<String, Command> commands = new HashMap<>();
 	// current working directory
@@ -29,6 +31,10 @@ public class State {
 		return commands;
 	}
 
+	public Map<String, String> getVariables() {
+		return variables;
+	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -39,7 +45,7 @@ public class State {
 
 	@Override
 	public String toString() {
-		return String.format("State[cwd='%s',id=%s,commands=%s]", cwd, id, commands);
+		return String.format("State[cwd='%s',id=%s,variables=%s,commands=%s]", cwd, id, variables, commands);
 	}
 
 }

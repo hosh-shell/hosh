@@ -22,6 +22,7 @@ public class ParserTest {
 		sut.parse("git commit --amend\n");
 		sut.parse("cd ..\n");
 		sut.parse("cd /tmp\n");
+		sut.parse("cd $DIR\n");
 	}
 
 	@Test

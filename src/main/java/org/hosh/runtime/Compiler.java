@@ -47,7 +47,27 @@ public class Compiler {
 	}
 
 	private List<String> compileArguments(StmtContext stmt) {
-		return stmt.ID().stream().skip(1).map(TerminalNode::getSymbol).map(Token::getText).collect(Collectors.toList());
+		return stmt.ID()
+				.stream()
+				.skip(1)
+				.map(TerminalNode::getSymbol)
+				.map(this::resolveVariable)
+				.collect(Collectors.toList());
+	}
+
+	// resolves $DIR by looking at variables for DIR
+	private String resolveVariable(Token token) {
+		String id = token.getText();
+		if (id.startsWith("$")) {
+			String variableName = id.substring(1);
+			if (state.getVariables().containsKey(variableName)) {
+				return state.getVariables().get(variableName);
+			} else {
+				throw new CompileError("line " + token.getLine() + ": unknown variable " + variableName);
+			}
+		} else {
+			return id;
+		}
 	}
 
 	public static class Program {

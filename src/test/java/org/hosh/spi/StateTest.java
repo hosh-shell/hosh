@@ -8,7 +8,7 @@ public class StateTest {
 
 	@Test
 	public void string() {
-		assertThat(new State()).hasToString("State[cwd='null',id=0,commands={}]");
+		assertThat(new State()).hasToString("State[cwd='null',id=0,variables={},commands={}]");
 	}
 
 }
