@@ -1,5 +1,6 @@
 package org.hosh.runtime;
 
+import org.hosh.doc.BUG;
 import org.hosh.runtime.Parser.ParseError;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,7 +28,13 @@ public class ParserTest {
 		sut.parse("git commit --amend\n");
 		sut.parse("cd ..\n");
 		sut.parse("cd /tmp\n");
-		sut.parse("cd $DIR\n");
+		sut.parse("cd ${DIR}\n");
+	}
+
+	@BUG(description = "this produces is equivalent to 'cd ${DIR}' instead of 'cd${DIR}'")
+	@Test
+	public void languageBug() {
+		sut.parse("cd${DIR}\n");
 	}
 
 	@Test

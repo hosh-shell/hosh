@@ -58,7 +58,7 @@ public class HoshIT {
 	public void scriptWithEchoEnv() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
-			script.write("echo $OS_ENV_VARIABLE\n");
+			script.write("echo ${OS_ENV_VARIABLE}\n");
 			script.flush();
 		}
 		ProcessBuilder processBuilder = new ProcessBuilder();

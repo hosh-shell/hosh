@@ -52,7 +52,7 @@ public class CompilerTest {
 		given(state.getCommands()).willReturn(Collections.singletonMap("cd", command));
 		given(state.getVariables()).willReturn(Collections.singletonMap("DIR", "/tmp"));
 
-		Program program = sut.compile("cd $DIR");
+		Program program = sut.compile("cd ${DIR}");
 
 		assertThat(program.getStatements()).hasSize(1);
 		List<Statement> statements = program.getStatements();
@@ -65,7 +65,7 @@ public class CompilerTest {
 		given(state.getCommands()).willReturn(Collections.singletonMap("cd", command));
 		given(state.getVariables()).willReturn(Collections.singletonMap("DIR", "/tmp"));
 
-		Program program = sut.compile("cd$DIRaaa");
+		Program program = sut.compile("cd${DIR}aaa");
 
 		assertThat(program.getStatements()).hasSize(1);
 		List<Statement> statements = program.getStatements();
@@ -77,7 +77,7 @@ public class CompilerTest {
 	public void commandWithUnknownVariableExpansion() {
 		given(state.getCommands()).willReturn(Collections.singletonMap("cd", command));
 
-		assertThatThrownBy(() -> sut.compile("cd $DIR"))
+		assertThatThrownBy(() -> sut.compile("cd ${DIR}"))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: unknown variable DIR");
 	}

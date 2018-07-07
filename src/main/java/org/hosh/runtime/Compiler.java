@@ -58,8 +58,8 @@ public class Compiler {
 	// resolves $DIR by looking for DIR in variables
 	private String resolveVariable(Token token) {
 		String id = token.getText();
-		if (id.startsWith("$")) {
-			String variableName = id.substring(1);
+		if (id.startsWith("${")) {
+			String variableName = id.substring(2, id.length() - 1);
 			if (state.getVariables().containsKey(variableName)) {
 				return state.getVariables().get(variableName);
 			} else {
