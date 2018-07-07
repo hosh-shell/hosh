@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hosh.doc.TODO;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -34,7 +35,7 @@ public class SystemModule implements Module {
 
 	}
 
-	// TODO: this is the original OS variables, but they are immutable in java
+	@TODO(description = "should print the variables stored in the state")
 	public static class Env implements Command {
 
 		@Override
@@ -78,8 +79,7 @@ public class SystemModule implements Module {
 
 	}
 
-	// TODO: commands are not sorted by default
-	// (let's wait for "| sortBy key" syntax)
+	@TODO(description = "commands are not sorted by default, planning to use pipelines")
 	public static class Help implements Command, StateAware {
 
 		private State state;

@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.hosh.doc.TODO;
+
 public class Version {
 
 	private Version() {
 	}
 
-	// TODO: rename this class to VersionLoader, Version should be a value object
+	@TODO(description = "rename this class to VersionLoader, Version should be a value object")
 	public static String readVersion() throws IOException {
 		try (InputStream is = Version.class.getResourceAsStream("/git.properties")) {
 			Properties properties = new Properties();

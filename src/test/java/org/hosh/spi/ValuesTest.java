@@ -10,6 +10,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Paths;
 import java.util.Locale;
 
+import org.hosh.doc.BUG;
 import org.hosh.spi.Values.Unit;
 import org.hosh.spi.ValuesTest.LocalPathValueTest;
 import org.hosh.spi.ValuesTest.SizeValueTest;
@@ -86,6 +87,12 @@ public class ValuesTest {
 			Values.ofSize(10, Unit.GB).append(appendable, Locale.getDefault());
 		}
 
+		@BUG(description = "should be 1.99MB, instead of 1")
+		@Test
+		public void humanizedSizeApproximation() {
+			assertThat(Values.ofHumanizedSize(1024L * 1024 * 2 - 1)).hasToString("Size[1MB]");
+		}
+
 		@Test
 		public void humanizedSize() {
 			assertThat(Values.ofHumanizedSize(0L)).hasToString("Size[0B]");
@@ -93,7 +100,7 @@ public class ValuesTest {
 			assertThat(Values.ofHumanizedSize(1023L)).hasToString("Size[1023B]");
 			assertThat(Values.ofHumanizedSize(1024L)).hasToString("Size[1KB]");
 			assertThat(Values.ofHumanizedSize(1024L * 1024)).hasToString("Size[1MB]");
-			assertThat(Values.ofHumanizedSize(1024L * 1024 * 2 - 1)).hasToString("Size[1MB]"); // TODO: should be 1.99MB
+
 			assertThat(Values.ofHumanizedSize(1024L * 1024 * 1024)).hasToString("Size[1GB]");
 
 			assertThatThrownBy(() -> Values.ofHumanizedSize(-1))

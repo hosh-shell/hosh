@@ -15,6 +15,11 @@ public class ParserTest {
 	private Parser sut = new Parser();
 
 	@Test
+	public void empty() {
+		sut.parse("");
+	}
+
+	@Test
 	public void usage() {
 		sut.parse("git");
 		sut.parse("git\n");
@@ -32,11 +37,6 @@ public class ParserTest {
 		sut.parse("\r\n");
 		sut.parse("\r\n\n");
 		sut.parse("\n\r\n");
-	}
-
-	@Test
-	public void empty() {
-		sut.parse("");
 	}
 
 	@Test
