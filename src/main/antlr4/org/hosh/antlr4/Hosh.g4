@@ -5,19 +5,24 @@ program
     ;
 
 stmt
-    : ID+ eos
-    | ID+ '|' stmt
+    : command end_of_statement
+    | command '|' stmt
     ;
 
-eos
+command
+	: ID+
+	;
+
+end_of_statement
 	: NEWLINE
 	| EOF
 	;
 
 ID
     : ( [a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/' )+
-    | '$' '{' ( [A-Z] | '_' | '-' )+ '}'
+    | '$' '{' ( [a-zA-Z0-9] | '_' | '-' )+ '}' // this could VARNAME, to remove logic from compiler 
     ;
+    
 
 NEWLINE
     : '\r'? '\n'

@@ -29,7 +29,7 @@ public class SystemModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			Record record = Record.of("text", Values.ofText(String.join(" ", args)));
+			Record record = Record.of("text", Values.ofText(String.join("", args)));
 			out.send(record);
 		}
 

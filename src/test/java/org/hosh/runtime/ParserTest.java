@@ -57,6 +57,7 @@ public class ParserTest {
 
 	@Test
 	public void pipelines() {
+		sut.parse("env | grep /regexp/");
 		sut.parse("cat file.txt | grep /regexp/");
 		sut.parse("cat file.txt | grep /regexp/ | wc -l");
 	}

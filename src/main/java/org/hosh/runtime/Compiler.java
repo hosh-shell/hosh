@@ -33,7 +33,7 @@ public class Compiler {
 	}
 
 	private Statement compileStatement(StmtContext stmt) {
-		Token token = stmt.ID().get(0).getSymbol();
+		Token token = stmt.command().ID().get(0).getSymbol();
 		String commandName = token.getText();
 		Command command = state.getCommands().get(commandName);
 		if (command == null) {
@@ -47,7 +47,9 @@ public class Compiler {
 	}
 
 	private List<String> compileArguments(StmtContext stmt) {
-		return stmt.ID()
+		return stmt
+				.command()
+				.ID()
 				.stream()
 				.skip(1)
 				.map(TerminalNode::getSymbol)
