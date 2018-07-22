@@ -1,6 +1,7 @@
 package org.hosh.runtime;
 
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +30,16 @@ public class ExternalCommand implements Command, StateAware {
 		List<String> processArgs = new ArrayList<>();
 		processArgs.add(command.toAbsolutePath().toString());
 		processArgs.addAll(args);
+		logger.info("executing command {}", processArgs);
 		try {
-			new ProcessBuilder(processArgs.toArray(new String[0])).directory(state.getCwd().toFile()).start();
-		} catch (IOException e) {
+			Process process= new ProcessBuilder(processArgs.toArray(new String[0]))
+				.directory(state.getCwd().toFile())
+				.redirectError(Redirect.INHERIT)
+				.redirectOutput(Redirect.INHERIT)
+				.start();
+			int exitCode = process.waitFor();
+			out.send(Record.of("message", Values.ofText("exit code: " + exitCode)));
+		} catch (IOException | InterruptedException e) {
 			err.send(Record.of("error", Values.ofText(e.getMessage())));
 			logger.error("got", e);
 		}
