@@ -16,8 +16,26 @@ public class TerminalModule implements Module {
 
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
+		commandRegistry.registerCommand("dump", new Dump());
 		commandRegistry.registerCommand("clear", new Clear());
 		commandRegistry.registerCommand("bell", new Bell());
+	}
+
+	public static class Dump implements Command, TerminalAware {
+
+		private Terminal terminal;
+
+		@Override
+		public void setTerminal(Terminal terminal) {
+			this.terminal = terminal;
+		}
+
+		@Override
+		public void run(List<String> args, Channel out, Channel err) {
+			out.send(Record.of("name", Values.ofText(terminal.getName())));
+			out.send(Record.of("type", Values.ofText(terminal.getType())));
+			out.send(Record.of("attributes", Values.ofText(terminal.getAttributes().toString())));
+		}
 	}
 
 	public static class Clear implements Command, TerminalAware {
