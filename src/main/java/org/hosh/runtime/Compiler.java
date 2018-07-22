@@ -11,8 +11,10 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.hosh.antlr4.HoshParser;
 import org.hosh.antlr4.HoshParser.StmtContext;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
+
 
 public class Compiler {
 
@@ -52,6 +54,7 @@ public class Compiler {
 		return statement;
 	}
 
+
 	private Command resolveCommandInPath(String commandName, List<Path> path) {
 		for (Path dir : path) {
 			Path candidate = Paths.get(dir.toAbsolutePath().toString(), commandName);
@@ -63,6 +66,7 @@ public class Compiler {
 		return null;
 	}
 
+	@Todo(description="allows to grouping arguments by using ' or \"")
 	private List<String> compileArguments(StmtContext stmt) {
 		return stmt
 				.command()
@@ -75,6 +79,7 @@ public class Compiler {
 	}
 
 	// resolves ${NAME} by looking for NAME in variables
+	@Todo(description="move this logic in a grammar production")
 	private String resolveVariable(Token token) {
 		String id = token.getText();
 		if (id.startsWith("${")) {

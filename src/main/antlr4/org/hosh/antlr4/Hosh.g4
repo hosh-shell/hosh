@@ -20,7 +20,7 @@ end_of_statement
 
 ID
     : ( [a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/' )+
-    | '$' '{' ( [a-zA-Z0-9] | '_' | '-' )+ '}' // this could VARNAME, to remove logic from compiler 
+    | '$' '{' ( [a-zA-Z0-9] | '_' | '-' )+ '}' 
     ;
     
 
