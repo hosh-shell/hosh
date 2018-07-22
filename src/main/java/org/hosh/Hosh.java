@@ -1,9 +1,12 @@
 package org.hosh;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,10 +52,15 @@ public class Hosh {
 				.builder()
 				.system(true)
 				.build();
+		List<Path> path = Stream
+				.of(System.getenv("PATH").split(File.pathSeparator))
+				.map(Paths::get)
+				.collect(Collectors.toList());
 		State state = new State();
 		state.setId(1);
 		state.setCwd(Paths.get("."));
 		state.getVariables().putAll(System.getenv());
+		state.setPath(path);
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {

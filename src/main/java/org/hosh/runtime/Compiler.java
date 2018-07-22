@@ -1,5 +1,8 @@
 package org.hosh.runtime;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +40,9 @@ public class Compiler {
 		String commandName = token.getText();
 		Command command = state.getCommands().get(commandName);
 		if (command == null) {
+			command = resolveCommandInPath(commandName, state.getPath());
+		}
+		if (command == null) {
 			throw new CompileError("line " + token.getLine() + ": unknown command " + commandName);
 		}
 		List<String> commandArgs = compileArguments(stmt);
@@ -44,6 +50,17 @@ public class Compiler {
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
 		return statement;
+	}
+
+	private Command resolveCommandInPath(String commandName, List<Path> path) {
+		for (Path dir : path) {
+			Path candidate = Paths.get(dir.toAbsolutePath().toString(), commandName);
+			boolean exists = Files.exists(candidate);
+			if (exists) {
+				return new ExternalCommand(candidate);
+			}
+		}
+		return null;
 	}
 
 	private List<String> compileArguments(StmtContext stmt) {
