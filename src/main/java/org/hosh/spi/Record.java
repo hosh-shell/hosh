@@ -39,10 +39,24 @@ public final class Record {
 		return new Record(data);
 	}
 
+	public static Record of(String key1, Value value1, String key2, Value value2) {
+		Map<String, Value> data = new LinkedHashMap<>(2);
+		data.put(key1, value1);
+		addUniqueMapping(data, key2, value2);
+		return new Record(data);
+	}
+
 	public Record add(String key, Value value) {
 		Map<String, Value> copy = new LinkedHashMap<>(data);
-		copy.put(key, value);
+		addUniqueMapping(copy, key, value);
 		return new Record(copy);
+	}
+
+	private static void addUniqueMapping(Map<String, Value> data, String key2, Value value2) {
+		Value previous = data.put(key2, value2);
+		if (previous != null) {
+			throw new IllegalArgumentException("duplicated key: " + key2);
+		}
 	}
 
 	public Collection<String> keys() {

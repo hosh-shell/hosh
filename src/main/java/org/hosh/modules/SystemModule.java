@@ -2,6 +2,7 @@ package org.hosh.modules;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hosh.doc.Todo;
@@ -22,7 +23,6 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("env", new Env());
 		commandRegistry.registerCommand("exit", new Exit());
 		commandRegistry.registerCommand("help", new Help());
-
 	}
 
 	public static class Echo implements Command {
@@ -46,9 +46,8 @@ public class SystemModule implements Module {
 			}
 			Map<String, String> env = System.getenv();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
-				Record record = Record.empty()
-						.add("key", Values.ofText(entry.getKey()))
-						.add("value", Values.ofText(entry.getValue()));
+				Record record = Record.of("key", Values.ofText(entry.getKey()), "value",
+						Values.ofText(entry.getValue()));
 				out.send(record);
 			}
 		}
@@ -60,20 +59,20 @@ public class SystemModule implements Module {
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 			switch (args.size()) {
-				case 0:
-					System.exit(0);
-					break;
-				case 1:
-					String arg = args.get(0);
-					if (arg.matches("\\d{1,3}")) {
-						System.exit(Integer.parseInt(arg));
-					} else {
-						err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
-					}
-					break;
-				default:
-					err.send(Record.of("error", Values.ofText("too many parameters")));
-					break;
+			case 0:
+				System.exit(0);
+				break;
+			case 1:
+				String arg = args.get(0);
+				if (arg.matches("\\d{1,3}")) {
+					System.exit(Integer.parseInt(arg));
+				} else {
+					err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
+				}
+				break;
+			default:
+				err.send(Record.of("error", Values.ofText("too many parameters")));
+				break;
 			}
 		}
 
@@ -102,4 +101,5 @@ public class SystemModule implements Module {
 		}
 
 	}
+
 }

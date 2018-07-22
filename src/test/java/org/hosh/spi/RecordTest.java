@@ -1,6 +1,8 @@
 package org.hosh.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.Map;
 
 import org.hosh.spi.Values.Unit;
 import org.junit.Test;
@@ -54,6 +56,25 @@ public class RecordTest {
 		Record a = Record.empty().add("key", value).add("another_key", anotherValue);
 		assertThat(a.keys()).containsExactly("key", "another_key");
 		assertThat(a.values()).containsExactly(value, anotherValue);
+	}
+
+	@Test
+	public void addNonUniqueKey() {
+		Value value = Values.ofText("value");
+		Value anotherValue = Values.ofText("another_value");
+		Record a = Record.of("kkk", value);
+		assertThatThrownBy(() -> {
+			a.add("kkk", anotherValue);
+		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("duplicated key: kkk");
+	}
+
+	@Test
+	public void ofNonUniqueKey() {
+		Value value = Values.ofText("value");
+		Value anotherValue = Values.ofText("another_value");
+		assertThatThrownBy(() -> {
+			Record a = Record.of("kkk", value, "kkk", anotherValue);
+		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("duplicated key: kkk");
 	}
 
 	@Test
