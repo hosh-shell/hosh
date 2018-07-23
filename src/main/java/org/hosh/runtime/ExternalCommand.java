@@ -1,5 +1,6 @@
 package org.hosh.runtime;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,13 +27,14 @@ public class ExternalCommand implements Command, StateAware {
 
 	@Override
 	public void run(List<String> args, Channel out, Channel err) {
-		List<String> processArgs = new ArrayList<>();
+		List<String> processArgs = new ArrayList<>(args.size() + 1);
 		processArgs.add(command.toAbsolutePath().toString());
 		processArgs.addAll(args);
-		logger.info("executing command {}", processArgs);
+		File directory = state.getCwd().toFile();
+		logger.info("executing command {} inside {}", processArgs, directory);
 		try {
 			Process process= new ProcessBuilder(processArgs.toArray(new String[0]))
-				.directory(state.getCwd().toFile())
+				.directory(directory)
 				.inheritIO()
 				.start();
 			int exitCode = process.waitFor();
