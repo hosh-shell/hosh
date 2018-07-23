@@ -51,6 +51,7 @@ public class Hosh {
 		Terminal terminal = TerminalBuilder
 				.builder()
 				.system(true)
+				.streams(System.in, System.out)
 				.build();
 		List<Path> path = Stream
 				.of(System.getenv("PATH").split(File.pathSeparator))
