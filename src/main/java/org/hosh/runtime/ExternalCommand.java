@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 public class ExternalCommand implements Command, StateAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(ExternalCommand.class);
+
 	private final Path command;
 	private State state;
 
@@ -41,7 +42,7 @@ public class ExternalCommand implements Command, StateAware {
 			out.send(Record.of("message", Values.ofText("exit code: " + exitCode)));
 		} catch (IOException | InterruptedException e) {
 			err.send(Record.of("error", Values.ofText(e.getMessage())));
-			logger.error("got", e);
+			logger.error("caught exception", e);
 		}
 	}
 

@@ -55,6 +55,7 @@ public class Compiler {
 	}
 
 
+	@Todo(description="don't resolve absolute paths like /usr/bin/vim")
 	private Command resolveCommandInPath(String commandName, List<Path> path) {
 		for (Path dir : path) {
 			Path candidate = Paths.get(dir.toAbsolutePath().toString(), commandName);
