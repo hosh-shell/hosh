@@ -61,7 +61,7 @@ public class Compiler {
 		logger.info("resolving commandName '{}'", commandName);
 		Path candidate = Paths.get(commandName).normalize();
 		if (candidate.isAbsolute() && Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
-			logger.info("  absolute file and executable {}");
+			logger.info("  absolute file and executable {}", candidate);
 			return new ExternalCommand(candidate);
 		}
 		for (Path dir : path) {
