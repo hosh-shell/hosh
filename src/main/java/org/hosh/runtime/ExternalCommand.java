@@ -36,9 +36,11 @@ public class ExternalCommand implements Command, StateAware {
 		File directory = state.getCwd().toFile();
 		logger.info("executing command {} inside {}", processArgs, directory);
 		try {
-			Process process = new ProcessBuilder(processArgs.toArray(new String[0]))
+			ProcessBuilder processBuilder = new ProcessBuilder(processArgs.toArray(new String[0]))
 					.directory(directory)
-					.inheritIO()
+					.inheritIO();
+			processBuilder.environment().putAll(state.getVariables());
+			Process process = processBuilder
 					.start();
 			int exitCode = process.waitFor();
 			out.send(Record.of("message", Values.ofText("exit code: " + exitCode)));
