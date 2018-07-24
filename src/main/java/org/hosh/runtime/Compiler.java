@@ -15,7 +15,6 @@ import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
 
-
 public class Compiler {
 
 	private final State state;
@@ -55,10 +54,13 @@ public class Compiler {
 	}
 
 
-	@Todo(description="don't resolve absolute paths like /usr/bin/vim")
 	private Command resolveCommandInPath(String commandName, List<Path> path) {
+		Path candidate = Paths.get(commandName);
+		if (candidate.isAbsolute() && Files.exists(candidate)) {
+			return new ExternalCommand(candidate);
+		}
 		for (Path dir : path) {
-			Path candidate = Paths.get(dir.toAbsolutePath().toString(), commandName);
+			candidate = Paths.get(dir.toString(), commandName);
 			boolean exists = Files.exists(candidate);
 			if (exists) {
 				return new ExternalCommand(candidate);
