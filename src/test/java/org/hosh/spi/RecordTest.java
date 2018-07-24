@@ -2,8 +2,6 @@ package org.hosh.spi;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.Map;
-
 import org.hosh.spi.Values.Unit;
 import org.junit.Test;
 
@@ -73,7 +71,7 @@ public class RecordTest {
 		Value value = Values.ofText("value");
 		Value anotherValue = Values.ofText("another_value");
 		assertThatThrownBy(() -> {
-			Record a = Record.of("kkk", value, "kkk", anotherValue);
+			Record.of("kkk", value, "kkk", anotherValue);
 		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("duplicated key: kkk");
 	}
 
