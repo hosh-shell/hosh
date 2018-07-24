@@ -1,10 +1,10 @@
 package org.hosh.runtime;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
@@ -21,6 +21,7 @@ public class ExternalCommand implements Command, StateAware {
 	private static final Logger logger = LoggerFactory.getLogger(ExternalCommand.class);
 
 	private final Path command;
+	private ProcessFactory processFactory = new DefaultProcessFactory();
 	private State state;
 
 	public ExternalCommand(Path command) {
@@ -33,15 +34,10 @@ public class ExternalCommand implements Command, StateAware {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);
 		processArgs.add(command.toAbsolutePath().toString());
 		processArgs.addAll(args);
-		File directory = state.getCwd().toFile();
-		logger.info("executing command {} inside {}", processArgs, directory);
+		Path cwd = state.getCwd();
+		logger.info("executing command {} inside {}", processArgs, cwd);
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder(processArgs.toArray(new String[0]))
-					.directory(directory)
-					.inheritIO();
-			processBuilder.environment().putAll(state.getVariables());
-			Process process = processBuilder
-					.start();
+			Process process = processFactory.create(processArgs, cwd, state.getVariables());
 			int exitCode = process.waitFor();
 			out.send(Record.of("message", Values.ofText("exit code: " + exitCode)));
 		} catch (IOException | InterruptedException e) {
@@ -50,9 +46,33 @@ public class ExternalCommand implements Command, StateAware {
 		}
 	}
 
+	private static class DefaultProcessFactory implements ProcessFactory {
+
+		@Override
+		public Process create(List<String> args, Path cwd, Map<String, String> env) throws IOException {
+			ProcessBuilder processBuilder = new ProcessBuilder(args.toArray(new String[0]))
+					.directory(cwd.toFile())
+					.inheritIO();
+			processBuilder.environment().putAll(env);
+			return processBuilder.start();
+		}
+
+	}
+
 	@Override
 	public void setState(State state) {
 		this.state = state;
+	}
+
+	// testing aid since we cannot mock ProcessBuilder
+	static interface ProcessFactory {
+
+		Process create(List<String> args, Path cwd, Map<String, String> env) throws IOException;
+
+	}
+
+	public void setProcessFactory(ProcessFactory processFactory) {
+		this.processFactory = processFactory;
 	}
 
 }
