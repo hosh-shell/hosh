@@ -1,7 +1,11 @@
-package org.hosh.spi;
+package org.hosh.runtime;
 
 import java.io.PrintStream;
 import java.util.Locale;
+
+import org.hosh.spi.Channel;
+import org.hosh.spi.Record;
+import org.hosh.spi.Value;
 
 public class SimpleChannel implements Channel {
 
