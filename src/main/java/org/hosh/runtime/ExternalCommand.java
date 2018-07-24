@@ -27,7 +27,7 @@ public class ExternalCommand implements Command, StateAware {
 		this.command = command;
 	}
 
-	@Todo(description = "save exitCode as variable")
+	@Todo(description = "save exitCode as variable?")
 	@Override
 	public void run(List<String> args, Channel out, Channel err) {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);

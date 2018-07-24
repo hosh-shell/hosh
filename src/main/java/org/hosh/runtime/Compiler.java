@@ -76,7 +76,7 @@ public class Compiler {
 		return null;
 	}
 
-	@Todo(description="allows to grouping arguments by using ' or \"")
+	@Todo(description="allows to grouping arguments by using ' or \" in the grammar (strings)")
 	private List<String> compileArguments(StmtContext stmt) {
 		return stmt
 				.command()
