@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.Record;
@@ -26,6 +27,7 @@ public class ExternalCommand implements Command, StateAware {
 		this.command = command;
 	}
 
+	@Todo(description = "save exitCode as variable")
 	@Override
 	public void run(List<String> args, Channel out, Channel err) {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);
@@ -34,10 +36,10 @@ public class ExternalCommand implements Command, StateAware {
 		File directory = state.getCwd().toFile();
 		logger.info("executing command {} inside {}", processArgs, directory);
 		try {
-			Process process= new ProcessBuilder(processArgs.toArray(new String[0]))
-				.directory(directory)
-				.inheritIO()
-				.start();
+			Process process = new ProcessBuilder(processArgs.toArray(new String[0]))
+					.directory(directory)
+					.inheritIO()
+					.start();
 			int exitCode = process.waitFor();
 			out.send(Record.of("message", Values.ofText("exit code: " + exitCode)));
 		} catch (IOException | InterruptedException e) {
