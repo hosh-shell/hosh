@@ -14,9 +14,12 @@ import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Compiler {
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final State state;
 
 	public Compiler(State state) {
@@ -55,17 +58,21 @@ public class Compiler {
 
 
 	private Command resolveCommandInPath(String commandName, List<Path> path) {
-		Path candidate = Paths.get(commandName);
-		if (candidate.isAbsolute() && Files.exists(candidate)) {
+		logger.info("resolving commandName '{}'", commandName);
+		Path candidate = Paths.get(commandName).normalize();
+		if (candidate.isAbsolute() && Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
+			logger.info("  absolute file and executable {}");
 			return new ExternalCommand(candidate);
 		}
 		for (Path dir : path) {
-			candidate = Paths.get(dir.toString(), commandName);
-			boolean exists = Files.exists(candidate);
-			if (exists) {
+			candidate = Paths.get(dir.toString(), commandName).normalize();
+			logger.info("  trying {}", candidate);
+			if (Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
+				logger.info("  found in {}", candidate);
 				return new ExternalCommand(candidate);
 			}
 		}
+		logger.info("  not found!");
 		return null;
 	}
 
