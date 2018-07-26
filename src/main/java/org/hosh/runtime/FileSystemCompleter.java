@@ -26,23 +26,29 @@ public class FileSystemCompleter implements Completer {
 
 	@Override
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-		logger.info("current '{}', candidates {}", line.word(), candidates);
-		Path path = Paths.get(line.word());
-		if (!path.isAbsolute()) {
-			path = state.getCwd();
-		}
-		populate(candidates, path);
-	}
-
-	private void populate(List<Candidate> candidates, Path path) {
 		try {
-			Files.list(path)
-					.map(p -> new DebuggableCandidate(p.getFileName().toString()))
-					.peek(p -> logger.info("  {}", p))
-					.forEach(c -> candidates.add(c));
+			tryComplete(line, candidates);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+
 	}
 
+	private void tryComplete(ParsedLine line, List<Candidate> candidates) throws IOException {
+		logger.info("current '{}', candidates {}", line.word(), candidates);
+		Path path = Paths.get(line.word());
+		if (path.isAbsolute()) {
+			Files.list(path.getParent() == null ? path : path.getParent())
+					.map(p -> new DebuggableCandidate(p.toString()))
+					.peek(p -> logger.info("  {}", p))
+					.forEach(c -> candidates.add(c));
+
+		} else {
+			Files.list(state.getCwd())
+					.map(p -> new DebuggableCandidate(p.getFileName().toString()))
+					.peek(p -> logger.info("  {}", p))
+					.forEach(c -> candidates.add(c));
+
+		}
+	}
 }
