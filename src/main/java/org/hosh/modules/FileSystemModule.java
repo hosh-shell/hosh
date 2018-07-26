@@ -39,7 +39,12 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(state.getCwd())) {
+			if (args.size() > 1) {
+				err.send(Record.of("message", Values.ofText("expected at most 1 argument")));
+				return;
+			}
+			Path of = args.size() == 0? state.getCwd() : Paths.get(args.get(0));
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(of)) {
 				for (Path path : stream) {
 					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));
 					if (Files.isRegularFile(path)) {

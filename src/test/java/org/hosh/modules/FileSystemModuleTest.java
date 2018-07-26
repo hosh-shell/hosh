@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.then;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -57,7 +58,15 @@ public class FileSystemModuleTest {
 		private ListFiles sut;
 
 		@Test
-		public void emptyDirectory() {
+		public void errorTwoOrMoreArgs() {
+			sut.run(Arrays.asList("dir1", "dir2"), out, err);
+
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("message", Values.ofText("expected at most 1 argument")));
+		}
+
+		@Test
+		public void zeroArgsWithEmptyDirectory() {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 
 			sut.run(Arrays.asList(), out, err);
@@ -67,17 +76,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void error() {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
-
-			sut.run(Arrays.asList("A123"), out, err);
-
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
-		}
-
-		@Test
-		public void oneDirectory() throws IOException {
+		public void zeroArgsWithOneDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			temporaryFolder.newFolder("dir").mkdirs();
 
@@ -88,25 +87,48 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneFile() throws IOException {
+		public void zeroArgsWithOneFile() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			temporaryFolder.newFile("file").createNewFile();
 
 			sut.run(Arrays.asList(), out, err);
 
 			then(out).should()
-					.send(Record.of("name", Values.ofLocalPath(Paths.get("file"))).add("size", Values.ofSize(0, Unit.B)));
+					.send(Record.of("name", Values.ofLocalPath(Paths.get("file"))).add("size",
+							Values.ofSize(0, Unit.B)));
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
-		public void wrongCurrentDirectory() throws IOException {
+		public void oneArgWithFile() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.newFile().toPath());
 
 			sut.run(Arrays.asList(), out, err);
 
 			then(err).should().send(ArgumentMatchers.any());
 			then(out).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void oneArgWithEmptyDirectory() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.newFolder().toPath());
+
+			sut.run(Arrays.asList(), out, err);
+
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void oneArgWithNonEmptyDirectory() throws IOException {
+			File newFolder = temporaryFolder.newFolder();
+			Files.createFile(new File(newFolder, "aaa").toPath());
+			given(state.getCwd()).willReturn(newFolder.toPath());
+
+			sut.run(Arrays.asList(), out, err);
+
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should().send(ArgumentMatchers.any());
 		}
 
 	}
