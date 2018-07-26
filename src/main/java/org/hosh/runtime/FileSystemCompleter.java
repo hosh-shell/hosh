@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.hosh.spi.State;
 import org.jline.reader.Candidate;
@@ -35,20 +37,23 @@ public class FileSystemCompleter implements Completer {
 	}
 
 	private void tryComplete(ParsedLine line, List<Candidate> candidates) throws IOException {
-		logger.info("current '{}', candidates {}", line.word(), candidates);
 		Path path = Paths.get(line.word());
 		if (path.isAbsolute()) {
-			Files.list(path.getParent() == null ? path : path.getParent())
-					.map(p -> new DebuggableCandidate(p.toString()))
-					.peek(p -> logger.info("  {}", p))
-					.forEach(c -> candidates.add(c));
-
+			list(path.getParent() == null ? path : path.getParent(), (p) -> p.toString(), candidates);
 		} else {
-			Files.list(state.getCwd())
-					.map(p -> new DebuggableCandidate(p.getFileName().toString()))
-					.peek(p -> logger.info("  {}", p))
-					.forEach(c -> candidates.add(c));
+			list(state.getCwd(), (p) -> p.getFileName().toString(), candidates);
 
+		}
+	}
+
+	private void list(Path dir, Function<Path, String> toCandidate, List<Candidate> candidates) throws IOException {
+		logger.info("list '{}'", dir);
+		try (Stream<Path> list = Files.list(dir)) {
+			list
+					.peek(p -> logger.info("  {}", p))
+					.map(toCandidate)
+					.map(p -> new DebuggableCandidate(p))
+					.forEach(c -> candidates.add(c));
 		}
 	}
 }
