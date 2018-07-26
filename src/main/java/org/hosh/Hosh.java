@@ -15,6 +15,7 @@ import org.hosh.runtime.CommandCompleter;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
+import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.LineReaderIterator;
 import org.hosh.runtime.SimpleChannel;
@@ -28,6 +29,7 @@ import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.completer.AggregateCompleter;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
@@ -75,7 +77,7 @@ public class Hosh {
 					.history(new DefaultHistory())
 					.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
 					.variable(LineReader.HISTORY_FILE_SIZE, "1000")
-					.completer(new CommandCompleter(state))
+					.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
 					.terminal(terminal)
 					.build();
 			Channel out = new ConsoleChannel(terminal, AttributedStyle.WHITE);

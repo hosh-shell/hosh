@@ -1,8 +1,6 @@
 package org.hosh.runtime;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hosh.spi.State;
 import org.jline.reader.Candidate;
@@ -20,8 +18,10 @@ public class CommandCompleter implements Completer {
 
 	@Override
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-		Set<String> keySet = state.getCommands().keySet();
-		candidates.addAll(keySet.stream().map(Candidate::new).collect(Collectors.toList()));
+		state.getCommands().keySet()
+			.stream()
+			.map(DebuggableCandidate::new)
+			.forEach(c -> candidates.add(c));
 	}
 
 }
