@@ -71,7 +71,7 @@ public class FileSystemCompleterTest {
 
 		then(candidates).should().add(ArgumentMatchers.any());
 	}
-	
+
 	@Test
 	public void slash() throws IOException {
 		given(line.word()).willReturn("/");
@@ -80,7 +80,7 @@ public class FileSystemCompleterTest {
 
 		then(candidates).should(Mockito.atLeastOnce()).add(ArgumentMatchers.any());
 	}
-	
+
 	@Test
 	public void absoluteDir() throws IOException {
 		String dir = temporaryFolder.getRoot().getAbsolutePath().toString();
