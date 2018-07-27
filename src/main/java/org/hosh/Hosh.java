@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.runtime.CommandCompleter;
+import org.hosh.runtime.CommandResolver;
+import org.hosh.runtime.CommandResolvers;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
@@ -69,7 +71,8 @@ public class Hosh {
 		for (Module module : modules) {
 			module.onStartup(commandRegistry);
 		}
-		Compiler compiler = new Compiler(state);
+		CommandResolver commandResolver = CommandResolvers.builtinsThenSystem(state);
+		Compiler compiler = new Compiler(state, commandResolver);
 		if (args.length == 0) {
 			LineReader lineReader = LineReaderBuilder
 					.builder()

@@ -1,8 +1,5 @@
 package org.hosh.runtime;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,16 +11,15 @@ import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Compiler {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final State state;
+	private final CommandResolver commandResolver;
 
-	public Compiler(State state) {
+	public Compiler(State state, CommandResolver commandResolver) {
 		this.state = state;
+		this.commandResolver = commandResolver;
 	}
 
 	public Program compile(String input) {
@@ -42,10 +38,7 @@ public class Compiler {
 	private Statement compileStatement(StmtContext stmt) {
 		Token token = stmt.command().ID().get(0).getSymbol();
 		String commandName = token.getText();
-		Command command = state.getCommands().get(commandName);
-		if (command == null) {
-			command = resolveCommandInPath(commandName, state.getPath());
-		}
+		Command command = commandResolver.tryResolve(commandName);
 		if (command == null) {
 			throw new CompileError("line " + token.getLine() + ": unknown command " + commandName);
 		}
@@ -56,25 +49,6 @@ public class Compiler {
 		return statement;
 	}
 
-
-	private Command resolveCommandInPath(String commandName, List<Path> path) {
-		logger.info("resolving commandName '{}'", commandName);
-		Path candidate = Paths.get(commandName).normalize();
-		if (candidate.isAbsolute() && Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
-			logger.info("  absolute file and executable {}", candidate);
-			return new ExternalCommand(candidate);
-		}
-		for (Path dir : path) {
-			candidate = Paths.get(dir.toString(), commandName).normalize();
-			logger.info("  trying {}", candidate);
-			if (Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
-				logger.info("  found in {}", candidate);
-				return new ExternalCommand(candidate);
-			}
-		}
-		logger.info("  not found!");
-		return null;
-	}
 
 	@Todo(description="allows to grouping arguments by using ' or \" in the grammar (strings)")
 	private List<String> compileArguments(StmtContext stmt) {
@@ -160,4 +134,5 @@ public class Compiler {
 		}
 
 	}
+	
 }

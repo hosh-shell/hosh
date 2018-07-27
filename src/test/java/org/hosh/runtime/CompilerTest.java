@@ -28,13 +28,16 @@ public class CompilerTest {
 	@Mock
 	private Command command;
 
+	@Mock
+	private CommandResolver commandResolver;
+
 	@InjectMocks
 	private Compiler sut;
 
 	@Ignore("missing support for pipeline")
 	@Test
 	public void commandWithPipeline() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
+		given(commandResolver.tryResolve("env")).willReturn(command);
 
 		Program program = sut.compile("env | env");
 
@@ -49,7 +52,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandWithVariableExpansionWithSpace() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("cd", command));
+		given(commandResolver.tryResolve("cd")).willReturn(command);
 		given(state.getVariables()).willReturn(Collections.singletonMap("DIR", "/tmp"));
 
 		Program program = sut.compile("cd ${DIR}");
@@ -62,7 +65,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandWithVariableExpansionNoSpace() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("echo", command));
+		given(commandResolver.tryResolve("echo")).willReturn(command);
 		given(state.getVariables()).willReturn(Collections.singletonMap("DIR", "/tmp"));
 
 		Program program = sut.compile("echo ${DIR}/aaa");
@@ -75,7 +78,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandWithUnknownVariableExpansion() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("cd", command));
+		given(commandResolver.tryResolve("cd")).willReturn(command);
 
 		assertThatThrownBy(() -> sut.compile("cd ${DIR}"))
 				.isInstanceOf(CompileError.class)
@@ -84,7 +87,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandWithoutArguments() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
+		given(commandResolver.tryResolve("env")).willReturn(command);
 
 		Program program = sut.compile("env");
 
@@ -96,7 +99,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandWithArguments() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
+		given(commandResolver.tryResolve("env")).willReturn(command);
 
 		Program program = sut.compile("env --system");
 
@@ -108,7 +111,7 @@ public class CompilerTest {
 
 	@Test
 	public void commandNotRegistered() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("env", command));
+		given(commandResolver.tryResolve("env")).willReturn(command);
 
 		assertThatThrownBy(() -> sut.compile("env\nenv\nenv2"))
 				.isInstanceOf(CompileError.class)
