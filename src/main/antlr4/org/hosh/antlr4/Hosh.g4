@@ -1,7 +1,7 @@
 grammar Hosh;
 
 program
-    : stmt* 
+    : ( stmt )* 
     ;
 
 stmt
@@ -23,17 +23,22 @@ wrapper
 	;
 
 invocation
-	: ID ( arg ) *
+	: ID ( arg )*
 	;
 
 arg
 	: ID
+	| STRING
 	| VARIABLE
 	;
 
 ID
     : ( [a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/' )+
     ;
+
+STRING
+	: '\'' ( ~["\\] )* '\''
+	;
 
 VARIABLE
 	: '$' '{' ( [a-zA-Z0-9] | '_' | '-' )+ '}'

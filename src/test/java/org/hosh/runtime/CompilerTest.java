@@ -114,4 +114,14 @@ public class CompilerTest {
 		Program program = sut.compile("withTime { git push }");
 		assertThat(program.getStatements()).hasSize(1);
 	}
+
+	@Test
+	public void strings() {
+		willReturn(command).given(commandResolver).tryResolve("vim");
+		Program program = sut.compile("vim 'file with spaces'");
+		assertThat(program.getStatements()).hasSize(1);
+		List<Statement> statements = program.getStatements();
+		assertThat(statements.get(0).getCommand()).isSameAs(command);
+		assertThat(statements.get(0).getArguments()).containsExactly("file with spaces");
+	}
 }

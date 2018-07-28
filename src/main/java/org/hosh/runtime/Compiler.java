@@ -12,7 +12,6 @@ import org.hosh.antlr4.HoshParser.InvocationContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrapperContext;
-import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.State;
@@ -81,7 +80,6 @@ public class Compiler {
 		return statement;
 	}
 
-	@Todo(description = "allows to grouping arguments by using ' or \" in the grammar (strings)")
 	private List<String> compileArguments(InvocationContext ctx) {
 		return ctx
 				.arg()
@@ -104,10 +102,20 @@ public class Compiler {
 			Token token = ctx.ID().getSymbol();
 			return token.getText();
 		}
+		if (ctx.STRING() != null) {
+			Token token = ctx.STRING().getSymbol();
+			return dropQuotes(token);
+		}
 		throw new InternalBug();
 	}
 
-	@Todo(description = "convince ANTLR to save just VARIABLE, without instead of ${VARIABLE}")
+	// "some text" -> some text
+	private String dropQuotes(Token token) {
+		String text = token.getText();
+		return text.substring(1, text.length() - 1);
+	}
+
+	// ${VARIABLE} -> VARIABLE
 	private String variableNameFromToken(Token token) {
 		return token.getText().substring(2, token.getText().length() - 1);
 	}

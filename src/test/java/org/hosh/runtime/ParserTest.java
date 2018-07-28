@@ -30,6 +30,7 @@ public class ParserTest {
 		sut.parse("cd ${DIR}");
 		sut.parse("withTime { git push }");
 		sut.parse("withLock /tmp/push.lock { git push }");
+		sut.parse("vim 'filename with spaces'");
 	}
 
 	@Ignore("recursive wrapped commands still not allowed")
