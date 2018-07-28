@@ -5,17 +5,17 @@ program
     ;
 
 stmt
-    : command end_of_statement
+    : command ( NEWLINE | EOF )
     | command '|' stmt
+    | wrapper
     ;
 
 command
 	: ID+
 	;
 
-end_of_statement
-	: NEWLINE
-	| EOF
+wrapper
+	: ID+ '{' command '}'
 	;
 
 ID

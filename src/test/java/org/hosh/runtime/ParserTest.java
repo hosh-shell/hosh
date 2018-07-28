@@ -1,7 +1,7 @@
 package org.hosh.runtime;
 
-import org.hosh.doc.Bug;
 import org.hosh.runtime.Parser.ParseError;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -9,10 +9,8 @@ import org.junit.rules.ExpectedException;
 // this test is for language explorations
 // by now no asserts are enforced
 public class ParserTest {
-
 	@Rule
 	public final ExpectedException expectedException = ExpectedException.none();
-
 	private Parser sut = new Parser();
 
 	@Test
@@ -29,12 +27,15 @@ public class ParserTest {
 		sut.parse("cd ..\n");
 		sut.parse("cd /tmp\n");
 		sut.parse("cd ${DIR}\n");
+		sut.parse("withTime { git push }");
+		sut.parse("withLock /tmp/push.lock { git push }");
+
 	}
 
-	@Bug(description = "this produces is equivalent to 'cd ${DIR}' instead of 'cd${DIR}'")
+	@Ignore("recursive wrapped commands still not allowed")
 	@Test
-	public void languageBug() {
-		sut.parse("cd${DIR}\n");
+	public void recursiveWrappedCommands() {
+		sut.parse("withLock /tmp/push.lock { git push\n git push --tags\n }");
 	}
 
 	@Test
@@ -66,8 +67,6 @@ public class ParserTest {
 	public void lexerError() {
 		expectedException.expect(ParseError.class);
 		expectedException.expectMessage("line 1:0: token recognition error at: '!'");
-
 		sut.parse("!");
 	}
-
 }
