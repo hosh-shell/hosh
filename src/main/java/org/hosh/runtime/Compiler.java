@@ -47,7 +47,7 @@ public class Compiler {
 		if (command.wrapper() != null) {
 			return compileWrappedCommand(command.wrapper());
 		}
-		throw new IllegalStateException("internal bug");
+		throw new InternalBug();
 	}
 
 	private Statement compileSimpleCommand(SimpleContext simple) {
@@ -104,7 +104,7 @@ public class Compiler {
 			Token token = ctx.ID().getSymbol();
 			return token.getText();
 		}
-		throw new IllegalStateException("internal bug");
+		throw new InternalBug();
 	}
 
 	@Todo(description = "convince ANTLR to save just VARIABLE, without instead of ${VARIABLE}")
@@ -161,5 +161,9 @@ public class Compiler {
 		public CompileError(String message) {
 			super(message);
 		}
+	}
+
+	public static class InternalBug extends RuntimeException {
+		private static final long serialVersionUID = 1L;
 	}
 }
