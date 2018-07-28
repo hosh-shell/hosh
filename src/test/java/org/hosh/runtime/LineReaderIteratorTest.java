@@ -19,13 +19,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class LineReaderIteratorTest {
-
 	@Mock
 	private LineReader lineReader;
-
 	@Mock
 	private State state;
-
 	@InjectMocks
 	private LineReaderIterator sut;
 
@@ -41,7 +38,6 @@ public class LineReaderIteratorTest {
 	public void twoLines() throws Exception {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willReturn("1", "2");
-
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("1");
 		assertThat(sut.hasNext()).isTrue();
@@ -52,7 +48,6 @@ public class LineReaderIteratorTest {
 	public void hasNextIsIdempotent() throws Exception {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willReturn("1");
-
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.hasNext()).isTrue(); // second call
 		assertThat(sut.next()).isEqualTo("1");
@@ -62,7 +57,6 @@ public class LineReaderIteratorTest {
 	public void stopsAtEOF() throws Exception {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
-
 		assertThat(sut.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> sut.next());
 	}
@@ -71,9 +65,7 @@ public class LineReaderIteratorTest {
 	public void stopsAtINT() throws Exception {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated CTRL-C"));
-
 		assertThat(sut.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> sut.next());
 	}
-
 }

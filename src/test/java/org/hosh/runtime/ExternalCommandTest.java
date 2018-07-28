@@ -18,19 +18,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ExternalCommandTest {
-
 	@Mock(name = "out")
 	private Channel out;
-
 	@Mock(name = "err")
 	private Channel err;
-
 	@Mock
 	private State state;
-
 	@Mock
 	private ProcessFactory processFactory;
-
 	@Mock
 	private Process process;
 
@@ -43,9 +38,7 @@ public class ExternalCommandTest {
 		given(process.waitFor()).willReturn(0);
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-
 		sut.run(Collections.emptyList(), out, err);
-
 		then(processFactory).should().create(
 				Arrays.asList("/usr/bin/vim"),
 				Paths.get("."),
@@ -63,9 +56,7 @@ public class ExternalCommandTest {
 		given(process.waitFor()).willReturn(0);
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-
 		sut.run(Collections.singletonList("file.hosh"), out, err);
-
 		then(processFactory).should().create(
 				Arrays.asList("/usr/bin/vim", "file.hosh"),
 				Paths.get("."),
@@ -83,9 +74,7 @@ public class ExternalCommandTest {
 		given(process.waitFor()).willThrow(InterruptedException.class);
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-
 		sut.run(Collections.singletonList("file.hosh"), out, err);
-
 		then(processFactory).should().create(
 				Arrays.asList("/usr/bin/vim", "file.hosh"),
 				Paths.get("."),
@@ -93,5 +82,4 @@ public class ExternalCommandTest {
 		then(out).shouldHaveZeroInteractions();
 		then(err).should().send(any());
 	}
-
 }

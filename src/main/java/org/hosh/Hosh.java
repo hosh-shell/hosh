@@ -42,7 +42,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /** Main class */
 public class Hosh {
-
 	private Hosh() {
 	}
 
@@ -136,5 +135,4 @@ public class Hosh {
 		out.send(Record.of("message", Values.ofText("hosh v" + version)));
 		out.send(Record.of("message", Values.ofText("Running on Java " + System.getProperty("java.version"))));
 	}
-
 }

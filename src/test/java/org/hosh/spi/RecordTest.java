@@ -1,6 +1,7 @@
 package org.hosh.spi;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hosh.spi.Values.Unit;
 import org.junit.Test;
@@ -8,12 +9,10 @@ import org.junit.Test;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class RecordTest {
-
 	@Test
 	public void copy() {
 		Record a = Record.of("key", Values.ofText("a"));
 		Record b = Record.copy(a);
-
 		assertThat(a).isEqualTo(b);
 		assertThat(a).hasSameHashCodeAs(b);
 		assertThat(a.toString()).isEqualTo(b.toString());
@@ -23,7 +22,6 @@ public class RecordTest {
 	public void valueObject() {
 		Record a = Record.empty();
 		Record b = a;
-
 		Record c = a.add("test", Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
 		assertThat(a).isNotEqualTo(c);
@@ -34,7 +32,6 @@ public class RecordTest {
 	public void mutation() {
 		Record a = Record.empty();
 		Record b = Record.copy(a).add("key", Values.ofText("a"));
-
 		assertThat(a).isNotEqualTo(b);
 		assertThat(a).isNotSameAs(b);
 	}
@@ -79,5 +76,4 @@ public class RecordTest {
 	public void equalsContract() {
 		EqualsVerifier.forClass(Record.class).verify();
 	}
-
 }

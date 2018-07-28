@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileSystemCompleter implements Completer {
-
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final State state;
 
@@ -33,7 +32,6 @@ public class FileSystemCompleter implements Completer {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-
 	}
 
 	private void tryComplete(ParsedLine line, List<Candidate> candidates) throws IOException {
@@ -42,7 +40,6 @@ public class FileSystemCompleter implements Completer {
 			list(path.getParent() == null ? path : path.getParent(), (p) -> p.toString(), candidates);
 		} else {
 			list(state.getCwd(), (p) -> p.getFileName().toString(), candidates);
-
 		}
 	}
 

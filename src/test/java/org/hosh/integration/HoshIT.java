@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class HoshIT {
-
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -91,5 +90,4 @@ public class HoshIT {
 		assertThat(output).contains("line 1: unknown command AAAAB");
 		assertThat(exitCode).isEqualTo(1);
 	}
-
 }

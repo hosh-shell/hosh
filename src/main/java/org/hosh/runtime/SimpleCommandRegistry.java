@@ -7,7 +7,6 @@ import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.State;
 
 public class SimpleCommandRegistry implements CommandRegistry {
-
 	private final State state;
 
 	public SimpleCommandRegistry(State state) {
@@ -23,5 +22,4 @@ public class SimpleCommandRegistry implements CommandRegistry {
 			throw new IllegalArgumentException("command with same name already registered: " + name);
 		}
 	}
-
 }

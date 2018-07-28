@@ -14,23 +14,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SimpleCommandRegistryTest {
-
 	@Mock
 	private Command command;
-
 	@Mock
 	private Command anotherCommand;
-
 	@Spy
 	private State state = new State();
-
 	@InjectMocks
 	private SimpleCommandRegistry sut;
 
 	@Test
 	public void oneCommand() {
 		sut.registerCommand("foo", command);
-
 		assertThat(state.getCommands()).containsEntry("foo", command);
 	}
 
@@ -38,7 +33,6 @@ public class SimpleCommandRegistryTest {
 	public void sameCommandTwice() {
 		sut.registerCommand("foo", command);
 		sut.registerCommand("bar", command);
-
 		assertThat(state.getCommands()).containsEntry("foo", command).containsEntry("bar", command);
 	}
 
@@ -46,7 +40,6 @@ public class SimpleCommandRegistryTest {
 	public void twoDifferentCommands() {
 		sut.registerCommand("foo", command);
 		sut.registerCommand("bar", anotherCommand);
-
 		assertThat(state.getCommands()).containsEntry("foo", command).containsEntry("bar", anotherCommand);
 	}
 

@@ -14,9 +14,8 @@ import org.hosh.doc.Todo;
  * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
  *
  */
-@Todo(description="to be used later, do not delete")
+@Todo(description = "to be used later, do not delete")
 public class AlphaNumericStringComparator implements Comparator<String> {
-
 	private static final Pattern alphaNumChunkPattern = Pattern.compile("(\\d+)|(\\D+)");
 
 	@Override

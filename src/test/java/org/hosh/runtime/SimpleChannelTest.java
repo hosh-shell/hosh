@@ -15,13 +15,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SimpleChannelTest {
-
 	@Mock
 	private PrintStream printStream;
-
 	@InjectMocks
 	private SimpleChannel sut;
-
 
 	@Test
 	public void empty() {
@@ -40,5 +37,4 @@ public class SimpleChannelTest {
 		sut.send(Record.of("key", Values.ofText("foo"), "another_key", Values.ofText("bar")));
 		Mockito.verify(printStream).println("foo bar");
 	}
-
 }

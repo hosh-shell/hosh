@@ -16,12 +16,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ConsoleChannelTest {
-
 	@Mock
 	private Terminal terminal;
 	@Mock
 	private PrintWriter printWriter;
-
 	private ConsoleChannel sut;
 
 	@Before
@@ -50,5 +48,4 @@ public class ConsoleChannelTest {
 		sut.send(Record.of("key", Values.ofText("foo")).add("another_key", Values.ofText("bar")));
 		then(printWriter).should().println("[38;5;2147483647mfoo bar[0m");
 	}
-
 }

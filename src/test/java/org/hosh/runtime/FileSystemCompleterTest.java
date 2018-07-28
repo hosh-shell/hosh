@@ -22,22 +22,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class FileSystemCompleterTest {
-
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
 	@Mock
 	private State state;
-
 	@Mock(stubOnly = true)
 	private LineReader lineReader;
-
 	@Mock
 	private ParsedLine line;
-
 	@Mock
 	private List<Candidate> candidates;
-
 	@InjectMocks
 	private FileSystemCompleter sut;
 
@@ -45,9 +39,7 @@ public class FileSystemCompleterTest {
 	public void emptyWordInEmptyDir() {
 		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 		given(line.word()).willReturn("");
-
 		sut.complete(lineReader, line, candidates);
-
 		then(candidates).shouldHaveZeroInteractions();
 	}
 
@@ -55,9 +47,7 @@ public class FileSystemCompleterTest {
 	public void nonEmptyWordInEmptyDir() {
 		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 		given(line.word()).willReturn("aaa");
-
 		sut.complete(lineReader, line, candidates);
-
 		then(candidates).shouldHaveZeroInteractions();
 	}
 
@@ -66,18 +56,14 @@ public class FileSystemCompleterTest {
 		temporaryFolder.newFile("a");
 		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 		given(line.word()).willReturn("aaa");
-
 		sut.complete(lineReader, line, candidates);
-
 		then(candidates).should().add(ArgumentMatchers.any());
 	}
 
 	@Test
 	public void slash() throws IOException {
 		given(line.word()).willReturn("/");
-
 		sut.complete(lineReader, line, candidates);
-
 		then(candidates).should(Mockito.atLeastOnce()).add(ArgumentMatchers.any());
 	}
 
@@ -86,10 +72,7 @@ public class FileSystemCompleterTest {
 		String dir = temporaryFolder.getRoot().getAbsolutePath().toString();
 		temporaryFolder.newFile();
 		given(line.word()).willReturn(dir);
-
 		sut.complete(lineReader, line, candidates);
-
 		then(candidates).should(Mockito.atLeastOnce()).add(ArgumentMatchers.any());
 	}
-
 }

@@ -30,7 +30,6 @@ public class ParserTest {
 		sut.parse("cd ${DIR}");
 		sut.parse("withTime { git push }");
 		sut.parse("withLock /tmp/push.lock { git push }");
-
 	}
 
 	@Ignore("recursive wrapped commands still not allowed")

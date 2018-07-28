@@ -18,7 +18,6 @@ import org.hosh.doc.Todo;
  */
 @Todo(description = "emit a special record at the start to provide column names")
 public final class Record {
-
 	private final Map<String, Value> data;
 
 	private Record(Map<String, Value> data) {
@@ -86,5 +85,4 @@ public final class Record {
 			return false;
 		}
 	}
-
 }

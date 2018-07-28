@@ -12,7 +12,6 @@ import org.junit.Test;
 import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
 
 public class ProperJUnitUsageTest {
-
 	@Test
 	public void enforcePresenceOfTestAnnotation() {
 		new FastClasspathScanner("-jar:")
@@ -40,5 +39,4 @@ public class ProperJUnitUsageTest {
 			throw new IllegalArgumentException(e);
 		}
 	}
-
 }

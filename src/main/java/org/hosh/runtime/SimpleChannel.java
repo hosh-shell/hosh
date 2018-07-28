@@ -13,7 +13,6 @@ import org.hosh.spi.Value;
  * non-interactive shell.
  */
 public class SimpleChannel implements Channel {
-
 	private final PrintStream printStream;
 
 	public SimpleChannel(PrintStream printStream) {
@@ -33,5 +32,4 @@ public class SimpleChannel implements Channel {
 		}
 		printStream.println(output.toString());
 	}
-
 }

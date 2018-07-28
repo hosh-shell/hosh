@@ -17,24 +17,18 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
  * </ul>
  */
 public class InteralArchitectureTest {
-
 	@Test
 	public void properDependencies() {
 		JavaClasses importedClasses = new ClassFileImporter().importPackages("org.hosh");
-
 		slices().matching("org.hosh").should().beFreeOfCycles();
-
 		classes().that().resideInAPackage("..modules..")
 				.should().accessClassesThat().resideInAnyPackage("..spi..", "java..")
 				.check(importedClasses);
-
 		noClasses().that().resideInAPackage("..modules..")
 				.should().accessClassesThat().resideInAPackage("..runtime..")
 				.check(importedClasses);
-
 		noClasses().that().resideInAPackage("..spi..")
 				.should().accessClassesThat().resideInAPackage("..runtime..")
 				.check(importedClasses);
 	}
-
 }

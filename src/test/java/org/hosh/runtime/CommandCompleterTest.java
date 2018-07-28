@@ -21,19 +21,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CommandCompleterTest {
-
 	@Mock
 	private LineReader lineReader;
-
 	@Mock
 	private ParsedLine parsedLine;
-
 	@Mock
 	private State state;
-
 	@Mock
 	private Command command;
-
 	@InjectMocks
 	private CommandCompleter sut;
 
@@ -58,5 +53,4 @@ public class CommandCompleterTest {
 				.extracting(Candidate::value)
 				.allMatch(p -> p.equals("cmd"));
 	}
-
 }

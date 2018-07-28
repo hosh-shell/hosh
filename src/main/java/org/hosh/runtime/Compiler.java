@@ -109,7 +109,7 @@ public class Compiler {
 
 	@Todo(description = "convince ANTLR to save just VARIABLE, without instead of ${VARIABLE}")
 	private String variableNameFromToken(Token token) {
-		return token.getText().substring(2, token.getText().length()-1);
+		return token.getText().substring(2, token.getText().length() - 1);
 	}
 
 	public static class Program {

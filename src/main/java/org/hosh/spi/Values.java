@@ -12,7 +12,6 @@ import java.util.Objects;
  * NB: actual value types are not exposed by purpose
  */
 public class Values {
-
 	private Values() {
 	}
 
@@ -41,7 +40,6 @@ public class Values {
 		Unit unit = pre[exp - 1];
 		long value = (long) (bytes / Math.pow(k, exp));
 		return ofSize(value, unit);
-
 	}
 
 	public static Value ofLocalPath(Path path) {
@@ -53,7 +51,6 @@ public class Values {
 	 * the current locale.
 	 */
 	static final class Text implements Value {
-
 		private final String value;
 
 		public Text(String value) {
@@ -88,14 +85,12 @@ public class Values {
 		public int hashCode() {
 			return Objects.hash(value);
 		}
-
 	}
 
 	/**
 	 * Used to represent a size of a file, etc.
 	 */
 	static final class Size implements Value {
-
 		private final long value;
 		private final Unit unit;
 
@@ -136,11 +131,9 @@ public class Values {
 		public int hashCode() {
 			return Objects.hash(value, unit);
 		}
-
 	}
 
 	static final class LocalPath implements Value {
-
 		private final Path path;
 
 		public LocalPath(Path path) {
@@ -175,6 +168,5 @@ public class Values {
 		public int hashCode() {
 			return Objects.hash(path);
 		}
-
 	}
 }

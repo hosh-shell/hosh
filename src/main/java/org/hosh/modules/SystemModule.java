@@ -15,7 +15,6 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
 
 public class SystemModule implements Module {
-
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("echo", new Echo());
@@ -25,18 +24,15 @@ public class SystemModule implements Module {
 	}
 
 	public static class Echo implements Command {
-
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 			Record record = Record.of("text", Values.ofText(String.join("", args)));
 			out.send(record);
 		}
-
 	}
 
 	@Todo(description = "should print the variables stored in the state")
 	public static class Env implements Command {
-
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 			if (!args.isEmpty()) {
@@ -50,36 +46,32 @@ public class SystemModule implements Module {
 				out.send(record);
 			}
 		}
-
 	}
 
 	public static class Exit implements Command {
-
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
 			switch (args.size()) {
-			case 0:
-				System.exit(0);
-				break;
-			case 1:
-				String arg = args.get(0);
-				if (arg.matches("\\d{1,3}")) {
-					System.exit(Integer.parseInt(arg));
-				} else {
-					err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
-				}
-				break;
-			default:
-				err.send(Record.of("error", Values.ofText("too many parameters")));
-				break;
+				case 0:
+					System.exit(0);
+					break;
+				case 1:
+					String arg = args.get(0);
+					if (arg.matches("\\d{1,3}")) {
+						System.exit(Integer.parseInt(arg));
+					} else {
+						err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
+					}
+					break;
+				default:
+					err.send(Record.of("error", Values.ofText("too many parameters")));
+					break;
 			}
 		}
-
 	}
 
 	@Todo(description = "commands are not sorted by default, planning to use pipelines")
 	public static class Help implements Command, StateAware {
-
 		private State state;
 
 		@Override
@@ -98,7 +90,5 @@ public class SystemModule implements Module {
 				out.send(Record.of("command", Values.ofText(command)));
 			}
 		}
-
 	}
-
 }

@@ -15,9 +15,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(Suite.class)
@@ -26,26 +26,21 @@ import org.mockito.junit.MockitoJUnitRunner;
 		TerminalModuleTest.BellTest.class,
 })
 public class TerminalModuleTest {
-
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ClearTest {
-
 		@Mock
 		private Channel out;
-
 		@Mock
 		private Channel err;
-
 		@Mock
 		private Terminal terminal;
-
 		@InjectMocks
 		private Clear sut;
 
 		@Test
 		public void noArgs() {
 			sut.run(Arrays.asList(), out, err);
-			then(terminal).should().puts(Mockito.any());
+			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -60,28 +55,23 @@ public class TerminalModuleTest {
 			then(err).should().send(Record.of("error", Values.ofText("no parameters expected")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
-
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class BellTest {
-
 		@Mock
 		private Channel out;
-
 		@Mock
 		private Channel err;
-
 		@Mock
 		private Terminal terminal;
-
 		@InjectMocks
 		private Bell sut;
 
 		@Test
 		public void noArgs() throws IOException {
 			sut.run(Arrays.asList(), out, err);
-			then(terminal).should().puts(Mockito.any());
+			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -96,7 +86,5 @@ public class TerminalModuleTest {
 			then(err).should().send(Record.of("error", Values.ofText("no parameters expected")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
-
 	}
-
 }

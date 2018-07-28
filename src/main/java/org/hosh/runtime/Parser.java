@@ -10,7 +10,6 @@ import org.hosh.antlr4.HoshParser;
 
 /** Facade for ANTLR4 runtime. */
 public class Parser {
-
 	public HoshParser.ProgramContext parse(String input) {
 		HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
 		lexer.removeErrorListeners();
@@ -23,7 +22,6 @@ public class Parser {
 	}
 
 	public static class ParseError extends RuntimeException {
-
 		private static final long serialVersionUID = 1L;
 
 		public ParseError(String message) {
@@ -32,13 +30,10 @@ public class Parser {
 	}
 
 	private static class CustomErrorListener extends BaseErrorListener {
-
 		@Override
 		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
 				String msg, RecognitionException e) {
 			throw new ParseError(String.format("line %s:%s: %s", line, charPositionInLine, msg));
-
 		}
 	}
-
 }

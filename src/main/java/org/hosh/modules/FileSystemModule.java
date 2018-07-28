@@ -19,7 +19,6 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
 
 public class FileSystemModule implements Module {
-
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("cd", new ChangeDirectory());
@@ -29,7 +28,6 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class ListFiles implements Command, StateAware {
-
 		private State state;
 
 		@Override
@@ -43,7 +41,7 @@ public class FileSystemModule implements Module {
 				err.send(Record.of("message", Values.ofText("expected at most 1 argument")));
 				return;
 			}
-			Path of = args.size() == 0? state.getCwd() : Paths.get(args.get(0));
+			Path of = args.size() == 0 ? state.getCwd() : Paths.get(args.get(0));
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(of)) {
 				for (Path path : stream) {
 					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));
@@ -60,7 +58,6 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class CurrentWorkingDirectory implements Command, StateAware {
-
 		private State state;
 
 		@Override
@@ -79,7 +76,6 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class ChangeDirectory implements Command, StateAware {
-
 		private State state;
 
 		@Override
@@ -89,7 +85,6 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-
 			switch (args.size()) {
 				case 0:
 					err.send(Record.of("error", Values.ofText("missing path argument")));
@@ -113,11 +108,9 @@ public class FileSystemModule implements Module {
 					break;
 			}
 		}
-
 	}
 
 	public static class Cat implements Command, StateAware {
-
 		private State state;
 
 		@Override
@@ -152,6 +145,5 @@ public class FileSystemModule implements Module {
 				err.send(Record.of("exception", Values.ofText(e.getMessage())));
 			}
 		}
-
 	}
 }

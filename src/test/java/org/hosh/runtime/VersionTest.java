@@ -7,11 +7,9 @@ import java.io.IOException;
 import org.junit.Test;
 
 public class VersionTest {
-
 	@Test
 	public void readVersion() throws IOException {
 		String readVersion = Version.readVersion();
 		assertThat(readVersion).isNotBlank();
 	}
-
 }

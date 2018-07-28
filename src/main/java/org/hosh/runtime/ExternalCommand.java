@@ -17,9 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExternalCommand implements Command, StateAware {
-
 	private static final Logger logger = LoggerFactory.getLogger(ExternalCommand.class);
-
 	private final Path command;
 	private ProcessFactory processFactory = new DefaultProcessFactory();
 	private State state;
@@ -47,7 +45,6 @@ public class ExternalCommand implements Command, StateAware {
 	}
 
 	private static class DefaultProcessFactory implements ProcessFactory {
-
 		@Override
 		public Process create(List<String> args, Path cwd, Map<String, String> env) throws IOException {
 			ProcessBuilder processBuilder = new ProcessBuilder(args.toArray(new String[0]))
@@ -56,7 +53,6 @@ public class ExternalCommand implements Command, StateAware {
 			processBuilder.environment().putAll(env);
 			return processBuilder.start();
 		}
-
 	}
 
 	@Override
@@ -65,14 +61,11 @@ public class ExternalCommand implements Command, StateAware {
 	}
 
 	// testing aid since we cannot mock ProcessBuilder
-	static interface ProcessFactory {
-
+	interface ProcessFactory {
 		Process create(List<String> args, Path cwd, Map<String, String> env) throws IOException;
-
 	}
 
 	public void setProcessFactory(ProcessFactory processFactory) {
 		this.processFactory = processFactory;
 	}
-
 }

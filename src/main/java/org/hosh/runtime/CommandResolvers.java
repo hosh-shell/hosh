@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
  * compiler unaware of how commands are resolved.
  */
 public class CommandResolvers {
-
 	private CommandResolvers() {
 	}
 
@@ -31,7 +30,6 @@ public class CommandResolvers {
 	}
 
 	public static class AggregateCommandResolver implements CommandResolver {
-
 		private final List<CommandResolver> resolvers;
 
 		public AggregateCommandResolver(List<CommandResolver> resolvers) {
@@ -48,11 +46,9 @@ public class CommandResolvers {
 			}
 			return null;
 		}
-
 	}
 
 	public static class ExternalCommandResolver implements CommandResolver {
-
 		private final Logger logger = LoggerFactory.getLogger(getClass());
 		private final State state;
 
@@ -79,11 +75,9 @@ public class CommandResolvers {
 			logger.info("  not found");
 			return null;
 		}
-
 	}
 
 	public static class BuiltinCommandResolver implements CommandResolver {
-
 		private final Logger logger = LoggerFactory.getLogger(getClass());
 		private final State state;
 
@@ -99,5 +93,4 @@ public class CommandResolvers {
 			return command;
 		}
 	}
-
 }

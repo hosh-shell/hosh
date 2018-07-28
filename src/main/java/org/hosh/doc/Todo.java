@@ -11,7 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target({ ElementType.TYPE, ElementType.LOCAL_VARIABLE, ElementType.METHOD })
 public @interface Todo {
-
 	String description();
-
 }

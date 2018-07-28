@@ -11,7 +11,6 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 
 public class LineReaderIterator implements Iterator<String> {
-
 	private final State state;
 	private final LineReader lineReader;
 	private String nextLine;
@@ -56,5 +55,4 @@ public class LineReaderIterator implements Iterator<String> {
 				.style(AttributedStyle.DEFAULT)
 				.toAnsi(lineReader.getTerminal());
 	}
-
 }

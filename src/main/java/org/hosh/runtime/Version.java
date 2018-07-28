@@ -7,7 +7,6 @@ import java.util.Properties;
 import org.hosh.doc.Todo;
 
 public class Version {
-
 	private Version() {
 	}
 
@@ -20,5 +19,4 @@ public class Version {
 					properties.getProperty("git.commit.id.abbrev"));
 		}
 	}
-
 }

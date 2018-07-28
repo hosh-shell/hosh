@@ -11,7 +11,6 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 
 public class ConsoleChannel implements Channel {
-
 	private final Terminal terminal;
 	private final int color;
 
@@ -38,5 +37,4 @@ public class ConsoleChannel implements Channel {
 				.toAnsi(terminal);
 		terminal.writer().println(ansiString);
 	}
-
 }

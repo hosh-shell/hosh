@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The state of the shell: it has been modeled as explicit state, 
+ * The state of the shell: it has been modeled as explicit state,
  * in practice this is a global variable.
  */
 public class State {
-
 	// variables
 	private final Map<String, String> variables = new HashMap<>();
 	// registered commands
@@ -20,9 +19,9 @@ public class State {
 	private Path cwd;
 	// current command id: used by the REPL
 	private int id;
-	// PATH 
+	// PATH
 	private List<Path> path = new ArrayList<>();
-	
+
 	public void setCwd(Path cwd) {
 		this.cwd = cwd.normalize().toAbsolutePath();
 	}
@@ -59,6 +58,4 @@ public class State {
 	public String toString() {
 		return String.format("State[cwd='%s',id=%s,path=%s,variables=%s,commands=%s]", cwd, id, path, variables, commands);
 	}
-
-
 }

@@ -14,16 +14,12 @@ import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
 
 public class HoshTest {
-
 	@Rule
 	public final ExpectedSystemExit expectedSystemExit = ExpectedSystemExit.none();
-
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
 	@Rule
 	public final SystemOutRule systemOutRule = new SystemOutRule().enableLog().mute();
-
 	@Rule
 	public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().mute();
 
@@ -31,15 +27,12 @@ public class HoshTest {
 	public void missingScript() throws Exception {
 		expectedSystemExit.expectSystemExitWithStatus(1);
 		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-
 			@Override
 			public void checkAssertion() throws Exception {
 				assertThat(systemOutRule.getLog()).isEmpty();
 				assertThat(systemErrRule.getLog()).contains("unable to load: test.hosh");
 			}
-
 		});
-
 		Hosh.main(new String[] { "test.hosh" });
 	}
 
@@ -52,15 +45,12 @@ public class HoshTest {
 		}
 		expectedSystemExit.expectSystemExitWithStatus(1);
 		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-
 			@Override
 			public void checkAssertion() throws Exception {
 				assertThat(systemOutRule.getLog()).isEmpty();
 				assertThat(systemErrRule.getLog()).contains("line 1: unknown command asd");
 			}
-
 		});
-
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 	}
 
@@ -71,17 +61,13 @@ public class HoshTest {
 			script.write("exit 1" + "\n");
 			script.flush();
 		}
-
 		expectedSystemExit.expectSystemExitWithStatus(1);
 		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-
 			@Override
 			public void checkAssertion() throws Exception {
 				assertThat(systemOutRule.getLog()).isEmpty();
 			}
-
 		});
-
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 	}
 
@@ -95,15 +81,11 @@ public class HoshTest {
 		}
 		expectedSystemExit.expectSystemExitWithStatus(0);
 		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
-
 			@Override
 			public void checkAssertion() throws Exception {
 				assertThat(systemOutRule.getLog()).contains("test.hosh");
 			}
-
 		});
-
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 	}
-
 }
