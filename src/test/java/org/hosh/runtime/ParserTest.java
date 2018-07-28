@@ -26,7 +26,8 @@ public class ParserTest {
 		sut.parse("git commit --amend\n");
 		sut.parse("cd ..\n");
 		sut.parse("cd /tmp\n");
-		sut.parse("cd ${DIR}\n");
+		sut.parse("${EXECUTABLE}");
+		sut.parse("cd ${DIR}");
 		sut.parse("withTime { git push }");
 		sut.parse("withLock /tmp/push.lock { git push }");
 

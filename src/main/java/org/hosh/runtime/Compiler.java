@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.hosh.antlr4.HoshParser;
+import org.hosh.antlr4.HoshParser.ArgContext;
 import org.hosh.antlr4.HoshParser.CommandContext;
+import org.hosh.antlr4.HoshParser.InvocationContext;
+import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrapperContext;
 import org.hosh.doc.Todo;
@@ -38,42 +40,32 @@ public class Compiler {
 	}
 
 	private Statement compileStatement(StmtContext stmt) {
-		if (stmt.command() != null) {
-			return compileAsCommand(stmt.command());
+		CommandContext command = stmt.command();
+		if (command.simple() != null) {
+			return compileSimpleCommand(command.simple());
 		}
-		if (stmt.wrapper() != null) {
-			return compileAsWrappedCommand(stmt.wrapper());
+		if (command.wrapper() != null) {
+			return compileWrappedCommand(command.wrapper());
 		}
 		throw new IllegalStateException("internal bug");
 	}
 
-	private Statement compileAsCommand(CommandContext ctx) {
-		Token token = ctx.ID().get(0).getSymbol();
+	private Statement compileSimpleCommand(SimpleContext simple) {
+		Token token = simple.invocation().ID().getSymbol();
 		String commandName = token.getText();
 		Command command = commandResolver.tryResolve(commandName);
 		if (command == null) {
 			throw new CompileError("line " + token.getLine() + ": unknown command " + commandName);
 		}
-		List<String> commandArgs = compileArguments(ctx);
+		List<String> commandArgs = compileArguments(simple.invocation());
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
 		return statement;
 	}
 
-	@Todo(description = "allows to grouping arguments by using ' or \" in the grammar (strings)")
-	private List<String> compileArguments(CommandContext ctx) {
-		return ctx
-				.ID()
-				.stream()
-				.skip(1)
-				.map(TerminalNode::getSymbol)
-				.map(this::resolveVariable)
-				.collect(Collectors.toList());
-	}
-
-	private Statement compileAsWrappedCommand(WrapperContext ctx) {
-		Token token = ctx.ID().get(0).getSymbol();
+	private Statement compileWrappedCommand(WrapperContext ctx) {
+		Token token = ctx.invocation().ID().getSymbol();
 		String commandName = token.getText();
 		Command command = commandResolver.tryResolve(commandName);
 		if (command == null) {
@@ -82,7 +74,7 @@ public class Compiler {
 		if (command instanceof CommandWrapper == false) {
 			throw new CompileError("line " + token.getLine() + ": not a command wrapper " + commandName);
 		}
-		List<String> commandArgs = compileWrappedArguments(ctx);
+		List<String> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
@@ -90,30 +82,34 @@ public class Compiler {
 	}
 
 	@Todo(description = "allows to grouping arguments by using ' or \" in the grammar (strings)")
-	private List<String> compileWrappedArguments(WrapperContext ctx) {
+	private List<String> compileArguments(InvocationContext ctx) {
 		return ctx
-				.ID()
+				.arg()
 				.stream()
-				.skip(1)
-				.map(TerminalNode::getSymbol)
-				.map(this::resolveVariable)
+				.map(this::resolve)
 				.collect(Collectors.toList());
 	}
 
-	// resolves ${NAME} by looking for NAME in variables
-	@Todo(description = "move this logic in a grammar production")
-	private String resolveVariable(Token token) {
-		String id = token.getText();
-		if (id.startsWith("${")) {
-			String variableName = id.substring(2, id.length() - 1);
+	private String resolve(ArgContext ctx) {
+		if (ctx.VARIABLE() != null) {
+			Token token = ctx.VARIABLE().getSymbol();
+			String variableName = variableNameFromToken(token);
 			if (state.getVariables().containsKey(variableName)) {
 				return state.getVariables().get(variableName);
 			} else {
 				throw new CompileError("line " + token.getLine() + ": unknown variable " + variableName);
 			}
-		} else {
-			return id;
 		}
+		if (ctx.ID() != null) {
+			Token token = ctx.ID().getSymbol();
+			return token.getText();
+		}
+		throw new IllegalStateException("internal bug");
+	}
+
+	@Todo(description = "convince ANTLR to save just VARIABLE, without instead of ${VARIABLE}")
+	private String variableNameFromToken(Token token) {
+		return token.getText().substring(2, token.getText().length()-1);
 	}
 
 	public static class Program {

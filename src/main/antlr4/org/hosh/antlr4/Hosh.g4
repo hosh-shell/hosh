@@ -7,22 +7,37 @@ program
 stmt
     : command ( NEWLINE | EOF )
     | command '|' stmt
-    | wrapper
     ;
 
 command
-	: ID+
+	: simple
+	| wrapper
+	;
+
+simple
+	: invocation
 	;
 
 wrapper
-	: ID+ '{' command '}'
+	: invocation '{' command '}'
+	;
+
+invocation
+	: ID ( arg ) *
+	;
+
+arg
+	: ID
+	| VARIABLE
 	;
 
 ID
     : ( [a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/' )+
-    | '$' '{' ( [a-zA-Z0-9] | '_' | '-' )+ '}' 
     ;
-    
+
+VARIABLE
+	: '$' '{' ( [a-zA-Z0-9] | '_' | '-' )+ '}'
+	;
 
 NEWLINE
     : '\r'? '\n'
