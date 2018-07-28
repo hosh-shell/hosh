@@ -25,9 +25,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class CompilerTest {
 	@Mock
 	private State state;
-	@Mock
+	@Mock(stubOnly=true)
 	private Command command;
-	@Mock
+	@Mock(stubOnly=true)
 	private CommandWrapper commandWrapper;
 	@Mock
 	private CommandResolver commandResolver;
