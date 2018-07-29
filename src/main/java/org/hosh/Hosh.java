@@ -62,15 +62,16 @@ public class Hosh {
 	}
 
 	public static void main(String[] args) throws Exception {
+		try (Terminal terminal = TerminalBuilder.builder().system(true).build()) {
+			runWithin(terminal, args);
+		}
+	}
+
+	private static void runWithin(Terminal terminal, String[] args) throws IOException {
 		configureLogging();
 		Logger logger = LoggerFactory.getLogger(Hosh.class);
 		String version = Version.readVersion();
 		logger.info("starting hosh {}", version);
-		Terminal terminal = TerminalBuilder
-				.builder()
-				.system(true)
-				.streams(System.in, System.out)
-				.build();
 		List<Path> path = Stream
 				.of(System.getenv("PATH").split(File.pathSeparator))
 				.map(Paths::get)
