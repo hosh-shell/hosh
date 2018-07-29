@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -37,20 +38,26 @@ public class FileSystemCompleter implements Completer {
 	private void tryComplete(ParsedLine line, List<Candidate> candidates) throws IOException {
 		Path path = Paths.get(line.word());
 		if (path.isAbsolute()) {
-			list(path.getParent() == null ? path : path.getParent(), (p) -> p.toString(), candidates);
+			listCandidates(parent(path), Path::toAbsolutePath, candidates);
 		} else {
-			list(state.getCwd(), (p) -> p.getFileName().toString(), candidates);
+			listCandidates(state.getCwd(), Path::getFileName, candidates);
 		}
 	}
 
-	private void list(Path dir, Function<Path, String> toCandidate, List<Candidate> candidates) throws IOException {
+	// get parent dir, handling special case / (where parent("/") == null)
+	private Path parent(Path path) {
+		return path.getParent() == null ? path : path.getParent();
+	}
+
+	private void listCandidates(Path dir, Function<Path, Path> toCandidate, List<Candidate> candidates) throws IOException {
 		logger.info("list '{}'", dir);
 		try (Stream<Path> list = Files.list(dir)) {
 			list
 					.peek(p -> logger.info("  {}", p))
 					.map(toCandidate)
-					.map(p -> new DebuggableCandidate(p))
-					.forEach(c -> candidates.add(c));
+					.map(Objects::toString)
+					.map(DebuggableCandidate::new)
+					.forEach(dc -> candidates.add(dc));
 		}
 	}
 }

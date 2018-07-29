@@ -16,7 +16,7 @@ public class ExitStatus {
 	@Todo(description = "check the range of possible exit status on windows")
 	private ExitStatus(int value) {
 		if (value < 0 || value > 255) {
-			throw new IllegalArgumentException("illegal exit status: " + value);
+			throw new InvalidExitCode("illegal exit status: " + value);
 		}
 		this.value = value;
 	}
@@ -43,7 +43,7 @@ public class ExitStatus {
 			return Optional.of(new ExitStatus(value));
 		} catch (NumberFormatException e) {
 			return Optional.empty();
-		} catch (IllegalArgumentException e) {
+		} catch (InvalidExitCode e) {
 			return Optional.empty();
 		}
 	}
@@ -70,5 +70,13 @@ public class ExitStatus {
 	@Override
 	public String toString() {
 		return String.format("ExitStatus[value=%s]", value);
+	}
+
+	public static class InvalidExitCode extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		public InvalidExitCode(String message) {
+			super(message);
+		}
 	}
 }

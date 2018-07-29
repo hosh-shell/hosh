@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
+import org.hosh.spi.ExitStatus.InvalidExitCode;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -14,12 +15,12 @@ public class ExitStatusTest {
 		EqualsVerifier.forClass(ExitStatus.class).verify();
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = InvalidExitCode.class)
 	public void belowMin() {
 		ExitStatus.of(-1);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = InvalidExitCode.class)
 	public void aboveMax() {
 		ExitStatus.of(256);
 	}
