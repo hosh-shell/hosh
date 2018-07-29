@@ -1,6 +1,7 @@
 package org.hosh.spi;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.hosh.doc.Todo;
 
@@ -8,7 +9,7 @@ import org.hosh.doc.Todo;
  * Value object for describing exit status from external as well as internal
  * commands.
  */
-@Todo(description = "this should a Value?")
+@Todo(description = "this should a org.hosh.spi.Value?")
 public class ExitStatus {
 	private final int value;
 
@@ -30,6 +31,21 @@ public class ExitStatus {
 
 	public static ExitStatus of(int value) {
 		return new ExitStatus(value);
+	}
+
+	/**
+	 * Malformed (e.g. 'not a number') or invalid exit values (e.g. -1)
+	 * yield no value.
+	 */
+	public static Optional<ExitStatus> parse(String str) {
+		try {
+			int value = Integer.parseInt(str, 10);
+			return Optional.of(new ExitStatus(value));
+		} catch (NumberFormatException e) {
+			return Optional.empty();
+		} catch (IllegalArgumentException e) {
+			return Optional.empty();
+		}
 	}
 
 	public int value() {

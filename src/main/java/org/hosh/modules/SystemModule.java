@@ -3,6 +3,7 @@ package org.hosh.modules;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hosh.doc.Todo;
@@ -55,26 +56,33 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "this is silly: we should signal using state our intention to really exit, using ExitStatus")
-	public static class Exit implements Command {
+	public static class Exit implements Command, StateAware {
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
 		@Override
 		public ExitStatus run(List<String> args, Channel out, Channel err) {
 			switch (args.size()) {
 				case 0:
-					System.exit(0);
+					state.setExit(true);
 					return ExitStatus.success();
 				case 1:
 					String arg = args.get(0);
-					if (arg.matches("\\d{1,3}")) {
-						System.exit(Integer.parseInt(arg));
-						return ExitStatus.success();
+					Optional<ExitStatus> exitStatus = ExitStatus.parse(arg);
+					if (exitStatus.isPresent()) {
+						state.setExit(true);
+						return exitStatus.get();
 					} else {
-						err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
+						err.send(Record.of("error", Values.ofText("not a valid exit status: " + arg)));
 						return ExitStatus.error();
 					}
 				default:
 					err.send(Record.of("error", Values.ofText("too many parameters")));
-					return ExitStatus.success();
+					return ExitStatus.error();
 			}
 		}
 	}

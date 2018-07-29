@@ -14,13 +14,13 @@ import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
 import org.hosh.modules.SystemModule.Sleep;
 import org.hosh.spi.Channel;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.contrib.java.lang.system.ExpectedSystemExit;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -42,8 +42,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ExitTest {
-		@Rule
-		public final ExpectedSystemExit expectedSystemExit = ExpectedSystemExit.none();
+		@Mock
+		private State state;
 		@Mock
 		private Channel out;
 		@Mock
@@ -53,26 +53,38 @@ public class SystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			expectedSystemExit.expectSystemExitWithStatus(0);
-			sut.run(Arrays.asList(), out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), out, err);
+			assertThat(exitStatus.value()).isEqualTo(0);
+			then(state).should().setExit(true);
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneValidArg() {
-			expectedSystemExit.expectSystemExitWithStatus(21);
-			sut.run(Arrays.asList("21"), out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("21"), out, err);
+			assertThat(exitStatus.value()).isEqualTo(21);
+			then(state).should().setExit(true);
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneInvalidArg() {
-			sut.run(Arrays.asList("asd"), out, err);
-			then(err).should().send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), out, err);
+			assertThat(exitStatus.value()).isEqualTo(1);
+			then(state).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("not a valid exit status: asd")));
+			then(out).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
-			sut.run(Arrays.asList("1", "2"), out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("1", "2"), out, err);
+			assertThat(exitStatus.value()).isEqualTo(1);
+			then(state).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("too many parameters")));
+			then(out).shouldHaveZeroInteractions();
 		}
 	}
 

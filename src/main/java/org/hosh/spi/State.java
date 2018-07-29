@@ -21,6 +21,8 @@ public class State {
 	private int id;
 	// PATH
 	private List<Path> path = new ArrayList<>();
+	// request exit shell before executing next command
+	private boolean exit = false;
 
 	public void setCwd(Path cwd) {
 		this.cwd = cwd.normalize().toAbsolutePath();
@@ -52,6 +54,14 @@ public class State {
 
 	public void setPath(List<Path> path) {
 		this.path = path;
+	}
+
+	public boolean isExit() {
+		return exit;
+	}
+
+	public void setExit(boolean exit) {
+		this.exit = exit;
 	}
 
 	@Override

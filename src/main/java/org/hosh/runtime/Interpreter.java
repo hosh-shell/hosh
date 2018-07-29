@@ -29,12 +29,16 @@ public class Interpreter {
 		this.err = err;
 	}
 
-	@Todo(description = "exit at first error")
-	public void eval(Program program) {
+	public ExitStatus eval(Program program) {
+		ExitStatus exitStatus = ExitStatus.success();
 		for (Statement statement : program.getStatements()) {
-			ExitStatus exitStatus = execute(statement);
+			exitStatus = execute(statement);
 			store(exitStatus);
+			if (state.isExit() || exitStatus.value() != 0) {
+				break;
+			}
 		}
+		return exitStatus;
 	}
 
 	private ExitStatus execute(Statement statement) {

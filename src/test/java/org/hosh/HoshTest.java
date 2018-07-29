@@ -41,6 +41,7 @@ public class HoshTest {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
 			script.write("asd" + "\n");
+			script.write("exit 0" + "\n"); // this line will be not executed
 			script.flush();
 		}
 		expectedSystemExit.expectSystemExitWithStatus(1);
@@ -113,6 +114,25 @@ public class HoshTest {
 			script.flush();
 		}
 		expectedSystemExit.expectSystemExitWithStatus(0);
+		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
+	}
+
+	@Test
+	public void scriptIsParsedThenExecuted() throws Exception {
+		File scriptPath = temporaryFolder.newFile("test.hosh");
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("echo hello" + "\n");
+			script.write("asd" + "\n");
+			script.flush();
+		}
+		expectedSystemExit.expectSystemExitWithStatus(1);
+		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
+			@Override
+			public void checkAssertion() throws Exception {
+				assertThat(systemOutRule.getLog()).isEmpty();
+				assertThat(systemErrRule.getLog()).contains("line 2: unknown command asd");
+			}
+		});
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 	}
 }

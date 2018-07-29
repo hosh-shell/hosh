@@ -27,6 +27,7 @@ import org.hosh.runtime.SimpleCommandRegistry;
 import org.hosh.runtime.Version;
 import org.hosh.spi.Channel;
 import org.hosh.spi.CommandRegistry;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
@@ -47,8 +48,9 @@ public class Hosh {
 	private Hosh() {
 	}
 
-	// enabling logging to $HOME/.hosh.log only if HOSH_LOG_LEVEL is
-	// defined (i.e. DEBUG)
+	// enabling logging to $HOME/.hosh.log
+	// if and only if HOSH_LOG_LEVEL is defined (i.e. DEBUG)
+	// by default logging is disabled
 	private static void configureLogging() {
 		String homeDir = System.getProperty("user.home", "");
 		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
@@ -114,8 +116,8 @@ public class Hosh {
 		try {
 			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);
-			interpreter.eval(program);
-			System.exit(0);
+			ExitStatus exitStatus = interpreter.eval(program);
+			System.exit(exitStatus.value());
 		} catch (Exception e) {
 			logger.error("caught exception", e);
 			err.send(Record.of("message", Values.ofText(e.getMessage())));
@@ -139,9 +141,12 @@ public class Hosh {
 			String line = read.next();
 			try {
 				Program program = compiler.compile(line);
-				interpreter.eval(program);
+				ExitStatus exitStatus = interpreter.eval(program);
+				if (state.isExit() || exitStatus.value() != 0) {
+					System.exit(exitStatus.value());
+				}
 			} catch (Exception e) {
-				logger.info("caught exception for input: " + line, e);
+				logger.error("caught exception for input: " + line, e);
 				err.send(Record.of("message", Values.ofText(e.getMessage())));
 			}
 		}
