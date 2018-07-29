@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,9 +46,18 @@ public class Hosh {
 	private Hosh() {
 	}
 
-	public static void main(String[] args) throws Exception {
+	private static void configureLogging() {
+		String homeDir = System.getProperty("user.home", "");
+		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
+		String logLevel = Objects.toString(System.getenv("HOSH_LOG_LEVEL"), "OFF");
+		System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, logLevel);
+		System.setProperty(org.slf4j.impl.SimpleLogger.LOG_FILE_KEY, logFilePath);
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
+	}
+
+	public static void main(String[] args) throws Exception {
+		configureLogging();
 		Logger logger = LoggerFactory.getLogger(Hosh.class);
 		String version = Version.readVersion();
 		logger.info("starting hosh {}", version);
