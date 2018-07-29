@@ -22,7 +22,7 @@ public class HoshIT {
 	@Test
 	public void interactive() throws Exception {
 		Process java = new ProcessBuilder()
-				.command("java", "-Duser.home=/tmp", "-jar", "target/dist/hosh.jar")
+				.command("java", "-jar", "target/dist/hosh.jar")
 				.redirectErrorStream(true)
 				.start();
 		try (Writer writer = new OutputStreamWriter(java.getOutputStream(), StandardCharsets.UTF_8)) {
@@ -43,7 +43,7 @@ public class HoshIT {
 			script.flush();
 		}
 		Process java = new ProcessBuilder()
-				.command("java", "-Duser.home=/tmp", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
+				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
 				.redirectErrorStream(true)
 				.start();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
@@ -63,7 +63,7 @@ public class HoshIT {
 		ProcessBuilder processBuilder = new ProcessBuilder();
 		processBuilder.environment().put("OS_ENV_VARIABLE", "hello world!");
 		Process java = processBuilder
-				.command("java", "-Duser.home=/tmp", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
+				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
 				.redirectErrorStream(true)
 				.start();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
@@ -81,7 +81,7 @@ public class HoshIT {
 			script.flush();
 		}
 		Process java = new ProcessBuilder()
-				.command("java", "-Duser.home=/tmp", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
+				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
 				.redirectErrorStream(true)
 				.start();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
