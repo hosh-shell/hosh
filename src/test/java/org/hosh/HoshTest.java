@@ -24,7 +24,7 @@ public class HoshTest {
 	public final SystemErrRule systemErrRule = new SystemErrRule().enableLog().mute();
 
 	@Test
-	public void missingScript() throws Exception {
+	public void scriptFileMissing() throws Exception {
 		expectedSystemExit.expectSystemExitWithStatus(1);
 		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
 			@Override
@@ -37,7 +37,7 @@ public class HoshTest {
 	}
 
 	@Test
-	public void scriptWithSyntaxError() throws Exception {
+	public void scriptWithUnknownCommand() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
 			script.write("asd" + "\n");
@@ -55,13 +55,29 @@ public class HoshTest {
 	}
 
 	@Test
-	public void scriptWithExit() throws Exception {
+	public void scriptWithExplicitExit() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
 			script.write("exit 1" + "\n");
 			script.flush();
 		}
 		expectedSystemExit.expectSystemExitWithStatus(1);
+		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
+			@Override
+			public void checkAssertion() throws Exception {
+				assertThat(systemOutRule.getLog()).isEmpty();
+			}
+		});
+		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
+	}
+
+	@Test
+	public void scriptWithImplicitExit() throws Exception {
+		File scriptPath = temporaryFolder.newFile("test.hosh");
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.flush();
+		}
+		expectedSystemExit.expectSystemExitWithStatus(0);
 		expectedSystemExit.checkAssertionAfterwards(new Assertion() {
 			@Override
 			public void checkAssertion() throws Exception {
