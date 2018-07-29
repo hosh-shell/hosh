@@ -55,6 +55,7 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Todo(description = "this is silly: we should signal using state our intention to really exit, using ExitStatus")
 	public static class Exit implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel out, Channel err) {

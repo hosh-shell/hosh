@@ -2,6 +2,7 @@ package org.hosh;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,6 +47,8 @@ public class Hosh {
 	private Hosh() {
 	}
 
+	// enabling logging to $HOME/.hosh.log only if HOSH_LOG_LEVEL is
+	// defined (i.e. DEBUG)
 	private static void configureLogging() {
 		String homeDir = System.getProperty("user.home", "");
 		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
@@ -108,19 +111,23 @@ public class Hosh {
 
 	private static void script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger)
 			throws IOException {
-		try (Stream<String> lines = Files.lines(Paths.get(path), StandardCharsets.UTF_8)) {
-			String script = lines.collect(Collectors.joining("\n"));
+		try {
+			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);
 			interpreter.eval(program);
 			System.exit(0);
-		} catch (IOException e) {
-			err.send(Record.of("message", Values.ofText("unable to load: " + path)));
-			logger.debug("caught exception for load: " + path, e);
-			System.exit(1);
 		} catch (Exception e) {
-			logger.debug("caught exception", e);
+			logger.error("caught exception", e);
 			err.send(Record.of("message", Values.ofText(e.getMessage())));
 			System.exit(1);
+		}
+	}
+
+	private static String loadScript(Path path) {
+		try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
+			return lines.collect(Collectors.joining("\n"));
+		} catch (IOException e) {
+			throw new UncheckedIOException("unable to load: " + path, e);
 		}
 	}
 
@@ -133,8 +140,8 @@ public class Hosh {
 			try {
 				Program program = compiler.compile(line);
 				interpreter.eval(program);
-			} catch (RuntimeException e) {
-				logger.debug("caught exception for input: " + line, e);
+			} catch (Exception e) {
+				logger.info("caught exception for input: " + line, e);
 				err.send(Record.of("message", Values.ofText(e.getMessage())));
 			}
 		}
@@ -144,5 +151,6 @@ public class Hosh {
 	private static void welcome(Channel out, String version) {
 		out.send(Record.of("message", Values.ofText("hosh v" + version)));
 		out.send(Record.of("message", Values.ofText("Running on Java " + System.getProperty("java.version"))));
+		out.send(Record.of("message", Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
 	}
 }

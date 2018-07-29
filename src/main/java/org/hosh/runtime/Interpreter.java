@@ -29,6 +29,7 @@ public class Interpreter {
 		this.err = err;
 	}
 
+	@Todo(description = "exit at first error")
 	public void eval(Program program) {
 		for (Statement statement : program.getStatements()) {
 			ExitStatus exitStatus = execute(statement);
