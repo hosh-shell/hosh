@@ -25,9 +25,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class CompilerTest {
 	@Mock
 	private State state;
-	@Mock(stubOnly=true)
+	@Mock(stubOnly = true)
 	private Command command;
-	@Mock(stubOnly=true)
+	@Mock(stubOnly = true)
 	private CommandWrapper commandWrapper;
 	@Mock
 	private CommandResolver commandResolver;
@@ -106,7 +106,6 @@ public class CompilerTest {
 				.hasMessage("line 3: unknown command env2");
 	}
 
-	@Ignore("unfinished")
 	@Test
 	public void wrappedCommandNoArgs() {
 		willReturn(commandWrapper).given(commandResolver).tryResolve("withTime");

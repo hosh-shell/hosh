@@ -1,5 +1,6 @@
 package org.hosh.modules;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,6 +9,7 @@ import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
+import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
@@ -21,6 +23,8 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("env", new Env());
 		commandRegistry.registerCommand("exit", new Exit());
 		commandRegistry.registerCommand("help", new Help());
+		commandRegistry.registerCommand("sleep", new Sleep());
+		commandRegistry.registerCommand("withTime", new WithTime());
 	}
 
 	public static class Echo implements Command {
@@ -89,6 +93,50 @@ public class SystemModule implements Module {
 			for (String command : commands) {
 				out.send(Record.of("command", Values.ofText(command)));
 			}
+		}
+	}
+
+	@Todo(description = "use Duration as argument")
+	public static class Sleep implements Command {
+		@Override
+		public void run(List<String> args, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of("error", Values.ofText("expecting just one argument millis")));
+				return;
+			}
+			String arg = args.get(0);
+			try {
+				Thread.sleep(Long.parseLong(arg));
+			} catch (NumberFormatException e) {
+				err.send(Record.of("error", Values.ofText("not millis: " + arg)));
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				err.send(Record.of("error", Values.ofText("interrupted")));
+			}
+		}
+	}
+
+	@Todo(description = "we need a context here, otherwise it is hard to share objects between before/after")
+	public static class WithTime implements CommandWrapper {
+		// not thread safe :-(
+		private long startNanos;
+
+		@Todo(description = "this is empty and looks like we have a design problem here")
+		@Override
+		public void run(List<String> args, Channel out, Channel err) {
+			// stupid, this should be
+		}
+
+		@Override
+		public void before(List<String> args, Channel out, Channel err) {
+			startNanos = System.nanoTime();
+		}
+
+		@Override
+		public void after(Channel out, Channel err) {
+			long endNanos = System.nanoTime();
+			Duration duration = Duration.ofNanos(endNanos - startNanos);
+			out.send(Record.of("message", Values.ofText("took " + duration)));
 		}
 	}
 }

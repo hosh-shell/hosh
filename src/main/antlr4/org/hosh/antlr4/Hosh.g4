@@ -19,7 +19,7 @@ simple
 	;
 
 wrapper
-	: invocation '{' command '}'
+	: invocation '{' simple '}'
 	;
 
 invocation

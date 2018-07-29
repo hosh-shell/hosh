@@ -88,7 +88,7 @@ public class HoshTest {
 	}
 
 	@Test
-	public void simpleScript() throws Exception {
+	public void scriptWithSimpleCommand() throws Exception {
 		File scriptPath = temporaryFolder.newFile("test.hosh");
 		try (FileWriter script = new FileWriter(scriptPath)) {
 			script.write("cd " + temporaryFolder.getRoot().getAbsolutePath() + "\n");
@@ -102,6 +102,17 @@ public class HoshTest {
 				assertThat(systemOutRule.getLog()).contains("test.hosh");
 			}
 		});
+		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
+	}
+
+	@Test
+	public void scriptWithWrapper() throws Exception {
+		File scriptPath = temporaryFolder.newFile("test.hosh");
+		try (FileWriter script = new FileWriter(scriptPath)) {
+			script.write("withTime { ls }");
+			script.flush();
+		}
+		expectedSystemExit.expectSystemExitWithStatus(0);
 		Hosh.main(new String[] { scriptPath.getAbsolutePath() });
 	}
 }

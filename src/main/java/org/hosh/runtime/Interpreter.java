@@ -3,6 +3,7 @@ package org.hosh.runtime;
 import java.util.List;
 import java.util.Optional;
 
+import org.hosh.runtime.Compiler.GeneratedCommand;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
@@ -28,11 +29,18 @@ public class Interpreter {
 	public void eval(Program program) {
 		for (Statement statement : program.getStatements()) {
 			Command command = statement.getCommand();
+			if (command instanceof GeneratedCommand) {
+				injectDeps(((GeneratedCommand) command).getNestedStatement().getCommand());
+			}
 			List<String> arguments = statement.getArguments();
-			downCast(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
-			downCast(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
+			injectDeps(command);
 			command.run(arguments, out, err);
 		}
+	}
+
+	private void injectDeps(Command command) {
+		downCast(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
+		downCast(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 	}
 
 	private static <T> Optional<T> downCast(Object object, Class<T> requiredClass) {
