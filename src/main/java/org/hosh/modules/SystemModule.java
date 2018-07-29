@@ -10,6 +10,7 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.CommandWrapper;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
@@ -29,19 +30,20 @@ public class SystemModule implements Module {
 
 	public static class Echo implements Command {
 		@Override
-		public void run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel out, Channel err) {
 			Record record = Record.of("text", Values.ofText(String.join("", args)));
 			out.send(record);
+			return ExitStatus.success();
 		}
 	}
 
 	@Todo(description = "should print the variables stored in the state")
 	public static class Env implements Command {
 		@Override
-		public void run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel out, Channel err) {
 			if (!args.isEmpty()) {
 				err.send(Record.of("error", Values.ofText("expecting no parameters")));
-				return;
+				return ExitStatus.error();
 			}
 			Map<String, String> env = System.getenv();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
@@ -49,27 +51,29 @@ public class SystemModule implements Module {
 						Values.ofText(entry.getValue()));
 				out.send(record);
 			}
+			return ExitStatus.success();
 		}
 	}
 
 	public static class Exit implements Command {
 		@Override
-		public void run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel out, Channel err) {
 			switch (args.size()) {
 				case 0:
 					System.exit(0);
-					break;
+					return ExitStatus.success();
 				case 1:
 					String arg = args.get(0);
 					if (arg.matches("\\d{1,3}")) {
 						System.exit(Integer.parseInt(arg));
+						return ExitStatus.success();
 					} else {
 						err.send(Record.of("error", Values.ofText("arg must be a number (0-999)")));
+						return ExitStatus.error();
 					}
-					break;
 				default:
 					err.send(Record.of("error", Values.ofText("too many parameters")));
-					break;
+					return ExitStatus.success();
 			}
 		}
 	}
@@ -84,44 +88,47 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public void run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel out, Channel err) {
 			if (!args.isEmpty()) {
 				err.send(Record.of("error", Values.ofText("expecting no parameters")));
-				return;
+				return ExitStatus.error();
 			}
 			Set<String> commands = state.getCommands().keySet();
 			for (String command : commands) {
 				out.send(Record.of("command", Values.ofText(command)));
 			}
+			return ExitStatus.success();
 		}
 	}
 
 	@Todo(description = "use Duration as argument, we really need Value as arguments")
 	public static class Sleep implements Command {
 		@Override
-		public void run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel out, Channel err) {
 			if (args.size() != 1) {
 				err.send(Record.of("error", Values.ofText("expecting just one argument millis")));
-				return;
+				return ExitStatus.error();
 			}
 			String arg = args.get(0);
 			try {
 				Thread.sleep(Long.parseLong(arg));
+				return ExitStatus.success();
 			} catch (NumberFormatException e) {
 				err.send(Record.of("error", Values.ofText("not millis: " + arg)));
+				return ExitStatus.error();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				err.send(Record.of("error", Values.ofText("interrupted")));
+				return ExitStatus.error();
 			}
 		}
 	}
 
 	public static class WithTime implements CommandWrapper<Long> {
-
 		@Todo(description = "this is empty and looks like we have a design problem here")
 		@Override
-		public void run(List<String> args, Channel out, Channel err) {
-			// stupid, this should be
+		public ExitStatus run(List<String> args, Channel out, Channel err) {
+			return ExitStatus.success();
 		}
 
 		@Override

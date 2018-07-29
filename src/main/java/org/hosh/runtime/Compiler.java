@@ -15,6 +15,7 @@ import org.hosh.antlr4.HoshParser.WrapperContext;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.State;
 
 public class Compiler {
@@ -134,10 +135,10 @@ public class Compiler {
 		}
 
 		@Override
-		public void run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel out, Channel err) {
 			Object resource = commandWrapper.before(args, out, err);
 			try {
-				nestedStatement.command.run(nestedStatement.arguments, out, err);
+				return nestedStatement.command.run(nestedStatement.arguments, out, err);
 			} finally {
 				commandWrapper.after(resource, out, err);
 			}

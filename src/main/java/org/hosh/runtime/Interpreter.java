@@ -1,6 +1,7 @@
 package org.hosh.runtime;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.hosh.doc.Todo;
@@ -9,6 +10,7 @@ import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
@@ -29,12 +31,22 @@ public class Interpreter {
 
 	public void eval(Program program) {
 		for (Statement statement : program.getStatements()) {
-			Command command = statement.getCommand();
-			List<String> arguments = statement.getArguments();
-			injectDepsIntoNested(command);
-			injectDeps(command);
-			command.run(arguments, out, err);
+			ExitStatus exitStatus = execute(statement);
+			store(exitStatus);
 		}
+	}
+
+	private ExitStatus execute(Statement statement) {
+		Command command = statement.getCommand();
+		List<String> arguments = statement.getArguments();
+		injectDepsIntoNested(command);
+		injectDeps(command);
+		return command.run(arguments, out, err);
+	}
+
+	private void store(ExitStatus exitStatus) {
+		Objects.requireNonNull(exitStatus, "exit status cannot be null");
+		state.getVariables().put("EXIT_STATUS", String.valueOf(exitStatus.value()));
 	}
 
 	@Todo(description = "this is another design error? we need a way a tree of commands")

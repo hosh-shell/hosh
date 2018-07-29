@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
@@ -26,9 +26,8 @@ public class ExternalCommand implements Command, StateAware {
 		this.command = command;
 	}
 
-	@Todo(description = "save exitCode as variable?")
 	@Override
-	public void run(List<String> args, Channel out, Channel err) {
+	public ExitStatus run(List<String> args, Channel out, Channel err) {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);
 		processArgs.add(command.toAbsolutePath().toString());
 		processArgs.addAll(args);
@@ -37,10 +36,11 @@ public class ExternalCommand implements Command, StateAware {
 		try {
 			Process process = processFactory.create(processArgs, cwd, state.getVariables());
 			int exitCode = process.waitFor();
-			out.send(Record.of("message", Values.ofText("exit code: " + exitCode)));
+			return ExitStatus.of(exitCode);
 		} catch (IOException | InterruptedException e) {
 			err.send(Record.of("error", Values.ofText(e.getMessage())));
 			logger.error("caught exception", e);
+			return ExitStatus.error();
 		}
 	}
 

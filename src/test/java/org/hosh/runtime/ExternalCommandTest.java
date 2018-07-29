@@ -43,7 +43,7 @@ public class ExternalCommandTest {
 				Arrays.asList("/usr/bin/vim"),
 				Paths.get("."),
 				Collections.emptyMap());
-		then(out).should().send(any());
+		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
 
@@ -61,7 +61,7 @@ public class ExternalCommandTest {
 				Arrays.asList("/usr/bin/vim", "file.hosh"),
 				Paths.get("."),
 				Collections.emptyMap());
-		then(out).should().send(any());
+		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
 
