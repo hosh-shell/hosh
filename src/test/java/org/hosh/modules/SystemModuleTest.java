@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.hosh.modules.SystemModule.Echo;
 import org.hosh.modules.SystemModule.Env;
 import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
+import org.hosh.modules.SystemModule.Sleep;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
@@ -31,9 +33,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-		SystemModuleTest.ExitTest.class,
+		SystemModuleTest.EchoTest.class,
 		SystemModuleTest.EnvTest.class,
+		SystemModuleTest.ExitTest.class,
 		SystemModuleTest.HelpTest.class,
+		SystemModuleTest.SleepTest.class,
 })
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -140,6 +144,75 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList("1"), out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting no parameters")));
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class EchoTest {
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Echo sut;
+
+		@Test
+		public void noArgs() {
+			sut.run(Arrays.asList(), out, err);
+			then(out).should().send(Record.of("text", Values.ofText("")));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void oneArg() {
+			sut.run(Arrays.asList("a"), out, err);
+			then(out).should().send(Record.of("text", Values.ofText("a")));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void twoArgs() {
+			sut.run(Arrays.asList("a", "b"), out, err);
+			then(out).should().send(Record.of("text", Values.ofText("ab")));
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class SleepTest {
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Sleep sut;
+
+		@Test
+		public void noArgs() {
+			sut.run(Arrays.asList(), out, err);
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
+		}
+
+		@Test
+		public void oneArgNumber() {
+			sut.run(Arrays.asList("1"), out, err);
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void oneArgNotNumber() {
+			sut.run(Arrays.asList("a"), out, err);
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("not millis: a")));
+		}
+
+		@Test
+		public void twoArgs() {
+			sut.run(Arrays.asList("a", "b"), out, err);
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
 		}
 	}
 }
