@@ -111,8 +111,7 @@ public class Hosh {
 		}
 	}
 
-	private static void script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger)
-			throws IOException {
+	private static void script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger) {
 		try {
 			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);

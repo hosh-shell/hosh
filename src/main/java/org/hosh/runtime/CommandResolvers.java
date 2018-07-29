@@ -61,7 +61,7 @@ public class CommandResolvers {
 			logger.info("resolving commandName '{}' as system command", commandName);
 			Path candidate = Paths.get(commandName).normalize();
 			if (candidate.isAbsolute() && Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
-				logger.info("  absolute file and executable {}", candidate);
+				logger.info("  found in {}", candidate);
 				return new ExternalCommand(candidate);
 			}
 			for (Path dir : state.getPath()) {
