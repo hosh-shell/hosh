@@ -96,7 +96,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "use Duration as argument")
+	@Todo(description = "use Duration as argument, we really need Value as arguments")
 	public static class Sleep implements Command {
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
@@ -116,10 +116,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "we need a context here, otherwise it is hard to share objects between before/after")
-	public static class WithTime implements CommandWrapper {
-		// not thread safe :-(
-		private long startNanos;
+	public static class WithTime implements CommandWrapper<Long> {
 
 		@Todo(description = "this is empty and looks like we have a design problem here")
 		@Override
@@ -128,12 +125,12 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public void before(List<String> args, Channel out, Channel err) {
-			startNanos = System.nanoTime();
+		public Long before(List<String> args, Channel out, Channel err) {
+			return System.nanoTime();
 		}
 
 		@Override
-		public void after(Channel out, Channel err) {
+		public void after(Long startNanos, Channel out, Channel err) {
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
 			out.send(Record.of("message", Values.ofText("took " + duration)));

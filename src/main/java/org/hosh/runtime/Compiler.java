@@ -74,7 +74,8 @@ public class Compiler {
 		if (command instanceof CommandWrapper == false) {
 			throw new CompileError("line " + token.getLine() + ": not a command wrapper " + commandName);
 		}
-		CommandWrapper commandWrapper = (CommandWrapper) command;
+		@SuppressWarnings("unchecked")
+		CommandWrapper<Object> commandWrapper = (CommandWrapper<Object>) command;
 		Statement nestedStatement = compileSimpleCommand(ctx.simple());
 		List<String> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
@@ -125,20 +126,20 @@ public class Compiler {
 
 	public static final class GeneratedCommand implements Command {
 		private final Statement nestedStatement;
-		private final CommandWrapper commandWrapper;
+		private final CommandWrapper<Object> commandWrapper;
 
-		private GeneratedCommand(Statement nestedStatement, CommandWrapper commandWrapper) {
+		private GeneratedCommand(Statement nestedStatement, CommandWrapper<Object> commandWrapper) {
 			this.nestedStatement = nestedStatement;
 			this.commandWrapper = commandWrapper;
 		}
 
 		@Override
 		public void run(List<String> args, Channel out, Channel err) {
-			commandWrapper.before(args, out, err);
+			Object resource = commandWrapper.before(args, out, err);
 			try {
 				nestedStatement.command.run(nestedStatement.arguments, out, err);
 			} finally {
-				commandWrapper.after(out, err);
+				commandWrapper.after(resource, out, err);
 			}
 		}
 

@@ -28,7 +28,7 @@ public class CompilerTest {
 	@Mock(stubOnly = true)
 	private Command command;
 	@Mock(stubOnly = true)
-	private CommandWrapper commandWrapper;
+	private CommandWrapper<?> commandWrapper;
 	@Mock
 	private CommandResolver commandResolver;
 	@InjectMocks

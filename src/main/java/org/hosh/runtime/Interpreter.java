@@ -3,6 +3,7 @@ package org.hosh.runtime;
 import java.util.List;
 import java.util.Optional;
 
+import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.GeneratedCommand;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
@@ -29,12 +30,17 @@ public class Interpreter {
 	public void eval(Program program) {
 		for (Statement statement : program.getStatements()) {
 			Command command = statement.getCommand();
-			if (command instanceof GeneratedCommand) {
-				injectDeps(((GeneratedCommand) command).getNestedStatement().getCommand());
-			}
 			List<String> arguments = statement.getArguments();
+			injectDepsIntoNested(command);
 			injectDeps(command);
 			command.run(arguments, out, err);
+		}
+	}
+
+	@Todo(description = "this is another design error? we need a way a tree of commands")
+	private void injectDepsIntoNested(Command command) {
+		if (command instanceof GeneratedCommand) {
+			injectDeps(((GeneratedCommand) command).getNestedStatement().getCommand());
 		}
 	}
 
