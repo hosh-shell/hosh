@@ -2,7 +2,6 @@ package org.hosh.modules;
 
 import static org.mockito.BDDMockito.then;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import org.hosh.modules.TerminalModule.Bell;
@@ -69,7 +68,7 @@ public class TerminalModuleTest {
 		private Bell sut;
 
 		@Test
-		public void noArgs() throws IOException {
+		public void noArgs() {
 			sut.run(Arrays.asList(), out, err);
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();

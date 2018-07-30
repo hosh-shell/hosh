@@ -61,7 +61,7 @@ public class FileSystemCompleterTest {
 	}
 
 	@Test
-	public void slash() throws IOException {
+	public void slash() {
 		given(line.word()).willReturn("/");
 		sut.complete(lineReader, line, candidates);
 		then(candidates).should(Mockito.atLeastOnce()).add(ArgumentMatchers.any());

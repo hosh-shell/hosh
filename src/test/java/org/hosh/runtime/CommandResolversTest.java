@@ -75,7 +75,7 @@ public class CommandResolversTest {
 	}
 
 	@Test
-	public void notFoundInPath() throws IOException {
+	public void notFoundInPath() {
 		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 		given(state.getCommands()).willReturn(Collections.emptyMap());
 		Command result = sut.tryResolve("test");

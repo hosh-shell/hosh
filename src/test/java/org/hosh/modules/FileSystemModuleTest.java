@@ -251,7 +251,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void directory() throws IOException {
+		public void directory() {
 			sut.run(Arrays.asList(temporaryFolder.getRoot().getAbsolutePath()), out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("not readable file")));

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -102,7 +101,7 @@ public class SystemModuleTest {
 		private Env sut;
 
 		@Test
-		public void noArgs() throws IOException {
+		public void noArgs() {
 			environmentVariables.set("HOSH_VERSION", "1.0");
 			sut.run(Arrays.asList(), out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
@@ -135,7 +134,7 @@ public class SystemModuleTest {
 		private Help sut;
 
 		@Test
-		public void oneCommand() throws IOException {
+		public void oneCommand() {
 			given(state.getCommands()).willReturn(Collections.singletonMap("name", null));
 			sut.run(Arrays.asList(), out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
@@ -144,7 +143,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void noCommands() throws IOException {
+		public void noCommands() {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			sut.run(Arrays.asList(), out, err);
 			then(out).shouldHaveZeroInteractions();

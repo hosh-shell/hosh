@@ -12,6 +12,7 @@ import org.hosh.antlr4.HoshParser.InvocationContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrapperContext;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
@@ -93,6 +94,7 @@ public class Compiler {
 				.collect(Collectors.toList());
 	}
 
+	@Todo(description = "we are resolving all variables before running")
 	private String compileArgument(ArgContext ctx) {
 		if (ctx.VARIABLE() != null) {
 			Token token = ctx.VARIABLE().getSymbol();
