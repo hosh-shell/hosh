@@ -142,7 +142,7 @@ public class Hosh {
 			try {
 				Program program = compiler.compile(line);
 				ExitStatus exitStatus = interpreter.eval(program);
-				if (state.isExit() || exitStatus.value() != 0) {
+				if (state.isExit()) {
 					System.exit(exitStatus.value());
 				}
 			} catch (Exception e) {

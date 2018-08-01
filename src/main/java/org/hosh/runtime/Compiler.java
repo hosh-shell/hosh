@@ -94,7 +94,7 @@ public class Compiler {
 				.collect(Collectors.toList());
 	}
 
-	@Todo(description = "we are resolving all variables before running")
+	@Todo(description = "we are resolving only variables known at compile-time, in the REPL this is fine since we compile line by line but it is not in a script")
 	private String compileArgument(ArgContext ctx) {
 		if (ctx.VARIABLE() != null) {
 			Token token = ctx.VARIABLE().getSymbol();
