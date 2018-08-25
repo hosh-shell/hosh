@@ -139,7 +139,7 @@ public class ValuesTest {
 
 		@Test
 		public void asString() {
-			assertThat(Values.ofLocalPath(Paths.get("dir", "file"))).hasToString("LocalPath[dir/file]");
+			assertThat(Values.ofLocalPath(Paths.get("file"))).hasToString("LocalPath[file]");
 		}
 	}
 }

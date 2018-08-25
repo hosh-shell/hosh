@@ -26,6 +26,8 @@ public class ParserTest {
 		sut.parse("git commit --amend\n");
 		sut.parse("cd ..\n");
 		sut.parse("cd /tmp\n");
+		sut.parse("cd c:\\temp\n");
+		sut.parse("cd c:/temp\n");
 		sut.parse("${EXECUTABLE}");
 		sut.parse("cd ${DIR}");
 		sut.parse("withTime { git push }");

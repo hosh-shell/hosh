@@ -62,7 +62,7 @@ public class Hosh {
 	}
 
 	public static void main(String[] args) throws Exception {
-		try (Terminal terminal = TerminalBuilder.builder().system(true).build()) {
+		try (Terminal terminal = TerminalBuilder.builder().exec(false).build()) {
 			runWithin(terminal, args);
 		}
 	}
