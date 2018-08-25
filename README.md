@@ -4,12 +4,11 @@
 
 JDK8
 
-`$ mvn clean package`
+`$ ./mvnw clean package`
 
 ## Requirements
 
 JRE8
 
-`$ java -jar hosh.jar`
-
+`$ java -jar target/dist/hosh.jar`
 
