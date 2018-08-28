@@ -18,6 +18,8 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileSystemModule implements Module {
 	@Override
@@ -29,6 +31,7 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class ListFiles implements Command, StateAware {
+		private static final Logger LOGGER = LoggerFactory.getLogger(ListFiles.class);
 		private State state;
 
 		@Override
@@ -42,8 +45,20 @@ public class FileSystemModule implements Module {
 				err.send(Record.of("message", Values.ofText("expected at most 1 argument")));
 				return ExitStatus.error();
 			}
-			Path of = args.size() == 0 ? state.getCwd() : Paths.get(args.get(0));
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(of)) {
+			final Path cwd = state.getCwd();
+			final Path dir;
+			if (args.size() == 1) {
+				Path arg = Paths.get(args.get(0));
+				if (arg.isAbsolute()) {
+					dir = arg;
+				} else {
+					dir = cwd.resolve(arg).toAbsolutePath();
+				}
+			} else {
+				dir = cwd;
+			}
+			LOGGER.debug("listing {}", dir);
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
 				for (Path path : stream) {
 					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));
 					if (Files.isRegularFile(path)) {
@@ -54,7 +69,7 @@ public class FileSystemModule implements Module {
 				}
 				return ExitStatus.success();
 			} catch (IOException e) {
-				err.send(Record.of("exception", Values.ofText(e.getMessage())));
+				err.send(Record.of("error", Values.ofText("not a directory: " + e.getMessage())));
 				return ExitStatus.error();
 			}
 		}
