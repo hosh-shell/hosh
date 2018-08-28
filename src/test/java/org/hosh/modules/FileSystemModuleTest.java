@@ -19,7 +19,6 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
-import org.hosh.spi.Values.Unit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -82,9 +81,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			temporaryFolder.newFile("file").createNewFile();
 			sut.run(Arrays.asList(), out, err);
-			then(out).should()
-					.send(Record.of("name", Values.ofLocalPath(Paths.get("file"))).add("size",
-							Values.ofSize(0, Unit.B)));
+			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("file"))).add("size", Values.ofHumanizedSize(0)));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -122,7 +119,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(newFolder.toPath());
 			sut.run(Arrays.asList("."), out, err);
 			then(err).shouldHaveNoMoreInteractions();
-			then(out).should().send(Mockito.eq(Record.of("name", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofSize(0, Unit.B))));
+			then(out).should().send(Mockito.eq(Record.of("name", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofHumanizedSize(0))));
 		}
 	}
 

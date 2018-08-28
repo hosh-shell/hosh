@@ -10,8 +10,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import org.hosh.doc.Bug;
-import org.hosh.spi.Values.Unit;
 import org.hosh.spi.ValuesTest.LocalPathValueTest;
 import org.hosh.spi.ValuesTest.SizeValueTest;
 import org.hosh.spi.ValuesTest.TextValueTest;
@@ -64,29 +62,30 @@ public class ValuesTest {
 	public static class SizeValueTest {
 		@Mock
 		private Appendable appendable;
+		private static final long K = 1024;
 
 		@Test
 		public void appendWithUkLocale() throws IOException {
-			Values.ofSize(10_000_000, Unit.B).append(appendable, Locale.UK);
-			then(appendable).should().append("10,000,000B");
+			Values.ofHumanizedSize(2 * K + K / 2).append(appendable, Locale.UK);
+			then(appendable).should().append("2.5KB");
 		}
 
 		@Test
 		public void appendWithItalianLocale() throws IOException {
-			Values.ofSize(10_000_000, Unit.B).append(appendable, Locale.ITALIAN);
-			then(appendable).should().append("10.000.000B");
+			Values.ofHumanizedSize(2 * K + K / 2).append(appendable, Locale.ITALIAN);
+			then(appendable).should().append("2,5KB");
 		}
 
 		@Test(expected = UncheckedIOException.class)
 		public void appendError() throws IOException {
 			given(appendable.append(ArgumentMatchers.any())).willThrow(IOException.class);
-			Values.ofSize(10, Unit.GB).append(appendable, Locale.getDefault());
+			Values.ofHumanizedSize(10).append(appendable, Locale.getDefault());
 		}
 
-		@Bug(description = "should be 1.99MB, instead of 1")
 		@Test
 		public void humanizedSizeApproximation() {
-			assertThat(Values.ofHumanizedSize(1024L * 1024 * 2 - 1)).hasToString("Size[1MB]");
+			long twoMegabytes = K * K * 2;
+			assertThat(Values.ofHumanizedSize(twoMegabytes - 1)).hasToString("Size[2.0MB]");
 		}
 
 		@Test
@@ -94,9 +93,9 @@ public class ValuesTest {
 			assertThat(Values.ofHumanizedSize(0L)).hasToString("Size[0B]");
 			assertThat(Values.ofHumanizedSize(512L)).hasToString("Size[512B]");
 			assertThat(Values.ofHumanizedSize(1023L)).hasToString("Size[1023B]");
-			assertThat(Values.ofHumanizedSize(1024L)).hasToString("Size[1KB]");
-			assertThat(Values.ofHumanizedSize(1024L * 1024)).hasToString("Size[1MB]");
-			assertThat(Values.ofHumanizedSize(1024L * 1024 * 1024)).hasToString("Size[1GB]");
+			assertThat(Values.ofHumanizedSize(1024L)).hasToString("Size[1.0KB]");
+			assertThat(Values.ofHumanizedSize(1024L * 1024)).hasToString("Size[1.0MB]");
+			assertThat(Values.ofHumanizedSize(1024L * 1024 * 1024)).hasToString("Size[1.0GB]");
 			assertThatThrownBy(() -> Values.ofHumanizedSize(-1))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("negative size");
@@ -104,7 +103,7 @@ public class ValuesTest {
 
 		@Test
 		public void size() {
-			assertThatThrownBy(() -> Values.ofSize(-1, Unit.B))
+			assertThatThrownBy(() -> Values.ofHumanizedSize(-1))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("negative size");
 		}

@@ -3,7 +3,6 @@ package org.hosh.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.hosh.spi.Values.Unit;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -40,8 +39,8 @@ public class RecordTest {
 	public void representation() {
 		Record a = Record.empty();
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
-		Record b = a.add("size", Values.ofSize(10, Unit.MB));
-		assertThat(b.toString()).isEqualTo("Record[data={size=Size[10MB]}]");
+		Record b = a.add("size", Values.ofHumanizedSize(10));
+		assertThat(b.toString()).isEqualTo("Record[data={size=Size[10B]}]");
 	}
 
 	@Test

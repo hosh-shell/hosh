@@ -2,7 +2,10 @@ package org.hosh.spi;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Path;
+import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -23,25 +26,25 @@ public class Values {
 		B, KB, MB, GB, TB
 	}
 
-	public static Value ofSize(long value, Unit unit) {
-		return new Size(value, unit);
-	}
+	private static final Unit[] pre = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
+	private static final int k = 1024;
 
 	/**
 	 * Select the appropriate unit for measuring bytes.
 	 */
 	public static Value ofHumanizedSize(long bytes) {
-		Unit[] pre = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
-		int k = 1024;
 		if (bytes < k) {
-			return ofSize(bytes, Unit.B);
+			return new Size(BigDecimal.valueOf(bytes), Unit.B);
 		}
 		int exp = (int) (Math.log(bytes) / Math.log(k));
 		Unit unit = pre[exp - 1];
-		long value = (long) (bytes / Math.pow(k, exp));
-		return ofSize(value, unit);
+		BigDecimal value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(k, exp)), 1, RoundingMode.HALF_UP);
+		return new Size(value, unit);
 	}
 
+	/**
+	 * Paths, without any special attributes.
+	 */
 	public static Value ofLocalPath(Path path) {
 		return new LocalPath(path);
 	}
@@ -91,11 +94,11 @@ public class Values {
 	 * Used to represent a size of a file, etc.
 	 */
 	static final class Size implements Value {
-		private final long value;
+		private final BigDecimal value;
 		private final Unit unit;
 
-		public Size(long value, Unit unit) {
-			if (value < 0) {
+		public Size(BigDecimal value, Unit unit) {
+			if (value.compareTo(BigDecimal.ZERO) < 0) {
 				throw new IllegalArgumentException("negative size");
 			}
 			this.value = value;
@@ -104,9 +107,9 @@ public class Values {
 
 		@Override
 		public void append(Appendable appendable, Locale locale) {
-			String formattedValue = String.format(locale, "%,d%s", value, unit);
+			NumberFormat instance = NumberFormat.getInstance(locale);
 			try {
-				appendable.append(formattedValue);
+				appendable.append(instance.format(value) + unit.toString());
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
