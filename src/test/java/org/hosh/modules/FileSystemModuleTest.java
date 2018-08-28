@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
@@ -28,6 +29,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(Suite.class)
@@ -88,16 +90,17 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void oneArgWithFile() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.newFile().toPath());
-			sut.run(Arrays.asList(), out, err);
-			then(err).should().send(ArgumentMatchers.any());
+			Path file = temporaryFolder.newFile().toPath();
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			sut.run(Arrays.asList(file.getFileName().toString()), out, err);
 			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Mockito.any()); // TODO: improve assertions
 		}
 
 		@Test
 		public void oneArgWithEmptyDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.newFolder().toPath());
-			sut.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList("."), out, err);
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 		}
@@ -106,10 +109,20 @@ public class FileSystemModuleTest {
 		public void oneArgWithNonEmptyDirectory() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Files.createFile(new File(newFolder, "aaa").toPath());
-			given(state.getCwd()).willReturn(newFolder.toPath());
-			sut.run(Arrays.asList(), out, err);
-			then(err).shouldHaveNoMoreInteractions();
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			sut.run(Arrays.asList(newFolder.getName()), out, err);
 			then(out).should().send(ArgumentMatchers.any());
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void oneArgWithIsRelativizedToCwd() throws IOException {
+			File newFolder = temporaryFolder.newFolder();
+			Files.createFile(new File(newFolder, "aaa").toPath());
+			given(state.getCwd()).willReturn(newFolder.toPath());
+			sut.run(Arrays.asList("."), out, err);
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should().send(Mockito.eq(Record.of("name", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofSize(0, Unit.B))));
 		}
 	}
 
