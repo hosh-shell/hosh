@@ -119,7 +119,27 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(newFolder.toPath());
 			sut.run(Arrays.asList("."), out, err);
 			then(err).shouldHaveNoMoreInteractions();
-			then(out).should().send(Mockito.eq(Record.of("name", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofHumanizedSize(0))));
+			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofHumanizedSize(0)));
+		}
+
+		@Test
+		public void oneArgAbsoluteFile() throws IOException {
+			File newFolder = temporaryFolder.newFolder();
+			Path path = Files.createFile(new File(newFolder, "aaa").toPath()).toAbsolutePath();
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
+			sut.run(Arrays.asList(path.toString()), out, err);
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("not a directory: " + path)));
+		}
+
+		@Test
+		public void oneArgAbsoluteDir() throws IOException {
+			File newFolder = temporaryFolder.newFolder();
+			Files.createFile(new File(newFolder, "aaa").toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
+			sut.run(Arrays.asList(newFolder.getAbsolutePath()), out, err);
+			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofHumanizedSize(0)));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 

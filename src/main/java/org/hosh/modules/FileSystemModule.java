@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -68,8 +69,11 @@ public class FileSystemModule implements Module {
 					out.send(entry);
 				}
 				return ExitStatus.success();
-			} catch (IOException e) {
+			} catch (NotDirectoryException e) {
 				err.send(Record.of("error", Values.ofText("not a directory: " + e.getMessage())));
+				return ExitStatus.error();
+			} catch (IOException e) {
+				err.send(Record.of("error", Values.ofText("error: " + e.getMessage())));
 				return ExitStatus.error();
 			}
 		}
