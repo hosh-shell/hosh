@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.0.16] - 2018-08-28
 - fix #1: improved 'ls' command
-- fix #4: improved humanized size
+- fix #6: improved humanized size
 - improved windows support
 - maven wrapper support
 
