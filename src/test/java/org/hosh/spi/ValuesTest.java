@@ -62,17 +62,16 @@ public class ValuesTest {
 	public static class SizeValueTest {
 		@Mock
 		private Appendable appendable;
-		private static final long K = 1024;
 
 		@Test
 		public void appendWithUkLocale() throws IOException {
-			Values.ofHumanizedSize(2 * K + K / 2).append(appendable, Locale.UK);
+			Values.ofHumanizedSize(2 * Values.KiB + Values.KiB / 2).append(appendable, Locale.UK);
 			then(appendable).should().append("2.5KB");
 		}
 
 		@Test
 		public void appendWithItalianLocale() throws IOException {
-			Values.ofHumanizedSize(2 * K + K / 2).append(appendable, Locale.ITALIAN);
+			Values.ofHumanizedSize(2 * Values.KiB + Values.KiB / 2).append(appendable, Locale.ITALIAN);
 			then(appendable).should().append("2,5KB");
 		}
 
@@ -84,7 +83,7 @@ public class ValuesTest {
 
 		@Test
 		public void humanizedSizeApproximation() {
-			long twoMegabytes = K * K * 2;
+			long twoMegabytes = Values.KiB * Values.KiB * 2;
 			assertThat(Values.ofHumanizedSize(twoMegabytes - 1)).hasToString("Size[2.0MB]");
 		}
 

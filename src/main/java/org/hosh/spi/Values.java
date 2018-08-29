@@ -26,19 +26,23 @@ public class Values {
 		B, KB, MB, GB, TB
 	}
 
-	private static final Unit[] pre = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
-	private static final int k = 1024;
+	// indexed units table
+	private static final Unit[] UNITS = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
+	/**
+	 * One kibibyte (1024 bytes), this is in contrast to the SI system (1000 bytes)
+	 */
+	public static final int KiB = 1024;
 
 	/**
 	 * Select the appropriate unit for measuring bytes.
 	 */
 	public static Value ofHumanizedSize(long bytes) {
-		if (bytes < k) {
+		if (bytes < KiB) {
 			return new Size(BigDecimal.valueOf(bytes), Unit.B);
 		}
-		int exp = (int) (Math.log(bytes) / Math.log(k));
-		Unit unit = pre[exp - 1];
-		BigDecimal value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(k, exp)), 1, RoundingMode.HALF_UP);
+		int exp = (int) (Math.log(bytes) / Math.log(KiB));
+		Unit unit = UNITS[exp - 1];
+		BigDecimal value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(KiB, exp)), 1, RoundingMode.HALF_UP);
 		return new Size(value, unit);
 	}
 
