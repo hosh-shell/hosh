@@ -28,9 +28,9 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+// TODO: check ExitStatus
 @RunWith(Suite.class)
 @SuiteClasses({
 		FileSystemModuleTest.ListTest.class,
@@ -86,12 +86,12 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArgWithFile() throws IOException {
+		public void oneArgWithRelativeFile() throws IOException {
 			Path file = temporaryFolder.newFile().toPath();
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			sut.run(Arrays.asList(file.getFileName().toString()), out, err);
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Mockito.any()); // TODO: improve assertions
+			then(err).should().send(Record.of("error", Values.ofText("not a directory: " + file.toAbsolutePath().toString())));
 		}
 
 		@Test
