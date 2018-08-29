@@ -29,6 +29,7 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("ls", new ListFiles());
 		commandRegistry.registerCommand("cwd", new CurrentWorkingDirectory());
 		commandRegistry.registerCommand("cat", new Cat());
+		commandRegistry.registerCommand("find", new Find());
 	}
 
 	public static class ListFiles implements Command, StateAware {
@@ -168,6 +169,38 @@ public class FileSystemModule implements Module {
 				lines.forEach(line -> out.send(Record.of("line", Values.ofText(line))));
 			} catch (IOException e) {
 				err.send(Record.of("exception", Values.ofText(e.getMessage())));
+			}
+		}
+	}
+
+	public static class Find implements Command, StateAware {
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of("error", Values.ofText("expecting one path argument")));
+				return ExitStatus.error();
+			}
+			Path dir = state.getCwd();
+			String matcher = args.get(0);
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, matcher)) {
+				for (Path path : stream) {
+					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));
+					out.send(entry);
+				}
+				return ExitStatus.success();
+			} catch (NotDirectoryException e) {
+				err.send(Record.of("error", Values.ofText("not a directory: " + e.getMessage())));
+				return ExitStatus.error();
+			} catch (IOException e) {
+				err.send(Record.of("error", Values.ofText("error: " + e.getMessage())));
+				return ExitStatus.error();
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package org.hosh.modules;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -14,8 +15,10 @@ import java.util.Arrays;
 import org.hosh.modules.FileSystemModule.Cat;
 import org.hosh.modules.FileSystemModule.ChangeDirectory;
 import org.hosh.modules.FileSystemModule.CurrentWorkingDirectory;
+import org.hosh.modules.FileSystemModule.Find;
 import org.hosh.modules.FileSystemModule.ListFiles;
 import org.hosh.spi.Channel;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
@@ -30,13 +33,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-// TODO: check ExitStatus
+// TODO: improve tests (e.g. check ExitStatus, check produced records)
 @RunWith(Suite.class)
 @SuiteClasses({
 		FileSystemModuleTest.ListTest.class,
 		FileSystemModuleTest.ChangeDirectoryTest.class,
 		FileSystemModuleTest.CurrentWorkingDirectoryTest.class,
-		FileSystemModuleTest.CatTest.class
+		FileSystemModuleTest.CatTest.class,
+		FileSystemModuleTest.FindTest.class
 })
 public class FileSystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -292,6 +296,48 @@ public class FileSystemModuleTest {
 			sut.run(Arrays.asList(), out, err);
 			then(err).should().send(Record.of("error", Values.ofText("expecting one path argument")));
 			then(out).shouldHaveZeroInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class FindTest {
+		@Rule
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		@Mock
+		private State state;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Find sut;
+
+		@Test
+		public void noArgs() throws IOException {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), out, err);
+			assertThat(exitStatus.value()).isEqualTo(1);
+			then(err).should().send(Record.of("error", Values.ofText("expecting one path argument")));
+			then(out).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void nonMatchingFiles() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			temporaryFolder.newFile("file.txt");
+			ExitStatus exitStatus = sut.run(Arrays.asList("*.doc"), out, err);
+			assertThat(exitStatus.value()).isEqualTo(0);
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void matchingFiles() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			temporaryFolder.newFile("file.txt");
+			ExitStatus exitStatus = sut.run(Arrays.asList("*.txt"), out, err);
+			assertThat(exitStatus.value()).isEqualTo(0);
+			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("file.txt"))));
+			then(err).shouldHaveZeroInteractions();
 		}
 	}
 }
