@@ -62,14 +62,14 @@ public class Hosh {
 	}
 
 	public static void main(String[] args) throws Exception {
+		configureLogging();
+		Logger logger = LoggerFactory.getLogger(Hosh.class);
 		try (Terminal terminal = TerminalBuilder.builder().exec(false).build()) {
-			runWithin(terminal, args);
+			runWithin(terminal, logger, args);
 		}
 	}
 
-	private static void runWithin(Terminal terminal, String[] args) throws IOException {
-		configureLogging();
-		Logger logger = LoggerFactory.getLogger(Hosh.class);
+	private static void runWithin(Terminal terminal, Logger logger, String[] args) throws IOException {
 		String version = Version.readVersion();
 		logger.info("starting hosh {}", version);
 		List<Path> path = Stream
