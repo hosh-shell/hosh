@@ -13,7 +13,7 @@ JDK8 for build, JRE8 to run
 `$ java -jar target/dist/hosh.jar`
 
 
-## DEbug
+## Debug
 
 `$ java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar target/dist/hosh.jar`
 
