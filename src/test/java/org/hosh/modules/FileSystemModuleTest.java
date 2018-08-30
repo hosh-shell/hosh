@@ -313,7 +313,7 @@ public class FileSystemModuleTest {
 		private Find sut;
 
 		@Test
-		public void noArgs() throws IOException {
+		public void noArgs() throws Exception {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(err).should().send(Record.of("error", Values.ofText("expecting one path argument")));

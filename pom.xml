@@ -54,7 +54,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jline</groupId>
-			<artifactId>jline-terminal-jna</artifactId>
+			<artifactId>jline-terminal-jansi</artifactId>
 			<version>3.8.2</version>
 			<scope>runtime</scope>
 		</dependency>

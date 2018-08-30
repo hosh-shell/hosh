@@ -64,7 +64,7 @@ public class Hosh {
 	public static void main(String[] args) throws Exception {
 		configureLogging();
 		Logger logger = LoggerFactory.getLogger(Hosh.class);
-		try (Terminal terminal = TerminalBuilder.builder().exec(false).build()) {
+		try (Terminal terminal = TerminalBuilder.builder().build()) {
 			runWithin(terminal, logger, args);
 		}
 	}
