@@ -1,4 +1,4 @@
-image: maven:3-jdk-10-slim
+image: maven:3-jdk-11-slim
 
 pipelines:
   branches:

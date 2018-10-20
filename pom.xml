@@ -136,8 +136,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
 				<configuration>
-					<source>1.10</source>
-					<target>1.10</target>
+					<release>11</release>
 					<compilerArgs>
 						<arg>-Werror</arg>
 						<arg>-Xlint:all</arg>
