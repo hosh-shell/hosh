@@ -17,3 +17,6 @@ JDK8 for build, JRE10 to run.
 
 `$ java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar target/dist/hosh.jar`
 
+## Eclipse support
+
+Project specific settings can be found under './eclipse' directory.
