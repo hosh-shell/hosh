@@ -23,6 +23,7 @@ public class SystemModule implements Module {
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("echo", new Echo());
 		commandRegistry.registerCommand("env", new Env());
+	    commandRegistry.registerCommand("quit", new Exit());
 		commandRegistry.registerCommand("exit", new Exit());
 		commandRegistry.registerCommand("help", new Help());
 		commandRegistry.registerCommand("sleep", new Sleep());
@@ -57,7 +58,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Exit implements Command, StateAware {
-		private State state;
+        private State state;
 
 		@Override
 		public void setState(State state) {
