@@ -3,7 +3,9 @@ package org.hosh.modules;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -174,6 +176,8 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class Find implements Command, StateAware {
+		private static final Logger LOGGER = LoggerFactory.getLogger(Find.class);
+
 		private State state;
 
 		@Override
@@ -184,22 +188,28 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expecting one path argument")));
+				err.send(Record.of("error", Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
-			Path dir = state.getCwd();
-			String matcher = args.get(0);
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, matcher)) {
-				for (Path path : stream) {
-					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));
-					out.send(entry);
-				}
+			Path arg = Path.of(args.get(0));
+			Path start;
+			if (arg.isAbsolute()) {
+				start = arg;
+			} else {
+				start = state.getCwd().resolve(arg).normalize();
+			}
+			LOGGER.debug("start is '{}'", start);
+			try (Stream<Path> stream = Files.walk(start)) {
+				stream.forEach(path -> {
+					Record result = Record.of("name", Values.ofLocalPath(path.toAbsolutePath()));
+					out.send(result);
+				});
 				return ExitStatus.success();
-			} catch (NotDirectoryException e) {
-				err.send(Record.of("error", Values.ofText("not a directory: " + e.getMessage())));
+			} catch (NoSuchFileException e) {
+				err.send(Record.of("error", Values.ofText("path does not exist: " + e.getFile())));
 				return ExitStatus.error();
 			} catch (IOException e) {
-				err.send(Record.of("error", Values.ofText("error: " + e.getMessage())));
+				err.send(Record.of("error", Values.ofText(e.getMessage())));
 				return ExitStatus.error();
 			}
 		}

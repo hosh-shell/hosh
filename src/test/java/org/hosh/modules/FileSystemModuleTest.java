@@ -316,28 +316,29 @@ public class FileSystemModuleTest {
 		public void noArgs() throws Exception {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
-			then(err).should().send(Record.of("error", Values.ofText("expecting one path argument")));
+			then(err).should().send(Record.of("error", Values.ofText("expecting one argument")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
 		@Test
-		public void nonMatchingFiles() throws IOException {
+		public void relativePath() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
-			temporaryFolder.newFile("file.txt");
-			ExitStatus exitStatus = sut.run(Arrays.asList("*.doc"), out, err);
+			File newFile = temporaryFolder.newFile("file.txt");
+			ExitStatus exitStatus = sut.run(Arrays.asList("."), out, err);
 			assertThat(exitStatus.value()).isEqualTo(0);
-			then(out).shouldHaveZeroInteractions();
+			then(out).should().send(Record.of("name", Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
 			then(err).shouldHaveZeroInteractions();
 		}
-
+		
 		@Test
-		public void matchingFiles() throws IOException {
+		public void nonExistentRelativePath() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
-			temporaryFolder.newFile("file.txt");
-			ExitStatus exitStatus = sut.run(Arrays.asList("*.txt"), out, err);
-			assertThat(exitStatus.value()).isEqualTo(0);
-			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("file.txt"))));
-			then(err).shouldHaveZeroInteractions();
+			File newFile = temporaryFolder.newFile("file.txt");
+			newFile.delete();
+			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getName()), out, err);
+			assertThat(exitStatus.value()).isEqualTo(1);
+			then(err).should().send(Record.of("error", Values.ofText("path does not exist: " + newFile)));
+			then(out).shouldHaveZeroInteractions();
 		}
 	}
 }

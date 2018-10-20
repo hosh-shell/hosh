@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - requires Java 11
+- removing glob pattern from 'find'
+  (the idea is to use pipelines to filter paths)
 - 'ps' command
 - 'kill' command
 - 'quit' as alias of 'exit'
