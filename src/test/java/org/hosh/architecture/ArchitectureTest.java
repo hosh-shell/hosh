@@ -11,11 +11,12 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 
 /**
- * Enforcing general dependencies of the project:
+ * Enforcing package dependencies of the project:
  * <ul>
  * <li>modules can see only spi</li>
  * <li>runtime can see spi but spi cannot see runtime</li>
  * </ul>
+ * The short term goal is to prepare ground for modules.
  */
 public class ArchitectureTest {
 	@Test
