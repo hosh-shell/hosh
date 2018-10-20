@@ -16,9 +16,9 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
  * <li>runtime can see spi but spi cannot see runtime</li>
  * </ul>
  */
-public class InteralArchitectureTest {
+public class ArchitectureTest {
 	@Test
-	public void properDependencies() {
+	public void enforceProperDependenciesBetweenPackages() {
 		JavaClasses importedClasses = new ClassFileImporter().importPackages("org.hosh");
 		slices().matching("org.hosh").should().beFreeOfCycles();
 		classes().that().resideInAPackage("..modules..")
