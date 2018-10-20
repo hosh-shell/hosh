@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
 
 /**
  * Enforcing general dependencies of the project:
@@ -19,7 +20,10 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 public class ArchitectureTest {
 	@Test
 	public void enforceProperDependenciesBetweenPackages() {
-		JavaClasses importedClasses = new ClassFileImporter().importPackages("org.hosh");
+		JavaClasses importedClasses = new ClassFileImporter()
+				.withImportOption(ImportOption.Predefined.DONT_INCLUDE_JARS)
+				.withImportOption(ImportOption.Predefined.DONT_INCLUDE_ARCHIVES)
+				.importPackages("org.hosh");
 		slices().matching("org.hosh").should().beFreeOfCycles();
 		classes().that().resideInAPackage("..modules..")
 				.should().accessClassesThat().resideInAnyPackage("..spi..", "java..")
