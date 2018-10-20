@@ -1,4 +1,5 @@
 # Todo
 
-- [java9] use ProcessHandle to list, query and kill system processes
-  For example: ProcessHandle.allProcesses().map(ProcessHandle::info).forEach(System.out::println);
+- pipelines
+- record-based grep command
+- tables as described in https://medium.com/@jdxcode/12-factor-cli-apps-dd3c227a0e46 
