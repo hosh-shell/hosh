@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - 'ps' command
 - 'kill' command
 - 'quit' as alias of 'exit'
-- 'withEnv' command wrapper
 
 ## [0.0.17] - 2018-08-28
 - fix #3: 'find' command
