@@ -87,7 +87,7 @@ public class Hosh {
 			module.onStartup(commandRegistry);
 		}
 		CommandResolver commandResolver = CommandResolvers.builtinsThenSystem(state);
-		Compiler compiler = new Compiler(state, commandResolver);
+		Compiler compiler = new Compiler(commandResolver);
 		if (args.length == 0) {
 			LineReader lineReader = LineReaderBuilder
 					.builder()

@@ -17,14 +17,11 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
-import org.hosh.spi.State;
 
 public class Compiler {
-	private final State state;
 	private final CommandResolver commandResolver;
 
-	public Compiler(State state, CommandResolver commandResolver) {
-		this.state = state;
+	public Compiler(CommandResolver commandResolver) {
 		this.commandResolver = commandResolver;
 	}
 
@@ -94,16 +91,10 @@ public class Compiler {
 				.collect(Collectors.toList());
 	}
 
-	@Todo(description = "we are resolving only variables known at compile-time, in the REPL this is fine since we compile line by line but it is not in a script")
 	private String compileArgument(ArgContext ctx) {
 		if (ctx.VARIABLE() != null) {
 			Token token = ctx.VARIABLE().getSymbol();
-			String variableName = variableNameFromToken(token);
-			if (state.getVariables().containsKey(variableName)) {
-				return state.getVariables().get(variableName);
-			} else {
-				throw new CompileError("line " + token.getLine() + ": unknown variable " + variableName);
-			}
+			return token.getText();
 		}
 		if (ctx.ID() != null) {
 			Token token = ctx.ID().getSymbol();
@@ -122,10 +113,6 @@ public class Compiler {
 		return text.substring(1, text.length() - 1);
 	}
 
-	// ${VARIABLE} -> VARIABLE
-	private String variableNameFromToken(Token token) {
-		return token.getText().substring(2, token.getText().length() - 1);
-	}
 
 	@Todo(description="primitive support for closures, enhance later")
 	public static final class GeneratedCommandWrapper implements Command {

@@ -3,6 +3,7 @@ package org.hosh.runtime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hosh.runtime.Compiler.GeneratedCommandWrapper;
 import org.hosh.runtime.Compiler.Program;
@@ -42,10 +43,32 @@ public class Interpreter {
 
 	private ExitStatus execute(Statement statement) {
 		Command command = statement.getCommand();
-		List<String> arguments = statement.getArguments();
+		List<String> arguments = resolveArguments(statement.getArguments());
 		injectDepsIntoNested(command);
 		injectDeps(command);
 		return command.run(arguments, out, err);
+	}
+
+	private List<String> resolveArguments(List<String> arguments) {
+		return arguments.stream().map(this::resolveVariable).collect(Collectors.toList());
+	}
+
+	private String resolveVariable(String argument) {
+		if (argument.startsWith("${") && argument.endsWith("}")) {
+			String variableName = variableName(argument);
+			if (state.getVariables().containsKey(variableName)) {
+				return state.getVariables().get(variableName);
+			} else {
+				throw new IllegalStateException("unknown variable: " + variableName);
+			}
+		} else {
+			return argument;
+		}
+	}
+
+	// ${VARIABLE} -> VARIABLE
+	private String variableName(String variable) {
+		return variable.substring(2, variable.length() - 1);
 	}
 
 	private void store(ExitStatus exitStatus) {
