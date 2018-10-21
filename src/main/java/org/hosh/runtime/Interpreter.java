@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hosh.runtime.Compiler.GeneratedCommand;
+import org.hosh.runtime.Compiler.GeneratedCommandWrapper;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
@@ -54,8 +54,8 @@ public class Interpreter {
 	}
 
 	private void injectDepsIntoNested(Command command) {
-		if (command instanceof GeneratedCommand) {
-			injectDeps(((GeneratedCommand) command).getNestedStatement().getCommand());
+		if (command instanceof GeneratedCommandWrapper) {
+			injectDeps(((GeneratedCommandWrapper) command).getNestedStatement().getCommand());
 		}
 	}
 

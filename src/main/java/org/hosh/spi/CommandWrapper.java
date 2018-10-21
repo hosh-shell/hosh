@@ -4,7 +4,8 @@ import java.util.List;
 
 /**
  * A command specialization that performs setup and cleanup.
- * This is useful to create commands that locks a file.
+ * 
+ * This is useful to create resource-aware closures, such as locks,.
  */
 public interface CommandWrapper<T> extends Command {
 	/**

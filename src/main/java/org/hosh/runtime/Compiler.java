@@ -81,7 +81,7 @@ public class Compiler {
 		Statement nestedStatement = compileSimpleCommand(ctx.simple());
 		List<String> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
-		statement.setCommand(new GeneratedCommand(nestedStatement, commandWrapper));
+		statement.setCommand(new GeneratedCommandWrapper(nestedStatement, commandWrapper));
 		statement.setArguments(commandArgs);
 		return statement;
 	}
@@ -127,11 +127,12 @@ public class Compiler {
 		return token.getText().substring(2, token.getText().length() - 1);
 	}
 
-	public static final class GeneratedCommand implements Command {
+	@Todo(description="primitive support for closures, enhance later")
+	public static final class GeneratedCommandWrapper implements Command {
 		private final Statement nestedStatement;
 		private final CommandWrapper<Object> commandWrapper;
 
-		private GeneratedCommand(Statement nestedStatement, CommandWrapper<Object> commandWrapper) {
+		private GeneratedCommandWrapper(Statement nestedStatement, CommandWrapper<Object> commandWrapper) {
 			this.nestedStatement = nestedStatement;
 			this.commandWrapper = commandWrapper;
 		}
