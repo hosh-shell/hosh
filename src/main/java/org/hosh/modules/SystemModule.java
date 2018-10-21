@@ -30,6 +30,7 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("help", new Help());
 		commandRegistry.registerCommand("sleep", new Sleep());
 		commandRegistry.registerCommand("withTime", new WithTime());
+		commandRegistry.registerCommand("withEnv", new WithEnv());
 		commandRegistry.registerCommand("ps", new ProcessList());
 		commandRegistry.registerCommand("kill", new KillProcess());
 	}
@@ -139,12 +140,6 @@ public class SystemModule implements Module {
 	}
 
 	public static class WithTime implements CommandWrapper<Long> {
-		@Todo(description = "dummy implementation: it looks like we have a design problem here?")
-		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
-			return ExitStatus.success();
-		}
-
 		@Override
 		public Long before(List<String> args, Channel out, Channel err) {
 			return System.nanoTime();
@@ -155,6 +150,31 @@ public class SystemModule implements Module {
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
 			out.send(Record.of("message", Values.ofText("took " + duration)));
+		}
+	}
+
+	public static class WithEnv implements CommandWrapper<Map<String, String>>, StateAware {
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public Map<String, String> before(List<String> args, Channel out, Channel err) {
+			Map<String, String> resource = Map.copyOf(state.getVariables());
+			for (String arg : args) {
+				String[] kv = arg.split(":", 2);
+				state.getVariables().put(kv[0], kv[1]);
+			}
+			return resource;
+		}
+
+		@Override
+		public void after(Map<String, String> resource, Channel out, Channel err) {
+			state.getVariables().clear();
+			state.getVariables().putAll(resource);
 		}
 	}
 
