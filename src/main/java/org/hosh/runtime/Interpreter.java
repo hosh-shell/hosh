@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.GeneratedCommand;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
@@ -54,7 +53,6 @@ public class Interpreter {
 		state.getVariables().put("EXIT_STATUS", String.valueOf(exitStatus.value()));
 	}
 
-	@Todo(description = "this is another design error? we need a way a tree of commands")
 	private void injectDepsIntoNested(Command command) {
 		if (command instanceof GeneratedCommand) {
 			injectDeps(((GeneratedCommand) command).getNestedStatement().getCommand());
