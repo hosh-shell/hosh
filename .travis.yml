@@ -5,5 +5,6 @@ jdk:
 os:
   - linux
   - osx
+  - windows
 script:
   - mvn verify
