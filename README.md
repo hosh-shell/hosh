@@ -2,7 +2,7 @@
 
 ## Requirements
 
-JDK8 for build. JRE8 to run.
+JDK11 for build. JRE11 to run.
 
 ## Build
 
