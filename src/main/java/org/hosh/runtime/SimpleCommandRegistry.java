@@ -1,5 +1,6 @@
 package org.hosh.runtime;
 
+import java.util.Map;
 import java.util.Objects;
 
 import org.hosh.spi.Command;
@@ -17,9 +18,10 @@ public class SimpleCommandRegistry implements CommandRegistry {
 	public void registerCommand(String name, Command command) {
 		Objects.requireNonNull(name, "name cannot be null");
 		Objects.requireNonNull(command, "command cannot be null");
-		Command oldCommand = state.getCommands().putIfAbsent(name, command);
-		if (oldCommand != null) {
+		Map<String, Command> commands = state.getCommands();
+		if (commands.containsKey(name)) {
 			throw new IllegalArgumentException("command with same name already registered: " + name);
 		}
+		commands.putIfAbsent(name, command);
 	}
 }
