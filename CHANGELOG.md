@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- introducing pipe operator (i.e. ls | grep)
+- introducing pipe operator (i.e. ls | sort name)
+  and some commands like enumerate, sort, filter
+- using alphanum to sort paths
 
 ## [0.0.18] - 2018-10-20
 - requires Java 11

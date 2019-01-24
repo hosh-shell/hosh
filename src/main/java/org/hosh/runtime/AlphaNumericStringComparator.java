@@ -4,17 +4,13 @@ import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hosh.doc.Todo;
-
 /*
  * The Alphanum Algorithm is an improved sorting algorithm for strings
  * containing numbers.  Instead of sorting numbers in ASCII order like
  * a standard sort, this algorithm sorts numbers in numeric order.
  *
  * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
- *
  */
-@Todo(description = "to be used later, do not delete")
 public class AlphaNumericStringComparator implements Comparator<String> {
 	private static final Pattern alphaNumChunkPattern = Pattern.compile("(\\d+)|(\\D+)");
 

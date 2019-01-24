@@ -10,6 +10,8 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.hosh.runtime.AlphaNumericStringComparator;
+
 /**
  * Built-in values to be used in Records.
  *
@@ -159,15 +161,7 @@ public class Values {
 			return Objects.hash(value, unit);
 		}
 
-		@Override
-		public int compareTo(Value obj) {
-			if (obj instanceof Size) {
-				Size that = (Size) obj;
-				return comparator.compare(this, that);
-			} else {
-				throw new IllegalArgumentException();
-			}
-		}
+		private static final Comparator<Size> comparator = Comparator.comparing(Size::getUnit).thenComparing(Size::getValue);
 
 		public BigDecimal getValue() {
 			return value;
@@ -177,7 +171,15 @@ public class Values {
 			return unit;
 		}
 
-		private static final Comparator<Size> comparator = Comparator.comparing(Size::getUnit).thenComparing(Size::getValue);
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof Size) {
+				Size that = (Size) obj;
+				return comparator.compare(this, that);
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
 	}
 
 	static final class LocalPath implements Value {
@@ -216,11 +218,13 @@ public class Values {
 			return Objects.hash(path);
 		}
 
+		private static final Comparator<Path> comparator = Comparator.comparing(Path::toString, new AlphaNumericStringComparator());
+
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof LocalPath) {
 				LocalPath that = (LocalPath) obj;
-				return this.path.compareTo(that.path);
+				return comparator.compare(this.path, that.path);
 			} else {
 				throw new IllegalArgumentException();
 			}
