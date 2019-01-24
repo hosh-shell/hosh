@@ -16,6 +16,7 @@ public class TextModule implements Module {
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("schema", new Schema());
 		commandRegistry.registerCommand("filter", new Filter());
+		commandRegistry.registerCommand("enumerate", new Enumerate());
 	}
 
 	public static class Schema implements Command {
@@ -57,6 +58,25 @@ public class TextModule implements Module {
 						.ifPresent(v -> {
 							out.send(record);
 						});
+			}
+		}
+	}
+
+	public static class Enumerate implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 0) {
+				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				return ExitStatus.error();
+			}
+			int i = 0;
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					return ExitStatus.success();
+				}
+				Record record = incoming.get();
+				out.send(record.add("index", Values.ofText(Integer.toString(i++))));
 			}
 		}
 	}
