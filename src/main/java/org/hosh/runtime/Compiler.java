@@ -32,6 +32,13 @@ public class Compiler {
 		List<Statement> statements = new ArrayList<>();
 		for (StmtContext stmtContext : programContext.stmt()) {
 			Statement statement = compileStatement(stmtContext);
+			Statement next = null;
+			if (stmtContext.getChildCount() == 3) { // pipeline
+				String pipe = stmtContext.getChild(1).getText();
+				assert pipe.equals("|");
+				next = compileStatement(stmtContext.stmt());
+			}
+			statement.setNext(next);
 			statements.add(statement);
 		}
 		program.setStatements(statements);
@@ -113,8 +120,7 @@ public class Compiler {
 		return text.substring(1, text.length() - 1);
 	}
 
-
-	@Todo(description="primitive support for closures, enhance later")
+	@Todo(description = "primitive support for closures, enhance later")
 	public static final class GeneratedCommandWrapper implements Command {
 		private final Statement nestedStatement;
 		private final CommandWrapper<Object> commandWrapper;
@@ -125,10 +131,10 @@ public class Compiler {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			Object resource = commandWrapper.before(args, out, err);
 			try {
-				return nestedStatement.command.run(nestedStatement.arguments, out, err);
+				return nestedStatement.command.run(nestedStatement.arguments, null, out, err);
 			} finally {
 				commandWrapper.after(resource, out, err);
 			}
@@ -164,6 +170,7 @@ public class Compiler {
 	public static class Statement {
 		private Command command;
 		private List<String> arguments;
+		private Statement next; // not null if part of a pipeline
 
 		public void setCommand(Command command) {
 			this.command = command;
@@ -181,9 +188,17 @@ public class Compiler {
 			this.arguments = arguments;
 		}
 
+		public void setNext(Statement next) {
+			this.next = next;
+		}
+
+		public Statement getNext() {
+			return next;
+		}
+
 		@Override
 		public String toString() {
-			return String.format("Statement[class=%s,arguments=%s]", command.getClass().getCanonicalName(), arguments);
+			return String.format("Statement[class=%s,arguments=%s,pipe=%s]", command.getClass().getCanonicalName(), arguments, next);
 		}
 	}
 

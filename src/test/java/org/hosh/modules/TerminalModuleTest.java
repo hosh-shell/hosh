@@ -38,7 +38,7 @@ public class TerminalModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList(), null, out, err);
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
@@ -48,7 +48,7 @@ public class TerminalModuleTest {
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), out, err);
+			sut.run(Arrays.asList("asd"), null, out, err);
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("no parameters expected")));
@@ -69,7 +69,7 @@ public class TerminalModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList(), null, out, err);
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
@@ -79,7 +79,7 @@ public class TerminalModuleTest {
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), out, err);
+			sut.run(Arrays.asList("asd"), null, out, err);
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("no parameters expected")));

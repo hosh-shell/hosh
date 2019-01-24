@@ -52,7 +52,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			ExitStatus exitStatus = sut.run(Arrays.asList(), out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), null, out, err);
 			assertThat(exitStatus.value()).isEqualTo(0);
 			then(state).should().setExit(true);
 			then(out).shouldHaveZeroInteractions();
@@ -61,7 +61,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void oneValidArg() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("21"), out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("21"), null, out, err);
 			assertThat(exitStatus.value()).isEqualTo(21);
 			then(state).should().setExit(true);
 			then(out).shouldHaveZeroInteractions();
@@ -70,7 +70,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void oneInvalidArg() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), null, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(state).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("not a valid exit status: asd")));
@@ -79,7 +79,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void twoArgs() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("1", "2"), out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("1", "2"), null, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(state).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("too many parameters")));
@@ -103,7 +103,7 @@ public class SystemModuleTest {
 		@Test
 		public void noArgs() {
 			environmentVariables.set("HOSH_VERSION", "1.0");
-			sut.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList(), null, out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
 			Record record = Record.empty().add("key", Values.ofText("HOSH_VERSION")).add("value", Values.ofText("1.0"));
@@ -112,7 +112,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("1"), out, err);
+			sut.run(Arrays.asList("1"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting no parameters")));
 		}
@@ -136,7 +136,7 @@ public class SystemModuleTest {
 		@Test
 		public void oneCommand() {
 			given(state.getCommands()).willReturn(Collections.singletonMap("name", null));
-			sut.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList(), null, out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
 			assertThat(records.getAllValues()).contains(Record.of("command", Values.ofText("name")));
@@ -145,14 +145,14 @@ public class SystemModuleTest {
 		@Test
 		public void noCommands() {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			sut.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList(), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("1"), out, err);
+			sut.run(Arrays.asList("1"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting no parameters")));
 		}
@@ -169,21 +169,21 @@ public class SystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList(), null, out, err);
 			then(out).should().send(Record.of("text", Values.ofText("")));
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("a"), out, err);
+			sut.run(Arrays.asList("a"), null, out, err);
 			then(out).should().send(Record.of("text", Values.ofText("a")));
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
-			sut.run(Arrays.asList("a", "b"), out, err);
+			sut.run(Arrays.asList("a", "b"), null, out, err);
 			then(out).should().send(Record.of("text", Values.ofText("ab")));
 			then(err).shouldHaveZeroInteractions();
 		}
@@ -200,28 +200,28 @@ public class SystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), out, err);
+			sut.run(Arrays.asList(), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
 		}
 
 		@Test
 		public void oneArgNumber() {
-			sut.run(Arrays.asList("1"), out, err);
+			sut.run(Arrays.asList("1"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArgNotNumber() {
-			sut.run(Arrays.asList("a"), out, err);
+			sut.run(Arrays.asList("a"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("not millis: a")));
 		}
 
 		@Test
 		public void twoArgs() {
-			sut.run(Arrays.asList("a", "b"), out, err);
+			sut.run(Arrays.asList("a", "b"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
 		}

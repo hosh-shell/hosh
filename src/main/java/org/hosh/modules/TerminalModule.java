@@ -30,7 +30,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			out.send(Record.of("name", Values.ofText(terminal.getName())));
 			out.send(Record.of("type", Values.ofText(terminal.getType())));
 			out.send(Record.of("attributes", Values.ofText(terminal.getAttributes().toString())));
@@ -47,7 +47,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
 				err.send(Record.of("error", Values.ofText("no parameters expected")));
 				return ExitStatus.error();
@@ -67,7 +67,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
 				err.send(Record.of("error", Values.ofText("no parameters expected")));
 				return ExitStatus.error();

@@ -43,7 +43,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() > 1) {
 				err.send(Record.of("message", Values.ofText("expected at most 1 argument")));
 				return ExitStatus.error();
@@ -90,7 +90,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
 				err.send(Record.of("error", Values.ofText("expecting no parameters")));
 				return ExitStatus.error();
@@ -109,7 +109,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			switch (args.size()) {
 				case 0:
 					err.send(Record.of("error", Values.ofText("missing path argument")));
@@ -145,7 +145,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			switch (args.size()) {
 				case 1:
 					Path path = Paths.get(args.get(0));
@@ -176,7 +176,6 @@ public class FileSystemModule implements Module {
 
 	public static class Find implements Command, StateAware {
 		private static final Logger LOGGER = LoggerFactory.getLogger(Find.class);
-
 		private State state;
 
 		@Override
@@ -185,7 +184,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
 				err.send(Record.of("error", Values.ofText("expecting one argument")));
 				return ExitStatus.error();

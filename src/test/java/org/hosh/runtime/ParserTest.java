@@ -6,8 +6,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-// this test is for language explorations
-// by now no asserts are enforced
 public class ParserTest {
 	@Rule
 	public final ExpectedException expectedException = ExpectedException.none();

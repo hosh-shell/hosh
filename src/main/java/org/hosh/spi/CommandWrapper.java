@@ -12,7 +12,7 @@ import org.hosh.doc.Todo;
 public interface CommandWrapper<T> extends Command {
 	@Todo(description = "dummy implementation: it looks like we have a design problem here?")
 	@Override
-	default ExitStatus run(List<String> args, Channel out, Channel err) {
+	default ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		return ExitStatus.success();
 	}
 

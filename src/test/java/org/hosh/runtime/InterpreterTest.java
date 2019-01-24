@@ -35,6 +35,8 @@ public class InterpreterTest {
 	private State state;
 	@Mock(stubOnly = true)
 	private Terminal terminal;
+	@Mock(name = "in", stubOnly = true)
+	private Channel in;
 	@Mock(name = "out", stubOnly = true)
 	private Channel out;
 	@Mock(stubOnly = true)
@@ -51,65 +53,48 @@ public class InterpreterTest {
 	private Interpreter sut;
 
 	@Test
-	public void plainCommandWithoutDeps() throws Exception {
-		given(state.getVariables()).willReturn(variables);
-		given(command.run(args, out, out)).willReturn(ExitStatus.success());
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
-		sut.eval(program);
-		then(command).should().run(args, out, out);
-		then(command).shouldHaveNoMoreInteractions();
-	}
-
-	@Test
 	public void storeCommandExitStatus() throws Exception {
 		given(state.getVariables()).willReturn(variables);
-		given(command.run(args, out, out)).willReturn(ExitStatus.error());
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		sut.eval(program);
-		then(command).should().run(args, out, out);
-		then(command).shouldHaveNoMoreInteractions();
+		ExitStatus exitStatus = sut.eval(program);
+		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 		assertThat(variables).containsEntry("EXIT_STATUS", "1");
 	}
 
 	@Test
-	public void stateAwareCommand() throws Exception {
+	public void injectStateAwareCommand() throws Exception {
 		given(state.getVariables()).willReturn(variables);
-		given(stateAwareCommand.run(args, out, out)).willReturn(ExitStatus.success());
+		given(stateAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(stateAwareCommand);
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
-		then(stateAwareCommand).should().run(args, out, out);
 		then((StateAware) stateAwareCommand).should().setState(state);
-		then(stateAwareCommand).shouldHaveNoMoreInteractions();
 	}
 
 	@Test
 	public void terminalAwareCommand() throws Exception {
-		given(terminalAwareCommand.run(args, out, out)).willReturn(ExitStatus.success());
+		given(terminalAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(terminalAwareCommand);
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
-		then(terminalAwareCommand).should().run(args, out, out);
 		then((TerminalAware) terminalAwareCommand).should().setTerminal(terminal);
-		then(terminalAwareCommand).shouldHaveNoMoreInteractions();
 	}
 
 	@Test
 	public void plainArguments() throws Exception {
 		args.add("file");
 		given(state.getVariables()).willReturn(variables);
-		given(command.run(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
-		then(command).should().run(Arrays.asList("file"), out, out);
+		then(command).should().run(Mockito.eq(args), Mockito.any(), Mockito.any(), Mockito.any());
 		then(command).shouldHaveNoMoreInteractions();
 	}
 
@@ -118,12 +103,12 @@ public class InterpreterTest {
 		args.add("${VARIABLE}");
 		variables.put("VARIABLE", "1");
 		given(state.getVariables()).willReturn(variables);
-		given(command.run(Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
-		then(command).should().run(Arrays.asList("1"), out, out);
+		then(command).should().run(Mockito.eq(Arrays.asList("1")), Mockito.any(), Mockito.any(), Mockito.any());
 		then(command).shouldHaveNoMoreInteractions();
 	}
 

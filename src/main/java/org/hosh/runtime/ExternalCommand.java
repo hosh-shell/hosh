@@ -27,7 +27,7 @@ public class ExternalCommand implements Command, StateAware {
 	}
 
 	@Override
-	public ExitStatus run(List<String> args, Channel out, Channel err) {
+	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);
 		processArgs.add(command.toAbsolutePath().toString());
 		processArgs.addAll(args);

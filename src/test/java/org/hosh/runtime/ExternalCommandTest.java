@@ -51,7 +51,7 @@ public class ExternalCommandTest {
 		given(process.waitFor()).willReturn(0);
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.emptyList(), out, err);
+		sut.run(Collections.emptyList(), null, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString()),
 				Paths.get("."),
@@ -69,7 +69,7 @@ public class ExternalCommandTest {
 		given(process.waitFor()).willReturn(0);
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), out, err);
+		sut.run(Collections.singletonList("file.hosh"), null, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
@@ -87,7 +87,7 @@ public class ExternalCommandTest {
 		given(process.waitFor()).willThrow(InterruptedException.class);
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), out, err);
+		sut.run(Collections.singletonList("file.hosh"), null, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),

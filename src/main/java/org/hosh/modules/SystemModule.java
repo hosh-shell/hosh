@@ -36,25 +36,25 @@ public class SystemModule implements Module {
 
 	public static class Echo implements Command {
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			Record record = Record.of("text", Values.ofText(String.join("", args)));
 			out.send(record);
 			return ExitStatus.success();
 		}
 	}
 
-	@Todo(description = "should print the variables stored in the state")
 	public static class Env implements Command {
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
 				err.send(Record.of("error", Values.ofText("expecting no parameters")));
 				return ExitStatus.error();
 			}
 			Map<String, String> env = System.getenv();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
-				Record record = Record.of("key", Values.ofText(entry.getKey()), "value",
-						Values.ofText(entry.getValue()));
+				Record record = Record.of(
+						"key", Values.ofText(entry.getKey()),
+						"value", Values.ofText(entry.getValue()));
 				out.send(record);
 			}
 			return ExitStatus.success();
@@ -70,7 +70,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			switch (args.size()) {
 				case 0:
 					state.setExit(true);
@@ -102,7 +102,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
 				err.send(Record.of("error", Values.ofText("expecting no parameters")));
 				return ExitStatus.error();
@@ -118,7 +118,7 @@ public class SystemModule implements Module {
 	@Todo(description = "use Duration as argument, we really need Value as arguments")
 	public static class Sleep implements Command {
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
 				err.send(Record.of("error", Values.ofText("expecting just one argument millis")));
 				return ExitStatus.error();
@@ -154,7 +154,7 @@ public class SystemModule implements Module {
 
 	public static class ProcessList implements Command {
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
 				err.send(Record.of("error", Values.ofText("expecting zero arguments")));
 				return ExitStatus.error();
@@ -174,7 +174,7 @@ public class SystemModule implements Module {
 
 	public static class KillProcess implements Command {
 		@Override
-		public ExitStatus run(List<String> args, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
 				err.send(Record.of("error", Values.ofText("expecting one argument")));
 				return ExitStatus.error();

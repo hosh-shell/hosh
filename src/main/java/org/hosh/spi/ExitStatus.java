@@ -9,7 +9,7 @@ import org.hosh.doc.Todo;
  * Value object for describing exit status from external as well as internal
  * commands.
  */
-@Todo(description = "this should a org.hosh.spi.Value?")
+@Todo(description = "this should be a org.hosh.spi.Value?")
 public class ExitStatus {
 	private final int value;
 
@@ -46,6 +46,10 @@ public class ExitStatus {
 		} catch (InvalidExitCode e) {
 			return Optional.empty();
 		}
+	}
+
+	public boolean isSuccess() {
+		return value == 0;
 	}
 
 	public int value() {

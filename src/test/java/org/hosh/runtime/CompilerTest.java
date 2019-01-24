@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willReturn;
+import static org.mockito.Mockito.doReturn;
 
 import java.util.List;
 
@@ -12,7 +13,6 @@ import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,24 +24,29 @@ public class CompilerTest {
 	@Mock(stubOnly = true)
 	private Command command;
 	@Mock(stubOnly = true)
+	private Command anotherCommand;
+	@Mock(stubOnly = true)
 	private CommandWrapper<?> commandWrapper;
 	@Mock
 	private CommandResolver commandResolver;
 	@InjectMocks
 	private Compiler sut;
 
-	@Ignore("missing support for pipeline")
 	@Test
 	public void commandWithPipeline() {
-		given(commandResolver.tryResolve("env")).willReturn(command);
-		Program program = sut.compile("env | env");
+		doReturn(command).when(commandResolver).tryResolve("ls");
+		doReturn(anotherCommand).when(commandResolver).tryResolve("grep");
+		Program program = sut.compile("ls | grep pattern");
 		assertThat(program.getStatements()).hasSize(1);
 		List<Statement> statements = program.getStatements();
-		assertThat(statements).hasSize(2);
-		assertThat(statements.get(0).getCommand()).isSameAs(command);
-		assertThat(statements.get(0).getArguments()).isEmpty();
-		assertThat(statements.get(0).getCommand()).isSameAs(command);
-		assertThat(statements.get(0).getArguments()).isEmpty();
+		assertThat(statements).hasSize(1);
+		Statement statement = statements.get(0);
+		assertThat(statement.getCommand()).isSameAs(command);
+		assertThat(statement.getArguments()).isEmpty();
+		Statement next = statement.getNext();
+		assertThat(next).isNotNull();
+		assertThat(next.getCommand()).isSameAs(anotherCommand);
+		assertThat(next.getArguments()).containsExactly("pattern");
 	}
 
 	@Test

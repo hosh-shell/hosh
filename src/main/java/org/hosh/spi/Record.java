@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A value object representing a record of k/v pairs.
@@ -61,6 +62,10 @@ public final class Record {
 
 	public Collection<Value> values() {
 		return Collections.unmodifiableCollection(data.values());
+	}
+
+	public Optional<Value> value(String key) {
+		return Optional.ofNullable(data.get(key));
 	}
 
 	@Override
