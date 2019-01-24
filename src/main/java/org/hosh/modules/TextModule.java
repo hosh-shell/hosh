@@ -1,5 +1,7 @@
 package org.hosh.modules;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +11,10 @@ import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
+import org.hosh.spi.Value;
 import org.hosh.spi.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TextModule implements Module {
 	@Override
@@ -17,6 +22,7 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("schema", new Schema());
 		commandRegistry.registerCommand("filter", new Filter());
 		commandRegistry.registerCommand("enumerate", new Enumerate());
+		commandRegistry.registerCommand("sort", new Sort());
 	}
 
 	public static class Schema implements Command {
@@ -52,12 +58,10 @@ public class TextModule implements Module {
 				String key = args.get(0);
 				String regex = args.get(1);
 				Record record = incoming.get();
-				record
-						.value(key)
-						.filter(v -> v.toString().matches(regex))
-						.ifPresent(v -> {
-							out.send(record);
-						});
+				Value value = record.value(key);
+				if (value != null && value.matches(regex)) {
+					out.send(record);
+				}
 			}
 		}
 	}
@@ -78,6 +82,36 @@ public class TextModule implements Module {
 				Record record = incoming.get();
 				out.send(record.add("index", Values.ofText(Integer.toString(i++))));
 			}
+		}
+	}
+
+	public static class Sort implements Command {
+		private final Logger logger = LoggerFactory.getLogger(getClass());
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of("error", Values.ofText("expected 1 parameters")));
+				return ExitStatus.error();
+			}
+			List<Record> records = new ArrayList<>();
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				Record record = incoming.get();
+				records.add(record);
+			}
+			String key = args.get(0);
+			var comparator = Comparator.<Record, Value>comparing((r) -> r.value(key), Comparator.nullsFirst(Comparator.naturalOrder()));
+			logger.debug("before sorting {}", records);
+			records.sort(comparator);
+			logger.debug("after sorting {}", records);
+			for (Record record : records) {
+				out.send(record);
+			}
+			return ExitStatus.success();
 		}
 	}
 }

@@ -5,15 +5,14 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * A value object representing a record of k/v pairs.
  *
- * Records are created, modified and finally consumed to create pipelines. E.g.
- * listing files of a directory produces a stream of records with name, size,
- * permissions. The user can select a subset of these keys (e.g. name) and then
- * it can be presented to the screen somehow.
+ * Records are created, modified and finally consumed to create pipelines
+ * e.g. listing files of a directory produces a stream of records with name,
+ * size,
+ * permissions.
  */
 public final class Record {
 	private final Map<String, Value> data;
@@ -64,8 +63,8 @@ public final class Record {
 		return Collections.unmodifiableCollection(data.values());
 	}
 
-	public Optional<Value> value(String key) {
-		return Optional.ofNullable(data.get(key));
+	public Value value(String key) {
+		return data.get(key);
 	}
 
 	@Override

@@ -34,7 +34,7 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class ListFiles implements Command, StateAware {
-		private static final Logger LOGGER = LoggerFactory.getLogger(ListFiles.class);
+		private final Logger logger = LoggerFactory.getLogger(getClass());
 		private State state;
 
 		@Override
@@ -60,7 +60,7 @@ public class FileSystemModule implements Module {
 			} else {
 				dir = cwd;
 			}
-			LOGGER.debug("listing {}", dir);
+			logger.debug("listing {}", dir);
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
 				for (Path path : stream) {
 					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));

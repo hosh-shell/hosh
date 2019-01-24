@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.text.NumberFormat;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -92,6 +93,25 @@ public class Values {
 		public int hashCode() {
 			return Objects.hash(value);
 		}
+
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof Text) {
+				Text that = (Text) obj;
+				return this.value.compareTo(that.value);
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+
+		@Override
+		public boolean matches(Object obj) {
+			if (obj instanceof String) {
+				return value.matches((String) obj);
+			} else {
+				return false;
+			}
+		}
 	}
 
 	/**
@@ -138,6 +158,26 @@ public class Values {
 		public int hashCode() {
 			return Objects.hash(value, unit);
 		}
+
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof Size) {
+				Size that = (Size) obj;
+				return comparator.compare(this, that);
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+
+		public BigDecimal getValue() {
+			return value;
+		}
+
+		public Unit getUnit() {
+			return unit;
+		}
+
+		private static final Comparator<Size> comparator = Comparator.comparing(Size::getUnit).thenComparing(Size::getValue);
 	}
 
 	static final class LocalPath implements Value {
@@ -174,6 +214,16 @@ public class Values {
 		@Override
 		public int hashCode() {
 			return Objects.hash(path);
+		}
+
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof LocalPath) {
+				LocalPath that = (LocalPath) obj;
+				return this.path.compareTo(that.path);
+			} else {
+				throw new IllegalArgumentException();
+			}
 		}
 	}
 }
