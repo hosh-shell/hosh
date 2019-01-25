@@ -66,7 +66,7 @@ public class FileSystemModule implements Module {
 					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));
 					if (Files.isRegularFile(path)) {
 						long size = Files.size(path);
-						entry = entry.add("size", Values.ofHumanizedSize(size));
+						entry = entry.append("size", Values.ofHumanizedSize(size));
 					}
 					out.send(entry);
 				}

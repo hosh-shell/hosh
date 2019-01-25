@@ -42,16 +42,24 @@ public final class Record {
 		return new Record(data);
 	}
 
-	public Record add(String key, Value value) {
-		Map<String, Value> copy = new LinkedHashMap<>(data);
+	public Record append(String key, Value value) {
+		Map<String, Value> copy = new LinkedHashMap<>(data.size() + 1);
+		copy.putAll(this.data);
 		addUniqueMapping(copy, key, value);
 		return new Record(copy);
 	}
 
-	private static void addUniqueMapping(Map<String, Value> data, String key2, Value value2) {
-		Value previous = data.put(key2, value2);
+	public Record prepend(String key, Value value) {
+		Map<String, Value> copy = new LinkedHashMap<>(data.size() + 1);
+		copy.put(key, value);
+		copy.putAll(this.data);
+		return new Record(copy);
+	}
+
+	private static void addUniqueMapping(Map<String, Value> data, String key, Value value) {
+		Value previous = data.put(key, value);
 		if (previous != null) {
-			throw new IllegalArgumentException("duplicated key: " + key2);
+			throw new IllegalArgumentException("duplicated key: " + key);
 		}
 	}
 

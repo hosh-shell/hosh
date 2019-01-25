@@ -45,7 +45,7 @@ public class ConsoleChannelTest {
 	@Test
 	public void twoValues() {
 		given(terminal.writer()).willReturn(printWriter);
-		sut.send(Record.of("key", Values.ofText("foo")).add("another_key", Values.ofText("bar")));
+		sut.send(Record.of("key", Values.ofText("foo")).append("another_key", Values.ofText("bar")));
 		then(printWriter).should().println("[38;5;2147483647mfoo bar[0m");
 	}
 }

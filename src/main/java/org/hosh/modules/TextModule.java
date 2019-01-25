@@ -73,14 +73,14 @@ public class TextModule implements Module {
 				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
-			int i = 0;
+			int i = 1;
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
 					return ExitStatus.success();
 				}
 				Record record = incoming.get();
-				out.send(record.add("index", Values.ofText(Integer.toString(i++))));
+				out.send(record.prepend("index", Values.ofText(Integer.toString(i++))));
 			}
 		}
 	}

@@ -106,7 +106,7 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList(), null, out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
-			Record record = Record.empty().add("key", Values.ofText("HOSH_VERSION")).add("value", Values.ofText("1.0"));
+			Record record = Record.empty().append("key", Values.ofText("HOSH_VERSION")).append("value", Values.ofText("1.0"));
 			assertThat(records.getAllValues()).contains(record);
 		}
 

@@ -161,11 +161,11 @@ public class SystemModule implements Module {
 			}
 			ProcessHandle.allProcesses().forEach(process -> {
 				Info info = process.info();
-				Record result = Record.empty().add("pid", Values.ofText(String.valueOf(process.pid())))
-						.add("user", Values.ofText(info.user().orElse("-")))
-						.add("start", Values.ofText(info.startInstant().map(Instant::toString).orElse("-")))
-						.add("command", Values.ofText(info.command().orElse("-")))
-						.add("arguments", Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))));
+				Record result = Record.empty().append("pid", Values.ofText(String.valueOf(process.pid())))
+						.append("user", Values.ofText(info.user().orElse("-")))
+						.append("start", Values.ofText(info.startInstant().map(Instant::toString).orElse("-")))
+						.append("command", Values.ofText(info.command().orElse("-")))
+						.append("arguments", Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))));
 				out.send(result);
 			});
 			return ExitStatus.success();

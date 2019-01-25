@@ -84,7 +84,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			temporaryFolder.newFile("file").createNewFile();
 			sut.run(Arrays.asList(), null, out, err);
-			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("file"))).add("size", Values.ofHumanizedSize(0)));
+			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("file"))).append("size", Values.ofHumanizedSize(0)));
 			then(err).shouldHaveZeroInteractions();
 		}
 
