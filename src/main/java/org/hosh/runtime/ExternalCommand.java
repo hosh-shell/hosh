@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExternalCommand implements Command, StateAware {
-	private static final Logger logger = LoggerFactory.getLogger(ExternalCommand.class);
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final Path command;
 	private ProcessFactory processFactory = new DefaultProcessFactory();
 	private State state;
@@ -69,3 +69,4 @@ public class ExternalCommand implements Command, StateAware {
 		this.processFactory = processFactory;
 	}
 }
+

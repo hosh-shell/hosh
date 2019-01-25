@@ -77,7 +77,7 @@ public class Compiler {
 		if (command == null) {
 			throw new CompileError("line " + token.getLine() + ": unknown command wrapper " + commandName);
 		}
-		if (command instanceof CommandWrapper == false) {
+		if (!(command instanceof CommandWrapper)) {
 			throw new CompileError("line " + token.getLine() + ": not a command wrapper " + commandName);
 		}
 		@SuppressWarnings("unchecked")

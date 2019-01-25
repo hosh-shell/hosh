@@ -6,3 +6,4 @@ public interface CommandResolver {
 	/** Yields null if not found. */
 	Command tryResolve(String commandName);
 }
+

@@ -6,7 +6,7 @@ import org.hosh.doc.Todo;
 
 /**
  * A command specialization that performs setup and cleanup.
- * 
+ *
  * This is useful to create resource-aware closures, such as locks,.
  */
 public interface CommandWrapper<T> extends Command {
@@ -26,3 +26,4 @@ public interface CommandWrapper<T> extends Command {
 	 */
 	void after(T resource, Channel out, Channel err);
 }
+

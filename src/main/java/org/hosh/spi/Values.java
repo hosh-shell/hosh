@@ -34,18 +34,18 @@ public class Values {
 	/**
 	 * One kibibyte (1024 bytes), this is in contrast to the SI system (1000 bytes)
 	 */
-	public static final int KiB = 1024;
+	public static final int KIB = 1024;
 
 	/**
 	 * Select the appropriate unit for measuring bytes.
 	 */
 	public static Value ofHumanizedSize(long bytes) {
-		if (bytes < KiB) {
+		if (bytes < KIB) {
 			return new Size(BigDecimal.valueOf(bytes), Unit.B);
 		}
-		int exp = (int) (Math.log(bytes) / Math.log(KiB));
+		int exp = (int) (Math.log(bytes) / Math.log(KIB));
 		Unit unit = UNITS[exp - 1];
-		BigDecimal value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(KiB, exp)), 1, RoundingMode.HALF_UP);
+		BigDecimal value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(KIB, exp)), 1, RoundingMode.HALF_UP);
 		return new Size(value, unit);
 	}
 
@@ -161,7 +161,9 @@ public class Values {
 			return Objects.hash(value, unit);
 		}
 
-		private static final Comparator<Size> comparator = Comparator.comparing(Size::getUnit).thenComparing(Size::getValue);
+		private static final Comparator<Size> SIZE_COMPARATOR = Comparator
+				.comparing(Size::getUnit)
+				.thenComparing(Size::getValue);
 
 		public BigDecimal getValue() {
 			return value;
@@ -175,7 +177,7 @@ public class Values {
 		public int compareTo(Value obj) {
 			if (obj instanceof Size) {
 				Size that = (Size) obj;
-				return comparator.compare(this, that);
+				return SIZE_COMPARATOR.compare(this, that);
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -218,13 +220,14 @@ public class Values {
 			return Objects.hash(path);
 		}
 
-		private static final Comparator<Path> comparator = Comparator.comparing(Path::toString, new AlphaNumericStringComparator());
+		private static final Comparator<Path> PATH_COMPARATOR = Comparator
+				.comparing(Path::toString, new AlphaNumericStringComparator());
 
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof LocalPath) {
 				LocalPath that = (LocalPath) obj;
-				return comparator.compare(this.path, that.path);
+				return PATH_COMPARATOR.compare(this.path, that.path);
 			} else {
 				throw new IllegalArgumentException();
 			}

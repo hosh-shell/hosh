@@ -12,13 +12,13 @@ import java.util.regex.Pattern;
  * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
  */
 public class AlphaNumericStringComparator implements Comparator<String> {
-	private static final Pattern alphaNumChunkPattern = Pattern.compile("(\\d+)|(\\D+)");
+	private static final Pattern CHUNK = Pattern.compile("(\\d+)|(\\D+)");
 
 	@Override
 	public int compare(String s1, String s2) {
 		int compareValue = 0;
-		Matcher s1ChunkMatcher = alphaNumChunkPattern.matcher(s1);
-		Matcher s2ChunkMatcher = alphaNumChunkPattern.matcher(s2);
+		Matcher s1ChunkMatcher = CHUNK.matcher(s1);
+		Matcher s2ChunkMatcher = CHUNK.matcher(s2);
 		while (s1ChunkMatcher.find() && s2ChunkMatcher.find() && compareValue == 0) {
 			String s1ChunkValue = s1ChunkMatcher.group();
 			String s2ChunkValue = s2ChunkMatcher.group();
