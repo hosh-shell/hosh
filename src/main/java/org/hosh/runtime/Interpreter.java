@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Todo;
@@ -69,17 +70,18 @@ public class Interpreter {
 	@Todo(description = "error channel is unbuffered by now, waiting for implementation of 2>&1")
 	private ExitStatus runPipelinedStatement(Statement statement) {
 		BlockingQueue<Record> queue = new LinkedBlockingQueue<>(100);
+		Channel pipeChannel = new QueueingChannel(queue);
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		Command command = prepareCommand(statement);
 		List<String> arguments = resolveArguments(statement.getArguments());
 		Future<ExitStatus> producer = executor.submit(() -> {
-			ExitStatus st = command.run(arguments, new UnlinkedChannel(), new QueueingChannel(queue), err);
+			ExitStatus st = command.run(arguments, new UnlinkedChannel(), pipeChannel, err);
 			queue.put(QueueingChannel.POISON_PILL);
 			return st;
 		});
 		Command nextCommand = prepareCommand(statement.getNext());
 		List<String> nextArguments = resolveArguments(statement.getNext().getArguments());
-		Future<ExitStatus> consumer = executor.submit(() -> nextCommand.run(nextArguments, new QueueingChannel(queue), out, err));
+		Future<ExitStatus> consumer = executor.submit(() -> nextCommand.run(nextArguments, pipeChannel, out, err));
 		try {
 			ExitStatus producerExitStatus = producer.get();
 			ExitStatus consumerExitStatus = consumer.get();
@@ -113,6 +115,7 @@ public class Interpreter {
 		public static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
 		private final Logger logger = LoggerFactory.getLogger(getClass());
 		private final BlockingQueue<Record> queue;
+		private final AtomicBoolean done = new AtomicBoolean(false);
 
 		public QueueingChannel(BlockingQueue<Record> queue) {
 			this.queue = queue;
@@ -144,6 +147,24 @@ public class Interpreter {
 				Thread.currentThread().interrupt();
 			}
 		}
+
+		@Override
+		public void requestStop() {
+			done.compareAndSet(false, true);
+			logger.debug("stop requested, done={}", done.get());
+		}
+
+		@Override
+		public boolean trySend(Record record) {
+			if (done.get()) {
+				logger.debug("record {} *not sent downstream", record);
+				return true;
+			} else {
+				send(record);
+				logger.debug("record {} sent downstream", record);
+				return false;
+			}
+		}
 	}
 
 	private Command prepareCommand(Statement statement) {
@@ -154,7 +175,10 @@ public class Interpreter {
 	}
 
 	private List<String> resolveArguments(List<String> arguments) {
-		return arguments.stream().map(this::resolveVariable).collect(Collectors.toList());
+		return arguments
+				.stream()
+				.map(this::resolveVariable)
+				.collect(Collectors.toList());
 	}
 
 	private String resolveVariable(String argument) {

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - introducing pipe operator (i.e. ls | sort name)
   and some commands like 'enumerate', 'sort', 'filter', 'take', 'drop'
 - using alphanum to sort paths
+- 'rand', infinite stream of random integers
 
 ## [0.0.18] - 2018-10-20
 - requires Java 11

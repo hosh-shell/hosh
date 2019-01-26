@@ -1,10 +1,14 @@
 package org.hosh.modules;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.hosh.doc.Experimental;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -25,6 +29,7 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("sort", new Sort());
 		commandRegistry.registerCommand("take", new Take());
 		commandRegistry.registerCommand("drop", new Drop());
+		commandRegistry.registerCommand("rand", new Rand());
 	}
 
 	public static class Schema implements Command {
@@ -117,6 +122,7 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Todo(description = "error handling (e.g. non-integer and negative value)")
 	public static class Take implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -134,11 +140,16 @@ public class TextModule implements Module {
 				if (take > 0) {
 					out.send(record);
 					take--;
+				} else {
+					in.requestStop();
+					break;
 				}
 			}
+			return ExitStatus.success();
 		}
 	}
 
+	@Todo(description = "error handling (e.g. non-integer and negative value)")
 	public static class Drop implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -159,6 +170,37 @@ public class TextModule implements Module {
 					out.send(record);
 				}
 			}
+		}
+	}
+
+	@Todo(description = "produces an infinite stream of records, cannot be blocked")
+	@Experimental(description = "extends with seed, bounds, doubles, booleans, etc")
+	public static class Rand implements Command {
+		private final Logger logger = LoggerFactory.getLogger(getClass());
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 0) {
+				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				return ExitStatus.error();
+			}
+			SecureRandom secureRandom;
+			try {
+				secureRandom = SecureRandom.getInstanceStrong();
+			} catch (NoSuchAlgorithmException e) {
+				logger.error("failed to get SecureRandom instance", e);
+				err.send(Record.of("error", Values.ofText(e.getMessage())));
+				return ExitStatus.error();
+			}
+			while (true) {
+				int nextInt = secureRandom.nextInt();
+				Record of = Record.of("value", Values.ofText(String.valueOf(nextInt)));
+				boolean halted = out.trySend(of);
+				if (halted) {
+					break;
+				}
+			}
+			return ExitStatus.success();
 		}
 	}
 }
