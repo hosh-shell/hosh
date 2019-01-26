@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - introducing pipe operator (i.e. ls | sort name)
-  and some commands like enumerate, sort, filter
+  and some commands like 'enumerate', 'sort', 'filter', 'take', 'drop'
 - using alphanum to sort paths
 
 ## [0.0.18] - 2018-10-20

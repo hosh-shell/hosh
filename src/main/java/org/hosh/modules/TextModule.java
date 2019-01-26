@@ -23,6 +23,8 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("filter", new Filter());
 		commandRegistry.registerCommand("enumerate", new Enumerate());
 		commandRegistry.registerCommand("sort", new Sort());
+		commandRegistry.registerCommand("take", new Take());
+		commandRegistry.registerCommand("drop", new Drop());
 	}
 
 	public static class Schema implements Command {
@@ -112,6 +114,51 @@ public class TextModule implements Module {
 				out.send(record);
 			}
 			return ExitStatus.success();
+		}
+	}
+
+	public static class Take implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of("error", Values.ofText("expected 1 parameters")));
+				return ExitStatus.error();
+			}
+			int take = Integer.parseInt(args.get(0));
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					return ExitStatus.success();
+				}
+				Record record = incoming.get();
+				if (take > 0) {
+					out.send(record);
+					take--;
+				}
+			}
+		}
+	}
+
+	public static class Drop implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of("error", Values.ofText("expected 1 parameters")));
+				return ExitStatus.error();
+			}
+			int drop = Integer.parseInt(args.get(0));
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					return ExitStatus.success();
+				}
+				Record record = incoming.get();
+				if (drop > 0) {
+					drop--;
+				} else {
+					out.send(record);
+				}
+			}
 		}
 	}
 }
