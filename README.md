@@ -6,7 +6,7 @@ JDK11 for build. JRE11 to run.
 
 ## Build
 
-`$ ./mvnw clean package`
+`$ ./mvnw clean verify`
 
 ## Run
 
