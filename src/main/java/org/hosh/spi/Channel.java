@@ -20,7 +20,9 @@ public interface Channel {
 	}
 
 	@Experimental(description = "upstream should use this method to 'nice' and stop producing items")
-	default boolean trySend(@SuppressWarnings("unused") Record record) {
-		return true; // by default do not send anything
+	default boolean trySend(Record record) {
+		// by default send everything
+		send(record);
+		return false;
 	}
 }
