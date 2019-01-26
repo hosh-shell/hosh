@@ -11,10 +11,12 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 
 /**
- * Enforcing proper package dependencies of the project (e.g. modules can see
- * only spi.
- *
- * The long term goal is to prepare ground for jmod/jlink.
+ * Enforcing package dependencies of the project:
+ * <ul>
+ * <li>modules can see only spi</li>
+ * <li>runtime can see spi but spi cannot see runtime</li>
+ * </ul>
+ * The short term goal is to prepare ground for modules.
  */
 public class ArchitectureTest {
 	@Test
@@ -28,6 +30,9 @@ public class ArchitectureTest {
 				.should().accessClassesThat().resideInAnyPackage("..spi..", "java..")
 				.check(importedClasses);
 		noClasses().that().resideInAPackage("..modules..")
+				.should().accessClassesThat().resideInAPackage("..runtime..")
+				.check(importedClasses);
+		noClasses().that().resideInAPackage("..spi..")
 				.should().accessClassesThat().resideInAPackage("..runtime..")
 				.check(importedClasses);
 	}
