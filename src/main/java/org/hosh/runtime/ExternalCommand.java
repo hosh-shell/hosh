@@ -32,7 +32,7 @@ public class ExternalCommand implements Command, StateAware {
 		processArgs.add(command.toAbsolutePath().toString());
 		processArgs.addAll(args);
 		Path cwd = state.getCwd();
-		logger.info("executing command {} inside {}", processArgs, cwd);
+		logger.debug("executing command {} in directory {}", processArgs, cwd);
 		try {
 			Process process = processFactory.create(processArgs, cwd, state.getVariables());
 			int exitCode = process.waitFor();
@@ -47,7 +47,7 @@ public class ExternalCommand implements Command, StateAware {
 	private static class DefaultProcessFactory implements ProcessFactory {
 		@Override
 		public Process create(List<String> args, Path cwd, Map<String, String> env) throws IOException {
-			ProcessBuilder processBuilder = new ProcessBuilder(args.toArray(new String[0]))
+			ProcessBuilder processBuilder = new ProcessBuilder(args)
 					.directory(cwd.toFile())
 					.inheritIO();
 			processBuilder.environment().putAll(env);
@@ -69,4 +69,3 @@ public class ExternalCommand implements Command, StateAware {
 		this.processFactory = processFactory;
 	}
 }
-
