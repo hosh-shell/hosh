@@ -72,4 +72,11 @@ public class ParserTest {
 		expectedException.expectMessage("line 1:0: token recognition error at: '!'");
 		sut.parse("!");
 	}
+
+	@Test
+	public void refuseSpaceInsideVariableExpansion() {
+		expectedException.expect(ParseError.class);
+		expectedException.expectMessage("line 1:0: token recognition error at: '${ '");
+		sut.parse("${ EXECUTABLE }");
+	}
 }
