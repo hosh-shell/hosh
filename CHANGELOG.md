@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 - allowing string in double quotes ""
 - new command 'count'
+- improved memory usage
 
 ## [0.0.19] - 2019-01-27
 - introducing pipe operator (i.e. ls | sort name)

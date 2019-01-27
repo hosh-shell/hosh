@@ -3,6 +3,9 @@ package org.hosh.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.hosh.spi.Record.Empty;
+import org.hosh.spi.Record.Generic;
+import org.hosh.spi.Record.Singleton;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -73,6 +76,8 @@ public class RecordTest {
 
 	@Test
 	public void equalsContract() {
-		EqualsVerifier.forClass(Record.class).verify();
+		EqualsVerifier.forClass(Empty.class).verify();
+		EqualsVerifier.forClass(Singleton.class).verify();
+		EqualsVerifier.forClass(Generic.class).verify();
 	}
 }
