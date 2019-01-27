@@ -158,7 +158,7 @@ public class SystemModule implements Module {
 			}
 			ProcessHandle.allProcesses().forEach(process -> {
 				Info info = process.info();
-				Record result = Record.empty().append("pid", Values.ofText(String.valueOf(process.pid())))
+				Record result = Record.empty().append("pid", Values.ofNumeric(process.pid()))
 						.append("user", Values.ofText(info.user().orElse("-")))
 						.append("start", Values.ofText(info.startInstant().map(Instant::toString).orElse("-")))
 						.append("command", Values.ofText(info.command().orElse("-")))

@@ -81,14 +81,14 @@ public class TextModule implements Module {
 				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
-			int i = 1;
+			long i = 1;
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
 					return ExitStatus.success();
 				}
 				Record record = incoming.get();
-				out.send(record.prepend("index", Values.ofText(Integer.toString(i++))));
+				out.send(record.prepend("index", Values.ofNumeric(i++)));
 			}
 		}
 	}
@@ -205,8 +205,8 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			while (true) {
-				int nextInt = secureRandom.nextInt();
-				Record of = Record.of("value", Values.ofText(String.valueOf(nextInt)));
+				long next = secureRandom.nextLong();
+				Record of = Record.of("value", Values.ofNumeric(next));
 				boolean halted = out.trySend(of);
 				if (halted) {
 					break;
@@ -223,11 +223,11 @@ public class TextModule implements Module {
 				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
-			int count = 0;
+			long count = 0;
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					out.send(Record.of("cound", Values.ofText("" + count)));
+					out.send(Record.of("cound", Values.ofNumeric(count)));
 					return ExitStatus.success();
 				} else {
 					count++;

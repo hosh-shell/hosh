@@ -21,6 +21,10 @@ public class Values {
 	private Values() {
 	}
 
+	public static Value ofNumeric(long number) {
+		return new Numeric(number);
+	}
+
 	public static Value ofText(String text) {
 		return new Text(text);
 	}
@@ -178,6 +182,53 @@ public class Values {
 			if (obj instanceof Size) {
 				Size that = (Size) obj;
 				return SIZE_COMPARATOR.compare(this, that);
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+	}
+
+	static final class Numeric implements Value {
+		private long number;
+
+		public Numeric(long number) {
+			this.number = number;
+		}
+
+		@Override
+		public void append(Appendable appendable, Locale locale) {
+			try {
+				appendable.append(String.valueOf(number));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Numeric[%s]", number);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(number);
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (o instanceof Numeric) {
+				Numeric that = (Numeric) o;
+				return this.number == that.number;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public int compareTo(Value o) {
+			if (o instanceof Numeric) {
+				Numeric that = (Numeric) o;
+				return Long.compare(this.number, that.number);
 			} else {
 				throw new IllegalArgumentException();
 			}
