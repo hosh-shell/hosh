@@ -96,6 +96,8 @@ public class Interpreter {
 			return ExitStatus.error();
 		} catch (ExecutionException e) {
 			return ExitStatus.error();
+		} finally {
+			executor.shutdownNow();
 		}
 	}
 

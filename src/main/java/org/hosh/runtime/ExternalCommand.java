@@ -78,6 +78,8 @@ public class ExternalCommand implements Command, StateAware {
 		} catch (ExecutionException e) {
 			logger.error("caught exception", e);
 			return ExitStatus.error();
+		} finally {
+			executor.shutdownNow();
 		}
 	}
 
