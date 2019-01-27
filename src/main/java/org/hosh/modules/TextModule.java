@@ -30,6 +30,7 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("take", new Take());
 		commandRegistry.registerCommand("drop", new Drop());
 		commandRegistry.registerCommand("rand", new Rand());
+		commandRegistry.registerCommand("count", new Count());
 	}
 
 	public static class Schema implements Command {
@@ -200,6 +201,26 @@ public class TextModule implements Module {
 				}
 			}
 			return ExitStatus.success();
+		}
+	}
+
+	public static class Count implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 0) {
+				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				return ExitStatus.error();
+			}
+			int count = 0;
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					out.send(Record.of("cound", Values.ofText("" + count)));
+					return ExitStatus.success();
+				} else {
+					count++;
+				}
+			}
 		}
 	}
 }
