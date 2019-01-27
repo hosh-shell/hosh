@@ -11,7 +11,7 @@ public class RecordTest {
 	@Test
 	public void copy() {
 		Record a = Record.of("key", Values.ofText("a"));
-		Record b = Record.copy(a);
+		Record b = Record.of("key", Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
 		assertThat(a).hasSameHashCodeAs(b);
 		assertThat(a.toString()).isEqualTo(b.toString());
@@ -30,7 +30,7 @@ public class RecordTest {
 	@Test
 	public void mutation() {
 		Record a = Record.empty();
-		Record b = Record.copy(a).append("key", Values.ofText("a"));
+		Record b = Record.of("key", Values.ofText("a"));
 		assertThat(a).isNotEqualTo(b);
 		assertThat(a).isNotSameAs(b);
 	}

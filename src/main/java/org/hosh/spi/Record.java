@@ -7,22 +7,14 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A value object representing a record of k/v pairs.
- *
- * Records are created, modified and finally consumed to create pipelines
- * e.g. listing files of a directory produces a stream of records with name,
- * size,
- * permissions.
+ * An immutable, persistent value object representing a record of key-value
+ * pairs.
  */
 public final class Record {
 	private final Map<String, Value> data;
 
 	private Record(Map<String, Value> data) {
 		this.data = data;
-	}
-
-	public static Record copy(Record record) {
-		return new Record(new LinkedHashMap<>(record.data));
 	}
 
 	public static Record empty() {
