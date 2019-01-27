@@ -19,6 +19,7 @@ import org.hosh.runtime.CommandResolvers;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
+import org.hosh.runtime.ConsoleChannel.Color;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.LineReaderIterator;
@@ -38,7 +39,6 @@ import org.jline.reader.impl.completer.AggregateCompleter;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
-import org.jline.utils.AttributedStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -98,8 +98,8 @@ public class Hosh {
 					.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
 					.terminal(terminal)
 					.build();
-			Channel out = new ConsoleChannel(terminal, AttributedStyle.WHITE);
-			Channel err = new ConsoleChannel(terminal, AttributedStyle.RED);
+			Channel out = new ConsoleChannel(terminal, Color.White);
+			Channel err = new ConsoleChannel(terminal, Color.Red);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			welcome(out, version);
 			repl(state, lineReader, compiler, interpreter, err, logger);

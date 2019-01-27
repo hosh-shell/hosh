@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.then;
 
 import java.io.PrintWriter;
 
+import org.hosh.runtime.ConsoleChannel.Color;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
@@ -16,7 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ConsoleChannelTest {
-	@Mock
+	@Mock(stubOnly = true)
 	private Terminal terminal;
 	@Mock
 	private PrintWriter printWriter;
@@ -24,28 +25,33 @@ public class ConsoleChannelTest {
 
 	@Before
 	public void setup() {
-		int color = 1; // not important by now
-		sut = new ConsoleChannel(terminal, color);
+		sut = new ConsoleChannel(terminal, Color.Red);
+		given(terminal.writer()).willReturn(printWriter);
 	}
 
 	@Test
 	public void empty() {
-		given(terminal.writer()).willReturn(printWriter);
 		sut.send(Record.empty());
-		then(printWriter).should().println("");
+		then(printWriter).should().println();
 	}
 
 	@Test
 	public void oneValue() {
-		given(terminal.writer()).willReturn(printWriter);
 		sut.send(Record.of("key", Values.ofText("foo")));
-		then(printWriter).should().println("[38;5;2147483647mfoo[0m");
+		then(printWriter).should().append(Color.Red.ansi());
+		then(printWriter).should().append("foo");
+		then(printWriter).should().append(Color.Reset.ansi());
+		then(printWriter).should().println();
 	}
 
 	@Test
 	public void twoValues() {
-		given(terminal.writer()).willReturn(printWriter);
 		sut.send(Record.of("key", Values.ofText("foo")).append("another_key", Values.ofText("bar")));
-		then(printWriter).should().println("[38;5;2147483647mfoo bar[0m");
+		then(printWriter).should().append(Color.Red.ansi());
+		then(printWriter).should().append("foo");
+		then(printWriter).should().append(" ");
+		then(printWriter).should().append("bar");
+		then(printWriter).should().append(Color.Reset.ansi());
+		then(printWriter).should().println();
 	}
 }

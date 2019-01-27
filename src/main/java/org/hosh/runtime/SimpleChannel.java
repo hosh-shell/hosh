@@ -21,15 +21,14 @@ public class SimpleChannel implements Channel {
 
 	@Override
 	public void send(Record record) {
-		StringBuilder output = new StringBuilder();
 		Iterator<Value> iterator = record.values().iterator();
 		while (iterator.hasNext()) {
 			Value value = iterator.next();
-			value.append(output, Locale.getDefault());
+			value.append(printStream, Locale.getDefault());
 			if (iterator.hasNext()) {
-				output.append(" ");
+				printStream.append(" ");
 			}
 		}
-		printStream.println(output.toString());
+		printStream.println();
 	}
 }
