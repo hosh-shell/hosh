@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -92,7 +91,6 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "commands are not sorted by default, planning to use pipelines")
 	public static class Help implements Command, StateAware {
 		private State state;
 
@@ -115,7 +113,6 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "use Duration as argument, we really need Value as arguments")
 	public static class Sleep implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {

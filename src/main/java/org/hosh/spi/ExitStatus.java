@@ -3,17 +3,13 @@ package org.hosh.spi;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hosh.doc.Todo;
-
 /**
  * Value object for describing exit status from external as well as internal
  * commands.
  */
-@Todo(description = "this should be a org.hosh.spi.Value?")
 public class ExitStatus {
 	private final int value;
 
-	@Todo(description = "check the range of possible exit status on windows")
 	private ExitStatus(int value) {
 		if (value < 0 || value > 255) {
 			throw new InvalidExitCode("illegal exit status: " + value);

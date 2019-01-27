@@ -173,7 +173,6 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Todo(description = "produces an infinite stream of records, cannot be blocked")
 	@Experimental(description = "extends with seed, bounds, doubles, booleans, etc")
 	public static class Rand implements Command {
 		private final Logger logger = LoggerFactory.getLogger(getClass());

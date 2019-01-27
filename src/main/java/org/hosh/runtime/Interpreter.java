@@ -52,7 +52,6 @@ public class Interpreter {
 		return exitStatus;
 	}
 
-	@Todo(description = "current implementation supports only 2 commands (!)")
 	private ExitStatus execute(Statement statement) {
 		if (statement.getNext() == null) {
 			return runStandaloneStatement(statement);
