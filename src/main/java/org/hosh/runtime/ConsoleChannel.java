@@ -20,6 +20,7 @@ public class ConsoleChannel implements Channel {
 
 	@Override
 	public void send(Record record) {
+		@SuppressWarnings("resource")
 		PrintWriter writer = terminal.writer();
 		writer.append(color.ansi);
 		Iterator<Value> values = record.values().iterator();

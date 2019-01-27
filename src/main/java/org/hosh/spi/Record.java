@@ -95,13 +95,13 @@ public interface Record {
 		}
 
 		@Override
-		public Record append(String key, Value value) {
-			return new Generic().append(this.key, this.value).append(key, value);
+		public Record append(String key2, Value value2) {
+			return new Generic().append(this.key, this.value).append(key2, value2);
 		}
 
 		@Override
-		public Record prepend(String key, Value value) {
-			return new Generic().prepend(this.key, this.value).prepend(key, value);
+		public Record prepend(String key2, Value value2) {
+			return new Generic().prepend(this.key, this.value).prepend(key2, value2);
 		}
 
 		@Override
