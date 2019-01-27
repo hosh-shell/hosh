@@ -9,7 +9,9 @@ import java.lang.annotation.Target;
  * Document a planned feature or improvement.
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target({ ElementType.TYPE, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.PACKAGE })
+@Target({
+		ElementType.TYPE, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.PACKAGE, ElementType.FIELD
+})
 public @interface Todo {
 	String description();
 }

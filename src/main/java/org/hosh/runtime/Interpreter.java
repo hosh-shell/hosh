@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Todo;
@@ -66,9 +65,12 @@ public class Interpreter {
 		return command.run(arguments, new UnlinkedChannel(), out, err);
 	}
 
+	@Todo(description = "move as tunable parameter? via state or env var")
+	private static final int QUEUE_CAPACITY = 5;
+
 	@Todo(description = "error channel is unbuffered by now, waiting for implementation of 2>&1")
 	private ExitStatus runPipelinedStatement(Statement statement) {
-		BlockingQueue<Record> queue = new LinkedBlockingQueue<>(100);
+		BlockingQueue<Record> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
 		Channel pipeChannel = new QueueingChannel(queue);
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		Command command = prepareCommand(statement);
@@ -114,7 +116,7 @@ public class Interpreter {
 		public static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
 		private final Logger logger = LoggerFactory.getLogger(getClass());
 		private final BlockingQueue<Record> queue;
-		private final AtomicBoolean done = new AtomicBoolean(false);
+		private volatile boolean done = false;
 
 		public QueueingChannel(BlockingQueue<Record> queue) {
 			this.queue = queue;
@@ -149,13 +151,13 @@ public class Interpreter {
 
 		@Override
 		public void requestStop() {
-			done.compareAndSet(false, true);
-			logger.debug("stop requested, done={}", done.get());
+			done = true;
+			logger.debug("stop requested, done={}", done);
 		}
 
 		@Override
 		public boolean trySend(Record record) {
-			if (done.get()) {
+			if (done) {
 				logger.debug("record {} *not sent downstream", record);
 				return true;
 			} else {
