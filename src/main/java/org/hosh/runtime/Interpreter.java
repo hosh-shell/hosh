@@ -23,10 +23,13 @@ import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
+import org.jline.terminal.Terminal.Signal;
+import org.jline.terminal.Terminal.SignalHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Interpreter {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final State state;
 	private final Terminal terminal;
 	private final Channel out;
@@ -83,6 +86,10 @@ public class Interpreter {
 		Command nextCommand = prepareCommand(statement.getNext());
 		List<String> nextArguments = resolveArguments(statement.getNext().getArguments());
 		Future<ExitStatus> consumer = executor.submit(() -> nextCommand.run(nextArguments, pipeChannel, out, err));
+		terminal.handle(Signal.INT, signal -> {
+			producer.cancel(true);
+			consumer.cancel(true);
+		});
 		try {
 			ExitStatus producerExitStatus = producer.get();
 			ExitStatus consumerExitStatus = consumer.get();
@@ -98,6 +105,7 @@ public class Interpreter {
 			return ExitStatus.error();
 		} finally {
 			executor.shutdownNow();
+			terminal.handle(Signal.INT, SignalHandler.SIG_DFL);
 		}
 	}
 
