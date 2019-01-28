@@ -25,9 +25,12 @@ public class LineReaderIterator implements Iterator<String> {
 		if (nextLine == null) {
 			try {
 				nextLine = lineReader.readLine(computePrompt());
-			} catch (EndOfFileException | UserInterruptException e) {
+			} catch (EndOfFileException e) {
 				nextLine = null;
 				return false;
+			} catch (UserInterruptException e) {
+				nextLine = "";
+				return true;
 			}
 		}
 		return true;

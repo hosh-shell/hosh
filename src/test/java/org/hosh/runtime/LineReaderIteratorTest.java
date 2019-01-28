@@ -62,10 +62,10 @@ public class LineReaderIteratorTest {
 	}
 
 	@Test
-	public void stopsAtINT() throws Exception {
+	public void killsCurrentLineAtINT() throws Exception {
 		given(state.getId()).willReturn(0);
-		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated CTRL-C"));
-		assertThat(sut.hasNext()).isFalse();
-		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> sut.next());
+		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated INT"));
+		assertThat(sut.hasNext()).isTrue();
+		assertThat(sut.next()).isEqualTo("");
 	}
 }
