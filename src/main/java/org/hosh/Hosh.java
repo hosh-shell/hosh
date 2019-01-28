@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -156,6 +157,8 @@ public class Hosh {
 	private static void welcome(Channel out, String version) {
 		out.send(Record.of("message", Values.ofText("hosh v" + version)));
 		out.send(Record.of("message", Values.ofText("Running on Java " + System.getProperty("java.version"))));
+		out.send(Record.of("message", Values.ofText("PID is " + ProcessHandle.current().pid())));
+		out.send(Record.of("message", Values.ofText("Locale is " + Locale.getDefault().toString())));
 		out.send(Record.of("message", Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
 	}
 }
