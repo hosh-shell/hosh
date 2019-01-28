@@ -1,5 +1,6 @@
 package org.hosh.runtime;
 
+import java.io.IOError;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -31,6 +32,14 @@ public class LineReaderIterator implements Iterator<String> {
 			} catch (UserInterruptException e) {
 				nextLine = "";
 				return true;
+			} catch (IOError e) {
+				// this happens when the user hits ctrl-c before Jline sets the signal handler
+				if (e.getCause() instanceof java.io.InterruptedIOException) {
+					nextLine = "";
+					return true;
+				} else {
+					throw e;
+				}
 			}
 		}
 		return true;
