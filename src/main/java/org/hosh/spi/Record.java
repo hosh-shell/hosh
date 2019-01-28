@@ -105,8 +105,8 @@ public interface Record {
 		}
 
 		@Override
-		public Value value(String key) {
-			if (Objects.equals(key, this.key)) {
+		public Value value(String key1) {
+			if (Objects.equals(this.key, key1)) {
 				return value;
 			} else {
 				return null;

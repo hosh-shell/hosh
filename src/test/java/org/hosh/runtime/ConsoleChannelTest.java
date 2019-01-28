@@ -25,7 +25,7 @@ public class ConsoleChannelTest {
 
 	@Before
 	public void setup() {
-		sut = new ConsoleChannel(terminal, Color.Red);
+		sut = new ConsoleChannel(terminal, Color.RED);
 		given(terminal.writer()).willReturn(printWriter);
 	}
 
@@ -38,20 +38,20 @@ public class ConsoleChannelTest {
 	@Test
 	public void oneValue() {
 		sut.send(Record.of("key", Values.ofText("foo")));
-		then(printWriter).should().append(Color.Red.ansi());
+		then(printWriter).should().append(Color.RED.ansi());
 		then(printWriter).should().append("foo");
-		then(printWriter).should().append(Color.Reset.ansi());
+		then(printWriter).should().append(Color.RESET.ansi());
 		then(printWriter).should().println();
 	}
 
 	@Test
 	public void twoValues() {
 		sut.send(Record.of("key", Values.ofText("foo")).append("another_key", Values.ofText("bar")));
-		then(printWriter).should().append(Color.Red.ansi());
+		then(printWriter).should().append(Color.RED.ansi());
 		then(printWriter).should().append("foo");
 		then(printWriter).should().append(" ");
 		then(printWriter).should().append("bar");
-		then(printWriter).should().append(Color.Reset.ansi());
+		then(printWriter).should().append(Color.RESET.ansi());
 		then(printWriter).should().println();
 	}
 }

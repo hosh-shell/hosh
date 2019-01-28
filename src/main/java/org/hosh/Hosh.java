@@ -98,8 +98,8 @@ public class Hosh {
 					.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
 					.terminal(terminal)
 					.build();
-			Channel out = new ConsoleChannel(terminal, Color.White);
-			Channel err = new ConsoleChannel(terminal, Color.Red);
+			Channel out = new ConsoleChannel(terminal, Color.WHITE);
+			Channel err = new ConsoleChannel(terminal, Color.RED);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			welcome(out, version);
 			repl(state, lineReader, compiler, interpreter, err, logger);

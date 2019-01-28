@@ -31,13 +31,13 @@ public class ConsoleChannel implements Channel {
 				writer.append(" ");
 			}
 		}
-		writer.append(Color.Reset.ansi);
+		writer.append(Color.RESET.ansi);
 		writer.println();
 	}
 
 	public enum Color {
-		Black("\u001b[30m"), Red("\u001b[31m"), Green("\u001b[32m"), Yellow("\u001b[33m"), Blue("\u001b[34m"), Magenta("\u001b[35m"), Cyan(
-				"\u001b[36m"), White("\u001b[37m"), Reset("\u001b[0m");
+		BLACK("\u001b[30m"), RED("\u001b[31m"), GREEN("\u001b[32m"), YELLOW("\u001b[33m"), BLUE("\u001b[34m"), MAGENTA("\u001b[35m"), CYAN(
+				"\u001b[36m"), WHITE("\u001b[37m"), RESET("\u001b[0m");
 		private final String ansi;
 
 		private Color(String ansi) {
