@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.FileWriter;
 
+import org.hosh.doc.Bug;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.Assertion;
@@ -13,6 +14,7 @@ import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.rules.TemporaryFolder;
 
+@Bug(description = "ExecPty with TERM=xterm gets stucked on Windows in ExecHelper. Using Redirect.PIPE everything is working fine")
 public class HoshTest {
 	@Rule
 	public final ExpectedSystemExit expectedSystemExit = ExpectedSystemExit.none();
