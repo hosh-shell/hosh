@@ -15,6 +15,7 @@ import java.util.Locale;
 import org.hosh.spi.Values.AlphaNumericStringComparator;
 import org.hosh.spi.ValuesTest.AlphaNumericStringComparatorTest;
 import org.hosh.spi.ValuesTest.LocalPathValueTest;
+import org.hosh.spi.ValuesTest.NumericValueTest;
 import org.hosh.spi.ValuesTest.SizeValueTest;
 import org.hosh.spi.ValuesTest.TextValueTest;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 @RunWith(Suite.class)
 @SuiteClasses({
 		TextValueTest.class,
+		NumericValueTest.class,
 		SizeValueTest.class,
 		LocalPathValueTest.class,
 		AlphaNumericStringComparatorTest.class
@@ -61,6 +63,48 @@ public class ValuesTest {
 		public void asString() {
 			assertThat(Values.ofText("aaa")).hasToString("Text[aaa]");
 		}
+
+		@Test
+		public void matches() {
+			Value text = Values.ofText("aaabaaa");
+			assertThat(text.matches("a+ba+")).isTrue();
+			assertThat(text.matches(".*b.*")).isTrue();
+			assertThat(text.matches(".*c.*")).isFalse();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class NumericValueTest {
+		@Mock
+		private Appendable appendable;
+
+		@Test
+		public void appendEnglish() throws IOException {
+			Values.ofNumeric(1_000_000).append(appendable, Locale.ENGLISH);
+			then(appendable).should().append("1,000,000");
+		}
+
+		@Test
+		public void appendItalian() throws IOException {
+			Values.ofNumeric(1_000_000).append(appendable, Locale.ITALIAN);
+			then(appendable).should().append("1.000.000");
+		}
+
+		@Test(expected = UncheckedIOException.class)
+		public void appendError() throws IOException {
+			given(appendable.append(ArgumentMatchers.any())).willThrow(IOException.class);
+			Values.ofNumeric(1_000_000).append(appendable, Locale.getDefault());
+		}
+
+		@Test
+		public void equalsContract() {
+			EqualsVerifier.forClass(Values.Numeric.class).verify();
+		}
+
+		@Test
+		public void asString() {
+			assertThat(Values.ofNumeric(1)).hasToString("Numeric[1]");
+		}
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -71,13 +115,15 @@ public class ValuesTest {
 		@Test
 		public void appendWithUkLocale() throws IOException {
 			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).append(appendable, Locale.UK);
-			then(appendable).should().append("2.5KB");
+			then(appendable).should().append("2.5");
+			then(appendable).should().append("KB");
 		}
 
 		@Test
 		public void appendWithItalianLocale() throws IOException {
 			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).append(appendable, Locale.ITALIAN);
-			then(appendable).should().append("2,5KB");
+			then(appendable).should().append("2,5");
+			then(appendable).should().append("KB");
 		}
 
 		@Test(expected = UncheckedIOException.class)

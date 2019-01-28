@@ -139,7 +139,8 @@ public class Values {
 		public void append(Appendable appendable, Locale locale) {
 			NumberFormat instance = NumberFormat.getInstance(locale);
 			try {
-				appendable.append(instance.format(value) + unit.toString());
+				appendable.append(instance.format(value));
+				appendable.append(unit.toString());
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -189,7 +190,7 @@ public class Values {
 	}
 
 	static final class Numeric implements Value {
-		private long number;
+		private final long number;
 
 		public Numeric(long number) {
 			this.number = number;
@@ -197,8 +198,9 @@ public class Values {
 
 		@Override
 		public void append(Appendable appendable, Locale locale) {
+			NumberFormat instance = NumberFormat.getInstance(locale);
 			try {
-				appendable.append(String.valueOf(number));
+				appendable.append(instance.format(number));
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
