@@ -42,14 +42,21 @@ public class SystemModule implements Module {
 		}
 	}
 
-	public static class Env implements Command {
+	public static class Env implements Command, StateAware {
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
 				err.send(Record.of("error", Values.ofText("expecting no parameters")));
 				return ExitStatus.error();
 			}
-			Map<String, String> env = System.getenv();
+			Map<String, String> env = state.getVariables();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
 				Record record = Record.of(
 						"key", Values.ofText(entry.getKey()),

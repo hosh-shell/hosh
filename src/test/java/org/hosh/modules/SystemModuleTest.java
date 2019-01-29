@@ -17,9 +17,7 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -89,8 +87,8 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class EnvTest {
-		@Rule
-		public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+		@Mock(stubOnly = true)
+		private State state;
 		@Mock
 		private Channel out;
 		@Mock
@@ -101,12 +99,20 @@ public class SystemModuleTest {
 		private Env sut;
 
 		@Test
-		public void noArgs() {
-			environmentVariables.set("HOSH_VERSION", "1.0");
+		public void noArgsWithNoEnvVariables() {
+			given(state.getVariables()).willReturn(Collections.emptyMap());
+			sut.run(Arrays.asList(), null, out, err);
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void noArgsWithSomeEnvVariables() {
+			given(state.getVariables()).willReturn(Collections.singletonMap("HOSH_VERSION", "1.0"));
 			sut.run(Arrays.asList(), null, out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
-			Record record = Record.empty().append("key", Values.ofText("HOSH_VERSION")).append("value", Values.ofText("1.0"));
+			Record record = Record.of("key", Values.ofText("HOSH_VERSION"), "value", Values.ofText("1.0"));
 			assertThat(records.getAllValues()).contains(record);
 		}
 
@@ -120,8 +126,6 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class HelpTest {
-		@Rule
-		public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 		@Mock
 		private Channel out;
 		@Mock
