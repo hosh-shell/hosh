@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Interpreter {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final State state;
 	private final Terminal terminal;
 	private final Channel out;
