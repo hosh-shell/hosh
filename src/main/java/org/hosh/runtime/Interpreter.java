@@ -78,13 +78,17 @@ public class Interpreter {
 		Command command = prepareCommand(statement);
 		List<String> arguments = resolveArguments(statement.getArguments());
 		Future<ExitStatus> producer = executor.submit(() -> {
+			setThreadName(statement);
 			ExitStatus st = command.run(arguments, new UnlinkedChannel(), pipeChannel, err);
 			queue.put(QueueingChannel.POISON_PILL);
 			return st;
 		});
 		Command nextCommand = prepareCommand(statement.getNext());
 		List<String> nextArguments = resolveArguments(statement.getNext().getArguments());
-		Future<ExitStatus> consumer = executor.submit(() -> nextCommand.run(nextArguments, pipeChannel, out, err));
+		Future<ExitStatus> consumer = executor.submit(() -> {
+			setThreadName(statement.getNext());
+			return nextCommand.run(nextArguments, pipeChannel, out, err);
+		});
 		terminal.handle(Signal.INT, signal -> {
 			producer.cancel(true);
 			consumer.cancel(true);
@@ -106,6 +110,12 @@ public class Interpreter {
 			executor.shutdownNow();
 			terminal.handle(Signal.INT, SignalHandler.SIG_DFL);
 		}
+	}
+
+	private void setThreadName(Statement statement) {
+		Thread.currentThread().setName(String.format("Pipeline: command=%s args=%s",
+				statement.getCommand().getClass().getSimpleName(),
+				statement.getArguments()));
 	}
 
 	private static class UnlinkedChannel implements Channel {
