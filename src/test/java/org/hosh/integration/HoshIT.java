@@ -3,12 +3,19 @@ package org.hosh.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.Rule;
@@ -20,74 +27,133 @@ public class HoshIT {
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Test
-	public void interactive() throws Exception {
-		Process java = new ProcessBuilder()
-				.command("java", "-jar", "target/dist/hosh.jar")
-				.redirectErrorStream(true)
-				.start();
-		try (Writer writer = new OutputStreamWriter(java.getOutputStream(), StandardCharsets.UTF_8)) {
-			writer.write("cwd\n");
-			writer.write("exit\n");
-			writer.flush();
-		}
-		int exitCode = java.waitFor();
+	public void interactiveExitSuccess() throws Exception {
+		Process hosh = givenHoshProcess();
+		sendInput(hosh, "exit");
+		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
+	public void interactiveExitFailure() throws Exception {
+		Process hosh = givenHoshProcess();
+		sendInput(hosh, "exit 42");
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(42);
+	}
+
+	@Test
 	public void scriptWithCdAndCwd() throws Exception {
-		File scriptPath = temporaryFolder.newFile("test.hosh");
-		try (FileWriter script = new FileWriter(scriptPath)) {
-			script.write("cd " + temporaryFolder.getRoot().getAbsolutePath() + "\n");
-			script.write("cwd" + "\n");
-			script.flush();
-		}
-		Process java = new ProcessBuilder()
-				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
-				.redirectErrorStream(true)
-				.start();
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
-		String output = bufferedReader.lines().collect(Collectors.joining());
-		int exitCode = java.waitFor();
+		Path scriptPath = givenScript(
+				"cd " + temporaryFolder.getRoot().getAbsolutePath(),
+				"cwd"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
 		assertThat(output).contains(temporaryFolder.getRoot().getAbsolutePath());
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	public void scriptWithEchoEnv() throws Exception {
-		File scriptPath = temporaryFolder.newFile("test.hosh");
-		try (FileWriter script = new FileWriter(scriptPath)) {
-			script.write("echo ${OS_ENV_VARIABLE}\n");
-			script.flush();
-		}
-		ProcessBuilder processBuilder = new ProcessBuilder();
-		processBuilder.environment().put("OS_ENV_VARIABLE", "hello world!");
-		Process java = processBuilder
-				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
-				.redirectErrorStream(true)
-				.start();
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
-		String output = bufferedReader.lines().collect(Collectors.joining());
-		int exitCode = java.waitFor();
+		Path scriptPath = givenScript(
+				"echo ${OS_ENV_VARIABLE}"//
+		);
+		Process hosh = givenHoshProcess(Collections.singletonMap("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
 		assertThat(output).contains("hello world!");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	public void scriptWithUnknownCommand() throws Exception {
-		File scriptPath = temporaryFolder.newFile("test.hosh");
-		try (FileWriter script = new FileWriter(scriptPath)) {
-			script.write("AAAAB" + "\n");
-			script.flush();
-		}
-		Process java = new ProcessBuilder()
-				.command("java", "-jar", "target/dist/hosh.jar", scriptPath.getAbsolutePath())
-				.redirectErrorStream(true)
-				.start();
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(java.getInputStream()));
-		String output = bufferedReader.lines().collect(Collectors.joining("\n"));
-		int exitCode = java.waitFor();
+		Path scriptPath = givenScript(
+				"AAAAB"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
 		assertThat(output).contains("line 1: unknown command AAAAB");
 		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@Test
+	public void scriptWithImplicitExit() throws Exception {
+		Path scriptPath = givenScript(/* empty */);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
+	public void scriptWithExplicitExit() throws Exception {
+		Path scriptPath = givenScript(
+				"exit 1"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@Test
+	public void scriptParsedThenExecuted() throws Exception {
+		Path scriptPath = givenScript(
+				"exit 0",
+				"AAAAB"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		int exitCode = hosh.waitFor();
+		String output = consumeOutput(hosh);
+		assertThat(output).contains("line 2: unknown command AAAAB");
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@Test
+	public void missingScript() throws Exception {
+		Path scriptPath = Paths.get("missing.hosh"); //
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).isEqualTo("unable to load: missing.hosh");
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	// simple test infrastructure
+	private Path givenScript(String... lines) throws IOException {
+		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
+		Files.write(scriptPath, Arrays.asList(lines));
+		return scriptPath;
+	}
+
+	private Process givenHoshProcess(String... args) throws IOException {
+		return givenHoshProcess(Collections.emptyMap(), args);
+	}
+
+	private Process givenHoshProcess(Map<String, String> env, String... args) throws IOException {
+		List<String> cmd = new ArrayList<>();
+		cmd.addAll(Arrays.asList("java", "-jar", "target/dist/hosh.jar"));
+		for (String arg : args) {
+			cmd.add(arg);
+		}
+		ProcessBuilder pb = new ProcessBuilder()
+				.command(cmd)
+				.redirectErrorStream(true);
+		pb.environment().putAll(env);
+		return pb.start();
+	}
+
+	private String consumeOutput(Process hosh) throws IOException {
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(hosh.getInputStream(), StandardCharsets.UTF_8))) {
+			return bufferedReader.lines().collect(Collectors.joining());
+		}
+	}
+
+	private void sendInput(Process hosh, String line) throws IOException {
+		try (Writer writer = new OutputStreamWriter(hosh.getOutputStream(), StandardCharsets.UTF_8)) {
+			writer.write(line + "\n");
+			writer.flush();
+		}
 	}
 }
