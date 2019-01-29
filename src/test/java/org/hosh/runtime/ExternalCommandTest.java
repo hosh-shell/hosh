@@ -38,22 +38,23 @@ public class ExternalCommandTest {
 	private Channel err;
 	@Mock(stubOnly = true)
 	private State state;
-	@Mock
-	private ProcessFactory processFactory;
 	@Mock(stubOnly = true)
 	private Process process;
+	@Mock
+	private ProcessFactory processFactory;
 	private Path executable;
+	private ExternalCommand sut;
 
 	@Before
 	public void setup() throws IOException {
 		executable = folder.newFile().toPath();
+		sut = new ExternalCommand(executable);
+		sut.setProcessFactory(processFactory);
+		sut.setState(state);
 	}
 
 	@Test
 	public void processNoArgs() throws Exception {
-		ExternalCommand sut = new ExternalCommand(executable);
-		sut.setProcessFactory(processFactory);
-		sut.setState(state);
 		given(processFactory.create(any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
@@ -70,9 +71,6 @@ public class ExternalCommandTest {
 
 	@Test
 	public void processWithArgs() throws Exception {
-		ExternalCommand sut = new ExternalCommand(executable);
-		sut.setProcessFactory(processFactory);
-		sut.setState(state);
 		given(processFactory.create(any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
@@ -89,9 +87,6 @@ public class ExternalCommandTest {
 
 	@Test
 	public void processExitsWithError() throws Exception {
-		ExternalCommand sut = new ExternalCommand(executable);
-		sut.setProcessFactory(processFactory);
-		sut.setState(state);
 		given(processFactory.create(any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(1);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
@@ -107,9 +102,6 @@ public class ExternalCommandTest {
 
 	@Test
 	public void processException() throws Exception {
-		ExternalCommand sut = new ExternalCommand(executable);
-		sut.setProcessFactory(processFactory);
-		sut.setState(state);
 		given(processFactory.create(any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willThrow(InterruptedException.class);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
@@ -125,9 +117,6 @@ public class ExternalCommandTest {
 
 	@Test
 	public void processSendRecordsToOut() throws Exception {
-		ExternalCommand sut = new ExternalCommand(executable);
-		sut.setProcessFactory(processFactory);
-		sut.setState(state);
 		given(processFactory.create(any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getInputStream()).willReturn(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
