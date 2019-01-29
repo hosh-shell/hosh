@@ -169,7 +169,13 @@ public class HoshIT {
 
 	private Process givenHoshProcess(Map<String, String> env, String... args) throws IOException {
 		List<String> cmd = new ArrayList<>();
-		cmd.addAll(Arrays.asList("java", "-jar", "target/dist/hosh.jar"));
+		cmd.add("java");
+		ProcessHandle.current().info().arguments().ifPresent(jvmArgs -> {
+			if (jvmArgs[0].contains("jacoco")) {
+				cmd.add(jvmArgs[0]);
+			}
+		});
+		cmd.addAll(Arrays.asList("-jar", "target/dist/hosh.jar"));
 		for (String arg : args) {
 			cmd.add(arg);
 		}
