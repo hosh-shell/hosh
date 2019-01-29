@@ -20,6 +20,7 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,6 +52,13 @@ public class ExternalCommandTest {
 		sut = new ExternalCommand(executable);
 		sut.setProcessFactory(processFactory);
 		sut.setState(state);
+	}
+
+	@After
+	public void after() {
+		// this is needed since a test could set the current thread interrupted
+		// otherwise random failures will be observed during the build
+		Thread.interrupted();
 	}
 
 	@Test
