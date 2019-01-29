@@ -111,6 +111,42 @@ public class HoshIT {
 	}
 
 	@Test
+	public void nonPipelineExternalCommand() throws Exception {
+		Path scriptPath = givenScript(
+				"java --version "//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		int exitCode = hosh.waitFor();
+		String output = consumeOutput(hosh);
+		assertThat(output).contains("Runtime Environment");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
+	public void pipelineWithInternalCommand() throws Exception {
+		Path scriptPath = givenScript(
+				"cwd | count"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		int exitCode = hosh.waitFor();
+		String output = consumeOutput(hosh);
+		assertThat(output).isEqualTo("1");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
+	public void pipelineWithExternalCommand() throws Exception {
+		Path scriptPath = givenScript(
+				"java --version | count"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		int exitCode = hosh.waitFor();
+		String output = consumeOutput(hosh);
+		assertThat(output).isEqualTo("3");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
 	public void missingScript() throws Exception {
 		Path scriptPath = Paths.get("missing.hosh"); //
 		Process hosh = givenHoshProcess(scriptPath.toString());

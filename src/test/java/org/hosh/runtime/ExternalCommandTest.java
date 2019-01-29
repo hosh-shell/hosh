@@ -63,41 +63,46 @@ public class ExternalCommandTest {
 
 	@Test
 	public void processNoArgs() throws Exception {
-		given(processFactory.create(any(), any(), any())).willReturn(process);
+		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
+		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.emptyList(), null, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString()),
 				Paths.get("."),
-				Collections.emptyMap());
+				Collections.emptyMap(),
+				true);
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void processWithArgs() throws Exception {
-		given(processFactory.create(any(), any(), any())).willReturn(process);
+		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
+		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), null, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
-				Collections.emptyMap());
+				Collections.emptyMap(),
+				true);
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void processExitsWithError() throws Exception {
-		given(processFactory.create(any(), any(), any())).willReturn(process);
+		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(1);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
+		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), null, out, err);
@@ -105,33 +110,50 @@ public class ExternalCommandTest {
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
-				Collections.emptyMap());
+				Collections.emptyMap(),
+				true);
 	}
 
 	@Test
 	public void processException() throws Exception {
-		given(processFactory.create(any(), any(), any())).willReturn(process);
+		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willThrow(InterruptedException.class);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
+		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), null, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
-				Collections.emptyMap());
+				Collections.emptyMap(),
+				true);
 		then(err).should().send(any());
 	}
 
 	@Test
 	public void processSendRecordsToOut() throws Exception {
-		given(processFactory.create(any(), any(), any())).willReturn(process);
+		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getInputStream()).willReturn(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
+		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), null, out, err);
 		then(out).should().trySend(Record.of("line", Values.ofText("test")));
 		then(err).shouldHaveZeroInteractions();
+	}
+
+	@Test
+	public void processSendRecordsToErr() throws Exception {
+		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
+		given(process.waitFor()).willReturn(0);
+		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
+		given(process.getErrorStream()).willReturn(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
+		given(state.getCwd()).willReturn(Paths.get("."));
+		given(state.getVariables()).willReturn(Collections.emptyMap());
+		sut.run(Collections.singletonList("file.hosh"), null, out, err);
+		then(err).shouldHaveZeroInteractions();
+		then(out).should().trySend(Record.of("line", Values.ofText("test")));
 	}
 }

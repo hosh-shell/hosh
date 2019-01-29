@@ -2,11 +2,14 @@ package org.hosh.runtime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
@@ -22,11 +25,19 @@ public class ExternalCommand implements Command, StateAware {
 	private final Path command;
 	private ProcessFactory processFactory = new DefaultProcessFactory();
 	private State state;
+	private boolean inheritIo = true;
 
 	public ExternalCommand(Path command) {
 		this.command = command;
 	}
 
+	@Override
+	public void pipeline() {
+		logger.debug("  part of a pipeline");
+		inheritIo = false;
+	}
+
+	@Todo(description = "redirecting err to out, this should be handled better")
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);
@@ -35,21 +46,11 @@ public class ExternalCommand implements Command, StateAware {
 		Path cwd = state.getCwd();
 		logger.debug("executing command {} in directory {}", processArgs, cwd);
 		try {
-			Process process = processFactory.create(processArgs, cwd, state.getVariables());
-			try (BufferedReader reader = new BufferedReader(new java.io.InputStreamReader(process.getInputStream()))) {
-				while (true) {
-					String readLine = reader.readLine();
-					if (readLine == null) {
-						break;
-					}
-					logger.debug("line: {}", readLine);
-					boolean done = out.trySend(Record.of("line", Values.ofText(readLine)));
-					if (done) {
-						break;
-					}
-				}
-			}
+			Process process = processFactory.create(processArgs, cwd, state.getVariables(), inheritIo);
 			int exitCode = process.waitFor();
+			consumeStdout(out, process);
+			consumeStderr(out, process);
+			logger.debug("  exited with {}", exitCode);
 			return ExitStatus.of(exitCode);
 		} catch (IOException e) {
 			err.send(Record.of("error", Values.ofText(e.getMessage())));
@@ -62,12 +63,38 @@ public class ExternalCommand implements Command, StateAware {
 		}
 	}
 
+	private void consumeStdout(Channel out, Process process) throws IOException {
+		consume(out, process.getInputStream());
+	}
+
+	private void consumeStderr(Channel err, Process process) throws IOException {
+		consume(err, process.getErrorStream());
+	}
+
+	private void consume(Channel channel, InputStream inputStream) throws IOException {
+		try (BufferedReader reader = new BufferedReader(new java.io.InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+			while (true) {
+				String readLine = reader.readLine();
+				logger.debug("line: {}", readLine);
+				if (readLine == null) {
+					break;
+				}
+				boolean done = channel.trySend(Record.of("line", Values.ofText(readLine)));
+				if (done) {
+					break;
+				}
+			}
+		}
+	}
+
 	private static class DefaultProcessFactory implements ProcessFactory {
 		@Override
-		public Process create(List<String> args, Path cwd, Map<String, String> env) throws IOException {
+		public Process create(List<String> args, Path cwd, Map<String, String> env, Boolean inheritIo) throws IOException {
 			ProcessBuilder processBuilder = new ProcessBuilder(args)
-					.directory(cwd.toFile())
-					.inheritIO();
+					.directory(cwd.toFile());
+			if (inheritIo) {
+				processBuilder.inheritIO();
+			}
 			processBuilder.environment().putAll(env);
 			return processBuilder.start();
 		}
@@ -80,7 +107,7 @@ public class ExternalCommand implements Command, StateAware {
 
 	// testing aid since we cannot mock ProcessBuilder
 	interface ProcessFactory {
-		Process create(List<String> args, Path cwd, Map<String, String> env) throws IOException;
+		Process create(List<String> args, Path cwd, Map<String, String> env, Boolean inheritIo) throws IOException;
 	}
 
 	public void setProcessFactory(ProcessFactory processFactory) {

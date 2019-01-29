@@ -67,7 +67,7 @@ public class Interpreter {
 		return command.run(arguments, new UnlinkedChannel(), out, err);
 	}
 
-	@Todo(description = "move as tunable parameter? via state or env var")
+	@Todo(description = "this should be tunable parameter?")
 	private static final int QUEUE_CAPACITY = 5;
 
 	@Todo(description = "error channel is unbuffered by now, waiting for implementation of 2>&1")
@@ -76,6 +76,7 @@ public class Interpreter {
 		Channel pipeChannel = new QueueingChannel(queue);
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		Command command = prepareCommand(statement);
+		command.pipeline();
 		List<String> arguments = resolveArguments(statement.getArguments());
 		Future<ExitStatus> producer = executor.submit(() -> {
 			setThreadName(statement);
@@ -84,6 +85,7 @@ public class Interpreter {
 			return st;
 		});
 		Command nextCommand = prepareCommand(statement.getNext());
+		nextCommand.pipeline();
 		List<String> nextArguments = resolveArguments(statement.getNext().getArguments());
 		Future<ExitStatus> consumer = executor.submit(() -> {
 			setThreadName(statement.getNext());
