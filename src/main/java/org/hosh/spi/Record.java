@@ -138,7 +138,7 @@ public interface Record {
 		private final Map<String, Value> data;
 
 		private Generic() {
-			this(new LinkedHashMap<>(2));
+			this(new LinkedHashMap<>(0));
 		}
 
 		private Generic(Map<String, Value> data) {
