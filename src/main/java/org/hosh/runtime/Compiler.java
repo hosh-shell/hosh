@@ -12,11 +12,8 @@ import org.hosh.antlr4.HoshParser.InvocationContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrapperContext;
-import org.hosh.doc.Todo;
-import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
-import org.hosh.spi.ExitStatus;
 
 public class Compiler {
 	private final CommandResolver commandResolver;
@@ -87,12 +84,11 @@ public class Compiler {
 		if (!(command instanceof CommandWrapper)) {
 			throw new CompileError("line " + token.getLine() + ": not a command wrapper " + commandName);
 		}
-		@SuppressWarnings("unchecked")
-		CommandWrapper<Object> commandWrapper = (CommandWrapper<Object>) command;
+		CommandWrapper<?> commandWrapper = (CommandWrapper<?>) command;
 		Statement nestedStatement = compileSimpleCommand(ctx.simple());
 		List<String> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
-		statement.setCommand(new GeneratedCommandWrapper(nestedStatement, commandWrapper));
+		statement.setCommand(new DefaultCommandWrapper<>(nestedStatement, commandWrapper));
 		statement.setArguments(commandArgs);
 		return statement;
 	}
@@ -125,36 +121,6 @@ public class Compiler {
 	private String dropQuotes(Token token) {
 		String text = token.getText();
 		return text.substring(1, text.length() - 1);
-	}
-
-	@Todo(description = "primitive support for closures, enhance later")
-	public static final class GeneratedCommandWrapper implements Command {
-		private final Statement nestedStatement;
-		private final CommandWrapper<Object> commandWrapper;
-
-		private GeneratedCommandWrapper(Statement nestedStatement, CommandWrapper<Object> commandWrapper) {
-			this.nestedStatement = nestedStatement;
-			this.commandWrapper = commandWrapper;
-		}
-
-		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			Object resource = commandWrapper.before(args, out, err);
-			try {
-				return nestedStatement.command.run(nestedStatement.arguments, null, out, err);
-			} finally {
-				commandWrapper.after(resource, out, err);
-			}
-		}
-
-		public Statement getNestedStatement() {
-			return nestedStatement;
-		}
-
-		@Override
-		public String toString() {
-			return String.format("GeneratedCommandWrapper[nested=%s,wrapper=%s]", nestedStatement, commandWrapper);
-		}
 	}
 
 	public static class Program {

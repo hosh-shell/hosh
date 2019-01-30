@@ -12,7 +12,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Todo;
-import org.hosh.runtime.Compiler.GeneratedCommandWrapper;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
@@ -191,7 +190,6 @@ public class Interpreter {
 
 	private Command prepareCommand(Statement statement) {
 		Command command = statement.getCommand();
-		injectDepsIntoWrapper(command);
 		injectDeps(command);
 		return command;
 	}
@@ -224,12 +222,6 @@ public class Interpreter {
 	private void store(ExitStatus exitStatus) {
 		Objects.requireNonNull(exitStatus, "exit status cannot be null");
 		state.getVariables().put("EXIT_STATUS", String.valueOf(exitStatus.value()));
-	}
-
-	private void injectDepsIntoWrapper(Command command) {
-		if (command instanceof GeneratedCommandWrapper) {
-			injectDeps(((GeneratedCommandWrapper) command).getNestedStatement().getCommand());
-		}
 	}
 
 	private void injectDeps(Command command) {

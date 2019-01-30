@@ -144,12 +144,12 @@ public class SystemModule implements Module {
 
 	public static class WithTime implements CommandWrapper<Long> {
 		@Override
-		public Long before(List<String> args, Channel out, Channel err) {
+		public Long before(List<String> args, Channel in, Channel out, Channel err) {
 			return System.nanoTime();
 		}
 
 		@Override
-		public void after(Long startNanos, Channel out, Channel err) {
+		public void after(Long startNanos, Channel in, Channel out, Channel err) {
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
 			out.send(Record.of("message", Values.ofText("took " + duration)));
