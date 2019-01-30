@@ -32,17 +32,24 @@ public class Compiler {
 		List<Statement> statements = new ArrayList<>();
 		for (StmtContext stmtContext : programContext.stmt()) {
 			Statement statement = compileStatement(stmtContext);
-			Statement next = null;
-			if (stmtContext.getChildCount() == 3) { // pipeline
-				String pipe = stmtContext.getChild(1).getText();
-				assert pipe.equals("|");
-				next = compileStatement(stmtContext.stmt());
+			if (isPipeline(stmtContext)) {
+				compilePipeline(stmtContext, statement);
 			}
-			statement.setNext(next);
 			statements.add(statement);
 		}
 		program.setStatements(statements);
 		return program;
+	}
+
+	private void compilePipeline(StmtContext stmtContext, Statement statement) {
+		String pipe = stmtContext.getChild(1).getText();
+		assert pipe.equals("|");
+		Statement next = compileStatement(stmtContext.stmt());
+		statement.setNext(next);
+	}
+
+	private boolean isPipeline(StmtContext stmtContext) {
+		return stmtContext.getChildCount() == 3;
 	}
 
 	private Statement compileStatement(StmtContext stmt) {
