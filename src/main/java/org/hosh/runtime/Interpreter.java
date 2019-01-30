@@ -225,15 +225,7 @@ public class Interpreter {
 	}
 
 	private void injectDeps(Command command) {
-		downCast(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
-		downCast(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
-	}
-
-	private static <T> Optional<T> downCast(Object object, Class<T> requiredClass) {
-		if (requiredClass.isInstance(object)) {
-			return Optional.of(requiredClass.cast(object));
-		} else {
-			return Optional.empty();
-		}
+		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
+		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 	}
 }

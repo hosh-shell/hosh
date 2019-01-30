@@ -38,17 +38,11 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 
 	@Override
 	public void setState(State state) {
-		Command command = nestedStatement.getCommand();
-		if (command instanceof StateAware) {
-			((StateAware) command).setState(state);
-		}
+		nestedStatement.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 	}
 
 	@Override
 	public void setTerminal(Terminal terminal) {
-		Command command = nestedStatement.getCommand();
-		if (command instanceof TerminalAware) {
-			((TerminalAware) command).setTerminal(terminal);
-		}
+		nestedStatement.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 	}
 }
