@@ -27,7 +27,7 @@ public class CompilerTest {
 	private Command anotherCommand;
 	@Mock(stubOnly = true)
 	private CommandWrapper<?> commandWrapper;
-	@Mock
+	@Mock(stubOnly = true)
 	private CommandResolver commandResolver;
 	@InjectMocks
 	private Compiler sut;
@@ -113,5 +113,23 @@ public class CompilerTest {
 		List<Statement> statements = program.getStatements();
 		assertThat(statements.get(0).getCommand()).isSameAs(command);
 		assertThat(statements.get(0).getArguments()).containsExactly("file with spaces");
+	}
+
+	@Test
+	public void commandUsedAsCommandWrapper() {
+		doReturn(command).when(commandResolver).tryResolve("ls");
+		doReturn(anotherCommand).when(commandResolver).tryResolve("grep");
+		assertThatThrownBy(() -> sut.compile("ls { grep pattern } "))
+				.isInstanceOf(CompileError.class)
+				.hasMessage("line 1: 'ls' is not a command wrapper");
+	}
+
+	@Test
+	public void usingCommandAsWrapper() {
+		doReturn(null).when(commandResolver).tryResolve("ls");
+		doReturn(anotherCommand).when(commandResolver).tryResolve("grep");
+		assertThatThrownBy(() -> sut.compile("ls { grep pattern } "))
+				.isInstanceOf(CompileError.class)
+				.hasMessage("line 1: 'ls' unknown command wrapper");
 	}
 }

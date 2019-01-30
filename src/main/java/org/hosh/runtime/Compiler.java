@@ -79,10 +79,10 @@ public class Compiler {
 		String commandName = token.getText();
 		Command command = commandResolver.tryResolve(commandName);
 		if (command == null) {
-			throw new CompileError("line " + token.getLine() + ": unknown command wrapper " + commandName);
+			throw new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName));
 		}
 		if (!(command instanceof CommandWrapper)) {
-			throw new CompileError("line " + token.getLine() + ": not a command wrapper " + commandName);
+			throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));
 		}
 		CommandWrapper<?> commandWrapper = (CommandWrapper<?>) command;
 		Statement nestedStatement = compileSimpleCommand(ctx.simple());
