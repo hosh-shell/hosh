@@ -11,6 +11,7 @@ import org.hosh.modules.SystemModule.Echo;
 import org.hosh.modules.SystemModule.Env;
 import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
+import org.hosh.modules.SystemModule.ProcessList;
 import org.hosh.modules.SystemModule.Sleep;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -35,6 +36,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.ExitTest.class,
 		SystemModuleTest.HelpTest.class,
 		SystemModuleTest.SleepTest.class,
+		SystemModuleTest.ProcessListTest.class
 })
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -228,6 +230,30 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList("a", "b"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class ProcessListTest {
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private ProcessList sut;
+
+		@Test
+		public void noArgs() {
+			sut.run(Arrays.asList(), null, out, err);
+			then(out).should(Mockito.atLeastOnce()).send(Mockito.any());
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void oneArgNumber() {
+			sut.run(Arrays.asList("1"), null, out, err);
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expecting zero arguments")));
 		}
 	}
 }
