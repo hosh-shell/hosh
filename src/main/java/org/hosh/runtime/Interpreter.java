@@ -178,7 +178,7 @@ public class Interpreter {
 		@Override
 		public boolean trySend(Record record) {
 			if (done) {
-				logger.debug("record {} *not sent downstream", record);
+				logger.debug("record {} not sent downstream", record);
 				return true;
 			} else {
 				send(record);
