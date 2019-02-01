@@ -20,6 +20,7 @@ import org.hosh.spi.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Todo(description = "this module has a bloody wrong name")
 public class TextModule implements Module {
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
