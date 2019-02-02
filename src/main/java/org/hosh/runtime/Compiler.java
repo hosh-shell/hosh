@@ -7,11 +7,10 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.Token;
 import org.hosh.antlr4.HoshParser;
 import org.hosh.antlr4.HoshParser.ArgContext;
-import org.hosh.antlr4.HoshParser.CommandContext;
 import org.hosh.antlr4.HoshParser.InvocationContext;
-import org.hosh.antlr4.HoshParser.SimpleContext;
+import org.hosh.antlr4.HoshParser.PipelineContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
-import org.hosh.antlr4.HoshParser.WrapperContext;
+import org.hosh.antlr4.HoshParser.WrappedContext;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 
@@ -29,52 +28,47 @@ public class Compiler {
 		List<Statement> statements = new ArrayList<>();
 		for (StmtContext stmtContext : programContext.stmt()) {
 			Statement statement = compileStatement(stmtContext);
-			if (isPipeline(stmtContext)) {
-				compilePipeline(stmtContext, statement);
-			}
 			statements.add(statement);
 		}
 		program.setStatements(statements);
 		return program;
 	}
 
-	private void compilePipeline(StmtContext stmtContext, Statement statement) {
-		String pipe = stmtContext.getChild(1).getText();
-		assert pipe.equals("|");
-		Statement next = compileStatement(stmtContext.stmt());
-		statement.setNext(next);
-	}
-
-	private boolean isPipeline(StmtContext stmtContext) {
-		return stmtContext.getChildCount() == 3;
-	}
-
-	private Statement compileStatement(StmtContext stmt) {
-		CommandContext command = stmt.command();
-		if (command.simple() != null) {
-			return compileSimpleCommand(command.simple());
+	private Statement compileStatement(StmtContext ctx) {
+		if (ctx.single() != null) {
+			return compileInvocation(ctx.single().invocation());
 		}
-		if (command.wrapper() != null) {
-			return compileWrappedCommand(command.wrapper());
+		if (ctx.wrapped() != null) {
+			return compileWrappedCommand(ctx.wrapped());
+		}
+		if (ctx.pipeline() != null) {
+			return compilePipeline(ctx.pipeline());
 		}
 		throw new InternalBug();
 	}
 
-	private Statement compileSimpleCommand(SimpleContext simple) {
-		Token token = simple.invocation().ID().getSymbol();
+	private Statement compilePipeline(PipelineContext ctx) {
+		Statement producer = compileInvocation(ctx.invocation());
+		Statement consumer = compileStatement(ctx.stmt());
+		producer.setNext(consumer);
+		return producer;
+	}
+
+	private Statement compileInvocation(InvocationContext ctx) {
+		Token token = ctx.ID().getSymbol();
 		String commandName = token.getText();
 		Command command = commandResolver.tryResolve(commandName);
 		if (command == null) {
-			throw new CompileError("line " + token.getLine() + ": unknown command " + commandName);
+			throw new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName));
 		}
-		List<String> commandArgs = compileArguments(simple.invocation());
+		List<String> commandArgs = compileArguments(ctx);
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
 		return statement;
 	}
 
-	private Statement compileWrappedCommand(WrapperContext ctx) {
+	private Statement compileWrappedCommand(WrappedContext ctx) {
 		Token token = ctx.invocation().ID().getSymbol();
 		String commandName = token.getText();
 		Command command = commandResolver.tryResolve(commandName);
@@ -85,7 +79,7 @@ public class Compiler {
 			throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));
 		}
 		CommandWrapper<?> commandWrapper = (CommandWrapper<?>) command;
-		Statement nestedStatement = compileSimpleCommand(ctx.simple());
+		Statement nestedStatement = compileStatement(ctx.stmt());
 		List<String> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
 		statement.setCommand(new DefaultCommandWrapper<>(nestedStatement, commandWrapper));

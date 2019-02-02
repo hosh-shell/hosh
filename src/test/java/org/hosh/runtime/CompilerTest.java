@@ -33,10 +33,10 @@ public class CompilerTest {
 	private Compiler sut;
 
 	@Test
-	public void commandWithPipeline() {
+	public void pipelineOfCommandsWithoutArguments() {
 		doReturn(command).when(commandResolver).tryResolve("ls");
-		doReturn(anotherCommand).when(commandResolver).tryResolve("grep");
-		Program program = sut.compile("ls | grep pattern");
+		doReturn(anotherCommand).when(commandResolver).tryResolve("count");
+		Program program = sut.compile("ls | count");
 		assertThat(program.getStatements()).hasSize(1);
 		List<Statement> statements = program.getStatements();
 		assertThat(statements).hasSize(1);
@@ -46,7 +46,23 @@ public class CompilerTest {
 		Statement next = statement.getNext();
 		assertThat(next).isNotNull();
 		assertThat(next.getCommand()).isSameAs(anotherCommand);
-		assertThat(next.getArguments()).containsExactly("pattern");
+	}
+
+	@Test
+	public void pipelineOfCommandsWithArguments() {
+		doReturn(command).when(commandResolver).tryResolve("ls");
+		doReturn(anotherCommand).when(commandResolver).tryResolve("grep");
+		Program program = sut.compile("ls /home | grep /regex/");
+		assertThat(program.getStatements()).hasSize(1);
+		List<Statement> statements = program.getStatements();
+		assertThat(statements).hasSize(1);
+		Statement statement = statements.get(0);
+		assertThat(statement.getCommand()).isSameAs(command);
+		assertThat(statement.getArguments()).containsExactly("/home");
+		Statement next = statement.getNext();
+		assertThat(next).isNotNull();
+		assertThat(next.getCommand()).isSameAs(anotherCommand);
+		assertThat(next.getArguments()).containsExactly("/regex/");
 	}
 
 	@Test
@@ -92,9 +108,9 @@ public class CompilerTest {
 	@Test
 	public void commandNotRegistered() {
 		given(commandResolver.tryResolve("env")).willReturn(command);
-		assertThatThrownBy(() -> sut.compile("env\nenv\nenv2"))
+		assertThatThrownBy(() -> sut.compile("env | env2"))
 				.isInstanceOf(CompileError.class)
-				.hasMessage("line 3: unknown command env2");
+				.hasMessage("line 1: 'env2' unknown command");
 	}
 
 	@Test
@@ -102,6 +118,14 @@ public class CompilerTest {
 		willReturn(commandWrapper).given(commandResolver).tryResolve("withTime");
 		willReturn(command).given(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime { git push }");
+		assertThat(program.getStatements()).hasSize(1);
+	}
+
+	@Test
+	public void nestedWrappedCommands() {
+		willReturn(commandWrapper).given(commandResolver).tryResolve("withTime");
+		willReturn(command).given(commandResolver).tryResolve("git");
+		Program program = sut.compile("withTime { withTime { git push } }");
 		assertThat(program.getStatements()).hasSize(1);
 	}
 
@@ -128,7 +152,7 @@ public class CompilerTest {
 	public void usingCommandAsWrapper() {
 		doReturn(null).when(commandResolver).tryResolve("ls");
 		doReturn(anotherCommand).when(commandResolver).tryResolve("grep");
-		assertThatThrownBy(() -> sut.compile("ls { grep pattern } "))
+		assertThatThrownBy(() -> sut.compile("ls { grep pattern }"))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'ls' unknown command wrapper");
 	}

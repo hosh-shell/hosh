@@ -5,22 +5,22 @@ program
     ;
 
 stmt
-    : command ( NEWLINE | EOF )
-    | command '|' stmt
+    : pipeline NEWLINE?
+    | wrapped NEWLINE?
+    | single NEWLINE?
     ;
 
-command
-	: simple
-	| wrapper
-	;
+pipeline
+    : invocation '|' stmt
+    ;
 
-simple
-	: invocation
-	;
+wrapped
+    : invocation '{' stmt '}'
+    ;
 
-wrapper
-	: invocation '{' simple '}'
-	;
+single
+    : invocation
+    ;
 
 invocation
 	: ID ( arg )*

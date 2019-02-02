@@ -1,7 +1,6 @@
 package org.hosh.runtime;
 
 import org.hosh.runtime.Parser.ParseError;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,17 +27,13 @@ public class ParserTest {
 		sut.parse("cd c:/temp\n");
 		sut.parse("${EXECUTABLE}");
 		sut.parse("cd ${DIR}");
-		sut.parse("withTime { git push }");
-		sut.parse("withLock /tmp/push.lock { git push }");
 		sut.parse("vim 'filename with spaces'");
 		sut.parse("vim \"filename with spaces\"");
 		sut.parse("git commit -am \"commit message\"");
-	}
-
-	@Ignore("recursive wrapped commands still not allowed")
-	@Test
-	public void recursiveWrappedCommands() {
+		sut.parse("withTime { git push }");
+		sut.parse("withLock /tmp/push.lock { git push }");
 		sut.parse("withLock /tmp/push.lock { git push\n git push --tags\n }");
+		sut.parse("withTime { withLock /tmp/push.lock { git push } }");
 	}
 
 	@Test
@@ -64,6 +59,7 @@ public class ParserTest {
 		sut.parse("env | grep /regexp/");
 		sut.parse("cat file.txt | grep /regexp/");
 		sut.parse("cat file.txt | grep /regexp/ | wc -l");
+		sut.parse("withTime { cat file.txt | grep /regexp/ | wc -l }");
 	}
 
 	@Test

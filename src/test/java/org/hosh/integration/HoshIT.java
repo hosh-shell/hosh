@@ -75,13 +75,15 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).contains("line 1: unknown command AAAAB");
+		assertThat(output).contains("line 1: 'AAAAB' unknown command");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	public void scriptWithImplicitExit() throws Exception {
-		Path scriptPath = givenScript(/* empty */);
+		Path scriptPath = givenScript(
+				"echo hello"//
+		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
@@ -106,7 +108,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
 		String output = consumeOutput(hosh);
-		assertThat(output).contains("line 2: unknown command AAAAB");
+		assertThat(output).contains("line 2: 'AAAAB' unknown command");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
@@ -148,7 +150,7 @@ public class HoshIT {
 
 	@Test
 	public void missingScript() throws Exception {
-		Path scriptPath = Paths.get("missing.hosh"); //
+		Path scriptPath = Paths.get("missing.hosh");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
