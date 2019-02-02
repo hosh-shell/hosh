@@ -33,10 +33,7 @@ public class PipelineCommandTest {
 	@Mock
 	private Command command2;
 
-	@Test
-	public void happyPath() {
-		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+	private PipelineCommand setupSut() {
 		Statement producer = new Statement();
 		producer.setCommand(command1);
 		producer.setArguments(Collections.emptyList());
@@ -45,7 +42,51 @@ public class PipelineCommandTest {
 		consumer.setArguments(Collections.emptyList());
 		PipelineCommand sut = new PipelineCommand(List.of(producer, consumer));
 		sut.setTerminal(terminal);
+		return sut;
+	}
+
+	@Test
+	public void producerAndConsumerSuccess() {
+		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
+	}
+
+	@Test
+	public void producerFailure() {
+		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
+		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		PipelineCommand sut = setupSut();
+		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		assertThat(exitStatus.isSuccess()).isEqualTo(false);
+	}
+
+	@Test
+	public void consumerFailure() {
+		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
+		PipelineCommand sut = setupSut();
+		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		assertThat(exitStatus.isSuccess()).isEqualTo(false);
+	}
+
+	@Test
+	public void producerInterrupted() {
+		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willThrow(NullPointerException.class);
+		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		PipelineCommand sut = setupSut();
+		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		assertThat(exitStatus.isSuccess()).isEqualTo(false);
+	}
+
+	@Test
+	public void consumerInterrupted() {
+		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willThrow(NullPointerException.class);
+		PipelineCommand sut = setupSut();
+		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 }

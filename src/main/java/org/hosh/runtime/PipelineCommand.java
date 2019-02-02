@@ -90,14 +90,11 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	private Future<ExitStatus> prepareProducer(Channel in, Channel out, Channel err, ExecutorService executor, BlockingQueue<Record> queue) {
 		return executor.submit(() -> {
 			setThreadName(statements.get(0));
-			logger.debug("producer started");
 			List<String> arguments = statements.get(0).getArguments();
 			Command command = statements.get(0).getCommand();
 			command.pipeline();
-			logger.debug("producer started");
 			ExitStatus st = command.run(arguments, in, out, err);
 			queue.put(QueueingChannel.POISON_PILL);
-			logger.debug("producer finished");
 			return st;
 		});
 	}
@@ -105,14 +102,11 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	private Future<ExitStatus> prepareConsumer(Channel in, Channel out, Channel err, ExecutorService executor) {
 		return executor.submit(() -> {
 			setThreadName(statements.get(1));
-			logger.debug("consumer started");
 			Command command = statements.get(1).getCommand();
 			command.pipeline();
 			List<String> arguments = statements.get(1).getArguments();
 			try {
-				ExitStatus exitStatus = command.run(arguments, in, out, err);
-				logger.debug("consumer stopped");
-				return exitStatus;
+				return command.run(arguments, in, out, err);
 			} finally {
 				consumeAnyRemainingRecord(in);
 			}
