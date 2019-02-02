@@ -156,7 +156,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expected 1 parameters")));
+				err.send(Record.of("error", Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
 			}
 			int drop = Integer.parseInt(args.get(0));
