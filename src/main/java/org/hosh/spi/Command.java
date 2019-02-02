@@ -20,7 +20,7 @@ public interface Command {
 	}
 
 	@Experimental(description = "to inform the command that is a part of pipeline; "
-			+ "this implies that Hosh should register command class and create new instance from scrarch")
+			+ "this works because it is needed only by ExternalCommand and that is never shared (i.e. new instance)")
 	default void pipeline() {
 	}
 }

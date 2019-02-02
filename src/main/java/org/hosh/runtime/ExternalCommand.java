@@ -75,10 +75,10 @@ public class ExternalCommand implements Command, StateAware {
 		try (BufferedReader reader = new BufferedReader(new java.io.InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 			while (true) {
 				String readLine = reader.readLine();
-				logger.debug("line: {}", readLine);
 				if (readLine == null) {
 					break;
 				}
+				logger.debug("line: {}", readLine);
 				boolean done = channel.trySend(Record.of("line", Values.ofText(readLine)));
 				if (done) {
 					break;

@@ -2,30 +2,17 @@ package org.hosh.runtime;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
-import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
-import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.Terminal.Signal;
-import org.jline.terminal.Terminal.SignalHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Interpreter {
 	private final State state;
@@ -45,147 +32,25 @@ public class Interpreter {
 		for (Statement statement : program.getStatements()) {
 			exitStatus = execute(statement);
 			store(exitStatus);
-			if (state.isExit() || exitStatus.value() != 0) {
+			if (userRequestedExit() || lastCommandFailed(exitStatus)) {
 				break;
 			}
 		}
 		return exitStatus;
 	}
 
-	private ExitStatus execute(Statement statement) {
-		if (statement.getNext() == null) {
-			return runStandaloneStatement(statement);
-		} else {
-			return runPipelinedStatement(statement);
-		}
+	private boolean lastCommandFailed(ExitStatus exitStatus) {
+		return exitStatus.value() != 0;
 	}
 
-	private ExitStatus runStandaloneStatement(Statement statement) {
+	private boolean userRequestedExit() {
+		return state.isExit();
+	}
+
+	private ExitStatus execute(Statement statement) {
 		Command command = prepareCommand(statement);
 		List<String> arguments = resolveArguments(statement.getArguments());
 		return command.run(arguments, new UnlinkedChannel(), out, err);
-	}
-
-	@Todo(description = "this should be tunable parameter?")
-	private static final int QUEUE_CAPACITY = 5;
-
-	@Todo(description = "error channel is unbuffered by now, waiting for implementation of 2>&1")
-	private ExitStatus runPipelinedStatement(Statement statement) {
-		BlockingQueue<Record> queue = new LinkedBlockingQueue<>(QUEUE_CAPACITY);
-		Channel pipeChannel = new QueueingChannel(queue);
-		ExecutorService executor = Executors.newFixedThreadPool(2);
-		Command command = prepareCommand(statement);
-		command.pipeline();
-		List<String> arguments = resolveArguments(statement.getArguments());
-		Future<ExitStatus> producer = executor.submit(() -> {
-			setThreadName(statement);
-			ExitStatus st = command.run(arguments, new UnlinkedChannel(), pipeChannel, err);
-			queue.put(QueueingChannel.POISON_PILL);
-			return st;
-		});
-		Command nextCommand = prepareCommand(statement.getNext());
-		nextCommand.pipeline();
-		List<String> nextArguments = resolveArguments(statement.getNext().getArguments());
-		Future<ExitStatus> consumer = executor.submit(() -> {
-			setThreadName(statement.getNext());
-			return nextCommand.run(nextArguments, pipeChannel, out, err);
-		});
-		terminal.handle(Signal.INT, signal -> {
-			producer.cancel(true);
-			consumer.cancel(true);
-		});
-		try {
-			ExitStatus producerExitStatus = producer.get();
-			ExitStatus consumerExitStatus = consumer.get();
-			if (producerExitStatus.isSuccess() && consumerExitStatus.isSuccess()) {
-				return ExitStatus.success();
-			} else {
-				return ExitStatus.error();
-			}
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			return ExitStatus.error();
-		} catch (ExecutionException e) {
-			return ExitStatus.error();
-		} finally {
-			executor.shutdownNow();
-			terminal.handle(Signal.INT, SignalHandler.SIG_DFL);
-		}
-	}
-
-	private void setThreadName(Statement statement) {
-		Thread.currentThread().setName(String.format("Pipeline: command=%s args=%s",
-				statement.getCommand().getClass().getSimpleName(),
-				statement.getArguments()));
-	}
-
-	private static class UnlinkedChannel implements Channel {
-		@Override
-		public Optional<Record> recv() {
-			throw new UnsupportedOperationException("cannot read from this channel");
-		}
-
-		@Override
-		public void send(Record record) {
-			throw new UnsupportedOperationException("cannot write to this channel");
-		}
-	}
-
-	@Todo(description = "improve InterruptedException handling")
-	private static class QueueingChannel implements Channel {
-		public static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
-		private final Logger logger = LoggerFactory.getLogger(getClass());
-		private final BlockingQueue<Record> queue;
-		private volatile boolean done = false;
-
-		public QueueingChannel(BlockingQueue<Record> queue) {
-			this.queue = queue;
-		}
-
-		@Override
-		public Optional<Record> recv() {
-			try {
-				logger.debug("waiting for record... ");
-				Record record = queue.take();
-				if (POISON_PILL.equals(record)) {
-					logger.debug("got POISON_PILL... ");
-					return Optional.empty();
-				}
-				logger.debug("got record {}", record);
-				return Optional.ofNullable(record);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return Optional.empty();
-			}
-		}
-
-		@Override
-		public void send(Record record) {
-			logger.debug("sent record {}", record);
-			try {
-				queue.put(record);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-
-		@Override
-		public void requestStop() {
-			done = true;
-			logger.debug("stop requested, done={}", done);
-		}
-
-		@Override
-		public boolean trySend(Record record) {
-			if (done) {
-				logger.debug("record {} not sent downstream", record);
-				return true;
-			} else {
-				send(record);
-				logger.debug("record {} sent downstream", record);
-				return false;
-			}
-		}
 	}
 
 	private Command prepareCommand(Statement statement) {

@@ -14,12 +14,12 @@ public interface Channel {
 		return Optional.empty();
 	}
 
-	@Experimental(description = "downstream command can signal upstream to stop producing items")
+	@Experimental(description = "consumer command can signal producer to halt")
 	default void requestStop() {
 		// by default it is ignored
 	}
 
-	@Experimental(description = "upstream should use this method to 'nice' and stop producing items")
+	@Experimental(description = "producer should use this method to exit as soon as possible after a consumer called requestStop")
 	default boolean trySend(Record record) {
 		// by default send everything
 		send(record);

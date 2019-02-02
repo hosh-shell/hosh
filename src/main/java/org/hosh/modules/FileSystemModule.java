@@ -68,6 +68,7 @@ public class FileSystemModule implements Module {
 						long size = Files.size(path);
 						entry = entry.append("size", Values.ofHumanizedSize(size));
 					}
+					logger.debug("  entry {}", entry);
 					out.send(entry);
 				}
 				return ExitStatus.success();

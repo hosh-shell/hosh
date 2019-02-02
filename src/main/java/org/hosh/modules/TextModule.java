@@ -144,22 +144,10 @@ public class TextModule implements Module {
 					take--;
 				} else {
 					in.requestStop();
-					consumeAnyRemainingRecord(in);
 					break;
 				}
 			}
 			return ExitStatus.success();
-		}
-
-		// let the producer to stop, otherwise it could be blocked
-		// during put() in the queue
-		private void consumeAnyRemainingRecord(Channel in) {
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-			}
 		}
 	}
 

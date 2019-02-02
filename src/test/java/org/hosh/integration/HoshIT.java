@@ -158,6 +158,18 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
+	@Test
+	public void pipelineExpandVariables() throws Exception {
+		Path scriptPath = givenScript(
+				"echo ${OS_ENV_VARIABLE} | count"//
+		);
+		Process hosh = givenHoshProcess(Collections.singletonMap("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).contains("1");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();

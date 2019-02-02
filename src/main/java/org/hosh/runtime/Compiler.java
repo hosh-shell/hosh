@@ -1,6 +1,8 @@
 package org.hosh.runtime;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +13,7 @@ import org.hosh.antlr4.HoshParser.InvocationContext;
 import org.hosh.antlr4.HoshParser.PipelineContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 
@@ -50,8 +53,10 @@ public class Compiler {
 	private Statement compilePipeline(PipelineContext ctx) {
 		Statement producer = compileInvocation(ctx.invocation());
 		Statement consumer = compileStatement(ctx.stmt());
-		producer.setNext(consumer);
-		return producer;
+		Statement pipeline = new Statement();
+		pipeline.setCommand(new PipelineCommand(Arrays.asList(producer, consumer)));
+		pipeline.setArguments(Collections.emptyList());
+		return pipeline;
 	}
 
 	private Statement compileInvocation(InvocationContext ctx) {
@@ -134,10 +139,10 @@ public class Compiler {
 		}
 	}
 
+	@Todo(description = "rename to invocation or something different from statement")
 	public static class Statement {
 		private Command command;
 		private List<String> arguments;
-		private Statement next; // not null if part of a pipeline
 
 		public void setCommand(Command command) {
 			this.command = command;
@@ -155,17 +160,9 @@ public class Compiler {
 			this.arguments = arguments;
 		}
 
-		public void setNext(Statement next) {
-			this.next = next;
-		}
-
-		public Statement getNext() {
-			return next;
-		}
-
 		@Override
 		public String toString() {
-			return String.format("Statement[class=%s,arguments=%s,pipe=%s]", command.getClass().getCanonicalName(), arguments, next);
+			return String.format("Statement[class=%s,arguments=%s]", command.getClass().getCanonicalName(), arguments);
 		}
 	}
 

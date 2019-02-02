@@ -118,8 +118,6 @@ public class ExternalCommandTest {
 	public void processException() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willThrow(InterruptedException.class);
-		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
-		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), null, out, err);
