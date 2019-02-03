@@ -1,7 +1,6 @@
 package org.hosh.runtime;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -55,7 +54,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		BlockingQueue<Record> queue = new LinkedBlockingQueue<>(10);
-		QueueingChannel pipeChannel = new QueueingChannel(queue);
+		PipeChannel pipeChannel = new PipeChannel(queue);
 		Future<ExitStatus> producer = prepareProducer(new UnlinkedChannel(), pipeChannel, err, executor);
 		Future<ExitStatus> consumer = prepareConsumer(pipeChannel, out, err, executor);
 		try {
@@ -104,19 +103,19 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		}
 	}
 
-	private Future<ExitStatus> prepareProducer(Channel in, QueueingChannel out, Channel err, ExecutorService executor) {
+	private Future<ExitStatus> prepareProducer(Channel in, PipeChannel out, Channel err, ExecutorService executor) {
 		return executor.submit(() -> {
 			setThreadName(statements.get(0));
 			List<String> arguments = statements.get(0).getArguments();
 			Command command = statements.get(0).getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline());
 			ExitStatus st = command.run(arguments, in, out, err);
-			out.sendPoisonPill();
+			out.stopConsumer();
 			return st;
 		});
 	}
 
-	private Future<ExitStatus> prepareConsumer(QueueingChannel in, Channel out, Channel err, ExecutorService executor) {
+	private Future<ExitStatus> prepareConsumer(PipeChannel in, Channel out, Channel err, ExecutorService executor) {
 		return executor.submit(() -> {
 			setThreadName(statements.get(1));
 			Command command = statements.get(1).getCommand();
@@ -134,83 +133,5 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		Thread.currentThread().setName(String.format("Pipeline/command='%s %s'",
 				statement.getCommand().getClass().getSimpleName(),
 				String.join(" ", statement.getArguments())));
-	}
-
-	@Todo(description = "improve InterruptedException handling")
-	private static class QueueingChannel implements Channel {
-		private static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
-		private final Logger logger = LoggerFactory.getLogger(getClass());
-		private final BlockingQueue<Record> queue;
-		private volatile boolean done = false;
-
-		public QueueingChannel(BlockingQueue<Record> queue) {
-			this.queue = queue;
-		}
-
-		@Override
-		public Optional<Record> recv() {
-			try {
-				if (done) {
-					return Optional.empty();
-				}
-				logger.trace("waiting for record... ");
-				Record record = queue.take();
-				if (POISON_PILL.equals(record)) {
-					logger.trace("got POISON_PILL... ");
-					done = true;
-					return Optional.empty();
-				}
-				logger.trace("got record {}", record);
-				return Optional.ofNullable(record);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return Optional.empty();
-			}
-		}
-
-		@Override
-		public void send(Record record) {
-			logger.trace("sending record {}", record);
-			try {
-				queue.put(record);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
-
-		@Override
-		public void requestStop() {
-			done = true;
-			logger.debug("stop requested, done={}", done);
-		}
-
-		@Override
-		public boolean trySend(Record record) {
-			if (done) {
-				logger.trace("record {} not sent", record);
-				return true;
-			} else {
-				send(record);
-				logger.trace("record {} sent", record);
-				return false;
-			}
-		}
-
-		public void sendPoisonPill() {
-			send(QueueingChannel.POISON_PILL);
-		}
-
-		// let the producer to get unblocked in put()
-		public void consumeAnyRemainingRecord() {
-			logger.trace("consuming remaining records");
-			while (true) {
-				Optional<Record> incoming = this.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				logger.trace("  discarding {}", incoming.get());
-			}
-			logger.trace("consumed remaining items");
-		}
 	}
 }

@@ -15,7 +15,7 @@ public interface Channel {
 	}
 
 	@Experimental(description = "consumer command can signal producer to halt")
-	default void requestStop() {
+	default void stopProducer() {
 		// by default it is ignored
 	}
 

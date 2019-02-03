@@ -143,7 +143,7 @@ public class TextModule implements Module {
 					out.send(record);
 					take--;
 				} else {
-					in.requestStop();
+					in.stopProducer();
 					break;
 				}
 			}
