@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Built-in values to be used in Records.
  *
- * NB: actual value types are not exposed by purpose
+ * NB: concrete types are not exposed by purpose
  */
 public class Values {
 	private Values() {

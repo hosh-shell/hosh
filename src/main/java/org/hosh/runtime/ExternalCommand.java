@@ -51,12 +51,12 @@ public class ExternalCommand implements Command, StateAware {
 			logger.debug("  exited with {}", exitCode);
 			return ExitStatus.of(exitCode);
 		} catch (IOException e) {
-			err.send(Record.of("error", Values.ofText(e.getMessage())));
 			logger.error("caught exception", e);
+			err.send(Record.of("error", Values.ofText(e.getMessage())));
 			return ExitStatus.error();
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			err.send(Record.of("error", Values.ofText(e.getMessage())));
+			err.send(Record.of("error", Values.ofText("interrupted")));
 			return ExitStatus.error();
 		}
 	}

@@ -55,8 +55,8 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		ExecutorService executor = Executors.newFixedThreadPool(2);
 		BlockingQueue<Record> queue = new LinkedBlockingQueue<>(10);
-		Channel pipeChannel = new QueueingChannel(queue);
-		Future<ExitStatus> producer = prepareProducer(new UnlinkedChannel(), pipeChannel, err, executor, queue);
+		QueueingChannel pipeChannel = new QueueingChannel(queue);
+		Future<ExitStatus> producer = prepareProducer(new UnlinkedChannel(), pipeChannel, err, executor);
 		Future<ExitStatus> consumer = prepareConsumer(pipeChannel, out, err, executor);
 		try {
 			return run(producer, consumer, err);
@@ -104,19 +104,19 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		}
 	}
 
-	private Future<ExitStatus> prepareProducer(Channel in, Channel out, Channel err, ExecutorService executor, BlockingQueue<Record> queue) {
+	private Future<ExitStatus> prepareProducer(Channel in, QueueingChannel out, Channel err, ExecutorService executor) {
 		return executor.submit(() -> {
 			setThreadName(statements.get(0));
 			List<String> arguments = statements.get(0).getArguments();
 			Command command = statements.get(0).getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline());
 			ExitStatus st = command.run(arguments, in, out, err);
-			queue.put(QueueingChannel.POISON_PILL);
+			out.sendPoisonPill();
 			return st;
 		});
 	}
 
-	private Future<ExitStatus> prepareConsumer(Channel in, Channel out, Channel err, ExecutorService executor) {
+	private Future<ExitStatus> prepareConsumer(QueueingChannel in, Channel out, Channel err, ExecutorService executor) {
 		return executor.submit(() -> {
 			setThreadName(statements.get(1));
 			Command command = statements.get(1).getCommand();
@@ -125,23 +125,9 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			try {
 				return command.run(arguments, in, out, err);
 			} finally {
-				consumeAnyRemainingRecord(in);
+				in.consumeAnyRemainingRecord();
 			}
 		});
-	}
-
-	// let the producer to stop, otherwise it could be blocked
-	// during put() in the queue
-	private void consumeAnyRemainingRecord(Channel in) {
-		logger.trace("consuming remaining records");
-		while (true) {
-			Optional<Record> incoming = in.recv();
-			if (incoming.isEmpty()) {
-				break;
-			}
-			logger.trace("  discarding {}", incoming.get());
-		}
-		logger.trace("consumed remaining items");
 	}
 
 	private void setThreadName(Statement statement) {
@@ -152,7 +138,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 
 	@Todo(description = "improve InterruptedException handling")
 	private static class QueueingChannel implements Channel {
-		public static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
+		private static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
 		private final Logger logger = LoggerFactory.getLogger(getClass());
 		private final BlockingQueue<Record> queue;
 		private volatile boolean done = false;
@@ -208,6 +194,23 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 				logger.trace("record {} sent", record);
 				return false;
 			}
+		}
+
+		public void sendPoisonPill() {
+			send(QueueingChannel.POISON_PILL);
+		}
+
+		// let the producer to get unblocked in put()
+		public void consumeAnyRemainingRecord() {
+			logger.trace("consuming remaining records");
+			while (true) {
+				Optional<Record> incoming = this.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				logger.trace("  discarding {}", incoming.get());
+			}
+			logger.trace("consumed remaining items");
 		}
 	}
 }
