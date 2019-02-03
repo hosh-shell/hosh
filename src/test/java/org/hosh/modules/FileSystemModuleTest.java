@@ -12,10 +12,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import org.hosh.modules.FileSystemModule.Cat;
 import org.hosh.modules.FileSystemModule.ChangeDirectory;
 import org.hosh.modules.FileSystemModule.CurrentWorkingDirectory;
 import org.hosh.modules.FileSystemModule.Find;
+import org.hosh.modules.FileSystemModule.Lines;
 import org.hosh.modules.FileSystemModule.ListFiles;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -38,7 +38,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 		FileSystemModuleTest.ListTest.class,
 		FileSystemModuleTest.ChangeDirectoryTest.class,
 		FileSystemModuleTest.CurrentWorkingDirectoryTest.class,
-		FileSystemModuleTest.CatTest.class,
+		FileSystemModuleTest.LinesTest.class,
 		FileSystemModuleTest.FindTest.class
 })
 public class FileSystemModuleTest {
@@ -236,7 +236,7 @@ public class FileSystemModuleTest {
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class CatTest {
+	public static class LinesTest {
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 		@Mock
@@ -246,7 +246,7 @@ public class FileSystemModuleTest {
 		@Mock
 		private Channel err;
 		@InjectMocks
-		private Cat sut;
+		private Lines sut;
 
 		@Test
 		public void emptyFile() throws IOException {

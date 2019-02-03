@@ -29,7 +29,7 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("cd", new ChangeDirectory());
 		commandRegistry.registerCommand("ls", new ListFiles());
 		commandRegistry.registerCommand("cwd", new CurrentWorkingDirectory());
-		commandRegistry.registerCommand("cat", new Cat());
+		commandRegistry.registerCommand("lines", new Lines());
 		commandRegistry.registerCommand("find", new Find());
 	}
 
@@ -136,7 +136,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	public static class Cat implements Command, StateAware {
+	public static class Lines implements Command, StateAware {
 		private State state;
 
 		@Override

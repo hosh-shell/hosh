@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - more powerful grammar (e.g. nested wrapper, wrapper of pipeline)
+- 'cat' has been renamed to 'lines'
 
 ## [0.0.20] - 2019-01-30
 - preliminary ctrl-C support
