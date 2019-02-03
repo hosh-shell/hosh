@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.hosh.doc.Bug;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -158,16 +160,46 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
+	@Ignore
+	@Bug(description = "output should be 'hello world!'")
 	@Test
-	public void pipelineExpandVariables() throws Exception {
+	public void pipelinesDontExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
-				"echo ${OS_ENV_VARIABLE} | count"//
+				"echo ${OS_ENV_VARIABLE} | take 1"//
 		);
 		Process hosh = givenHoshProcess(Collections.singletonMap("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).contains("1");
+		assertThat(output).isEqualTo("echo ${OS_ENV_VARIABLE}");
 		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Ignore
+	@Bug(description = "error is not visible")
+	@Test
+	public void errorInProducer() throws Exception {
+		Path scriptPath = givenScript(
+				"err | count"//
+		);
+		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).contains("injected error: please do not report");
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@Ignore
+	@Bug(description = "error is not visible")
+	@Test
+	public void errorInConsumer() throws Exception {
+		Path scriptPath = givenScript(
+				"ls | err"//
+		);
+		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).contains("injected error: please do not report");
+		assertThat(exitCode).isEqualTo(1);
 	}
 
 	// simple test infrastructure

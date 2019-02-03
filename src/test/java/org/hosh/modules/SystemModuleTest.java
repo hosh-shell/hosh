@@ -1,6 +1,7 @@
 package org.hosh.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -9,6 +10,7 @@ import java.util.Collections;
 
 import org.hosh.modules.SystemModule.Echo;
 import org.hosh.modules.SystemModule.Env;
+import org.hosh.modules.SystemModule.Err;
 import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
 import org.hosh.modules.SystemModule.ProcessList;
@@ -36,8 +38,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.ExitTest.class,
 		SystemModuleTest.HelpTest.class,
 		SystemModuleTest.SleepTest.class,
-		SystemModuleTest.ProcessListTest.class
-})
+		SystemModuleTest.ProcessListTest.class,
+		SystemModuleTest.ErrTest.class })
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ExitTest {
@@ -254,6 +256,25 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList("1"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting zero arguments")));
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class ErrTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Err sut;
+
+		@Test
+		public void noArgs() {
+			assertThatThrownBy(() -> sut.run(Arrays.asList(), in, out, err))
+					.hasMessage("injected error: please do not report")
+					.isInstanceOf(NullPointerException.class);
 		}
 	}
 }

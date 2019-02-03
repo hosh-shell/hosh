@@ -31,6 +31,7 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("withTime", new WithTime());
 		commandRegistry.registerCommand("ps", new ProcessList());
 		commandRegistry.registerCommand("kill", new KillProcess());
+		commandRegistry.registerCommand("err", new Err());
 	}
 
 	public static class Echo implements Command {
@@ -201,6 +202,18 @@ public class SystemModule implements Module {
 				err.send(Record.of("error", Values.ofText("not a valid pid: " + args.get(0))));
 				return ExitStatus.error();
 			}
+		}
+	}
+
+	public static class Err implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			simulateNullPointer();
+			return ExitStatus.success();
+		}
+
+		private void simulateNullPointer() {
+			throw new NullPointerException("injected error: please do not report");
 		}
 	}
 }
