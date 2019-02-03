@@ -136,14 +136,13 @@ public class TextModule implements Module {
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					return ExitStatus.success();
+					break;
 				}
 				Record record = incoming.get();
 				if (take > 0) {
-					out.send(record);
 					take--;
+					out.send(record);
 				} else {
-					in.stopProducer();
 					break;
 				}
 			}
@@ -163,7 +162,7 @@ public class TextModule implements Module {
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					return ExitStatus.success();
+					break;
 				}
 				Record record = incoming.get();
 				if (drop > 0) {
@@ -172,6 +171,7 @@ public class TextModule implements Module {
 					out.send(record);
 				}
 			}
+			return ExitStatus.success();
 		}
 	}
 
@@ -196,12 +196,8 @@ public class TextModule implements Module {
 			while (true) {
 				long next = secureRandom.nextLong();
 				Record of = Record.of("value", Values.ofNumeric(next));
-				boolean halted = out.trySend(of);
-				if (halted) {
-					break;
-				}
+				out.send(of);
 			}
-			return ExitStatus.success();
 		}
 	}
 
@@ -216,7 +212,7 @@ public class TextModule implements Module {
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					out.send(Record.of("cound", Values.ofNumeric(count)));
+					out.send(Record.of("count", Values.ofNumeric(count)));
 					return ExitStatus.success();
 				} else {
 					count++;

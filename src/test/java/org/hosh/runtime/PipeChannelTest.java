@@ -28,18 +28,9 @@ public class PipeChannelTest {
 	}
 
 	@Test
-	public void stopProducer() {
-		PipeChannel sut = new PipeChannel(new LinkedBlockingQueue<Record>(2));
-		sut.stopProducer();
-		boolean done = sut.trySend(one);
-		assertThat(done).isTrue();
-	}
-
-	@Test
 	public void trySend() {
 		PipeChannel sut = new PipeChannel(new LinkedBlockingQueue<Record>(2));
-		boolean done = sut.trySend(one);
-		assertThat(done).isFalse();
+		sut.send(one);
 		Optional<Record> recv1 = sut.recv();
 		assertThat(recv1).contains(one);
 	}

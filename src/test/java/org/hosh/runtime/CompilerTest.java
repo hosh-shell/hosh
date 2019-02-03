@@ -36,16 +36,13 @@ public class CompilerTest {
 	public void pipelineOfCommandsWithoutArguments() {
 		doReturn(command).when(commandResolver).tryResolve("ls");
 		doReturn(anotherCommand).when(commandResolver).tryResolve("count");
-		Program program = sut.compile("ls | count");
+		Program program = sut.compile("ls | count | count");
 		assertThat(program.getStatements()).hasSize(1);
 		List<Statement> statements = program.getStatements();
 		assertThat(statements).hasSize(1);
 		Statement statement = statements.get(0);
 		assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
 		assertThat(statement.getArguments()).isEmpty();
-		// Statement next = statement.getNext();
-		// assertThat(next).isNotNull();
-		// assertThat(next.getCommand()).isSameAs(anotherCommand);
 	}
 
 	@Test
@@ -59,10 +56,6 @@ public class CompilerTest {
 		Statement statement = statements.get(0);
 		assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
 		assertThat(statement.getArguments()).isEmpty();
-		// Statement next = statement.getNext();
-		// assertThat(next).isNotNull();
-		// assertThat(next.getCommand()).isSameAs(anotherCommand);
-		// assertThat(next.getArguments()).containsExactly("/regex/");
 	}
 
 	@Test

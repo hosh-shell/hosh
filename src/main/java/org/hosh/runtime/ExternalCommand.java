@@ -77,10 +77,7 @@ public class ExternalCommand implements Command, StateAware {
 					break;
 				}
 				logger.debug("line: {}", readLine);
-				boolean done = channel.trySend(Record.of("line", Values.ofText(readLine)));
-				if (done) {
-					break;
-				}
+				channel.send(Record.of("line", Values.ofText(readLine)));
 			}
 		}
 	}

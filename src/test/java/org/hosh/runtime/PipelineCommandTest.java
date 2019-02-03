@@ -6,7 +6,6 @@ import static org.mockito.BDDMockito.then;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.hosh.runtime.Compiler.Statement;
@@ -44,7 +43,7 @@ public class PipelineCommandTest {
 		Statement consumer = new Statement();
 		consumer.setCommand(command2);
 		consumer.setArguments(Collections.emptyList());
-		PipelineCommand sut = new PipelineCommand(List.of(producer, consumer));
+		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setTerminal(terminal);
 		return sut;
 	}
@@ -81,30 +80,34 @@ public class PipelineCommandTest {
 
 	@Test
 	public void producerUnhandledException() {
-		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willThrow(NullPointerException.class);
+		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
+			throw new NullPointerException("simulated exception");
+		});
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-		then(err).should().send(Record.of("error", Values.ofText("")));
+		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 
 	@Test
 	public void consumerUnhandledException() {
-		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willThrow(NullPointerException.class);
+		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
+			throw new NullPointerException("simulated exception");
+		});
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-		then(err).should().send(Record.of("error", Values.ofText("")));
+		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 
 	@Test
 	public void consumerUnhandledExecutionException() {
 		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			throw new ExecutionException("null pointer somewhere", null);
+			throw new ExecutionException("simulated exception", null);
 		});
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-		then(err).should().send(Record.of("error", Values.ofText("null pointer somewhere")));
+		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 }

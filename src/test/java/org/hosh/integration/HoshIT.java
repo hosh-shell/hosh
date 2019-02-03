@@ -201,12 +201,12 @@ public class HoshIT {
 	@Test
 	public void consumeInfiniteProducer() throws Exception {
 		Path scriptPath = givenScript(
-				"rand | take 2"//
+				"rand | take 100 | count"//
 		);
 		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).hasLineCount(2);
+		assertThat(output).isEqualTo("100");
 		assertThat(exitCode).isEqualTo(0);
 	}
 

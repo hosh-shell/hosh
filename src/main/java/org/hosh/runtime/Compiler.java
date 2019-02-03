@@ -1,7 +1,6 @@
 package org.hosh.runtime;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,7 +53,7 @@ public class Compiler {
 		Statement producer = compileInvocation(ctx.invocation());
 		Statement consumer = compileStatement(ctx.stmt());
 		Statement pipeline = new Statement();
-		pipeline.setCommand(new PipelineCommand(Arrays.asList(producer, consumer)));
+		pipeline.setCommand(new PipelineCommand(producer, consumer));
 		pipeline.setArguments(Collections.emptyList());
 		return pipeline;
 	}
