@@ -3,6 +3,7 @@ package org.hosh.runtime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -76,6 +77,8 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			} else {
 				return ExitStatus.error();
 			}
+		} catch (CancellationException e) {
+			return ExitStatus.error();
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			return ExitStatus.error();
@@ -122,15 +125,15 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	// let the producer to stop, otherwise it could be blocked
 	// during put() in the queue
 	private void consumeAnyRemainingRecord(Channel in) {
-		logger.debug("consuming remaining records");
+		logger.trace("consuming remaining records");
 		while (true) {
 			Optional<Record> incoming = in.recv();
 			if (incoming.isEmpty()) {
 				break;
 			}
-			logger.debug("  discarding {}", incoming.get());
+			logger.trace("  discarding {}", incoming.get());
 		}
-		logger.debug("consumed remaining items");
+		logger.trace("consumed remaining items");
 	}
 
 	private void setThreadName(Statement statement) {
@@ -156,14 +159,14 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 				if (done) {
 					return Optional.empty();
 				}
-				logger.debug("waiting for record... ");
+				logger.trace("waiting for record... ");
 				Record record = queue.take();
 				if (POISON_PILL.equals(record)) {
-					logger.debug("got POISON_PILL... ");
+					logger.trace("got POISON_PILL... ");
 					done = true;
 					return Optional.empty();
 				}
-				logger.debug("got record {}", record);
+				logger.trace("got record {}", record);
 				return Optional.ofNullable(record);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -173,7 +176,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 
 		@Override
 		public void send(Record record) {
-			logger.debug("sent record {}", record);
+			logger.trace("sending record {}", record);
 			try {
 				queue.put(record);
 			} catch (InterruptedException e) {
@@ -190,11 +193,11 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		@Override
 		public boolean trySend(Record record) {
 			if (done) {
-				logger.debug("record {} not sent downstream", record);
+				logger.trace("record {} not sent", record);
 				return true;
 			} else {
 				send(record);
-				logger.debug("record {} sent downstream", record);
+				logger.trace("record {} sent", record);
 				return false;
 			}
 		}
