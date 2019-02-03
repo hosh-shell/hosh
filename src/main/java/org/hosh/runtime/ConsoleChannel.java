@@ -8,8 +8,11 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.hosh.spi.Value;
 import org.jline.terminal.Terminal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConsoleChannel implements Channel {
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final Terminal terminal;
 	private final Color color;
 
@@ -20,6 +23,7 @@ public class ConsoleChannel implements Channel {
 
 	@Override
 	public void send(Record record) {
+		logger.debug("got record {}", record);
 		@SuppressWarnings("resource")
 		PrintWriter writer = terminal.writer();
 		writer.append(color.ansi);
