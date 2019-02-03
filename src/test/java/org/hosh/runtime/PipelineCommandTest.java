@@ -2,15 +2,19 @@ package org.hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Record;
+import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +55,7 @@ public class PipelineCommandTest {
 		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		then(err).shouldHaveZeroInteractions();
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
 	}
 
@@ -60,6 +65,7 @@ public class PipelineCommandTest {
 		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		then(err).shouldHaveZeroInteractions();
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 
@@ -69,22 +75,36 @@ public class PipelineCommandTest {
 		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		then(err).shouldHaveZeroInteractions();
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 
 	@Test
-	public void producerInterrupted() {
+	public void producerUnhandledException() {
 		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willThrow(NullPointerException.class);
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		then(err).should().send(Record.of("error", Values.ofText("")));
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 
 	@Test
-	public void consumerInterrupted() {
+	public void consumerUnhandledException() {
 		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willThrow(NullPointerException.class);
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		then(err).should().send(Record.of("error", Values.ofText("")));
+		assertThat(exitStatus.isSuccess()).isEqualTo(false);
+	}
+
+	@Test
+	public void consumerUnhandledExecutionException() {
+		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
+			throw new ExecutionException("null pointer somewhere", null);
+		});
+		PipelineCommand sut = setupSut();
+		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		then(err).should().send(Record.of("error", Values.ofText("null pointer somewhere")));
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 }

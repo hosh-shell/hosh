@@ -68,6 +68,9 @@ public class Values {
 		private final String value;
 
 		public Text(String value) {
+			if (value == null) {
+				throw new IllegalArgumentException("text cannot be null");
+			}
 			this.value = value;
 		}
 

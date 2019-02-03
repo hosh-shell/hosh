@@ -86,7 +86,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		} catch (ExecutionException e) {
 			logger.error("caught exception", e);
 			String details;
-			if (e.getCause() != null) {
+			if (e.getCause() != null && e.getCause().getMessage() != null) {
 				details = e.getCause().getMessage();
 			} else {
 				details = "";

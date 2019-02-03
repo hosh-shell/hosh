@@ -43,6 +43,13 @@ public class ValuesTest {
 		private Appendable appendable;
 
 		@Test
+		public void nullIsRereject() {
+			assertThatThrownBy(() -> Values.ofText(null))
+					.hasMessage("text cannot be null")
+					.isInstanceOf(IllegalArgumentException.class);
+		}
+
+		@Test
 		public void appendOk() throws IOException {
 			Values.ofText("aaa").append(appendable, Locale.getDefault());
 			then(appendable).should().append("aaa");
