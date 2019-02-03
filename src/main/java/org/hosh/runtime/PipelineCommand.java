@@ -92,7 +92,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			setThreadName(statements.get(0));
 			List<String> arguments = statements.get(0).getArguments();
 			Command command = statements.get(0).getCommand();
-			command.pipeline();
+			command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline());
 			ExitStatus st = command.run(arguments, in, out, err);
 			queue.put(QueueingChannel.POISON_PILL);
 			return st;
@@ -103,7 +103,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		return executor.submit(() -> {
 			setThreadName(statements.get(1));
 			Command command = statements.get(1).getCommand();
-			command.pipeline();
+			command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline());
 			List<String> arguments = statements.get(1).getArguments();
 			try {
 				return command.run(arguments, in, out, err);

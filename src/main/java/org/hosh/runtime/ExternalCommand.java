@@ -31,9 +31,7 @@ public class ExternalCommand implements Command, StateAware {
 		this.command = command;
 	}
 
-	@Override
 	public void pipeline() {
-		logger.debug("  part of a pipeline");
 		inheritIo = false;
 	}
 
