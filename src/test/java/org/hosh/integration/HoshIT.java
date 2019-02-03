@@ -198,6 +198,18 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
+	@Test
+	public void consumeInfiniteProducer() throws Exception {
+		Path scriptPath = givenScript(
+				"rand | take 2"//
+		);
+		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).hasLineCount(2);
+		assertThat(exitCode).isEqualTo(0);
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
@@ -230,7 +242,7 @@ public class HoshIT {
 
 	private String consumeOutput(Process hosh) throws IOException {
 		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(hosh.getInputStream(), StandardCharsets.UTF_8))) {
-			return bufferedReader.lines().collect(Collectors.joining());
+			return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
 		}
 	}
 

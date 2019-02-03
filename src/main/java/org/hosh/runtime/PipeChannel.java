@@ -69,7 +69,9 @@ public class PipeChannel implements Channel {
 
 	// sent by the producer to signal "end of channel"
 	public void stopConsumer() {
-		send(poisonPill);
+		if (!done) {
+			send(poisonPill);
+		}
 	}
 
 	// let the producer to get unblocked in put()
