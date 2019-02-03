@@ -65,8 +65,8 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 
 	private ExitStatus run(Future<ExitStatus> producer, Future<ExitStatus> consumer) {
 		terminal.handle(Signal.INT, signal -> {
-			producer.cancel(true);
-			consumer.cancel(true);
+			cancelIfStillRunning(producer);
+			cancelIfStillRunning(consumer);
 		});
 		try {
 			ExitStatus producerExitStatus = producer.get();
@@ -84,6 +84,12 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			return ExitStatus.error();
 		} finally {
 			terminal.handle(Signal.INT, SignalHandler.SIG_DFL);
+		}
+	}
+
+	private void cancelIfStillRunning(Future<ExitStatus> future) {
+		if (!future.isCancelled() && !future.isDone()) {
+			future.cancel(true);
 		}
 	}
 
