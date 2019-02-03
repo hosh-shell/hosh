@@ -19,6 +19,7 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
+import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.Terminal.Signal;
 import org.jline.terminal.Terminal.SignalHandler;
@@ -58,13 +59,13 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		Future<ExitStatus> producer = prepareProducer(new UnlinkedChannel(), pipeChannel, err, executor, queue);
 		Future<ExitStatus> consumer = prepareConsumer(pipeChannel, out, err, executor);
 		try {
-			return run(producer, consumer);
+			return run(producer, consumer, err);
 		} finally {
 			executor.shutdownNow();
 		}
 	}
 
-	private ExitStatus run(Future<ExitStatus> producer, Future<ExitStatus> consumer) {
+	private ExitStatus run(Future<ExitStatus> producer, Future<ExitStatus> consumer, Channel err) {
 		terminal.handle(Signal.INT, signal -> {
 			cancelIfStillRunning(producer);
 			cancelIfStillRunning(consumer);
@@ -84,6 +85,13 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			return ExitStatus.error();
 		} catch (ExecutionException e) {
 			logger.error("caught exception", e);
+			String details;
+			if (e.getCause() != null) {
+				details = e.getCause().getMessage();
+			} else {
+				details = "";
+			}
+			err.send(Record.of("error", Values.ofText(details)));
 			return ExitStatus.error();
 		} finally {
 			terminal.handle(Signal.INT, SignalHandler.SIG_DFL);

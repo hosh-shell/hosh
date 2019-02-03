@@ -174,8 +174,6 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(0);
 	}
 
-	@Ignore
-	@Bug(description = "error is not visible")
 	@Test
 	public void errorInProducer() throws Exception {
 		Path scriptPath = givenScript(
@@ -188,8 +186,6 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
-	@Ignore
-	@Bug(description = "error is not visible")
 	@Test
 	public void errorInConsumer() throws Exception {
 		Path scriptPath = givenScript(
