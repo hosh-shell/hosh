@@ -75,7 +75,6 @@ public class PipelineCommandTest {
 	@Test
 	public void producerInterrupted() {
 		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willThrow(NullPointerException.class);
-		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
@@ -83,7 +82,6 @@ public class PipelineCommandTest {
 
 	@Test
 	public void consumerInterrupted() {
-		given(command1.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(command2.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willThrow(NullPointerException.class);
 		PipelineCommand sut = setupSut();
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
