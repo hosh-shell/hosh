@@ -3,7 +3,6 @@ package org.hosh.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.hosh.spi.Record;
 import org.junit.Test;
@@ -18,7 +17,7 @@ public class PipeChannelTest {
 
 	@Test
 	public void stopConsumer() {
-		PipeChannel sut = new PipeChannel(new LinkedBlockingQueue<Record>(2));
+		PipeChannel sut = new PipeChannel();
 		sut.send(one);
 		sut.stopConsumer();
 		Optional<Record> recv1 = sut.recv();
@@ -28,8 +27,8 @@ public class PipeChannelTest {
 	}
 
 	@Test
-	public void trySend() {
-		PipeChannel sut = new PipeChannel(new LinkedBlockingQueue<Record>(2));
+	public void sendRecv() {
+		PipeChannel sut = new PipeChannel();
 		sut.send(one);
 		Optional<Record> recv1 = sut.recv();
 		assertThat(recv1).contains(one);

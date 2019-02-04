@@ -2,14 +2,12 @@ package org.hosh.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
@@ -62,8 +60,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		ExecutorService executor = Executors.newCachedThreadPool();
 		List<Future<ExitStatus>> futures = new ArrayList<>();
-		BlockingQueue<Record> queue = new LinkedBlockingQueue<>(5);
-		Channel pipeChannel = new PipeChannel(queue);
+		Channel pipeChannel = new PipeChannel();
 		Future<ExitStatus> producerFuture = prepareProducer(producer, new UnlinkedChannel(), pipeChannel, err, executor);
 		futures.add(producerFuture);
 		assemblePipeline(futures, consumer, pipeChannel, out, err, executor);
@@ -117,8 +114,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			ExecutorService executor) {
 		if (statement.getCommand() instanceof PipelineCommand) {
 			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
-			BlockingQueue<Record> queue = new LinkedBlockingQueue<>(5);
-			Channel pipeChannel = new PipeChannel(queue);
+			Channel pipeChannel = new PipeChannel();
 			Future<ExitStatus> producerFuture = prepareConsumer(pipelineCommand.producer, in, pipeChannel, err, executor);
 			futures.add(producerFuture);
 			if (pipelineCommand.consumer.getCommand() instanceof PipelineCommand) {

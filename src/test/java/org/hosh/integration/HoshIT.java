@@ -161,7 +161,7 @@ public class HoshIT {
 	}
 
 	@Ignore
-	@Bug(description = "output should be 'hello world!'")
+	@Bug(description = "output should be 'hello world!'", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
 	public void pipelinesDontExpandVariables() throws Exception {
 		Path scriptPath = givenScript(

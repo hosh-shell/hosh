@@ -2,22 +2,27 @@ package org.hosh.runtime;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.hosh.doc.Experimental;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PipeChannel implements Channel {
-	private final Logger logger = LoggerFactory.getLogger(PipeChannel.class);
-	private final Record poisonPill = Record.of("__POISON_PILL__", null);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PipeChannel.class);
+	private static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
+	private static final boolean QUEUE_FAIRNESS = true;
+	private static final int QUEUE_CAPACITY = 10;
 	private final BlockingQueue<Record> queue;
-	private AtomicBoolean done = new AtomicBoolean(false);
+	private final AtomicBoolean done;
 
-	public PipeChannel(BlockingQueue<Record> queue) {
-		this.queue = queue;
+	public PipeChannel() {
+		queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY, QUEUE_FAIRNESS);
+		done = new AtomicBoolean(false);
 	}
 
 	@Override
@@ -26,14 +31,14 @@ public class PipeChannel implements Channel {
 			if (done.getAcquire()) {
 				return Optional.empty();
 			}
-			logger.trace("waiting for record... ");
+			LOGGER.trace("waiting for record... ");
 			Record record = queue.take();
-			if (poisonPill.equals(record)) {
-				logger.trace("got POISON_PILL... ");
+			if (POISON_PILL.equals(record)) {
+				LOGGER.trace("got POISON_PILL... ");
 				done.compareAndSet(false, true);
 				return Optional.empty();
 			}
-			logger.trace("got record {}", record);
+			LOGGER.trace("got record {}", record);
 			return Optional.of(record);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -44,10 +49,9 @@ public class PipeChannel implements Channel {
 	@Override
 	public void send(Record record) {
 		if (done.getAcquire()) {
-			logger.trace("channel is done, not sending {}", record);
 			throw new ProducerPoisonPill();
 		}
-		logger.trace("sending record {}", record);
+		LOGGER.trace("sending record {}", record);
 		try {
 			queue.put(record);
 		} catch (InterruptedException e) {
@@ -58,13 +62,13 @@ public class PipeChannel implements Channel {
 	// sent by consumer to signal "do not produce anything"
 	public void stopProducer() {
 		done.compareAndSet(false, true);
-		logger.debug("producer stop requested, done={}", done);
+		LOGGER.debug("producer stop requested");
 	}
 
 	// sent by the producer to signal "end of channel"
 	public void stopConsumer() {
 		if (!done.getAcquire()) {
-			send(poisonPill);
+			send(POISON_PILL);
 		}
 	}
 
@@ -74,9 +78,11 @@ public class PipeChannel implements Channel {
 		queue.drainTo(new ArrayList<Record>());
 	}
 
+	@Experimental(description = "best solution found so far to stop a very fast producer")
 	public static class ProducerPoisonPill extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 
+		// stacktrace is not needed
 		@Override
 		public synchronized Throwable fillInStackTrace() {
 			return this;
