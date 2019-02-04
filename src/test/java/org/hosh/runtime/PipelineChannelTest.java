@@ -11,13 +11,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class PipeChannelTest {
+public class PipelineChannelTest {
 	@Mock
 	private Record one;
 
 	@Test
 	public void stopConsumer() {
-		PipeChannel sut = new PipeChannel();
+		PipelineChannel sut = new PipelineChannel();
 		sut.send(one);
 		sut.stopConsumer();
 		Optional<Record> recv1 = sut.recv();
@@ -28,7 +28,7 @@ public class PipeChannelTest {
 
 	@Test
 	public void sendRecv() {
-		PipeChannel sut = new PipeChannel();
+		PipelineChannel sut = new PipelineChannel();
 		sut.send(one);
 		Optional<Record> recv1 = sut.recv();
 		assertThat(recv1).contains(one);

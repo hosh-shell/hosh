@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 
 import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
-import org.hosh.runtime.PipeChannel.ProducerPoisonPill;
+import org.hosh.runtime.PipelineChannel.ProducerPoisonPill;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
@@ -68,8 +68,8 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		ExecutorService executor = Executors.newCachedThreadPool();
 		List<Future<ExitStatus>> futures = new ArrayList<>();
-		Channel pipeChannel = new PipeChannel();
-		Future<ExitStatus> producerFuture = prepareProducer(producer, new UnlinkedChannel(), pipeChannel, err, executor);
+		Channel pipeChannel = new PipelineChannel();
+		Future<ExitStatus> producerFuture = submitProducer(producer, new UnlinkedChannel(), pipeChannel, err, executor);
 		futures.add(producerFuture);
 		assemblePipeline(futures, consumer, pipeChannel, out, err, executor);
 		try {
@@ -122,22 +122,22 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			ExecutorService executor) {
 		if (statement.getCommand() instanceof PipelineCommand) {
 			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
-			Channel pipeChannel = new PipeChannel();
-			Future<ExitStatus> producerFuture = prepareConsumer(pipelineCommand.producer, in, pipeChannel, err, executor);
+			Channel pipelineChannel = new PipelineChannel();
+			Future<ExitStatus> producerFuture = submitConsumer(pipelineCommand.producer, in, pipelineChannel, err, executor);
 			futures.add(producerFuture);
 			if (pipelineCommand.consumer.getCommand() instanceof PipelineCommand) {
-				assemblePipeline(futures, pipelineCommand.consumer, pipeChannel, out, err, executor);
+				assemblePipeline(futures, pipelineCommand.consumer, pipelineChannel, out, err, executor);
 			} else {
-				Future<ExitStatus> consumerFuture = prepareConsumer(pipelineCommand.consumer, pipeChannel, out, err, executor);
+				Future<ExitStatus> consumerFuture = submitConsumer(pipelineCommand.consumer, pipelineChannel, out, err, executor);
 				futures.add(consumerFuture);
 			}
 		} else {
-			Future<ExitStatus> consumerFuture = prepareConsumer(statement, in, out, err, executor);
+			Future<ExitStatus> consumerFuture = submitConsumer(statement, in, out, err, executor);
 			futures.add(consumerFuture);
 		}
 	}
 
-	private Future<ExitStatus> prepareProducer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
+	private Future<ExitStatus> submitProducer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
 		return executor.submit(new Callable<>() {
 			@Override
 			public ExitStatus call() throws Exception {
@@ -151,7 +151,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 					LOGGER.trace("got poison pill");
 					return ExitStatus.success();
 				} finally {
-					((PipeChannel) out).stopConsumer();
+					((PipelineChannel) out).stopConsumer();
 				}
 			}
 
@@ -162,21 +162,21 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		});
 	}
 
-	private Future<ExitStatus> prepareConsumer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
-		return executor.submit(new Callable<ExitStatus>() {
+	private Future<ExitStatus> submitConsumer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
+		return executor.submit(new Callable<>() {
 			@Override
 			public ExitStatus call() throws Exception {
 				setThreadName(statement);
 				Command command = statement.getCommand();
-				command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline());
+				command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
 				List<String> arguments = statement.getArguments();
 				try {
 					return command.run(arguments, in, out, err);
 				} finally {
-					((PipeChannel) in).stopProducer();
-					((PipeChannel) in).consumeAnyRemainingRecord();
-					if (out instanceof PipeChannel) {
-						((PipeChannel) out).stopConsumer();
+					((PipelineChannel) in).stopProducer();
+					((PipelineChannel) in).consumeAnyRemainingRecord();
+					if (out instanceof PipelineChannel) {
+						((PipelineChannel) out).stopConsumer();
 					}
 				}
 			}

@@ -13,15 +13,15 @@ import org.hosh.spi.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PipeChannel implements Channel {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PipeChannel.class);
+public class PipelineChannel implements Channel {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PipelineChannel.class);
 	private static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
 	private static final boolean QUEUE_FAIRNESS = true;
 	private static final int QUEUE_CAPACITY = 10;
 	private final BlockingQueue<Record> queue;
 	private final AtomicBoolean done;
 
-	public PipeChannel() {
+	public PipelineChannel() {
 		queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY, QUEUE_FAIRNESS);
 		done = new AtomicBoolean(false);
 	}
