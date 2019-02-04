@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doReturn;
 
 import java.util.List;
 
+import org.hosh.doc.Bug;
 import org.hosh.runtime.Compiler.CompileError;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
@@ -31,6 +32,15 @@ public class CompilerTest {
 	private CommandResolver commandResolver;
 	@InjectMocks
 	private Compiler sut;
+
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")
+	@Test
+	public void incompletePipeline() {
+		doReturn(command).when(commandResolver).tryResolve("ls");
+		assertThatThrownBy(() -> sut.compile("ls | take 2 | "))
+				.isInstanceOf(CompileError.class)
+				.hasMessage("line 1:12: incomplete pipeline near '|'");
+	}
 
 	@Test
 	public void pipelineOfCommandsWithoutArguments() {

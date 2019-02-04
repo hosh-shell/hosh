@@ -50,6 +50,10 @@ public class Compiler {
 	}
 
 	private Statement compilePipeline(PipelineContext ctx) {
+		if (ctx.stmt() == null) {
+			throw new CompileError(String.format("line %d:%d: incomplete pipeline near '%s'", ctx.getStart().getLine(),
+					ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
+		}
 		Statement producer = compileInvocation(ctx.invocation());
 		Statement consumer = compileStatement(ctx.stmt());
 		Statement pipeline = new Statement();
@@ -161,7 +165,7 @@ public class Compiler {
 
 		@Override
 		public String toString() {
-			return String.format("Statement[class=%s,arguments=%s]", command.getClass().getCanonicalName(), arguments);
+			return String.format("Statement[command=%s,arguments=%s]", command, arguments);
 		}
 	}
 

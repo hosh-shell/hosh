@@ -1,5 +1,6 @@
 package org.hosh.runtime;
 
+import org.hosh.doc.Bug;
 import org.hosh.runtime.Parser.ParseError;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,5 +75,12 @@ public class ParserTest {
 		expectedException.expect(ParseError.class);
 		expectedException.expectMessage("line 1:0: token recognition error at: '${ '");
 		sut.parse("${ EXECUTABLE }");
+	}
+
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")
+	@Test
+	public void incompletePipeline() {
+		sut.parse("ls | take 1 | ");
+		sut.parse("ls | take | ");
 	}
 }

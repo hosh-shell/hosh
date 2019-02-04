@@ -12,6 +12,7 @@ stmt
 
 pipeline
     : invocation '|' stmt
+    | invocation '|' // will be rejected later by the compiler with a nice error message  
     ;
 
 wrapped
