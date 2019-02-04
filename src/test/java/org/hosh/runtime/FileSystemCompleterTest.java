@@ -30,10 +30,11 @@ import java.io.IOException;
 import java.util.List;
 
 import org.hosh.spi.State;
+import org.hosh.testsupport.IgnoreIf;
+import org.hosh.testsupport.IgnoreIf.IgnoredIf;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -48,6 +49,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class FileSystemCompleterTest {
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	@Rule
+	public final IgnoreIf ignoreIf = new IgnoreIf();
 	@Mock
 	private State state;
 	@Mock(stubOnly = true)
@@ -84,8 +87,8 @@ public class FileSystemCompleterTest {
 		then(candidates).should().add(ArgumentMatchers.any());
 	}
 
-	@Ignore("fails on windows, / should be C:/")
 	@Test
+	@IgnoredIf(description = "fails on windows, / should be C:/", condition = IgnoreIf.OnWindows.class)
 	public void slash() {
 		given(line.word()).willReturn("/");
 		sut.complete(lineReader, line, candidates);
