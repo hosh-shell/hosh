@@ -151,6 +151,18 @@ public class HoshIT {
 	}
 
 	@Test
+	public void pipelineWriteExternalCommand() throws Exception {
+		Path scriptPath = givenScript(
+				"cwd | wc -l"// 'cwd' is a Java command that writes into 'wc -l' (native command)
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		int exitCode = hosh.waitFor();
+		String output = consumeOutput(hosh);
+		assertThat(output).isEqualToNormalizingWhitespace("1");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
 	public void missingScript() throws Exception {
 		Path scriptPath = Paths.get("missing.hosh");
 		Process hosh = givenHoshProcess(scriptPath.toString());

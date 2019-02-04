@@ -69,7 +69,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		ExecutorService executor = Executors.newCachedThreadPool();
 		List<Future<ExitStatus>> futures = new ArrayList<>();
 		Channel pipeChannel = new PipelineChannel();
-		Future<ExitStatus> producerFuture = submitProducer(producer, new UnlinkedChannel(), pipeChannel, err, executor);
+		Future<ExitStatus> producerFuture = submitProducer(producer, new NullChannel(), pipeChannel, err, executor);
 		futures.add(producerFuture);
 		assemblePipeline(futures, consumer, pipeChannel, out, err, executor);
 		try {

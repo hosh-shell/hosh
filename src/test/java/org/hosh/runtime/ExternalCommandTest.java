@@ -6,13 +6,16 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hosh.runtime.ExternalCommand.ProcessFactory;
 import org.hosh.spi.Channel;
@@ -33,6 +36,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class ExternalCommandTest {
 	@Rule
 	public final TemporaryFolder folder = new TemporaryFolder();
+	@Mock(name = "in")
+	private Channel in;
 	@Mock(name = "out")
 	private Channel out;
 	@Mock(name = "err")
@@ -65,11 +70,12 @@ public class ExternalCommandTest {
 	public void processNoArgs() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
+		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.emptyList(), null, out, err);
+		sut.run(Collections.emptyList(), in, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString()),
 				Paths.get("."),
@@ -83,11 +89,12 @@ public class ExternalCommandTest {
 	public void processWithArgs() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
+		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), null, out, err);
+		sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
@@ -103,9 +110,10 @@ public class ExternalCommandTest {
 		given(process.waitFor()).willReturn(1);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
+		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), null, out, err);
+		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus.isSuccess()).isFalse();
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
@@ -118,9 +126,12 @@ public class ExternalCommandTest {
 	public void processException() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willThrow(InterruptedException.class);
+		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
+		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
+		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), null, out, err);
+		sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
@@ -133,11 +144,12 @@ public class ExternalCommandTest {
 	public void processSendRecordsToOut() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
+		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(process.getInputStream()).willReturn(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), null, out, err);
+		sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		then(out).should().send(Record.of("line", Values.ofText("test")));
 		then(err).shouldHaveZeroInteractions();
 	}
@@ -146,12 +158,33 @@ public class ExternalCommandTest {
 	public void processSendRecordsToErr() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
+		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), null, out, err);
+		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		then(out).shouldHaveZeroInteractions();
+		then(err).should().send(Record.of("line", Values.ofText("test")));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void processRecordsFromIn() throws Exception {
+		ByteArrayOutputStream value = new ByteArrayOutputStream();
+		given(in.recv()).willReturn(
+				Optional.of(Record.of("name", Values.ofText("aaa"), "size", Values.ofNumeric(10))),
+				Optional.empty());
+		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
+		given(process.waitFor()).willReturn(0);
+		given(process.getOutputStream()).willReturn(value);
+		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
+		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
+		given(state.getCwd()).willReturn(Paths.get("."));
+		given(state.getVariables()).willReturn(Collections.emptyMap());
+		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
-		then(out).should().send(Record.of("line", Values.ofText("test")));
+		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualTo("aaa 10\n");
 	}
 }

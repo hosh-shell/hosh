@@ -147,7 +147,7 @@ public class Hosh {
 					System.exit(exitStatus.value());
 				}
 			} catch (Exception e) {
-				logger.error("caught exception for input: " + line, e);
+				logger.error("caught exception for input: '{}'", line, e);
 				err.send(Record.of("message", Values.ofText(e.getMessage())));
 			}
 		}

@@ -50,7 +50,7 @@ public class Interpreter {
 	private ExitStatus execute(Statement statement) {
 		Command command = prepareCommand(statement);
 		List<String> arguments = resolveArguments(statement.getArguments());
-		return command.run(arguments, new UnlinkedChannel(), out, err);
+		return command.run(arguments, new NullChannel(), out, err);
 	}
 
 	private Command prepareCommand(Statement statement) {
