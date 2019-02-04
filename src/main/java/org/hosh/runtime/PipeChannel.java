@@ -1,6 +1,7 @@
 package org.hosh.runtime;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -74,8 +75,10 @@ public class PipeChannel implements Channel {
 
 	// let the producer to get unblocked in put()
 	public void consumeAnyRemainingRecord() {
-		logger.trace("consuming remaining records");
-		queue.drainTo(new ArrayList<Record>());
+		LOGGER.trace("consuming remaining records");
+		List<Record> consumer = new ArrayList<>();
+		queue.drainTo(consumer);
+		LOGGER.trace("done consuming remaining records");
 	}
 
 	@Experimental(description = "best solution found so far to stop a very fast producer")

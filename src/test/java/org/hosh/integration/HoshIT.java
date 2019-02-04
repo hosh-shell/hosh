@@ -141,12 +141,12 @@ public class HoshIT {
 	@Test
 	public void pipelineWithExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"java --version | count"//
+				"java --version | take 1 | count"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
 		String output = consumeOutput(hosh);
-		assertThat(output).isEqualTo("3");
+		assertThat(output).isEqualTo("1");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
