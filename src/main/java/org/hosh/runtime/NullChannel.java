@@ -1,7 +1,5 @@
 package org.hosh.runtime;
 
-import java.util.Optional;
-
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 
@@ -10,11 +8,6 @@ import org.hosh.spi.Record;
  * pipeline and in the REPL.
  */
 public class NullChannel implements Channel {
-	@Override
-	public Optional<Record> recv() {
-		return Optional.empty();
-	}
-
 	@Override
 	public void send(Record record) {
 	}
