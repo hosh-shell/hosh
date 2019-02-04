@@ -43,7 +43,7 @@ public class ValuesTest {
 		private Appendable appendable;
 
 		@Test
-		public void nullIsRereject() {
+		public void nullIsReject() {
 			assertThatThrownBy(() -> Values.ofText(null))
 					.hasMessage("text cannot be null")
 					.isInstanceOf(IllegalArgumentException.class);
