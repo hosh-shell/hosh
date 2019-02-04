@@ -56,7 +56,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of("error", Values.ofText("expected 2 parameters")));
+				err.send(Record.of("error", Values.ofText("expected 2 parameters: key regex")));
 				return ExitStatus.error();
 			}
 			while (true) {

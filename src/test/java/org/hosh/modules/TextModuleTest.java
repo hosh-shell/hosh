@@ -8,9 +8,11 @@ import java.util.Optional;
 
 import org.hosh.modules.TextModule.Drop;
 import org.hosh.modules.TextModule.Enumerate;
+import org.hosh.modules.TextModule.Filter;
 import org.hosh.modules.TextModule.Schema;
 import org.hosh.modules.TextModuleTest.DropTest;
 import org.hosh.modules.TextModuleTest.EnumerateTest;
+import org.hosh.modules.TextModuleTest.FilterTest;
 import org.hosh.modules.TextModuleTest.SchemaTest;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
@@ -27,7 +29,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @SuiteClasses({
 		SchemaTest.class,
 		EnumerateTest.class,
-		DropTest.class
+		DropTest.class,
+		FilterTest.class
 })
 public class TextModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -127,6 +130,54 @@ public class TextModuleTest {
 			sut.run(Arrays.asList(), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class FilterTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Filter sut;
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void printMatchingLines() {
+			Record record = Record.of("key", Values.ofText("some string"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			sut.run(Arrays.asList("key", ".*string.*"), in, out, err);
+			then(out).should().send(record);
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void ignoreNonMatchingLines() {
+			Record record = Record.of("key", Values.ofText("some string"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			sut.run(Arrays.asList("key", ".*number.*"), in, out, err);
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void zeroArgs() {
+			sut.run(Arrays.asList(), in, out, err);
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expected 2 parameters: key regex")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void oneArg() {
+			sut.run(Arrays.asList("key"), in, out, err);
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expected 2 parameters: key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
