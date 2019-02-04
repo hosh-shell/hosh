@@ -35,14 +35,20 @@ public class CompilerTest {
 	@Test
 	public void pipelineOfCommandsWithoutArguments() {
 		doReturn(command).when(commandResolver).tryResolve("ls");
-		doReturn(anotherCommand).when(commandResolver).tryResolve("count");
-		Program program = sut.compile("ls | count | count");
+		doReturn(anotherCommand).when(commandResolver).tryResolve("take");
+		Program program = sut.compile("ls | take 2 | take 1");
 		assertThat(program.getStatements()).hasSize(1);
 		List<Statement> statements = program.getStatements();
 		assertThat(statements).hasSize(1);
 		Statement statement = statements.get(0);
-		assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
 		assertThat(statement.getArguments()).isEmpty();
+		assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
+		statement.getCommand().downCast(PipelineCommand.class).ifPresent(outerCmd -> {
+			outerCmd.getConsumer().getCommand().downCast(PipelineCommand.class).ifPresent(innerCmd -> {
+				assertThat(innerCmd.getProducer().getArguments()).containsExactly("2");
+				assertThat(innerCmd.getConsumer().getArguments()).containsExactly("1");
+			});
+		});
 	}
 
 	@Test

@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PipelineCommand implements Command, TerminalAware, StateAware {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(PipelineCommand.class);
 	private final Statement producer;
 	private final Statement consumer;
 	private Terminal terminal;
@@ -35,6 +35,14 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	public PipelineCommand(Statement producer, Statement consumer) {
 		this.producer = producer;
 		this.consumer = consumer;
+	}
+
+	public Statement getProducer() {
+		return producer;
+	}
+
+	public Statement getConsumer() {
+		return consumer;
 	}
 
 	@Override
@@ -88,7 +96,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			Thread.currentThread().interrupt();
 			return ExitStatus.error();
 		} catch (ExecutionException e) {
-			logger.error("caught exception", e);
+			LOGGER.error("caught exception", e);
 			String details;
 			if (e.getCause() != null && e.getCause().getMessage() != null) {
 				details = e.getCause().getMessage();
@@ -140,7 +148,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 				try {
 					return command.run(arguments, in, out, err);
 				} catch (ProducerPoisonPill e) {
-					logger.trace("got poison pill");
+					LOGGER.trace("got poison pill");
 					return ExitStatus.success();
 				} finally {
 					((PipeChannel) out).stopConsumer();
