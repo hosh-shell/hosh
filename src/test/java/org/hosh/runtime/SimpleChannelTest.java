@@ -2,7 +2,7 @@ package org.hosh.runtime;
 
 import static org.mockito.BDDMockito.then;
 
-import java.io.PrintStream;
+import java.io.IOException;
 
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
@@ -15,33 +15,33 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SimpleChannelTest {
 	@Mock
-	private PrintStream printStream;
+	private Appendable appendable;
 	private SimpleChannel sut;
 
 	@Before
 	public void setup() {
-		sut = new SimpleChannel(printStream);
+		sut = new SimpleChannel(appendable);
 	}
 
 	@Test
-	public void empty() {
+	public void empty() throws IOException {
 		sut.send(Record.empty());
-		then(printStream).should().println();
+		then(appendable).should().append(System.lineSeparator());
 	}
 
 	@Test
-	public void oneValue() {
+	public void oneValue() throws IOException {
 		sut.send(Record.of("key", Values.ofText("foo")));
-		then(printStream).should().append("foo");
-		then(printStream).should().println();
+		then(appendable).should().append("foo");
+		then(appendable).should().append(System.lineSeparator());
 	}
 
 	@Test
-	public void twoValues() {
+	public void twoValues() throws IOException {
 		sut.send(Record.of("key", Values.ofText("foo"), "another_key", Values.ofText("bar")));
-		then(printStream).should().append("foo");
-		then(printStream).should().append(" ");
-		then(printStream).should().append("bar");
-		then(printStream).should().println();
+		then(appendable).should().append("foo");
+		then(appendable).should().append(" ");
+		then(appendable).should().append("bar");
+		then(appendable).should().append(System.lineSeparator());
 	}
 }

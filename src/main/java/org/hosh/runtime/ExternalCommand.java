@@ -8,20 +8,16 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
-import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +74,7 @@ public class ExternalCommand implements Command, StateAware {
 
 	private void pipeChannelToOutputStream(Channel in, OutputStream outputStream) throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
+			RecordWriter recordWriter = new RecordWriter(writer);
 			while (true) {
 				Optional<Record> recv = in.recv();
 				if (recv.isEmpty()) {
@@ -85,22 +82,9 @@ public class ExternalCommand implements Command, StateAware {
 				}
 				Record record = recv.get();
 				LOGGER.debug("external: got record '{}'", record);
-				writeAsLine(writer, record);
+				recordWriter.writeValues(record);
 			}
 		}
-	}
-
-	@Todo(description = "users cannot change separator by now")
-	private void writeAsLine(BufferedWriter writer, Record record) throws IOException {
-		Iterator<Value> iterator = record.values().iterator();
-		while (iterator.hasNext()) {
-			Value value = iterator.next();
-			value.append(writer, Locale.getDefault());
-			if (iterator.hasNext()) {
-				writer.append(' ');
-			}
-		}
-		writer.newLine();
 	}
 
 	private void readStdout(Channel out, Process process) throws IOException {

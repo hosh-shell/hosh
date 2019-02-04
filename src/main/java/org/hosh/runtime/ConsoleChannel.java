@@ -1,38 +1,21 @@
 package org.hosh.runtime;
 
-import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.Locale;
-
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
-import org.hosh.spi.Value;
 import org.jline.terminal.Terminal;
 
 public class ConsoleChannel implements Channel {
-	private final Terminal terminal;
-	private final Color color;
+	private final RecordWriter recordWriter;
 
 	public ConsoleChannel(Terminal terminal, Color color) {
-		this.terminal = terminal;
-		this.color = color;
+		this.recordWriter = new RecordWriter(terminal.writer());
+		this.recordWriter.setPrefix(color.ansi);
+		this.recordWriter.setSuffix(Color.RESET.ansi);
 	}
 
 	@Override
 	public void send(Record record) {
-		@SuppressWarnings("resource")
-		PrintWriter writer = terminal.writer();
-		writer.append(color.ansi);
-		Iterator<Value> values = record.values().iterator();
-		while (values.hasNext()) {
-			Value value = values.next();
-			value.append(writer, Locale.getDefault());
-			if (values.hasNext()) {
-				writer.append(" ");
-			}
-		}
-		writer.append(Color.RESET.ansi);
-		writer.println();
+		recordWriter.writeValues(record);
 	}
 
 	public enum Color {

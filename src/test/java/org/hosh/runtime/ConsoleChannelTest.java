@@ -25,14 +25,14 @@ public class ConsoleChannelTest {
 
 	@Before
 	public void setup() {
-		sut = new ConsoleChannel(terminal, Color.RED);
 		given(terminal.writer()).willReturn(printWriter);
+		sut = new ConsoleChannel(terminal, Color.RED);
 	}
 
 	@Test
 	public void empty() {
 		sut.send(Record.empty());
-		then(printWriter).should().println();
+		then(printWriter).should().append(System.lineSeparator());
 	}
 
 	@Test
@@ -41,7 +41,7 @@ public class ConsoleChannelTest {
 		then(printWriter).should().append(Color.RED.ansi());
 		then(printWriter).should().append("foo");
 		then(printWriter).should().append(Color.RESET.ansi());
-		then(printWriter).should().println();
+		then(printWriter).should().append(System.lineSeparator());
 	}
 
 	@Test
@@ -52,6 +52,6 @@ public class ConsoleChannelTest {
 		then(printWriter).should().append(" ");
 		then(printWriter).should().append("bar");
 		then(printWriter).should().append(Color.RESET.ansi());
-		then(printWriter).should().println();
+		then(printWriter).should().append(System.lineSeparator());
 	}
 }
