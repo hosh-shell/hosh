@@ -33,7 +33,7 @@ public interface Record {
 		return new Record.Generic().append(key1, value1).append(key2, value2);
 	}
 
-	static class Empty implements Record {
+	class Empty implements Record {
 		@Override
 		public Collection<String> keys() {
 			return Collections.emptyList();

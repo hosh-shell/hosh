@@ -20,6 +20,6 @@ public class CommandCompleter implements Completer {
 		state.getCommands().keySet()
 				.stream()
 				.map(DebuggableCandidate::new)
-				.forEach(c -> candidates.add(c));
+				.forEach(candidates::add);
 	}
 }

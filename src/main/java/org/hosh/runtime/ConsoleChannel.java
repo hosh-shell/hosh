@@ -40,7 +40,7 @@ public class ConsoleChannel implements Channel {
 				"\u001b[36m"), WHITE("\u001b[37m"), RESET("\u001b[0m");
 		private final String ansi;
 
-		private Color(String ansi) {
+		Color(String ansi) {
 			this.ansi = ansi;
 		}
 

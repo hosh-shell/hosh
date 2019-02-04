@@ -61,7 +61,7 @@ public class LineReaderIterator implements Iterator<String> {
 				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
 				.append("hosh:")
 				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.CYAN))
-				.append("" + state.getId())
+				.append(String.valueOf(state.getId()))
 				.style(AttributedStyle.DEFAULT.foreground(AttributedStyle.BLUE))
 				.append("> ")
 				.style(AttributedStyle.DEFAULT)

@@ -130,13 +130,13 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	}
 
 	private Future<ExitStatus> prepareProducer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
-		return executor.submit(new Callable<ExitStatus>() {
+		return executor.submit(new Callable<>() {
 			@Override
 			public ExitStatus call() throws Exception {
 				setThreadName(statement);
 				List<String> arguments = statement.getArguments();
 				Command command = statement.getCommand();
-				command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline());
+				command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
 				try {
 					return command.run(arguments, in, out, err);
 				} catch (ProducerPoisonPill e) {

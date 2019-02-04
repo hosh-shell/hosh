@@ -71,7 +71,7 @@ public class FileSystemCompleterTest {
 
 	@Test
 	public void absoluteDir() throws IOException {
-		String dir = temporaryFolder.getRoot().getAbsolutePath().toString();
+		String dir = temporaryFolder.getRoot().getAbsolutePath();
 		temporaryFolder.newFile();
 		given(line.word()).willReturn(dir);
 		sut.complete(lineReader, line, candidates);

@@ -57,7 +57,7 @@ public class FileSystemCompleter implements Completer {
 					.map(toCandidate)
 					.map(Objects::toString)
 					.map(DebuggableCandidate::new)
-					.forEach(dc -> candidates.add(dc));
+					.forEach(candidates::add);
 		}
 	}
 }

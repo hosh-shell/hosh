@@ -37,9 +37,7 @@ public class ExitStatus {
 		try {
 			int value = Integer.parseInt(str, 10);
 			return Optional.of(new ExitStatus(value));
-		} catch (NumberFormatException e) {
-			return Optional.empty();
-		} catch (InvalidExitCode e) {
+		} catch (NumberFormatException | InvalidExitCode e) {
 			return Optional.empty();
 		}
 	}
