@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- more powerful grammar (e.g. nested wrapper, wrapper of pipeline)
+
+## [0.0.21] - 2019-02-04
+- generalized pipelines e.g. 'ls | drop 1 | take 1 | count'
+- more powerful grammar e.g. nested wrapper, wrapper of pipeline
+- Java commands can pipe data into native commands e.g. 'lines pom.xml | /usr/bin/wc -l'
 - 'cat' has been renamed to 'lines'
 
 ## [0.0.20] - 2019-01-30
@@ -15,11 +19,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - improved memory usage
 
 ## [0.0.19] - 2019-01-27
-- introducing pipe operator (i.e. ls | sort name)
+- introducing pipe operator (i.e. ls | sort name) just for 2 commands
   and some commands like 'enumerate', 'sort', 'filter', 'take', 'drop'
 - using alphanum to sort paths
 - 'rand', infinite stream of random integers
-- JUnit5
 
 ## [0.0.18] - 2018-10-20
 - Hosh now requires Java 11
