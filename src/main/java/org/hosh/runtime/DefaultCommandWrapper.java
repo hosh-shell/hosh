@@ -13,11 +13,11 @@ import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 
 public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAware {
-	private final Statement nestedStatement;
+	private final Statement nested;
 	private final CommandWrapper<T> commandWrapper;
 
-	public DefaultCommandWrapper(Statement nestedStatement, CommandWrapper<T> commandWrapper) {
-		this.nestedStatement = nestedStatement;
+	public DefaultCommandWrapper(Statement nested, CommandWrapper<T> commandWrapper) {
+		this.nested = nested;
 		this.commandWrapper = commandWrapper;
 	}
 
@@ -25,7 +25,7 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		T resource = commandWrapper.before(args, in, out, err);
 		try {
-			return nestedStatement.getCommand().run(nestedStatement.getArguments(), in, out, err);
+			return nested.getCommand().run(nested.getArguments(), in, out, err);
 		} finally {
 			commandWrapper.after(resource, in, out, err);
 		}
@@ -33,16 +33,16 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 
 	@Override
 	public String toString() {
-		return String.format("DefaultCommandWrapper[nested=%s,wrapper=%s]", nestedStatement, commandWrapper);
+		return String.format("DefaultCommandWrapper[nested=%s,commandWrapper=%s]", nested, commandWrapper);
 	}
 
 	@Override
 	public void setState(State state) {
-		nestedStatement.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
+		nested.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 	}
 
 	@Override
 	public void setTerminal(Terminal terminal) {
-		nestedStatement.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
+		nested.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 	}
 }

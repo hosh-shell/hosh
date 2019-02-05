@@ -45,6 +45,18 @@ public class HoshIT {
 	}
 
 	@Test
+	public void wrapperThenPipeline() throws Exception {
+		Path scriptPath = givenScript(
+				"withTime { cwd } | count"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).hasLineCount(2);
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
 	public void scriptWithCdAndCwd() throws Exception {
 		Path scriptPath = givenScript(
 				"cd " + temporaryFolder.getRoot().getAbsolutePath(),
