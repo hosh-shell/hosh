@@ -95,8 +95,6 @@ public class TextModule implements Module {
 	}
 
 	public static class Sort implements Command {
-		private final Logger logger = LoggerFactory.getLogger(getClass());
-
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
@@ -113,10 +111,9 @@ public class TextModule implements Module {
 				records.add(record);
 			}
 			String key = args.get(0);
-			var comparator = Comparator.<Record, Value>comparing((r) -> r.value(key), Comparator.nullsFirst(Comparator.naturalOrder()));
-			logger.debug("before sorting {}", records);
+			Comparator<Value> nullsFirst = Comparator.nullsFirst(Comparator.naturalOrder());
+			Comparator<Record> comparator = Comparator.<Record, Value>comparing((r) -> r.value(key), nullsFirst);
 			records.sort(comparator);
-			logger.debug("after sorting {}", records);
 			for (Record record : records) {
 				out.send(record);
 			}
