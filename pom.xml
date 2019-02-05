@@ -263,7 +263,7 @@
 			<plugin>
 				<groupId>org.pitest</groupId>
 				<artifactId>pitest-maven</artifactId>
-				<version>1.4.0</version>
+				<version>1.4.5</version>
 				<configuration>
 					<targetClasses>
 						<param>org.hosh.*</param>

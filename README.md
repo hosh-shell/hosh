@@ -8,6 +8,10 @@ JDK11 for build. JRE11 to run.
 
 `$ ./mvnw clean verify`
 
+## Pitest
+
+`$ ./mvnw org.pitest:pitest-maven:mutationCoverage`
+
 ## Run
 
 `$ java -jar target/dist/hosh.jar`
