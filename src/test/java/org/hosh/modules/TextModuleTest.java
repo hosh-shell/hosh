@@ -23,8 +23,10 @@
  */
 package org.hosh.modules;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -33,19 +35,27 @@ import org.hosh.modules.TextModule.Drop;
 import org.hosh.modules.TextModule.Enumerate;
 import org.hosh.modules.TextModule.Filter;
 import org.hosh.modules.TextModule.Schema;
+import org.hosh.modules.TextModule.Sort;
+import org.hosh.modules.TextModule.Take;
 import org.hosh.modules.TextModuleTest.DropTest;
 import org.hosh.modules.TextModuleTest.EnumerateTest;
 import org.hosh.modules.TextModuleTest.FilterTest;
 import org.hosh.modules.TextModuleTest.SchemaTest;
+import org.hosh.modules.TextModuleTest.SortTest;
+import org.hosh.modules.TextModuleTest.TakeTest;
 import org.hosh.spi.Channel;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(Suite.class)
@@ -53,7 +63,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SchemaTest.class,
 		EnumerateTest.class,
 		DropTest.class,
-		FilterTest.class
+		TakeTest.class,
+		FilterTest.class,
+		SortTest.class
 })
 public class TextModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -158,6 +170,75 @@ public class TextModuleTest {
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class TakeTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Take sut;
+
+		@Test
+		public void takeZero() {
+			ExitStatus exitStatus = sut.run(Arrays.asList("0"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void takeExactly() {
+			Record record = Record.of("key", Values.ofText("some data"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(1)).recv();
+			then(out).should().send(record);
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void takeLess() {
+			Record record = Record.of("key", Values.ofText("some data"));
+			Record record2 = record.append("another key", Values.ofText("another value"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(1)).recv();
+			then(out).should().send(record);
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void takeMore() {
+			Record record = Record.of("key", Values.ofText("some data"));
+			Record record2 = record.append("another key", Values.ofText("another value"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("5"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
+			then(out).should().send(record);
+			then(out).should().send(record2);
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class FilterTest {
 		@Mock
 		private Channel in;
@@ -201,6 +282,56 @@ public class TextModuleTest {
 			sut.run(Arrays.asList("key"), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expected 2 parameters: key regex")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class SortTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Sort sut;
+		@Captor
+		private ArgumentCaptor<Record> records;
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void sortByExistingKey() {
+			Record record1 = Record.of("key", Values.ofNumeric(2));
+			Record record2 = Record.of("key", Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(2)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record2, record1);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void sortByNonExistingKey() {
+			Record record1 = Record.of("key", Values.ofNumeric(2));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("another_key"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(2)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(1)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
+		}
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

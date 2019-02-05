@@ -121,10 +121,18 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expected 1 parameters")));
+				err.send(Record.of("error", Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
 			}
+			String key = args.get(0);
 			List<Record> records = new ArrayList<>();
+			accumulate(in, records);
+			sortBy(key, records);
+			output(out, records);
+			return ExitStatus.success();
+		}
+
+		private void accumulate(Channel in, List<Record> records) {
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
@@ -133,14 +141,18 @@ public class TextModule implements Module {
 				Record record = incoming.get();
 				records.add(record);
 			}
-			String key = args.get(0);
-			Comparator<Value> nullsFirst = Comparator.nullsFirst(Comparator.naturalOrder());
-			Comparator<Record> comparator = Comparator.<Record, Value>comparing((r) -> r.value(key), nullsFirst);
+		}
+
+		private void sortBy(String key, List<Record> records) {
+			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key),
+					Comparator.nullsFirst(Comparator.naturalOrder()));
 			records.sort(comparator);
+		}
+
+		private void output(Channel out, List<Record> records) {
 			for (Record record : records) {
 				out.send(record);
 			}
-			return ExitStatus.success();
 		}
 	}
 
@@ -149,22 +161,21 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expected 1 parameters")));
+				err.send(Record.of("error", Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
 			}
 			int take = Integer.parseInt(args.get(0));
 			while (true) {
+				if (take == 0) {
+					break;
+				}
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
 					break;
 				}
 				Record record = incoming.get();
-				if (take > 0) {
-					take--;
-					out.send(record);
-				} else {
-					break;
-				}
+				out.send(record);
+				take--;
 			}
 			return ExitStatus.success();
 		}
