@@ -30,7 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import org.hosh.spi.State;
@@ -38,11 +38,8 @@ import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FileSystemCompleter implements Completer {
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final State state;
 
 	public FileSystemCompleter(State state) {
@@ -72,11 +69,9 @@ public class FileSystemCompleter implements Completer {
 		return path.getParent() == null ? path : path.getParent();
 	}
 
-	private void listCandidates(Path dir, Function<Path, Path> toCandidate, List<Candidate> candidates) throws IOException {
-		logger.info("list '{}'", dir);
+	private void listCandidates(Path dir, UnaryOperator<Path> toCandidate, List<Candidate> candidates) throws IOException {
 		try (Stream<Path> list = Files.list(dir)) {
 			list
-					.peek(p -> logger.info("  {}", p))
 					.map(toCandidate)
 					.map(Objects::toString)
 					.map(DebuggableCandidate::new)
