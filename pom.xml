@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org</groupId>
 	<artifactId>hosh</artifactId>
@@ -318,6 +320,31 @@
 								<sourceDirectory>src/main/java</sourceDirectory>
 							</sourceDirectories>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
+				<inherited>false</inherited>
+				<configuration>
+					<header>${project.basedir}/LICENSE.md</header>
+					<aggregate>true</aggregate>
+					<failIfMissing>true</failIfMissing>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<includes>
+						<include>**/main/java/**/*.java</include>
+						<include>**/test/java/**/*.java</include>
+					</includes>
+					<strictCheck>true</strictCheck>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>format</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
