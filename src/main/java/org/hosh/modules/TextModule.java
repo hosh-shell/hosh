@@ -23,12 +23,17 @@
  */
 package org.hosh.modules;
 
+import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hosh.doc.Experimental;
 import org.hosh.doc.Todo;
@@ -55,6 +60,7 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("drop", new Drop());
 		commandRegistry.registerCommand("rand", new Rand());
 		commandRegistry.registerCommand("count", new Count());
+		commandRegistry.registerCommand("table", new Table());
 	}
 
 	public static class Schema implements Command {
@@ -208,7 +214,7 @@ public class TextModule implements Module {
 
 	@Experimental(description = "extends with seed, bounds, doubles, booleans, etc")
 	public static class Rand implements Command {
-		private final Logger logger = LoggerFactory.getLogger(getClass());
+		private static final Logger LOGGER = LoggerFactory.getLogger(Rand.class);
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -220,7 +226,7 @@ public class TextModule implements Module {
 			try {
 				secureRandom = SecureRandom.getInstanceStrong();
 			} catch (NoSuchAlgorithmException e) {
-				logger.error("failed to get SecureRandom instance", e);
+				LOGGER.error("failed to get SecureRandom instance", e);
 				err.send(Record.of("error", Values.ofText(e.getMessage())));
 				return ExitStatus.error();
 			}
@@ -250,5 +256,66 @@ public class TextModule implements Module {
 				}
 			}
 		}
+	}
+
+	public static class Table implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 0) {
+				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				return ExitStatus.error();
+			}
+			boolean headerSent = false;
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				Record record = incoming.get();
+				if (!headerSent) {
+					sendHeader(record.keys(), out);
+					headerSent = true;
+				}
+				sendRow(record, out);
+			}
+			return ExitStatus.success();
+		}
+
+		@Todo(description = "try to optimize memory usage here")
+		private void sendRow(Record record, Channel out) {
+			Locale locale = Locale.getDefault();
+			StringBuilder formatter = new StringBuilder();
+			Collection<String> keys = record.keys();
+			List<String> formattedValues = new ArrayList<>(keys.size());
+			for (String key : keys) {
+				StringWriter writer = new StringWriter();
+				formatter.append(formatterFor(key));
+				Value value = record.value(key);
+				if (value != null) {
+					value.append(writer, locale);
+				} else {
+					writer.append("");
+				}
+				formattedValues.add(writer.toString());
+			}
+			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
+			out.send(Record.of("row", Values.ofText(row)));
+		}
+
+		private String formatterFor(String key) {
+			return String.format("%%-%ds", paddings.getOrDefault(key, 10));
+		}
+
+		private void sendHeader(Collection<String> keys, Channel out) {
+			Locale locale = Locale.getDefault();
+			String format = keys.stream()
+					.map(this::formatterFor)
+					.collect(Collectors.joining(" "));
+			String header = String.format(locale, format, keys.toArray());
+			out.send(Record.of("header", Values.ofText(header)));
+		}
+
+		@Todo(description = "should be user configurable")
+		private final Map<String, Integer> paddings = Map.of("path", 30, "size", 5);
 	}
 }

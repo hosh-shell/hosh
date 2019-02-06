@@ -35,6 +35,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hosh.doc.Experimental;
+
 /**
  * Built-in values to be used in Records.
  *
@@ -42,6 +44,13 @@ import java.util.regex.Pattern;
  */
 public class Values {
 	private Values() {
+	}
+
+	private static final None NONE = new None();
+
+	@Experimental(description = "it is useful to always provide a key, even if the value if missing. This simplifies a lot the pattern '| sort key | table'")
+	public static Value none() {
+		return NONE;
 	}
 
 	public static Value ofNumeric(long number) {
@@ -131,6 +140,8 @@ public class Values {
 			if (obj instanceof Text) {
 				Text that = (Text) obj;
 				return this.value.compareTo(that.value);
+			} else if (obj instanceof None) {
+				return 1;
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -209,6 +220,8 @@ public class Values {
 			if (obj instanceof Size) {
 				Size that = (Size) obj;
 				return SIZE_COMPARATOR.compare(this, that);
+			} else if (obj instanceof None) {
+				return 1;
 			} else {
 				throw new IllegalArgumentException();
 			}
@@ -243,9 +256,9 @@ public class Values {
 		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (o instanceof Numeric) {
-				Numeric that = (Numeric) o;
+		public boolean equals(Object obj) {
+			if (obj instanceof Numeric) {
+				Numeric that = (Numeric) obj;
 				return this.number == that.number;
 			} else {
 				return false;
@@ -253,12 +266,49 @@ public class Values {
 		}
 
 		@Override
-		public int compareTo(Value o) {
-			if (o instanceof Numeric) {
-				Numeric that = (Numeric) o;
+		public int compareTo(Value obj) {
+			if (obj instanceof Numeric) {
+				Numeric that = (Numeric) obj;
 				return Long.compare(this.number, that.number);
+			} else if (obj instanceof None) {
+				return 1;
 			} else {
 				throw new IllegalArgumentException();
+			}
+		}
+	}
+
+	static final class None implements Value {
+		@Override
+		public void append(Appendable appendable, Locale locale) {
+			try {
+				appendable.append("");
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return "None";
+		}
+
+		@Override
+		public int hashCode() {
+			return 17;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof None;
+		}
+
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof None) {
+				return 0;
+			} else {
+				return -1;
 			}
 		}
 	}
@@ -307,6 +357,8 @@ public class Values {
 			if (obj instanceof LocalPath) {
 				LocalPath that = (LocalPath) obj;
 				return PATH_COMPARATOR.compare(this.path, that.path);
+			} else if (obj instanceof None) {
+				return 1;
 			} else {
 				throw new IllegalArgumentException();
 			}

@@ -42,6 +42,7 @@ import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
+import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,11 +87,8 @@ public class FileSystemModule implements Module {
 			logger.debug("listing {}", dir);
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
 				for (Path path : stream) {
-					Record entry = Record.of("name", Values.ofLocalPath(path.getFileName()));
-					if (Files.isRegularFile(path)) {
-						long size = Files.size(path);
-						entry = entry.append("size", Values.ofHumanizedSize(size));
-					}
+					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
+					Record entry = Record.of("path", Values.ofLocalPath(path.getFileName()), "size", size);
 					out.send(entry);
 				}
 				return ExitStatus.success();
@@ -219,7 +217,7 @@ public class FileSystemModule implements Module {
 			} else {
 				start = state.getCwd().resolve(arg).normalize();
 			}
-			LOGGER.debug("start is '{}'", start);
+			LOGGER.debug("find: directory '{}'", start);
 			try (Stream<Path> stream = Files.walk(start)) {
 				stream.forEach(path -> {
 					Record result = Record.of("name", Values.ofLocalPath(path.toAbsolutePath()));

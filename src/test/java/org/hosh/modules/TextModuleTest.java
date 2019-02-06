@@ -36,12 +36,14 @@ import org.hosh.modules.TextModule.Enumerate;
 import org.hosh.modules.TextModule.Filter;
 import org.hosh.modules.TextModule.Schema;
 import org.hosh.modules.TextModule.Sort;
+import org.hosh.modules.TextModule.Table;
 import org.hosh.modules.TextModule.Take;
 import org.hosh.modules.TextModuleTest.DropTest;
 import org.hosh.modules.TextModuleTest.EnumerateTest;
 import org.hosh.modules.TextModuleTest.FilterTest;
 import org.hosh.modules.TextModuleTest.SchemaTest;
 import org.hosh.modules.TextModuleTest.SortTest;
+import org.hosh.modules.TextModuleTest.TableTest;
 import org.hosh.modules.TextModuleTest.TakeTest;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -65,7 +67,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 		DropTest.class,
 		TakeTest.class,
 		FilterTest.class,
-		SortTest.class
+		SortTest.class,
+		TableTest.class,
 })
 public class TextModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -332,6 +335,59 @@ public class TextModuleTest {
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class TableTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Table sut;
+		@Captor
+		private ArgumentCaptor<Record> records;
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void table() {
+			Record record1 = Record.of("age", Values.ofNumeric(2), "name", Values.ofText("zvrnv"));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(2)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(2)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactly(
+					Record.of("header", Values.ofText("age        name      ")),
+					Record.of("row", Values.ofText("2         zvrnv     ")));
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void tableWithNone() {
+			Record record1 = Record.of("age", Values.none(), "name", Values.ofText("zvrnv"));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(2)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(2)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactly(
+					Record.of("header", Values.ofText("age        name      ")),
+					Record.of("row", Values.ofText("          zvrnv     ")));
+		}
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList("a"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

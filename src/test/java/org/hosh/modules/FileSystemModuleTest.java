@@ -98,7 +98,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			temporaryFolder.newFolder("dir").mkdirs();
 			sut.run(Arrays.asList(), null, out, err);
-			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("dir"))));
+			then(out).should().send(Record.of("path", Values.ofLocalPath(Paths.get("dir")), "size", Values.none()));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -107,7 +107,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			temporaryFolder.newFile("file").createNewFile();
 			sut.run(Arrays.asList(), null, out, err);
-			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("file"))).append("size", Values.ofHumanizedSize(0)));
+			then(out).should().send(Record.of("path", Values.ofLocalPath(Paths.get("file"))).append("size", Values.ofHumanizedSize(0)));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -145,7 +145,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(newFolder.toPath());
 			sut.run(Arrays.asList("."), null, out, err);
 			then(err).shouldHaveNoMoreInteractions();
-			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofHumanizedSize(0)));
+			then(out).should().send(Record.of("path", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofHumanizedSize(0)));
 		}
 
 		@Test
@@ -164,7 +164,7 @@ public class FileSystemModuleTest {
 			Files.createFile(new File(newFolder, "aaa").toPath());
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
 			sut.run(Arrays.asList(newFolder.getAbsolutePath()), null, out, err);
-			then(out).should().send(Record.of("name", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofHumanizedSize(0)));
+			then(out).should().send(Record.of("path", Values.ofLocalPath(Paths.get("aaa")), "size", Values.ofHumanizedSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

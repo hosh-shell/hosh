@@ -34,12 +34,16 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hosh.spi.Values.AlphaNumericStringComparator;
 import org.hosh.spi.ValuesTest.AlphaNumericStringComparatorTest;
 import org.hosh.spi.ValuesTest.LocalPathValueTest;
+import org.hosh.spi.ValuesTest.NoneValueTest;
 import org.hosh.spi.ValuesTest.NumericValueTest;
 import org.hosh.spi.ValuesTest.SizeValueTest;
+import org.hosh.spi.ValuesTest.SortingBetweenValuesTest;
 import org.hosh.spi.ValuesTest.TextValueTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,13 +57,37 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+		NoneValueTest.class,
 		TextValueTest.class,
 		NumericValueTest.class,
 		SizeValueTest.class,
 		LocalPathValueTest.class,
-		AlphaNumericStringComparatorTest.class
+		AlphaNumericStringComparatorTest.class,
+		SortingBetweenValuesTest.class
 })
 public class ValuesTest {
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class NoneValueTest {
+		@Mock
+		private Appendable appendable;
+
+		@Test
+		public void append() throws IOException {
+			Values.none().append(appendable, Locale.ENGLISH);
+			then(appendable).should().append("");
+		}
+
+		@Test
+		public void equalsContract() {
+			EqualsVerifier.forClass(Values.None.class).verify();
+		}
+
+		@Test
+		public void asString() {
+			assertThat(Values.none()).hasToString("None");
+		}
+	}
+
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class TextValueTest {
 		@Mock
@@ -109,13 +137,13 @@ public class ValuesTest {
 		private Appendable appendable;
 
 		@Test
-		public void appendEnglish() throws IOException {
+		public void englishLocale() throws IOException {
 			Values.ofNumeric(1_000_000).append(appendable, Locale.ENGLISH);
 			then(appendable).should().append("1,000,000");
 		}
 
 		@Test
-		public void appendItalian() throws IOException {
+		public void italianLocale() throws IOException {
 			Values.ofNumeric(1_000_000).append(appendable, Locale.ITALIAN);
 			then(appendable).should().append("1.000.000");
 		}
@@ -284,6 +312,26 @@ public class ValuesTest {
 			List<String> input = Arrays.asList("a.1", "1.a", "2.a", "b.1");
 			input.sort(new AlphaNumericStringComparator());
 			assertThat(input).containsExactly("1.a", "2.a", "a.1", "b.1");
+		}
+	}
+
+	public static class SortingBetweenValuesTest {
+		@Test
+		public void numericWithNone() {
+			List<Value> sorted = Stream.of(
+					Values.ofNumeric(1),
+					Values.none(),
+					Values.none(),
+					Values.ofNumeric(-1),
+					Values.ofNumeric(0))
+					.sorted()
+					.collect(Collectors.toList());
+			assertThat(sorted).containsExactly(
+					Values.none(),
+					Values.none(),
+					Values.ofNumeric(-1),
+					Values.ofNumeric(0),
+					Values.ofNumeric(1));
 		}
 	}
 }
