@@ -25,7 +25,6 @@ package org.hosh.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -139,6 +138,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 		}
 	}
 
+	@Todo(description = "recursion here could be simplified?")
 	private void assemblePipeline(List<Future<ExitStatus>> futures,
 			Statement statement,
 			Channel in, Channel out, Channel err,
@@ -161,52 +161,36 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	}
 
 	private Future<ExitStatus> submitProducer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
-		return executor.submit(new Callable<>() {
-			@Override
-			public ExitStatus call() throws Exception {
-				setThreadName(statement);
-				List<String> arguments = statement.getArguments();
-				Command command = statement.getCommand();
-				command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
-				try {
-					return command.run(arguments, in, out, err);
-				} catch (ProducerPoisonPill e) {
-					LOGGER.trace("got poison pill");
-					return ExitStatus.success();
-				} finally {
-					((PipelineChannel) out).stopConsumer();
-				}
-			}
-
-			@Override
-			public String toString() {
-				return statement.toString();
+		return executor.submit(() -> {
+			setThreadName(statement);
+			List<String> arguments = statement.getArguments();
+			Command command = statement.getCommand();
+			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
+			try {
+				return command.run(arguments, in, out, err);
+			} catch (ProducerPoisonPill e) {
+				LOGGER.trace("got poison pill");
+				return ExitStatus.success();
+			} finally {
+				((PipelineChannel) out).stopConsumer();
 			}
 		});
 	}
 
 	private Future<ExitStatus> submitConsumer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
-		return executor.submit(new Callable<>() {
-			@Override
-			public ExitStatus call() throws Exception {
-				setThreadName(statement);
-				Command command = statement.getCommand();
-				command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
-				List<String> arguments = statement.getArguments();
-				try {
-					return command.run(arguments, in, out, err);
-				} finally {
-					((PipelineChannel) in).stopProducer();
-					((PipelineChannel) in).consumeAnyRemainingRecord();
-					if (out instanceof PipelineChannel) {
-						((PipelineChannel) out).stopConsumer();
-					}
+		return executor.submit(() -> {
+			setThreadName(statement);
+			Command command = statement.getCommand();
+			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
+			List<String> arguments = statement.getArguments();
+			try {
+				return command.run(arguments, in, out, err);
+			} finally {
+				((PipelineChannel) in).stopProducer();
+				((PipelineChannel) in).consumeAnyRemainingRecord();
+				if (out instanceof PipelineChannel) {
+					((PipelineChannel) out).stopConsumer();
 				}
-			}
-
-			@Override
-			public String toString() {
-				return statement.toString();
 			}
 		});
 	}
