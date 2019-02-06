@@ -35,9 +35,10 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 
-public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAware {
+public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAware, ArgumentResolverAware {
 	private final Statement nested;
 	private final CommandWrapper<T> commandWrapper;
+	private ArgumentResolver argumentResolver;
 
 	public DefaultCommandWrapper(Statement nested, CommandWrapper<T> commandWrapper) {
 		this.nested = nested;
@@ -48,7 +49,9 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		T resource = commandWrapper.before(args, in, out, err);
 		try {
-			return nested.getCommand().run(nested.getArguments(), in, out, err);
+			List<String> arguments = nested.getArguments();
+			List<String> resolvedArguments = argumentResolver.resolve(arguments);
+			return nested.getCommand().run(resolvedArguments, in, out, err);
 		} finally {
 			commandWrapper.after(resource, in, out, err);
 		}
@@ -67,5 +70,11 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 	@Override
 	public void setTerminal(Terminal terminal) {
 		nested.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
+	}
+
+	@Override
+	public void setArgumentResolver(ArgumentResolver argumentResolver) {
+		nested.getCommand().downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(argumentResolver));
+		this.argumentResolver = argumentResolver;
 	}
 }

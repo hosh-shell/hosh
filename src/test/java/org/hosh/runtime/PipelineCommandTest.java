@@ -52,12 +52,14 @@ public class PipelineCommandTest {
 	private Channel out;
 	@Mock
 	private Channel err;
-	@Mock
+	@Mock(stubOnly = true)
 	private Terminal terminal;
-	@Mock
+	@Mock(stubOnly = true)
 	private Command command1;
-	@Mock
+	@Mock(stubOnly = true)
 	private Command command2;
+	@Mock(stubOnly = true)
+	private ArgumentResolver argumentResolver;
 
 	private PipelineCommand setupSut() {
 		Statement producer = new Statement();
@@ -68,6 +70,7 @@ public class PipelineCommandTest {
 		consumer.setArguments(Collections.emptyList());
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setTerminal(terminal);
+		sut.setArgumentResolver(argumentResolver);
 		return sut;
 	}
 

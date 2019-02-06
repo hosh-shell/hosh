@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Bug;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -207,7 +206,6 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
-	@Ignore
 	@Bug(description = "output should be 'hello world!'", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
 	public void pipelinesDontExpandVariables() throws Exception {
@@ -217,7 +215,20 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(Collections.singletonMap("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).isEqualTo("echo ${OS_ENV_VARIABLE}");
+		assertThat(output).isEqualTo("hello world!");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Bug(description = "output should be 'hello world!'", issue = "https://github.com/dfa1/hosh/issues/23")
+	@Test
+	public void wrappersDontExpandVariables() throws Exception {
+		Path scriptPath = givenScript(
+				"withTime { echo ${OS_ENV_VARIABLE} } "//
+		);
+		Process hosh = givenHoshProcess(Collections.singletonMap("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).contains("hello world!");
 		assertThat(exitCode).isEqualTo(0);
 	}
 

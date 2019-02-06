@@ -36,9 +36,9 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -54,16 +54,23 @@ public class DefaultCommandWrapperTest {
 	private Statement statement;
 	@Mock(stubOnly = true)
 	private Command command;
+	@Mock(stubOnly = true)
+	private ArgumentResolver argumentResolver;
 	@Mock
 	private CommandWrapper<Object> commandWrapper;
-	@InjectMocks
 	private DefaultCommandWrapper<Object> sut;
+
+	@Before
+	public void setup() {
+		given(statement.getCommand()).willReturn(command);
+		sut = new DefaultCommandWrapper<>(statement, commandWrapper);
+		sut.setArgumentResolver(argumentResolver);
+	}
 
 	@Test
 	public void callsBeforeAndAfterWhenStatementCompletesNormally() {
 		Object resource = new Object();
 		List<String> args = Collections.emptyList();
-		given(statement.getCommand()).willReturn(command);
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
 		given(command.run(args, in, out, err)).willReturn(ExitStatus.success());
 		ExitStatus exitStatus = sut.run(args, in, out, err);
@@ -76,7 +83,6 @@ public class DefaultCommandWrapperTest {
 	public void callsBeforeAndAfterWhenStatementThrows() {
 		Object resource = new Object();
 		List<String> args = Collections.emptyList();
-		given(statement.getCommand()).willReturn(command);
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
 		given(command.run(args, in, out, err)).willThrow(NullPointerException.class);
 		assertThatThrownBy(() -> sut.run(args, in, out, err))

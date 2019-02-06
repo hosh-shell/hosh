@@ -48,11 +48,12 @@ import org.jline.terminal.Terminal.SignalHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PipelineCommand implements Command, TerminalAware, StateAware {
+public class PipelineCommand implements Command, TerminalAware, StateAware, ArgumentResolverAware {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PipelineCommand.class);
 	private final Statement producer;
 	private final Statement consumer;
 	private Terminal terminal;
+	private ArgumentResolver argumentResolver;
 
 	public PipelineCommand(Statement producer, Statement consumer) {
 		this.producer = producer;
@@ -78,6 +79,11 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	public void setState(State state) {
 		producer.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		consumer.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
+	}
+
+	@Override
+	public void setArgumentResolver(ArgumentResolver argumentResolver) {
+		this.argumentResolver = argumentResolver;
 	}
 
 	@Override
@@ -163,11 +169,12 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 	private Future<ExitStatus> submitProducer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
 		return executor.submit(() -> {
 			setThreadName(statement);
-			List<String> arguments = statement.getArguments();
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
+			List<String> arguments = statement.getArguments();
+			List<String> resolvedArguments = argumentResolver.resolve(arguments);
 			try {
-				return command.run(arguments, in, out, err);
+				return command.run(resolvedArguments, in, out, err);
 			} catch (ProducerPoisonPill e) {
 				LOGGER.trace("got poison pill");
 				return ExitStatus.success();
@@ -183,8 +190,9 @@ public class PipelineCommand implements Command, TerminalAware, StateAware {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
 			List<String> arguments = statement.getArguments();
+			List<String> resolvedArguments = argumentResolver.resolve(arguments);
 			try {
-				return command.run(arguments, in, out, err);
+				return command.run(resolvedArguments, in, out, err);
 			} finally {
 				((PipelineChannel) in).stopProducer();
 				((PipelineChannel) in).consumeAnyRemainingRecord();

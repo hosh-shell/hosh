@@ -70,16 +70,27 @@ public class Interpreter {
 		return state.isExit();
 	}
 
+	private void store(ExitStatus exitStatus) {
+		Objects.requireNonNull(exitStatus, "exit status cannot be null");
+		state.getVariables().put("EXIT_STATUS", String.valueOf(exitStatus.value()));
+	}
+
 	private ExitStatus execute(Statement statement) {
 		Command command = prepareCommand(statement);
-		List<String> arguments = resolveArguments(statement.getArguments());
-		return command.run(arguments, new NullChannel(), out, err);
+		List<String> resolvedArguments = resolveArguments(statement.getArguments());
+		return command.run(resolvedArguments, new NullChannel(), out, err);
 	}
 
 	private Command prepareCommand(Statement statement) {
 		Command command = statement.getCommand();
 		injectDeps(command);
 		return command;
+	}
+
+	private void injectDeps(Command command) {
+		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
+		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
+		command.downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(this::resolveArguments));
 	}
 
 	private List<String> resolveArguments(List<String> arguments) {
@@ -105,15 +116,5 @@ public class Interpreter {
 	// ${VARIABLE} -> VARIABLE
 	private String variableName(String variable) {
 		return variable.substring(2, variable.length() - 1);
-	}
-
-	private void store(ExitStatus exitStatus) {
-		Objects.requireNonNull(exitStatus, "exit status cannot be null");
-		state.getVariables().put("EXIT_STATUS", String.valueOf(exitStatus.value()));
-	}
-
-	private void injectDeps(Command command) {
-		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
-		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 	}
 }
