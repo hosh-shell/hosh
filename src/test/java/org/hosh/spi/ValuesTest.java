@@ -333,5 +333,59 @@ public class ValuesTest {
 					Values.ofNumeric(0),
 					Values.ofNumeric(1));
 		}
+
+		@Test
+		public void textWithNone() {
+			List<Value> sorted = Stream.of(
+					Values.ofText("a"),
+					Values.none(),
+					Values.none(),
+					Values.ofText("z"),
+					Values.ofText("b"))
+					.sorted()
+					.collect(Collectors.toList());
+			assertThat(sorted).containsExactly(
+					Values.none(),
+					Values.none(),
+					Values.ofText("a"),
+					Values.ofText("b"),
+					Values.ofText("z"));
+		}
+
+		@Test
+		public void sizeWithNone() {
+			List<Value> sorted = Stream.of(
+					Values.ofHumanizedSize(1),
+					Values.none(),
+					Values.none(),
+					Values.ofHumanizedSize(2),
+					Values.ofHumanizedSize(3))
+					.sorted()
+					.collect(Collectors.toList());
+			assertThat(sorted).containsExactly(
+					Values.none(),
+					Values.none(),
+					Values.ofHumanizedSize(1),
+					Values.ofHumanizedSize(2),
+					Values.ofHumanizedSize(3));
+		}
+
+		@Test
+		public void localPathWithNone() {
+			List<Value> sorted = Stream.of(
+					Values.ofLocalPath(Paths.get("bbb")),
+					Values.none(),
+					Values.none(),
+					Values.ofLocalPath(Paths.get("aaa")),
+					Values.ofLocalPath(Paths.get("ccc")))
+					.sorted()
+					.collect(Collectors.toList());
+			assertThat(sorted).containsExactly(
+					Values.none(),
+					Values.none(),
+					Values.ofLocalPath(Paths.get("aaa")),
+					Values.ofLocalPath(Paths.get("bbb")),
+					Values.ofLocalPath(Paths.get("ccc")));
+		}
 	}
 }
