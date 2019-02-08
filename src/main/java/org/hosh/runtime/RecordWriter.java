@@ -37,19 +37,11 @@ import org.hosh.spi.Value;
 @Experimental(description = "standard way to writer record as string")
 public class RecordWriter {
 	private final Appendable appendable;
-	private String prefix;
-	private String suffix;
+	private final Ansi.Style style;
 
-	public RecordWriter(Appendable appendable) {
+	public RecordWriter(Appendable appendable, Ansi.Style style) {
 		this.appendable = appendable;
-	}
-
-	public void setPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-
-	public void setSuffix(String suffix) {
-		this.suffix = suffix;
+		this.style = style;
 	}
 
 	public void writeValues(Record record) {
@@ -63,9 +55,7 @@ public class RecordWriter {
 	private void tryWriteValues(Record record) throws IOException {
 		Locale locale = Locale.getDefault();
 		Iterator<Value> values = record.values().iterator();
-		if (prefix != null) {
-			appendable.append(prefix);
-		}
+		style.enable(appendable);
 		while (values.hasNext()) {
 			Value value = values.next();
 			value.append(appendable, locale);
@@ -73,9 +63,7 @@ public class RecordWriter {
 				appendable.append(" ");
 			}
 		}
-		if (suffix != null) {
-			appendable.append(suffix);
-		}
+		style.disable(appendable);
 		appendable.append(System.lineSeparator());
 	}
 }

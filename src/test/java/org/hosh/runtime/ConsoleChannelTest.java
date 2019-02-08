@@ -28,7 +28,6 @@ import static org.mockito.BDDMockito.then;
 
 import java.io.PrintWriter;
 
-import org.hosh.runtime.ConsoleChannel.Color;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
@@ -49,7 +48,7 @@ public class ConsoleChannelTest {
 	@Before
 	public void setup() {
 		given(terminal.writer()).willReturn(printWriter);
-		sut = new ConsoleChannel(terminal, Color.RED);
+		sut = new ConsoleChannel(terminal, Ansi.Style.NONE);
 	}
 
 	@Test
@@ -61,20 +60,16 @@ public class ConsoleChannelTest {
 	@Test
 	public void oneValue() {
 		sut.send(Record.of("key", Values.ofText("foo")));
-		then(printWriter).should().append(Color.RED.ansi());
 		then(printWriter).should().append("foo");
-		then(printWriter).should().append(Color.RESET.ansi());
 		then(printWriter).should().append(System.lineSeparator());
 	}
 
 	@Test
 	public void twoValues() {
 		sut.send(Record.of("key", Values.ofText("foo")).append("another_key", Values.ofText("bar")));
-		then(printWriter).should().append(Color.RED.ansi());
 		then(printWriter).should().append("foo");
 		then(printWriter).should().append(" ");
 		then(printWriter).should().append("bar");
-		then(printWriter).should().append(Color.RESET.ansi());
 		then(printWriter).should().append(System.lineSeparator());
 	}
 }

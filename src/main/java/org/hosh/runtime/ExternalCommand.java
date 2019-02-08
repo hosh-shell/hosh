@@ -97,7 +97,7 @@ public class ExternalCommand implements Command, StateAware {
 
 	private void pipeChannelToOutputStream(Channel in, OutputStream outputStream) throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
-			RecordWriter recordWriter = new RecordWriter(writer);
+			RecordWriter recordWriter = new RecordWriter(writer, Ansi.Style.NONE);
 			while (true) {
 				Optional<Record> recv = in.recv();
 				if (recv.isEmpty()) {

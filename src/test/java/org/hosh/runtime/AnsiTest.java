@@ -23,22 +23,19 @@
  */
 package org.hosh.runtime;
 
-import org.hosh.spi.Channel;
-import org.hosh.spi.Record;
+import java.io.IOException;
 
-/**
- * Output a record to a non-ANSI terminal, this is used only by
- * non-interactive shell.
- */
-public class SimpleChannel implements Channel {
-	private final RecordWriter recordWriter;
+import org.hosh.runtime.Ansi.Style;
+import org.junit.Test;
 
-	public SimpleChannel(Appendable appendable) {
-		this.recordWriter = new RecordWriter(appendable, Ansi.Style.NONE);
-	}
-
-	@Override
-	public void send(Record record) {
-		recordWriter.writeValues(record);
+public class AnsiTest {
+	@Test
+	public void coloring() throws IOException {
+		for (Style style : Ansi.Style.values()) {
+			style.enable(System.out);
+			System.out.println("test".repeat(10));
+			style.disable(System.out);
+		}
+		Style.RESET.enable(System.out);
 	}
 }

@@ -37,13 +37,13 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hosh.runtime.Ansi;
 import org.hosh.runtime.CommandCompleter;
 import org.hosh.runtime.CommandResolver;
 import org.hosh.runtime.CommandResolvers;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
-import org.hosh.runtime.ConsoleChannel.Color;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.LineReaderIterator;
@@ -122,8 +122,8 @@ public class Hosh {
 					.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
 					.terminal(terminal)
 					.build();
-			Channel out = new ConsoleChannel(terminal, Color.WHITE);
-			Channel err = new ConsoleChannel(terminal, Color.RED);
+			Channel out = new ConsoleChannel(terminal, Ansi.Style.NONE);
+			Channel err = new ConsoleChannel(terminal, Ansi.Style.FG_RED);
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			welcome(out, version);
 			repl(state, lineReader, compiler, interpreter, err, logger);
