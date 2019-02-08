@@ -348,7 +348,7 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(Arrays.asList("."), null, out, err);
 			assertThat(exitStatus.value()).isEqualTo(0);
-			then(out).should().send(Record.of("name", Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
+			then(out).should().send(Record.of("path", Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
 			then(err).shouldHaveZeroInteractions();
 		}
 

@@ -24,6 +24,7 @@
 package org.hosh.modules;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -84,8 +85,10 @@ public class FileSystemModule implements Module {
 			} else {
 				dir = cwd;
 			}
-			logger.debug("listing {}", dir);
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+			logger.debug("list: requested '{}'", dir);
+			final Path realDir = followSymlinksRecursively(dir);
+			logger.debug("list: real '{}'", realDir);
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(realDir)) {
 				for (Path path : stream) {
 					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
 					Record entry = Record.of("path", Values.ofLocalPath(path.getFileName()), "size", size);
@@ -210,17 +213,19 @@ public class FileSystemModule implements Module {
 				err.send(Record.of("error", Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
-			Path arg = Path.of(args.get(0));
-			Path start;
+			final Path arg = Path.of(args.get(0));
+			final Path start;
 			if (arg.isAbsolute()) {
 				start = arg;
 			} else {
-				start = state.getCwd().resolve(arg).normalize();
+				start = state.getCwd().resolve(arg).normalize().toAbsolutePath();
 			}
-			LOGGER.debug("find: directory '{}'", start);
-			try (Stream<Path> stream = Files.walk(start)) {
+			LOGGER.debug("find: requested '{}'", start);
+			final Path realStart = followSymlinksRecursively(start);
+			LOGGER.debug("find: real '{}'", realStart);
+			try (Stream<Path> stream = Files.walk(realStart)) {
 				stream.forEach(path -> {
-					Record result = Record.of("name", Values.ofLocalPath(path.toAbsolutePath()));
+					Record result = Record.of("path", Values.ofLocalPath(path.toAbsolutePath()));
 					out.send(result);
 				});
 				return ExitStatus.success();
@@ -231,6 +236,24 @@ public class FileSystemModule implements Module {
 				err.send(Record.of("error", Values.ofText(e.getMessage())));
 				return ExitStatus.error();
 			}
+		}
+	}
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemModule.class);
+
+	private static Path followSymlinksRecursively(Path path) {
+		try {
+			LOGGER.debug("resolve_symlink: path {}", path);
+			if (Files.isSymbolicLink(path)) {
+				Path target = Files.readSymbolicLink(path);
+				Path resolvedPath = path.getParent().resolve(target);
+				LOGGER.debug("resolve_symlink: resolved as {}", resolvedPath);
+				return followSymlinksRecursively(resolvedPath);
+			} else {
+				return path;
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 }
