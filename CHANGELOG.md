@@ -5,8 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- introducing 'benchmark' command (lots of sharp edges)
+
+## [0.0.22] - 2019-02-09
+- introduced 'table' command: 'ls | table' for a bit nicer output
+- introduced 'benchmark' command (lots of sharp edges)
 - detecting and reporting extranous '}' at the end of statement
+- follow symlinks when target of 'find' and 'ls' are symlinks
 
 ## [0.0.21] - 2019-02-04
 - generalized pipelines e.g. 'ls | drop 1 | take 1 | count'
