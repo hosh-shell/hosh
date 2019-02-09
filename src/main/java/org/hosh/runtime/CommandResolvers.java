@@ -87,7 +87,7 @@ public class CommandResolvers {
 			}
 			for (Path dir : state.getPath()) {
 				Path dirCandidate = Paths.get(dir.toString(), commandName).normalize();
-				LOGGER.info(() -> String.format("  trying {}", dirCandidate));
+				LOGGER.info(() -> String.format("  trying %s", dirCandidate));
 				if (Files.isRegularFile(dirCandidate) && Files.isExecutable(dirCandidate)) {
 					LOGGER.info(() -> String.format("  found in %s", dirCandidate));
 					return Optional.of(new ExternalCommand(dirCandidate));
