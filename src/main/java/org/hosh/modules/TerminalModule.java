@@ -39,9 +39,9 @@ import org.jline.utils.InfoCmp;
 public class TerminalModule implements Module {
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("dump", new Dump());
-		commandRegistry.registerCommand("clear", new Clear());
-		commandRegistry.registerCommand("bell", new Bell());
+		commandRegistry.registerCommand("dump", Dump.class);
+		commandRegistry.registerCommand("clear", Clear.class);
+		commandRegistry.registerCommand("bell", Bell.class);
 	}
 
 	public static class Dump implements Command, TerminalAware {

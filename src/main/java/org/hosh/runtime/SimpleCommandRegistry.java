@@ -38,10 +38,10 @@ public class SimpleCommandRegistry implements CommandRegistry {
 	}
 
 	@Override
-	public void registerCommand(String name, Command command) {
+	public void registerCommand(String name, Class<? extends Command> command) {
 		Objects.requireNonNull(name, "name cannot be null");
 		Objects.requireNonNull(command, "command cannot be null");
-		Map<String, Command> commands = state.getCommands();
+		Map<String, Class<? extends Command>> commands = state.getCommands();
 		if (commands.containsKey(name)) {
 			throw new IllegalArgumentException("command with same name already registered: " + name);
 		}

@@ -51,11 +51,11 @@ import org.hosh.spi.Values;
 public class FileSystemModule implements Module {
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("cd", new ChangeDirectory());
-		commandRegistry.registerCommand("ls", new ListFiles());
-		commandRegistry.registerCommand("cwd", new CurrentWorkingDirectory());
-		commandRegistry.registerCommand("lines", new Lines());
-		commandRegistry.registerCommand("find", new Find());
+		commandRegistry.registerCommand("cd", ChangeDirectory.class);
+		commandRegistry.registerCommand("ls", ListFiles.class);
+		commandRegistry.registerCommand("cwd", CurrentWorkingDirectory.class);
+		commandRegistry.registerCommand("lines", Lines.class);
+		commandRegistry.registerCommand("find", Find.class);
 	}
 
 	public static class ListFiles implements Command, StateAware {

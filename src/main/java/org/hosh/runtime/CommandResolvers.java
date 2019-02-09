@@ -42,9 +42,6 @@ public class CommandResolvers {
 	private CommandResolvers() {
 	}
 
-	/**
-	 * The sole strategy by now.
-	 */
 	public static CommandResolver builtinsThenSystem(State state) {
 		List<CommandResolver> order = Arrays.asList(
 				new BuiltinCommandResolver(state),
@@ -111,9 +108,22 @@ public class CommandResolvers {
 		@Override
 		public Command tryResolve(String commandName) {
 			LOGGER.info(() -> String.format("resolving commandName '%s' as builtin", commandName));
-			Command command = state.getCommands().get(commandName);
-			LOGGER.info(() -> command != null ? "found" : "not found");
-			return command;
+			Class<? extends Command> commandClass = state.getCommands().get(commandName);
+			if (commandClass == null) {
+				LOGGER.info("not found");
+				return null;
+			} else {
+				LOGGER.info("found");
+				return createInstance(commandClass);
+			}
+		}
+
+		private Command createInstance(Class<? extends Command> commandClass) {
+			try {
+				return commandClass.getConstructor().newInstance();
+			} catch (ReflectiveOperationException e) {
+				throw new IllegalArgumentException("cannot create instance of " + commandClass, e);
+			}
 		}
 	}
 }

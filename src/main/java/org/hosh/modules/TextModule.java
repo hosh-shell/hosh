@@ -53,15 +53,15 @@ import org.hosh.spi.Values;
 public class TextModule implements Module {
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("schema", new Schema());
-		commandRegistry.registerCommand("filter", new Filter());
-		commandRegistry.registerCommand("enumerate", new Enumerate());
-		commandRegistry.registerCommand("sort", new Sort());
-		commandRegistry.registerCommand("take", new Take());
-		commandRegistry.registerCommand("drop", new Drop());
-		commandRegistry.registerCommand("rand", new Rand());
-		commandRegistry.registerCommand("count", new Count());
-		commandRegistry.registerCommand("table", new Table());
+		commandRegistry.registerCommand("schema", Schema.class);
+		commandRegistry.registerCommand("filter", Filter.class);
+		commandRegistry.registerCommand("enumerate", Enumerate.class);
+		commandRegistry.registerCommand("sort", Sort.class);
+		commandRegistry.registerCommand("take", Take.class);
+		commandRegistry.registerCommand("drop", Drop.class);
+		commandRegistry.registerCommand("rand", Rand.class);
+		commandRegistry.registerCommand("count", Count.class);
+		commandRegistry.registerCommand("table", Table.class);
 	}
 
 	public static class Schema implements Command {

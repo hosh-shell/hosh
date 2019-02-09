@@ -37,7 +37,7 @@ public class State {
 	// variables
 	private final Map<String, String> variables = new HashMap<>();
 	// registered commands
-	private final Map<String, Command> commands = new HashMap<>();
+	private final Map<String, Class<? extends Command>> commands = new HashMap<>();
 	// current working directory
 	private Path cwd;
 	// current command id: used by the REPL
@@ -55,7 +55,7 @@ public class State {
 		return cwd;
 	}
 
-	public Map<String, Command> getCommands() {
+	public Map<String, Class<? extends Command>> getCommands() {
 		return commands;
 	}
 

@@ -46,17 +46,17 @@ import org.hosh.spi.Values;
 public class SystemModule implements Module {
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("echo", new Echo());
-		commandRegistry.registerCommand("env", new Env());
-		commandRegistry.registerCommand("quit", new Exit());
-		commandRegistry.registerCommand("exit", new Exit());
-		commandRegistry.registerCommand("help", new Help());
-		commandRegistry.registerCommand("sleep", new Sleep());
-		commandRegistry.registerCommand("withTime", new WithTime());
-		commandRegistry.registerCommand("ps", new ProcessList());
-		commandRegistry.registerCommand("kill", new KillProcess());
-		commandRegistry.registerCommand("err", new Err());
-		commandRegistry.registerCommand("benchmark", new Benchmark());
+		commandRegistry.registerCommand("echo", Echo.class);
+		commandRegistry.registerCommand("env", Env.class);
+		commandRegistry.registerCommand("quit", Exit.class);
+		commandRegistry.registerCommand("exit", Exit.class);
+		commandRegistry.registerCommand("help", Help.class);
+		commandRegistry.registerCommand("sleep", Sleep.class);
+		commandRegistry.registerCommand("withTime", WithTime.class);
+		commandRegistry.registerCommand("ps", ProcessList.class);
+		commandRegistry.registerCommand("kill", KillProcess.class);
+		commandRegistry.registerCommand("err", Err.class);
+		commandRegistry.registerCommand("benchmark", Benchmark.class);
 	}
 
 	public static class Echo implements Command {

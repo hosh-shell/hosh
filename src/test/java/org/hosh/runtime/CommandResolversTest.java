@@ -47,7 +47,7 @@ public class CommandResolversTest {
 	public final TemporaryFolder folder = new TemporaryFolder();
 	@Mock(stubOnly = true)
 	private Command command;
-	@Mock
+	@Mock(stubOnly = true)
 	private State state;
 	private CommandResolver sut;
 
@@ -66,9 +66,9 @@ public class CommandResolversTest {
 
 	@Test
 	public void builtin() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("test", command));
+		given(state.getCommands()).willReturn(Collections.singletonMap("test", command.getClass()));
 		Command result = sut.tryResolve("test");
-		assertThat(result).isSameAs(command);
+		assertThat(result).isNotNull();
 	}
 
 	@Test

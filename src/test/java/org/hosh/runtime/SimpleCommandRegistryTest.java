@@ -48,29 +48,34 @@ public class SimpleCommandRegistryTest {
 
 	@Test
 	public void oneCommand() {
-		sut.registerCommand("foo", command);
-		assertThat(state.getCommands()).containsEntry("foo", command);
+		sut.registerCommand("foo", command.getClass());
+		assertThat(state.getCommands())
+				.containsEntry("foo", command.getClass());
 	}
 
 	@Test
 	public void sameCommandTwice() {
-		sut.registerCommand("foo", command);
-		sut.registerCommand("bar", command);
-		assertThat(state.getCommands()).containsEntry("foo", command).containsEntry("bar", command);
+		sut.registerCommand("foo", command.getClass());
+		sut.registerCommand("bar", command.getClass());
+		assertThat(state.getCommands())
+				.containsEntry("foo", command.getClass())
+				.containsEntry("bar", command.getClass());
 	}
 
 	@Test
 	public void twoDifferentCommands() {
-		sut.registerCommand("foo", command);
-		sut.registerCommand("bar", anotherCommand);
-		assertThat(state.getCommands()).containsEntry("foo", command).containsEntry("bar", anotherCommand);
+		sut.registerCommand("foo", command.getClass());
+		sut.registerCommand("bar", anotherCommand.getClass());
+		assertThat(state.getCommands())
+				.containsEntry("foo", command.getClass())
+				.containsEntry("bar", anotherCommand.getClass());
 	}
 
 	@Test
 	public void twoTimesSameCommand() {
 		assertThatThrownBy(() -> {
-			sut.registerCommand("foo", command);
-			sut.registerCommand("foo", command);
+			sut.registerCommand("foo", command.getClass());
+			sut.registerCommand("foo", command.getClass());
 		}).hasMessage("command with same name already registered: foo")
 				.isInstanceOf(IllegalArgumentException.class);
 	}
