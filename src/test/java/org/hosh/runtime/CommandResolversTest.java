@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
@@ -60,15 +61,15 @@ public class CommandResolversTest {
 	public void notFound() {
 		given(state.getCommands()).willReturn(Collections.emptyMap());
 		given(state.getPath()).willReturn(Collections.emptyList());
-		Command result = sut.tryResolve("test");
-		assertThat(result).isNull();
+		Optional<Command> result = sut.tryResolve("test");
+		assertThat(result).isEmpty();
 	}
 
 	@Test
 	public void builtin() {
 		given(state.getCommands()).willReturn(Collections.singletonMap("test", command.getClass()));
-		Command result = sut.tryResolve("test");
-		assertThat(result).isNotNull();
+		Optional<Command> result = sut.tryResolve("test");
+		assertThat(result).isPresent();
 	}
 
 	@Test
@@ -76,16 +77,16 @@ public class CommandResolversTest {
 		File file = folder.newFile("test");
 		file.setExecutable(true);
 		given(state.getCommands()).willReturn(Collections.emptyMap());
-		Command result = sut.tryResolve(file.getAbsolutePath());
-		assertThat(result).isNotNull();
+		Optional<Command> result = sut.tryResolve(file.getAbsolutePath());
+		assertThat(result).isPresent();
 	}
 
 	@Test
 	public void invalidAbsolutePath() throws IOException {
 		File file = folder.newFile("test");
 		given(state.getCommands()).willReturn(Collections.emptyMap());
-		Command result = sut.tryResolve(file.getAbsolutePath() + "_invalid");
-		assertThat(result).isNull();
+		Optional<Command> result = sut.tryResolve(file.getAbsolutePath() + "_invalid");
+		assertThat(result).isEmpty();
 	}
 
 	@Test
@@ -93,15 +94,15 @@ public class CommandResolversTest {
 		folder.newFile("test").setExecutable(true);
 		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 		given(state.getCommands()).willReturn(Collections.emptyMap());
-		Command result = sut.tryResolve("test");
-		assertThat(result).isNotNull();
+		Optional<Command> result = sut.tryResolve("test");
+		assertThat(result).isPresent();
 	}
 
 	@Test
 	public void notFoundInPath() {
 		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 		given(state.getCommands()).willReturn(Collections.emptyMap());
-		Command result = sut.tryResolve("test");
-		assertThat(result).isNull();
+		Optional<Command> result = sut.tryResolve("test");
+		assertThat(result).isEmpty();
 	}
 }

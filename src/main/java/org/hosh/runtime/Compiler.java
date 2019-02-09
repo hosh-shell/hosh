@@ -26,6 +26,7 @@ package org.hosh.runtime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.Token;
@@ -88,10 +89,9 @@ public class Compiler {
 	private Statement compileInvocation(InvocationContext ctx) {
 		Token token = ctx.ID().getSymbol();
 		String commandName = token.getText();
-		Command command = commandResolver.tryResolve(commandName);
-		if (command == null) {
-			throw new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName));
-		}
+		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
+		Command command = resolvedCommand
+				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
 		List<String> commandArgs = compileArguments(ctx);
 		Statement statement = new Statement();
 		statement.setCommand(command);
@@ -106,14 +106,11 @@ public class Compiler {
 		}
 		Token token = ctx.invocation().ID().getSymbol();
 		String commandName = token.getText();
-		Command command = commandResolver.tryResolve(commandName);
-		if (command == null) {
-			throw new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName));
-		}
-		if (!(command instanceof CommandWrapper)) {
-			throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));
-		}
-		CommandWrapper<?> commandWrapper = (CommandWrapper<?>) command;
+		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
+		Command command = resolvedCommand
+				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
+		CommandWrapper<?> commandWrapper = command.downCast(CommandWrapper.class)
+				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName)));
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		List<String> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();

@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.hosh.spi.Command;
@@ -57,14 +58,14 @@ public class CommandResolvers {
 		}
 
 		@Override
-		public Command tryResolve(String commandName) {
+		public Optional<Command> tryResolve(String commandName) {
 			for (CommandResolver resolver : resolvers) {
-				Command resolved = resolver.tryResolve(commandName);
-				if (resolved != null) {
+				Optional<Command> resolved = resolver.tryResolve(commandName);
+				if (resolved.isPresent()) {
 					return resolved;
 				}
 			}
-			return null;
+			return Optional.empty();
 		}
 	}
 
@@ -77,23 +78,23 @@ public class CommandResolvers {
 		}
 
 		@Override
-		public Command tryResolve(String commandName) {
+		public Optional<Command> tryResolve(String commandName) {
 			LOGGER.info(() -> String.format("resolving commandName '%s' as system command", commandName));
 			final Path candidate = Paths.get(commandName).normalize();
 			if (candidate.isAbsolute() && Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
 				LOGGER.info(() -> String.format("  found in %s", candidate));
-				return new ExternalCommand(candidate);
+				return Optional.of(new ExternalCommand(candidate));
 			}
 			for (Path dir : state.getPath()) {
 				Path dirCandidate = Paths.get(dir.toString(), commandName).normalize();
 				LOGGER.info(() -> String.format("  trying {}", dirCandidate));
 				if (Files.isRegularFile(dirCandidate) && Files.isExecutable(dirCandidate)) {
 					LOGGER.info(() -> String.format("  found in %s", dirCandidate));
-					return new ExternalCommand(dirCandidate);
+					return Optional.of(new ExternalCommand(dirCandidate));
 				}
 			}
 			LOGGER.info("  not found");
-			return null;
+			return Optional.empty();
 		}
 	}
 
@@ -106,15 +107,15 @@ public class CommandResolvers {
 		}
 
 		@Override
-		public Command tryResolve(String commandName) {
+		public Optional<Command> tryResolve(String commandName) {
 			LOGGER.info(() -> String.format("resolving commandName '%s' as builtin", commandName));
 			Class<? extends Command> commandClass = state.getCommands().get(commandName);
 			if (commandClass == null) {
 				LOGGER.info("not found");
-				return null;
+				return Optional.empty();
 			} else {
 				LOGGER.info("found");
-				return createInstance(commandClass);
+				return Optional.of(createInstance(commandClass));
 			}
 		}
 

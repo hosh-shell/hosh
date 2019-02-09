@@ -23,11 +23,10 @@
  */
 package org.hosh.runtime;
 
-import org.hosh.doc.Todo;
+import java.util.Optional;
+
 import org.hosh.spi.Command;
 
 public interface CommandResolver {
-	/** Yields null if not found. */
-	@Todo(description = "return Optional")
-	Command tryResolve(String commandName);
+	Optional<Command> tryResolve(String commandName);
 }
