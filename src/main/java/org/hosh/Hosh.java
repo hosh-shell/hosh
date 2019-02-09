@@ -171,7 +171,7 @@ public class Hosh {
 				}
 			} catch (Exception e) {
 				logger.error("caught exception for input: '{}'", line, e);
-				err.send(Record.of("message", Values.ofText(e.getMessage())));
+				err.send(Record.of("message", Values.ofText(Objects.toString(e.getMessage(), "no message, see logs"))));
 			}
 		}
 		System.exit(0);

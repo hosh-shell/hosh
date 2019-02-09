@@ -25,6 +25,7 @@ package org.hosh.runtime;
 
 import java.util.List;
 
+import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -35,6 +36,7 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 
+@Todo(description = "this has been implemented for 'benchmark', it is a bit ugly and it ignores cltr-C interrupts")
 public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAware, ArgumentResolverAware {
 	private final Statement nested;
 	private final CommandWrapper<T> commandWrapper;
@@ -49,12 +51,23 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		T resource = commandWrapper.before(args, in, out, err);
 		try {
-			List<String> arguments = nested.getArguments();
-			List<String> resolvedArguments = argumentResolver.resolve(arguments);
-			return nested.getCommand().run(resolvedArguments, in, out, err);
+			while (true) {
+				List<String> resolvedArguments = resolveArguments();
+				ExitStatus exitStatus = nested.getCommand().run(resolvedArguments, in, out, err);
+				if (commandWrapper.retry(resource)) {
+					continue;
+				}
+				return exitStatus;
+			}
 		} finally {
 			commandWrapper.after(resource, in, out, err);
 		}
+	}
+
+	private List<String> resolveArguments() {
+		List<String> arguments = nested.getArguments();
+		List<String> resolvedArguments = argumentResolver.resolve(arguments);
+		return resolvedArguments;
 	}
 
 	@Override

@@ -26,6 +26,7 @@ package org.hosh.modules;
 import java.lang.ProcessHandle.Info;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +56,7 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("ps", new ProcessList());
 		commandRegistry.registerCommand("kill", new KillProcess());
 		commandRegistry.registerCommand("err", new Err());
+		commandRegistry.registerCommand("benchmark", new Benchmark());
 	}
 
 	public static class Echo implements Command {
@@ -237,6 +239,54 @@ public class SystemModule implements Module {
 
 		private void simulateNullPointer() {
 			throw new NullPointerException("injected error: please do not report");
+		}
+	}
+
+	public static class Benchmark implements CommandWrapper<SystemModule.Benchmark.Accumulator> {
+		@Override
+		public Accumulator before(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				throw new IllegalArgumentException("benchmark requires one integer arg");
+			}
+			Accumulator accumulator = new Accumulator();
+			int repeat = Integer.parseInt(args.get(0));
+			accumulator.repeat = repeat;
+			accumulator.results = new ArrayList<>(repeat);
+			accumulator.start();
+			return accumulator;
+		}
+
+		@Override
+		public void after(Accumulator resource, Channel in, Channel out, Channel err) {
+			long best = resource.results.stream().mapToLong(Long::valueOf).min().orElse(0);
+			long worst = resource.results.stream().mapToLong(Long::valueOf).max().orElse(0);
+			long avg = resource.results.stream().mapToLong(Long::valueOf).sum() / resource.results.size();
+			out.send(Record.of("count", Values.ofNumeric(resource.results.size()))
+					.append("best", Values.ofNumeric(Duration.ofNanos(best).toMillis()))
+					.append("worst", Values.ofNumeric(Duration.ofNanos(worst).toMillis()))
+					.append("avg", Values.ofNumeric(Duration.ofNanos(avg).toMillis())));
+		}
+
+		@Override
+		public boolean retry(Accumulator resource) {
+			resource.takeTime();
+			return --resource.repeat > 0;
+		}
+
+		public static class Accumulator {
+			private int repeat;
+			private List<Long> results;
+			private long nanoTime;
+
+			public void start() {
+				nanoTime = System.nanoTime();
+			}
+
+			public void takeTime() {
+				long elapsed = System.nanoTime() - nanoTime;
+				results.add(elapsed);
+				start();
+			}
 		}
 	}
 }

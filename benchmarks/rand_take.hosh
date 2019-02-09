@@ -1,0 +1,1 @@
+benchmark 50 { rand | take 10000 | count }

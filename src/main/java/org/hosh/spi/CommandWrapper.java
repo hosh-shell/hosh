@@ -25,6 +25,7 @@ package org.hosh.spi;
 
 import java.util.List;
 
+import org.hosh.doc.Experimental;
 import org.hosh.doc.Todo;
 
 /**
@@ -40,6 +41,11 @@ public interface CommandWrapper<T> extends Command {
 	 * Clean-up the resource.
 	 */
 	void after(T resource, Channel in, Channel out, Channel err);
+
+	@Experimental(description = "retry the inner start if this method reports true, it has been abused to create 'repeat'")
+	default boolean retry(@SuppressWarnings("unused") T resource) {
+		return false;
+	}
 
 	@Todo(description = "to remove this ugliness it is required to provide a better CommandRegistry")
 	@Override
