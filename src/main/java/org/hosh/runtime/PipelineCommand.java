@@ -30,6 +30,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
@@ -37,6 +39,7 @@ import org.hosh.runtime.PipelineChannel.ProducerPoisonPill;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
@@ -45,11 +48,9 @@ import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.Terminal.Signal;
 import org.jline.terminal.Terminal.SignalHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PipelineCommand implements Command, TerminalAware, StateAware, ArgumentResolverAware {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PipelineCommand.class);
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final Statement producer;
 	private final Statement consumer;
 	private Terminal terminal;
@@ -124,7 +125,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 			Thread.currentThread().interrupt();
 			return ExitStatus.error();
 		} catch (ExecutionException e) {
-			LOGGER.error("caught exception", e);
+			LOGGER.log(Level.SEVERE, "caught exception", e);
 			String details;
 			if (e.getCause() != null && e.getCause().getMessage() != null) {
 				details = e.getCause().getMessage();
@@ -176,7 +177,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 			try {
 				return command.run(resolvedArguments, in, out, err);
 			} catch (ProducerPoisonPill e) {
-				LOGGER.trace("got poison pill");
+				LOGGER.finer("got poison pill");
 				return ExitStatus.success();
 			} finally {
 				((PipelineChannel) out).stopConsumer();

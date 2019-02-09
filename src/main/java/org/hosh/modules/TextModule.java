@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Experimental;
@@ -41,12 +43,11 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Todo(description = "this module has a bloody wrong name")
 public class TextModule implements Module {
@@ -214,7 +215,7 @@ public class TextModule implements Module {
 
 	@Experimental(description = "extends with seed, bounds, doubles, booleans, etc")
 	public static class Rand implements Command {
-		private static final Logger LOGGER = LoggerFactory.getLogger(Rand.class);
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -226,7 +227,7 @@ public class TextModule implements Module {
 			try {
 				secureRandom = SecureRandom.getInstanceStrong();
 			} catch (NoSuchAlgorithmException e) {
-				LOGGER.error("failed to get SecureRandom instance", e);
+				LOGGER.log(Level.SEVERE, "failed to get SecureRandom instance", e);
 				err.send(Record.of("error", Values.ofText(e.getMessage())));
 				return ExitStatus.error();
 			}

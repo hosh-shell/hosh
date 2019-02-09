@@ -28,11 +28,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.hosh.spi.Command;
+import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.State;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Search a command using various strategies. This has been done to keep the
@@ -72,7 +72,7 @@ public class CommandResolvers {
 	}
 
 	public static class ExternalCommandResolver implements CommandResolver {
-		private final Logger logger = LoggerFactory.getLogger(getClass());
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private final State state;
 
 		public ExternalCommandResolver(State state) {
@@ -81,27 +81,27 @@ public class CommandResolvers {
 
 		@Override
 		public Command tryResolve(String commandName) {
-			logger.info("resolving commandName '{}' as system command", commandName);
-			Path candidate = Paths.get(commandName).normalize();
+			LOGGER.info(() -> String.format("resolving commandName '%s' as system command", commandName));
+			final Path candidate = Paths.get(commandName).normalize();
 			if (candidate.isAbsolute() && Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
-				logger.info("  found in {}", candidate);
+				LOGGER.info(() -> String.format("  found in %s", candidate));
 				return new ExternalCommand(candidate);
 			}
 			for (Path dir : state.getPath()) {
-				candidate = Paths.get(dir.toString(), commandName).normalize();
-				logger.info("  trying {}", candidate);
-				if (Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
-					logger.info("  found in {}", candidate);
-					return new ExternalCommand(candidate);
+				Path dirCandidate = Paths.get(dir.toString(), commandName).normalize();
+				LOGGER.info(() -> String.format("  trying {}", dirCandidate));
+				if (Files.isRegularFile(dirCandidate) && Files.isExecutable(dirCandidate)) {
+					LOGGER.info(() -> String.format("  found in %s", dirCandidate));
+					return new ExternalCommand(dirCandidate);
 				}
 			}
-			logger.info("  not found");
+			LOGGER.info("  not found");
 			return null;
 		}
 	}
 
 	public static class BuiltinCommandResolver implements CommandResolver {
-		private final Logger logger = LoggerFactory.getLogger(getClass());
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private final State state;
 
 		public BuiltinCommandResolver(State state) {
@@ -110,9 +110,9 @@ public class CommandResolvers {
 
 		@Override
 		public Command tryResolve(String commandName) {
-			logger.info("resolving commandName '{}' as builtin", commandName);
+			LOGGER.info(() -> String.format("resolving commandName '%s' as builtin", commandName));
 			Command command = state.getCommands().get(commandName);
-			logger.info("  {}", command != null ? "found" : "not found");
+			LOGGER.info(() -> command != null ? "found" : "not found");
 			return command;
 		}
 	}

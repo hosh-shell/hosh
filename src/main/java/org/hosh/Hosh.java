@@ -34,6 +34,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,6 +58,7 @@ import org.hosh.runtime.Version;
 import org.hosh.spi.Channel;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
@@ -63,9 +69,6 @@ import org.jline.reader.impl.completer.AggregateCompleter;
 import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /** Main class */
 public class Hosh {
@@ -75,19 +78,22 @@ public class Hosh {
 	// enabling logging to $HOME/.hosh.log
 	// if and only if HOSH_LOG_LEVEL is defined (i.e. DEBUG)
 	// by default logging is disabled
-	private static void configureLogging() {
+	private static void configureLogging() throws IOException {
 		String homeDir = System.getProperty("user.home", "");
 		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
-		String logLevel = Objects.toString(System.getenv("HOSH_LOG_LEVEL"), "OFF");
-		System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, logLevel);
-		System.setProperty(org.slf4j.impl.SimpleLogger.LOG_FILE_KEY, logFilePath);
-		SLF4JBridgeHandler.removeHandlersForRootLogger();
-		SLF4JBridgeHandler.install();
+		SimpleFormatter formatter = new SimpleFormatter();
+		FileHandler fileHandler = new FileHandler(logFilePath);
+		fileHandler.setFormatter(formatter);
+		fileHandler.setLevel(Level.parse(Objects.toString(System.getenv("HOSH_LOG_LEVEL"), "OFF")));
+		LogManager logManager = LogManager.getLogManager();
+		logManager.reset();
+		String rootLoggerName = "";
+		logManager.getLogger(rootLoggerName).addHandler(fileHandler);
 	}
 
 	public static void main(String[] args) throws Exception {
 		configureLogging();
-		Logger logger = LoggerFactory.getLogger(Hosh.class);
+		Logger logger = LoggerFactory.forEnclosingClass();
 		try (Terminal terminal = TerminalBuilder.builder().build()) {
 			runWithin(terminal, logger, args);
 		}
@@ -95,7 +101,7 @@ public class Hosh {
 
 	private static void runWithin(Terminal terminal, Logger logger, String[] args) throws IOException {
 		String version = Version.readVersion();
-		logger.info("starting hosh {}", version);
+		logger.info(() -> String.format("starting hosh %s", version));
 		List<Path> path = Stream
 				.of(System.getenv("PATH").split(File.pathSeparator))
 				.map(Paths::get)
@@ -143,7 +149,7 @@ public class Hosh {
 			ExitStatus exitStatus = interpreter.eval(program);
 			System.exit(exitStatus.value());
 		} catch (Exception e) {
-			logger.error("caught exception", e);
+			logger.log(Level.SEVERE, "caught exception", e);
 			err.send(Record.of("message", Values.ofText(e.getMessage())));
 			System.exit(1);
 		}
@@ -170,7 +176,7 @@ public class Hosh {
 					System.exit(exitStatus.value());
 				}
 			} catch (Exception e) {
-				logger.error("caught exception for input: '{}'", line, e);
+				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line), e);
 				err.send(Record.of("message", Values.ofText(Objects.toString(e.getMessage(), "no message, see logs"))));
 			}
 		}

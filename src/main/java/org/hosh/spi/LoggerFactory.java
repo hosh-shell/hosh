@@ -21,20 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.architecture;
+package org.hosh.spi;
 
-import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS;
+import java.lang.StackWalker.Option;
+import java.util.logging.Logger;
 
-import org.junit.Test;
+public class LoggerFactory {
+	public static Logger forEnclosingClass() {
+		Class<?> callerClass = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE).getCallerClass();
+		return Logger.getLogger(callerClass.getCanonicalName());
+	}
 
-import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
-
-public class CodingRulesTest {
-	private final JavaClasses classes = new ClassFileImporter().importPackages("org.hosh");
-
-	@Test
-	public void classes_should_not_throw_generic_exceptions() {
-		NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS.check(classes);
+	private LoggerFactory() {
 	}
 }

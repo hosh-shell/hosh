@@ -29,15 +29,15 @@ import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 import org.hosh.doc.Experimental;
 import org.hosh.spi.Channel;
+import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PipelineChannel implements Channel {
-	private static final Logger LOGGER = LoggerFactory.getLogger(PipelineChannel.class);
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
 	private static final boolean QUEUE_FAIRNESS = true;
 	private static final int QUEUE_CAPACITY = 10;
@@ -55,14 +55,14 @@ public class PipelineChannel implements Channel {
 			if (done.getAcquire()) {
 				return Optional.empty();
 			}
-			LOGGER.trace("waiting for record... ");
+			LOGGER.finer("waiting for record... ");
 			Record record = queue.take();
 			if (POISON_PILL.equals(record)) {
-				LOGGER.trace("got POISON_PILL... ");
+				LOGGER.finer("got POISON_PILL... ");
 				done.compareAndSet(false, true);
 				return Optional.empty();
 			}
-			LOGGER.trace("got record {}", record);
+			LOGGER.finer("got record");
 			return Optional.of(record);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -75,7 +75,7 @@ public class PipelineChannel implements Channel {
 		if (done.getAcquire()) {
 			throw new ProducerPoisonPill();
 		}
-		LOGGER.trace("sending record {}", record);
+		LOGGER.finer("sending record");
 		try {
 			queue.put(record);
 		} catch (InterruptedException e) {
@@ -86,7 +86,7 @@ public class PipelineChannel implements Channel {
 	// sent by consumer to signal "do not produce anything"
 	public void stopProducer() {
 		done.compareAndSet(false, true);
-		LOGGER.debug("producer stop requested");
+		LOGGER.fine("producer stop requested");
 	}
 
 	// sent by the producer to signal "end of channel"
@@ -98,10 +98,10 @@ public class PipelineChannel implements Channel {
 
 	// let the producer to get unblocked in put()
 	public void consumeAnyRemainingRecord() {
-		LOGGER.trace("consuming remaining records");
+		LOGGER.finer("consuming remaining records");
 		List<Record> consumer = new ArrayList<>();
 		queue.drainTo(consumer);
-		LOGGER.trace("done consuming remaining records");
+		LOGGER.finer("done consuming remaining records");
 	}
 
 	@Experimental(description = "best solution found so far to stop a very fast producer")

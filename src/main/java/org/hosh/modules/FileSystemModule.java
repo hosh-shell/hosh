@@ -33,20 +33,20 @@ import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FileSystemModule implements Module {
 	@Override
@@ -59,7 +59,7 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class ListFiles implements Command, StateAware {
-		private final Logger logger = LoggerFactory.getLogger(getClass());
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private State state;
 
 		@Override
@@ -85,9 +85,9 @@ public class FileSystemModule implements Module {
 			} else {
 				dir = cwd;
 			}
-			logger.debug("list: requested '{}'", dir);
+			LOGGER.fine(() -> String.format("requested '%s'", dir));
 			final Path realDir = followSymlinksRecursively(dir);
-			logger.debug("list: real '{}'", realDir);
+			LOGGER.fine(() -> String.format("resolved '%s'", realDir));
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(realDir)) {
 				for (Path path : stream) {
 					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
@@ -199,7 +199,7 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class Find implements Command, StateAware {
-		private static final Logger LOGGER = LoggerFactory.getLogger(Find.class);
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private State state;
 
 		@Override
@@ -220,9 +220,9 @@ public class FileSystemModule implements Module {
 			} else {
 				start = state.getCwd().resolve(arg).normalize().toAbsolutePath();
 			}
-			LOGGER.debug("find: requested '{}'", start);
+			LOGGER.fine(() -> String.format("requested '%s'", start));
 			final Path realStart = followSymlinksRecursively(start);
-			LOGGER.debug("find: real '{}'", realStart);
+			LOGGER.fine(() -> String.format("resolved '%s'", realStart));
 			try (Stream<Path> stream = Files.walk(realStart)) {
 				stream.forEach(path -> {
 					Record result = Record.of("path", Values.ofLocalPath(path.toAbsolutePath()));
@@ -239,15 +239,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemModule.class);
-
 	private static Path followSymlinksRecursively(Path path) {
 		try {
-			LOGGER.debug("resolve_symlink: path {}", path);
 			if (Files.isSymbolicLink(path)) {
 				Path target = Files.readSymbolicLink(path);
 				Path resolvedPath = path.getParent().resolve(target);
-				LOGGER.debug("resolve_symlink: resolved as {}", resolvedPath);
 				return followSymlinksRecursively(resolvedPath);
 			} else {
 				return path;

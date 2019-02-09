@@ -34,19 +34,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ExternalCommand implements Command, StateAware {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExternalCommand.class);
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final Path command;
 	private ProcessFactory processFactory = new DefaultProcessFactory();
 	private State state; // needed for current working directory
@@ -71,17 +72,17 @@ public class ExternalCommand implements Command, StateAware {
 		processArgs.add(command.toAbsolutePath().toString());
 		processArgs.addAll(args);
 		Path cwd = state.getCwd();
-		LOGGER.debug("external: executing '{}' in directory {}", processArgs, cwd);
+		LOGGER.fine(() -> String.format("executing '%s' in directory %s", processArgs, cwd));
 		try {
 			Process process = processFactory.create(processArgs, cwd, state.getVariables(), inheritIo);
 			writeStdin(in, process);
 			readStdout(out, process);
 			readStderr(err, process);
 			int exitCode = process.waitFor();
-			LOGGER.debug("external: exited with {}", exitCode);
+			LOGGER.fine(() -> String.format("exited with %s", exitCode));
 			return ExitStatus.of(exitCode);
 		} catch (IOException e) {
-			LOGGER.error("external: caught exception", e);
+			LOGGER.log(Level.SEVERE, "caught exception", e);
 			err.send(Record.of("error", Values.ofText(e.getMessage())));
 			return ExitStatus.error();
 		} catch (InterruptedException e) {
@@ -104,7 +105,6 @@ public class ExternalCommand implements Command, StateAware {
 					break;
 				}
 				Record record = recv.get();
-				LOGGER.debug("external: got record '{}'", record);
 				recordWriter.writeValues(record);
 			}
 		}
@@ -125,7 +125,6 @@ public class ExternalCommand implements Command, StateAware {
 				if (readLine == null) {
 					break;
 				}
-				LOGGER.debug("external: got line '{}'", readLine);
 				channel.send(Record.of("line", Values.ofText(readLine)));
 			}
 		}
