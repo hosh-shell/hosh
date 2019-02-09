@@ -65,6 +65,14 @@ public class CompilerTest {
 				.hasMessage("line 1:12: incomplete pipeline near '|'");
 	}
 
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/42", description = "rejected by the compiler")
+	@Test
+	public void extraBraces() {
+		assertThatThrownBy(() -> sut.compile("withTime { ls } } "))
+				.isInstanceOf(CompileError.class)
+				.hasMessage("line 1: unnecessary closing '}'");
+	}
+
 	@Test
 	public void pipelineOfCommandsWithoutArguments() {
 		doReturn(command).when(commandResolver).tryResolve("ls");

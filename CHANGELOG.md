@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - introducing 'benchmark' command (lots of sharp edges)
+- detecting and reporting extranous '}' at the end of statement
 
 ## [0.0.21] - 2019-02-04
 - generalized pipelines e.g. 'ls | drop 1 | take 1 | count'

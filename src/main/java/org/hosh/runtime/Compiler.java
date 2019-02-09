@@ -100,6 +100,10 @@ public class Compiler {
 	}
 
 	private Statement compileWrappedCommand(WrappedContext ctx) {
+		if (ctx.wrapped() != null) {
+			int line = ctx.start.getLine();
+			throw new CompileError(String.format("line %d: unnecessary closing '}'", line));
+		}
 		Token token = ctx.invocation().ID().getSymbol();
 		String commandName = token.getText();
 		Command command = commandResolver.tryResolve(commandName);

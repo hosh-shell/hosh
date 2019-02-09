@@ -17,6 +17,7 @@ pipeline
 
 wrapped
     : invocation '{' stmt '}'
+    | wrapped '}' // will be rejected later by the compiler with a nice error message
     ;
 
 single
