@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -41,7 +41,7 @@ public class AnsiFormatter extends Formatter {
 	public String format(LogRecord record) {
 		StringWriter sw = new StringWriter();
 		try (PrintWriter pw = new PrintWriter(sw)) {
-			LocalDateTime zdt = LocalDateTime.ofInstant(record.getInstant(), ZoneOffset.UTC);
+			ZonedDateTime zdt = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
 			Ansi.Style style = colorize(record.getLevel());
 			pw.append(dateTime.format(zdt));
 			pw.append(' ');
