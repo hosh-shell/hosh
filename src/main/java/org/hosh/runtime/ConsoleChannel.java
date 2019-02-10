@@ -29,13 +29,20 @@ import org.jline.terminal.Terminal;
 
 public class ConsoleChannel implements Channel {
 	private final RecordWriter recordWriter;
+	private final Ansi.Style style;
 
 	public ConsoleChannel(Terminal terminal, Ansi.Style style) {
 		this.recordWriter = new RecordWriter(terminal.writer(), style);
+		this.style = style;
 	}
 
 	@Override
 	public void send(Record record) {
 		recordWriter.writeValues(record);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("ConsoleChannel[style=%s]", style);
 	}
 }

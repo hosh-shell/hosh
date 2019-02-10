@@ -27,9 +27,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -75,6 +77,7 @@ public class ExternalCommand implements Command, StateAware {
 		processArgs.addAll(args);
 		Path cwd = state.getCwd();
 		LOGGER.fine(() -> String.format("executing '%s' in directory %s", processArgs, cwd));
+		LOGGER.fine(() -> String.format("in '%s', out '%s', err '%s'", in, out, err));
 		try {
 			Process process = processFactory.create(processArgs, cwd, state.getVariables(), inheritIo);
 			writeStdin(in, process);
@@ -121,7 +124,7 @@ public class ExternalCommand implements Command, StateAware {
 	}
 
 	private void pipeInputStreamToChannel(Channel channel, InputStream inputStream) throws IOException {
-		try (BufferedReader reader = new BufferedReader(new java.io.InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 			while (true) {
 				String readLine = reader.readLine();
 				if (readLine == null) {
@@ -138,7 +141,9 @@ public class ExternalCommand implements Command, StateAware {
 			ProcessBuilder processBuilder = new ProcessBuilder(args)
 					.directory(cwd.toFile());
 			if (inheritIo) {
-				processBuilder.inheritIO();
+				processBuilder.redirectInput(Redirect.INHERIT);
+				processBuilder.redirectOutput(Redirect.INHERIT);
+				processBuilder.redirectError(Redirect.PIPE);
 			}
 			processBuilder.environment().putAll(env);
 			return processBuilder.start();

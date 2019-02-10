@@ -33,5 +33,11 @@ import org.hosh.spi.Record;
 public class NullChannel implements Channel {
 	@Override
 	public void send(Record record) {
+		// no-op
+	}
+
+	@Override
+	public String toString() {
+		return "NullChannel[]";
 	}
 }

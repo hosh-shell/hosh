@@ -104,6 +104,11 @@ public class PipelineChannel implements Channel {
 		LOGGER.finer("done consuming remaining records");
 	}
 
+	@Override
+	public String toString() {
+		return String.format("PipelineChannel[done=%s,queue=%s]", done, queue);
+	}
+
 	@Experimental(description = "best solution found so far to stop a very fast producer")
 	public static class ProducerPoisonPill extends RuntimeException {
 		private static final long serialVersionUID = 1L;
