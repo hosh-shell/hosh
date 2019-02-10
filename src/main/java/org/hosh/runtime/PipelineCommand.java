@@ -23,14 +23,7 @@
  */
 package org.hosh.runtime;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.hosh.doc.Todo;
@@ -40,21 +33,17 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.LoggerFactory;
-import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
-import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.Terminal.Signal;
-import org.jline.terminal.Terminal.SignalHandler;
 
-public class PipelineCommand implements Command, TerminalAware, StateAware, ArgumentResolverAware {
+public class PipelineCommand implements Command, TerminalAware, StateAware, ArgumentResolverAware, SupervisorAware {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final Statement producer;
 	private final Statement consumer;
-	private Terminal terminal;
 	private ArgumentResolver argumentResolver;
+	private Supervisor supervisor;
 
 	public PipelineCommand(Statement producer, Statement consumer) {
 		this.producer = producer;
@@ -71,7 +60,6 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 
 	@Override
 	public void setTerminal(Terminal terminal) {
-		this.terminal = terminal;
 		producer.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 		consumer.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 	}
@@ -80,6 +68,13 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	public void setState(State state) {
 		producer.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		consumer.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
+	}
+
+	@Override
+	public void setSupervisor(Supervisor supervisor) {
+		this.supervisor = supervisor;
+		producer.getCommand().downCast(SupervisorAware.class).ifPresent(cmd -> cmd.setSupervisor(supervisor));
+		consumer.getCommand().downCast(SupervisorAware.class).ifPresent(cmd -> cmd.setSupervisor(supervisor));
 	}
 
 	@Override
@@ -95,81 +90,31 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	@Todo(description = "error channel is unbuffered by now, waiting for implementation of 2>&1")
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-		ExecutorService executor = Executors.newCachedThreadPool();
-		List<Future<ExitStatus>> futures = new ArrayList<>();
 		Channel pipeChannel = new PipelineChannel();
-		Future<ExitStatus> producerFuture = submitProducer(producer, new NullChannel(), pipeChannel, err, executor);
-		futures.add(producerFuture);
-		assemblePipeline(futures, consumer, pipeChannel, out, err, executor);
-		try {
-			return run(futures, err);
-		} finally {
-			executor.shutdownNow();
-		}
-	}
-
-	private ExitStatus run(List<Future<ExitStatus>> futures, Channel err) {
-		terminal.handle(Signal.INT, signal -> {
-			futures.forEach(this::cancelIfStillRunning);
-		});
-		try {
-			List<ExitStatus> results = new ArrayList<>();
-			for (Future<ExitStatus> future : futures) {
-				results.add(future.get());
-			}
-			boolean allSuccesses = results.stream().allMatch(ExitStatus::isSuccess);
-			return allSuccesses ? ExitStatus.success() : ExitStatus.error();
-		} catch (CancellationException e) {
-			return ExitStatus.error();
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			return ExitStatus.error();
-		} catch (ExecutionException e) {
-			LOGGER.log(Level.SEVERE, "caught exception", e);
-			String details;
-			if (e.getCause() != null && e.getCause().getMessage() != null) {
-				details = e.getCause().getMessage();
-			} else {
-				details = "";
-			}
-			err.send(Record.of("error", Values.ofText(details)));
-			return ExitStatus.error();
-		} finally {
-			terminal.handle(Signal.INT, SignalHandler.SIG_DFL);
-		}
-	}
-
-	private void cancelIfStillRunning(Future<ExitStatus> future) {
-		if (!future.isCancelled() && !future.isDone()) {
-			future.cancel(true);
-		}
+		submitProducer(producer, new NullChannel(), pipeChannel, err);
+		assemblePipeline(consumer, pipeChannel, out, err);
+		return supervisor.waitForAll(err);
 	}
 
 	@Todo(description = "recursion here could be simplified?")
-	private void assemblePipeline(List<Future<ExitStatus>> futures,
-			Statement statement,
-			Channel in, Channel out, Channel err,
-			ExecutorService executor) {
+	private void assemblePipeline(Statement statement, Channel in, Channel out, Channel err) {
 		if (statement.getCommand() instanceof PipelineCommand) {
 			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
 			Channel pipelineChannel = new PipelineChannel();
-			Future<ExitStatus> producerFuture = submitConsumer(pipelineCommand.producer, in, pipelineChannel, err, executor);
-			futures.add(producerFuture);
+			submitConsumer(pipelineCommand.producer, in, pipelineChannel, err);
 			if (pipelineCommand.consumer.getCommand() instanceof PipelineCommand) {
-				assemblePipeline(futures, pipelineCommand.consumer, pipelineChannel, out, err, executor);
+				assemblePipeline(pipelineCommand.consumer, pipelineChannel, out, err);
 			} else {
-				Future<ExitStatus> consumerFuture = submitConsumer(pipelineCommand.consumer, pipelineChannel, out, err, executor);
-				futures.add(consumerFuture);
+				submitConsumer(pipelineCommand.consumer, pipelineChannel, out, err);
 			}
 		} else {
-			Future<ExitStatus> consumerFuture = submitConsumer(statement, in, out, err, executor);
-			futures.add(consumerFuture);
+			submitConsumer(statement, in, out, err);
 		}
 	}
 
-	private Future<ExitStatus> submitProducer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
-		return executor.submit(() -> {
-			setThreadName(statement);
+	private void submitProducer(Statement statement, Channel in, Channel out, Channel err) {
+		supervisor.submit(() -> {
+			supervisor.setThreadName(statement);
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
 			List<String> arguments = statement.getArguments();
@@ -185,9 +130,9 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 		});
 	}
 
-	private Future<ExitStatus> submitConsumer(Statement statement, Channel in, Channel out, Channel err, ExecutorService executor) {
-		return executor.submit(() -> {
-			setThreadName(statement);
+	private void submitConsumer(Statement statement, Channel in, Channel out, Channel err) {
+		supervisor.submit(() -> {
+			supervisor.setThreadName(statement);
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
 			List<String> arguments = statement.getArguments();
@@ -202,11 +147,5 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 				}
 			}
 		});
-	}
-
-	private void setThreadName(Statement statement) {
-		Thread.currentThread().setName(String.format("Pipeline/command='%s %s'",
-				statement.getCommand().getClass().getSimpleName(),
-				String.join(" ", statement.getArguments())));
 	}
 }

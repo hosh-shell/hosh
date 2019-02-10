@@ -232,10 +232,16 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			while (true) {
+				// this is needed to let ctrl-C interrupt the currently running thread
+				// later this could be improved (e.g. handling this logic in Channel#send
+				if (Thread.currentThread().isInterrupted()) {
+					break;
+				}
 				long next = secureRandom.nextLong();
 				Record of = Record.of("value", Values.ofNumeric(next));
 				out.send(of);
 			}
+			return ExitStatus.success();
 		}
 	}
 

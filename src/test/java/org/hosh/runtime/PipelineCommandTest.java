@@ -36,12 +36,15 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
+import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -60,6 +63,11 @@ public class PipelineCommandTest {
 	private Command command2;
 	@Mock(stubOnly = true)
 	private ArgumentResolver argumentResolver;
+	@InjectMocks
+	@Spy
+	private Supervisor supervisor;
+	@Mock(stubOnly = true)
+	private State state;
 
 	private PipelineCommand setupSut() {
 		Statement producer = new Statement();
@@ -69,8 +77,10 @@ public class PipelineCommandTest {
 		consumer.setCommand(command2);
 		consumer.setArguments(Collections.emptyList());
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
+		sut.setState(state);
 		sut.setTerminal(terminal);
 		sut.setArgumentResolver(argumentResolver);
+		sut.setSupervisor(supervisor);
 		return sut;
 	}
 

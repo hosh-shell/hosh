@@ -45,9 +45,9 @@ import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -60,10 +60,10 @@ public class InterpreterTest {
 	private State state;
 	@Mock(stubOnly = true)
 	private Terminal terminal;
-	@Mock(name = "in", stubOnly = true)
-	private Channel in;
-	@Mock(name = "out", stubOnly = true)
+	@Mock(stubOnly = true)
 	private Channel out;
+	@Mock(stubOnly = true)
+	private Channel err;
 	@Mock(stubOnly = true)
 	private Program program;
 	@Mock(stubOnly = true)
@@ -74,8 +74,12 @@ public class InterpreterTest {
 	private StateAwareCommand stateAwareCommand;
 	@Mock
 	private TerminalAwareCommand terminalAwareCommand;
-	@InjectMocks
 	private Interpreter sut;
+
+	@Before
+	public void setup() {
+		sut = new Interpreter(state, terminal, out, err);
+	}
 
 	@Test
 	public void storeCommandExitStatus() throws Exception {
@@ -125,7 +129,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void resolvePresentVariables() throws Exception {
+	public void presentVariable() throws Exception {
 		args.add("${VARIABLE}");
 		variables.put("VARIABLE", "1");
 		given(state.getVariables()).willReturn(variables);
@@ -138,13 +142,14 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void refuseAbsentVariables() throws Exception {
+	public void absentVariables() throws Exception {
 		args.add("${VARIABLE}");
 		given(state.getVariables()).willReturn(variables);
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
-		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		assertThatThrownBy(() -> sut.eval(program)).isInstanceOf(IllegalStateException.class).hasMessageContaining("unknown variable: VARIABLE");
+		assertThatThrownBy(() -> sut.eval(program))
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining("unknown variable: VARIABLE");
 	}
 
 	public interface StateAwareCommand extends Command, StateAware {

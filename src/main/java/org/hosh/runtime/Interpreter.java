@@ -53,6 +53,7 @@ public class Interpreter {
 	public ExitStatus eval(Program program) {
 		ExitStatus exitStatus = ExitStatus.success();
 		for (Statement statement : program.getStatements()) {
+			resolveArguments(statement.getArguments());
 			exitStatus = execute(statement);
 			store(exitStatus);
 			if (userRequestedExit() || lastCommandFailed(exitStatus)) {
@@ -76,21 +77,39 @@ public class Interpreter {
 	}
 
 	private ExitStatus execute(Statement statement) {
-		Command command = prepareCommand(statement);
+		try (Supervisor supervisor = new Supervisor(terminal)) {
+			if (skipSupervision(statement)) {
+				run(statement, supervisor);
+			} else {
+				runSupervised(statement, supervisor);
+			}
+			return supervisor.waitForAll(err);
+		}
+	}
+
+	private boolean skipSupervision(Statement statement) {
+		return statement.getCommand() instanceof SupervisorAware;
+	}
+
+	private void runSupervised(Statement statement, Supervisor supervisor) {
+		supervisor.submit(() -> {
+			supervisor.setThreadName(statement);
+			return run(statement, supervisor);
+		});
+	}
+
+	private ExitStatus run(Statement statement, Supervisor supervisor) {
+		Command command = statement.getCommand();
+		injectDeps(command, supervisor);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		return command.run(resolvedArguments, new NullChannel(), out, err);
 	}
 
-	private Command prepareCommand(Statement statement) {
-		Command command = statement.getCommand();
-		injectDeps(command);
-		return command;
-	}
-
-	private void injectDeps(Command command) {
+	private void injectDeps(Command command, Supervisor supervisor) {
 		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 		command.downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(this::resolveArguments));
+		command.downCast(SupervisorAware.class).ifPresent(cmd -> cmd.setSupervisor(supervisor));
 	}
 
 	private List<String> resolveArguments(List<String> arguments) {

@@ -92,7 +92,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithEchoEnv() throws Exception {
+	public void scriptWithOsVar() throws Exception {
 		Path scriptPath = givenScript(
 				"echo ${OS_ENV_VARIABLE}"//
 		);
@@ -101,6 +101,18 @@ public class HoshIT {
 		int exitCode = hosh.waitFor();
 		assertThat(output).contains("hello world!");
 		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
+	public void scriptWithMissingOsVar() throws Exception {
+		Path scriptPath = givenScript(
+				"echo ${OS_ENV_VARIABLE}"//
+		);
+		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).contains("unknown variable: OS_ENV_VARIABLE");
+		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
