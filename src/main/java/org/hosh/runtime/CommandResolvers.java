@@ -108,13 +108,13 @@ public class CommandResolvers {
 
 		@Override
 		public Optional<Command> tryResolve(String commandName) {
-			LOGGER.info(() -> String.format("resolving commandName '%s' as builtin", commandName));
+			LOGGER.info(() -> String.format("resolving commandName '%s' as built-in", commandName));
 			Class<? extends Command> commandClass = state.getCommands().get(commandName);
 			if (commandClass == null) {
-				LOGGER.info("not found");
+				LOGGER.info("  not found");
 				return Optional.empty();
 			} else {
-				LOGGER.info("found");
+				LOGGER.info(() -> String.format("  found '%s'", commandClass));
 				return Optional.of(createInstance(commandClass));
 			}
 		}
