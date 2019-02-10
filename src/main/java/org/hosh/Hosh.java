@@ -77,32 +77,34 @@ public class Hosh {
 	}
 
 	// enabling logging to $HOME/.hosh.log
-	// if and only if HOSH_LOG_LEVEL is defined (i.e. DEBUG)
+	// if and only if HOSH_LOG_LEVEL is defined
 	// by default logging is disabled
 	private static void configureLogging() throws IOException {
 		String homeDir = System.getProperty("user.home", "");
+		String logLevel = Objects.toString(System.getenv("HOSH_LOG_LEVEL"), "OFF");
 		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
 		AnsiFormatter formatter = new AnsiFormatter();
 		FileHandler fileHandler = new FileHandler(logFilePath);
 		fileHandler.setFormatter(formatter);
-		fileHandler.setLevel(Level.parse(Objects.toString(System.getenv("HOSH_LOG_LEVEL"), "OFF")));
 		LogManager logManager = LogManager.getLogManager();
 		logManager.reset();
 		String rootLoggerName = "";
-		logManager.getLogger(rootLoggerName).addHandler(fileHandler);
+		Logger logger = logManager.getLogger(rootLoggerName);
+		logger.addHandler(fileHandler);
+		logger.setLevel(Level.parse(logLevel));
 	}
 
 	public static void main(String[] args) throws Exception {
 		configureLogging();
 		Logger logger = LoggerFactory.forEnclosingClass();
+		String version = Version.readVersion();
+		logger.info(() -> String.format("starting hosh v.%s", version));
 		try (Terminal terminal = TerminalBuilder.builder().build()) {
-			runWithin(terminal, logger, args);
+			runWithin(terminal, version, logger, args);
 		}
 	}
 
-	private static void runWithin(Terminal terminal, Logger logger, String[] args) throws IOException {
-		String version = Version.readVersion();
-		logger.info(() -> String.format("starting hosh %s", version));
+	private static void runWithin(Terminal terminal, String version, Logger logger, String[] args) {
 		List<Path> path = Stream
 				.of(System.getenv("PATH").split(File.pathSeparator))
 				.map(Paths::get)
@@ -185,7 +187,7 @@ public class Hosh {
 	}
 
 	private static void welcome(Channel out, String version) {
-		out.send(Record.of("message", Values.ofText("hosh v" + version)));
+		out.send(Record.of("message", Values.ofText("hosh v." + version)));
 		out.send(Record.of("message", Values.ofText("Running on Java " + System.getProperty("java.version"))));
 		out.send(Record.of("message", Values.ofText("PID is " + ProcessHandle.current().pid())));
 		out.send(Record.of("message", Values.ofText("Locale is " + Locale.getDefault().toString())));
