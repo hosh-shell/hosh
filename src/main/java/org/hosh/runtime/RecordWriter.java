@@ -23,47 +23,37 @@
  */
 package org.hosh.runtime;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Locale;
 
-import org.hosh.doc.Experimental;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Record;
 import org.hosh.spi.Value;
 
 @Todo(description = "users cannot change separator by now")
-@Experimental(description = "standard way to writer record as string")
 public class RecordWriter {
-	private final Appendable appendable;
+	private final PrintWriter pw;
 	private final Ansi.Style style;
 
-	public RecordWriter(Appendable appendable, Ansi.Style style) {
-		this.appendable = appendable;
+	public RecordWriter(PrintWriter pw, Ansi.Style style) {
+		this.pw = pw;
 		this.style = style;
 	}
 
 	public void writeValues(Record record) {
-		try {
-			tryWriteValues(record);
-		} catch (IOException ex) {
-			throw new UncheckedIOException(ex);
-		}
-	}
-
-	private void tryWriteValues(Record record) throws IOException {
 		Locale locale = Locale.getDefault();
 		Iterator<Value> values = record.values().iterator();
-		style.enable(appendable);
+		style.enable(pw);
 		while (values.hasNext()) {
 			Value value = values.next();
-			value.append(appendable, locale);
+			value.append(pw, locale);
 			if (values.hasNext()) {
-				appendable.append(" ");
+				pw.append(" ");
 			}
 		}
-		style.disable(appendable);
-		appendable.append(System.lineSeparator());
+		style.disable(pw);
+		pw.append(System.lineSeparator());
+		pw.flush();
 	}
 }

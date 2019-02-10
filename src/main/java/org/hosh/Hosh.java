@@ -25,6 +25,7 @@ package org.hosh;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -134,8 +135,8 @@ public class Hosh {
 			welcome(out, version);
 			repl(state, lineReader, compiler, interpreter, err, logger);
 		} else {
-			Channel out = new SimpleChannel(System.out);
-			Channel err = new SimpleChannel(System.err);
+			Channel out = new SimpleChannel(new PrintWriter(System.out));
+			Channel err = new SimpleChannel(new PrintWriter(System.err));
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			String filePath = args[0];
 			script(filePath, compiler, interpreter, err, logger);

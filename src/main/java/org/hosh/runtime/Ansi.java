@@ -23,7 +23,7 @@
  */
 package org.hosh.runtime;
 
-import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Ansi {
 	public enum Style {
@@ -48,19 +48,19 @@ public class Ansi {
 		/** The Control Sequence Introducer (CSI) escape sequence. */
 		private static final String CSI = "\u001b[";
 
-		public void enable(Appendable appendable) throws IOException {
+		public void enable(PrintWriter pw) {
 			if (this != NONE) {
-				appendable.append(CSI);
-				appendable.append(startCode);
-				appendable.append("m");
+				pw.append(CSI);
+				pw.append(startCode);
+				pw.append("m");
 			}
 		}
 
-		public void disable(Appendable appendable) throws IOException {
+		public void disable(PrintWriter pw) {
 			if (this != NONE) {
-				appendable.append(CSI);
-				appendable.append(endCode);
-				appendable.append("m");
+				pw.append(CSI);
+				pw.append(endCode);
+				pw.append("m");
 			}
 		}
 	}

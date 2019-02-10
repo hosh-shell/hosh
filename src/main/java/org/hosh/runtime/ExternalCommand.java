@@ -28,6 +28,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -92,13 +94,13 @@ public class ExternalCommand implements Command, StateAware {
 		}
 	}
 
-	private void writeStdin(Channel in, Process process) throws IOException {
+	private void writeStdin(Channel in, Process process) {
 		pipeChannelToOutputStream(in, process.getOutputStream());
 	}
 
-	private void pipeChannelToOutputStream(Channel in, OutputStream outputStream) throws IOException {
-		try (BufferedWriter writer = new BufferedWriter(new java.io.OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
-			RecordWriter recordWriter = new RecordWriter(writer, Ansi.Style.NONE);
+	private void pipeChannelToOutputStream(Channel in, OutputStream outputStream) {
+		try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)))) {
+			RecordWriter recordWriter = new RecordWriter(pw, Ansi.Style.NONE);
 			while (true) {
 				Optional<Record> recv = in.recv();
 				if (recv.isEmpty()) {

@@ -23,10 +23,8 @@
  */
 package org.hosh.runtime;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UncheckedIOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -63,8 +61,6 @@ public class AnsiFormatter extends Formatter {
 				record.getThrown().printStackTrace(pw);
 			}
 			return sw.toString();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
 		}
 	}
 

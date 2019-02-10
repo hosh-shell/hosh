@@ -23,19 +23,20 @@
  */
 package org.hosh.runtime;
 
-import java.io.IOException;
+import java.io.PrintWriter;
 
 import org.hosh.runtime.Ansi.Style;
 import org.junit.Test;
 
 public class AnsiTest {
 	@Test
-	public void coloring() throws IOException {
+	public void coloring() {
+		PrintWriter pw = new PrintWriter(System.out);
 		for (Style style : Ansi.Style.values()) {
-			style.enable(System.out);
-			System.out.println("test".repeat(10));
-			style.disable(System.out);
+			style.enable(pw);
+			pw.println("test".repeat(10));
+			style.disable(pw);
 		}
-		Style.RESET.enable(System.out);
+		Style.RESET.enable(pw);
 	}
 }

@@ -23,6 +23,8 @@
  */
 package org.hosh.runtime;
 
+import java.io.PrintWriter;
+
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 
@@ -33,8 +35,8 @@ import org.hosh.spi.Record;
 public class SimpleChannel implements Channel {
 	private final RecordWriter recordWriter;
 
-	public SimpleChannel(Appendable appendable) {
-		this.recordWriter = new RecordWriter(appendable, Ansi.Style.NONE);
+	public SimpleChannel(PrintWriter pw) {
+		this.recordWriter = new RecordWriter(pw, Ansi.Style.NONE);
 	}
 
 	@Override
