@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -37,7 +38,7 @@ public class AnsiFormatter extends Formatter {
 	public String format(LogRecord record) {
 		StringWriter sw = new StringWriter();
 		try (PrintWriter pw = new PrintWriter(sw)) {
-			ZonedDateTime zdt = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+			ZonedDateTime zdt = ZonedDateTime.ofInstant(record.getInstant().truncatedTo(ChronoUnit.MICROS), ZoneId.systemDefault());
 			Ansi.Style style = colorize(record.getLevel());
 			pw.append(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(zdt));
 			pw.append(' ');
