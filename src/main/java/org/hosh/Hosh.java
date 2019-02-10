@@ -38,11 +38,11 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.runtime.Ansi;
+import org.hosh.runtime.AnsiFormatter;
 import org.hosh.runtime.CommandCompleter;
 import org.hosh.runtime.CommandResolver;
 import org.hosh.runtime.CommandResolvers;
@@ -81,7 +81,7 @@ public class Hosh {
 	private static void configureLogging() throws IOException {
 		String homeDir = System.getProperty("user.home", "");
 		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
-		SimpleFormatter formatter = new SimpleFormatter();
+		AnsiFormatter formatter = new AnsiFormatter();
 		FileHandler fileHandler = new FileHandler(logFilePath);
 		fileHandler.setFormatter(formatter);
 		fileHandler.setLevel(Level.parse(Objects.toString(System.getenv("HOSH_LOG_LEVEL"), "OFF")));

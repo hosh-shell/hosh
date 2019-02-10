@@ -44,14 +44,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CommandCompleterTest {
+	@Mock(stubOnly = true)
+	private State state;
+	@Mock(stubOnly = true)
+	private Command command;
 	@Mock
 	private LineReader lineReader;
 	@Mock
 	private ParsedLine parsedLine;
-	@Mock
-	private State state;
-	@Mock
-	private Command command;
 	@InjectMocks
 	private CommandCompleter sut;
 
