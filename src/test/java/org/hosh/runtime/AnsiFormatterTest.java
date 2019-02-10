@@ -27,9 +27,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import java.time.Instant;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import org.hosh.testsupport.WithTimeZone;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,6 +41,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AnsiFormatterTest {
+	@Rule
+	public final WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("PST"));
 	@Mock(stubOnly = true)
 	private LogRecord logRecord;
 	@InjectMocks
@@ -51,7 +56,7 @@ public class AnsiFormatterTest {
 		given(logRecord.getThrown()).willReturn(new Stacktraceless());
 		String result = sut.format(logRecord);
 		assertThat(result)
-				.isEqualTo("1970-01-01T01:00:00 [[31mSEVERE[39m] [main] - [31mmessage[39m\norg.hosh.runtime.AnsiFormatterTest$Stacktraceless\n");
+				.isEqualTo("1969-12-31T16:00:00 [[31mSEVERE[39m] [main] - [31mmessage[39m\norg.hosh.runtime.AnsiFormatterTest$Stacktraceless\n");
 	}
 
 	@Test
@@ -60,7 +65,7 @@ public class AnsiFormatterTest {
 		given(logRecord.getLevel()).willReturn(Level.WARNING);
 		given(logRecord.getMessage()).willReturn("message");
 		String result = sut.format(logRecord);
-		assertThat(result).isEqualTo("1970-01-01T01:00:00 [[33mWARNING[39m] [main] - [33mmessage[39m\n");
+		assertThat(result).isEqualTo("1969-12-31T16:00:00 [[33mWARNING[39m] [main] - [33mmessage[39m\n");
 	}
 
 	@Test
@@ -69,7 +74,7 @@ public class AnsiFormatterTest {
 		given(logRecord.getLevel()).willReturn(Level.INFO);
 		given(logRecord.getMessage()).willReturn("message");
 		String result = sut.format(logRecord);
-		assertThat(result).isEqualTo("1970-01-01T01:00:00 [INFO] [main] - message\n");
+		assertThat(result).isEqualTo("1969-12-31T16:00:00 [INFO] [main] - message\n");
 	}
 
 	@SuppressWarnings("serial")
