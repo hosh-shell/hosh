@@ -33,6 +33,7 @@ import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.TerminalAware;
 import org.hosh.spi.Values;
+import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
 
@@ -54,9 +55,13 @@ public class TerminalModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			out.send(Record.of("name", Values.ofText(terminal.getName())));
-			out.send(Record.of("type", Values.ofText(terminal.getType())));
-			out.send(Record.of("attributes", Values.ofText(terminal.getAttributes().toString())));
+			Attributes attributes = terminal.getAttributes();
+			out.send(Record.of("type", Values.ofText(terminal.getType()))
+					.append("lflags", Values.ofText(attributes.getLocalFlags().toString()))
+					.append("iflags", Values.ofText(attributes.getInputFlags().toString()))
+					.append("oflags", Values.ofText(attributes.getOutputFlags().toString()))
+					.append("cflags", Values.ofText(attributes.getControlFlags().toString()))
+					.append("cchars", Values.ofText(attributes.getControlChars().toString())));
 			return ExitStatus.success();
 		}
 	}

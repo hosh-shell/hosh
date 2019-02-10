@@ -23,15 +23,18 @@
  */
 package org.hosh.modules;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.util.Arrays;
 
 import org.hosh.modules.TerminalModule.Bell;
 import org.hosh.modules.TerminalModule.Clear;
+import org.hosh.modules.TerminalModule.Dump;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
+import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,16 +43,20 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(Suite.class)
 @SuiteClasses({
 		TerminalModuleTest.ClearTest.class,
 		TerminalModuleTest.BellTest.class,
+		TerminalModuleTest.DumpTest.class,
 })
 public class TerminalModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ClearTest {
+		@Mock(stubOnly = true)
+		private Channel in;
 		@Mock
 		private Channel out;
 		@Mock
@@ -61,26 +68,30 @@ public class TerminalModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), null, out, err);
+			sut.run(Arrays.asList(), in, out, err);
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), null, out, err);
+			sut.run(Arrays.asList("asd"), in, out, err);
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("no parameters expected")));
 			then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 		}
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class BellTest {
+		@Mock(stubOnly = true)
+		private Channel in;
 		@Mock
 		private Channel out;
 		@Mock
@@ -92,21 +103,47 @@ public class TerminalModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), null, out, err);
+			sut.run(Arrays.asList(), in, out, err);
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), null, out, err);
+			sut.run(Arrays.asList("asd"), in, out, err);
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("no parameters expected")));
 			then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class DumpTest {
+		@Mock(stubOnly = true)
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@Mock
+		private Terminal terminal;
+		@InjectMocks
+		private Dump sut;
+
+		@Test
+		public void noArgs() {
+			given(terminal.getType()).willReturn("xterm");
+			given(terminal.getAttributes()).willReturn(new Attributes());
+			sut.run(Arrays.asList(), in, out, err);
+			then(out).should().send(Mockito.any());
+			then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 		}
 	}
 }
