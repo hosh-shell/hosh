@@ -30,7 +30,11 @@ import static org.mockito.BDDMockito.then;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
+import org.hosh.doc.Todo;
+import org.hosh.modules.SystemModule.Benchmark;
+import org.hosh.modules.SystemModule.Benchmark.Accumulator;
 import org.hosh.modules.SystemModule.Echo;
 import org.hosh.modules.SystemModule.Env;
 import org.hosh.modules.SystemModule.Err;
@@ -62,7 +66,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.HelpTest.class,
 		SystemModuleTest.SleepTest.class,
 		SystemModuleTest.ProcessListTest.class,
-		SystemModuleTest.ErrTest.class })
+		SystemModuleTest.ErrTest.class,
+		SystemModuleTest.BenchmarkTest.class,
+})
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ExitTest {
@@ -298,6 +304,32 @@ public class SystemModuleTest {
 			assertThatThrownBy(() -> sut.run(Arrays.asList(), in, out, err))
 					.hasMessage("injected error: please do not report")
 					.isInstanceOf(NullPointerException.class);
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class BenchmarkTest {
+		@Mock
+		private State state;
+		@Mock(stubOnly = true)
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Benchmark sut;
+
+		@Todo(description = "improve this test")
+		@Test
+		public void oneArg() {
+			List<String> args = Arrays.asList("10");
+			Accumulator accumulator = sut.before(args, in, out, err);
+			sut.retry(accumulator);
+			sut.after(accumulator, in, out, err);
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Mockito.any());
+			then(err).shouldHaveZeroInteractions();
 		}
 	}
 }
