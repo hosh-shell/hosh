@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +44,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+@Todo(description = "improve assertions (e.g. check arguments parsing and proper nesting of objects)")
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CompilerTest {
 	@Mock(stubOnly = true)
@@ -153,7 +155,6 @@ public class CompilerTest {
 				.hasMessage("line 1: 'env2' unknown command");
 	}
 
-	@Todo(description = "added assert for arguments '-t -a' ")
 	@Test
 	public void wrappedCommand() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
@@ -161,7 +162,8 @@ public class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime -t -a { git push }");
 		assertThat(program.getStatements())
-				.hasSize(1);
+				.hasSize(1)
+				.first().extracting(Statement::getArguments).containsExactly(Arrays.asList("-t", "-a"));
 	}
 
 	@Test
