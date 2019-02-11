@@ -269,13 +269,16 @@ public class SystemModule implements Module {
 
 		@Override
 		public boolean retry(Accumulator resource) {
+			if (Thread.currentThread().isInterrupted()) {
+				return false;
+			}
 			resource.takeTime();
 			return --resource.repeat > 0;
 		}
 
 		public static class Accumulator {
-			private int repeat;
 			private List<Long> results;
+			private int repeat;
 			private long nanoTime;
 
 			public void start() {

@@ -88,6 +88,7 @@ public class Supervisor implements AutoCloseable {
 			return exitStatusFrom(results);
 		} catch (CancellationException e) {
 			LOGGER.log(Level.FINE, "got cancellation", e);
+			Thread.currentThread().interrupt();
 			return ExitStatus.error();
 		} catch (InterruptedException e) {
 			LOGGER.log(Level.FINE, "got interrupt", e);
