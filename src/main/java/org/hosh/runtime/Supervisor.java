@@ -67,11 +67,11 @@ public class Supervisor implements AutoCloseable {
 		executor.shutdownNow();
 	}
 
-	@Todo(description = "ideally this method should be private")
+	@Todo(description = "ideally this method should be called by submit() and never exposed outside")
 	public void setThreadName(Statement statement) {
 		String commandName = statement.getCommand().getClass().getSimpleName();
 		String arguments = String.join(" ", statement.getArguments());
-		String name = String.format("command='%s %s'", commandName, arguments);
+		String name = String.format("command='%s%s%s'", commandName, arguments.isEmpty() ? "" : " ", arguments);
 		Thread.currentThread().setName(name);
 	}
 
