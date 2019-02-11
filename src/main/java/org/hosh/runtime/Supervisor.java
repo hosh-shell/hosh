@@ -48,8 +48,9 @@ import org.jline.terminal.Terminal.Signal;
 import org.jline.terminal.Terminal.SignalHandler;
 
 /**
- * Manages the runtime execution of both java/built-in commands as well as
- * external commands.
+ * Manages runtime execution of built-in commands as well as external commands.
+ *
+ * SIGINT is handled as well, allowing to stop the current set of threads.
  */
 public class Supervisor implements AutoCloseable {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
@@ -61,6 +62,19 @@ public class Supervisor implements AutoCloseable {
 		this.terminal = terminal;
 	}
 
+	@Override
+	public void close() {
+		executor.shutdownNow();
+	}
+
+	@Todo(description = "ideally this method should be private")
+	public void setThreadName(Statement statement) {
+		String commandName = statement.getCommand().getClass().getSimpleName();
+		String arguments = String.join(" ", statement.getArguments());
+		String name = String.format("command='%s %s'", commandName, arguments);
+		Thread.currentThread().setName(name);
+	}
+
 	public void submit(Callable<ExitStatus> task) {
 		Future<ExitStatus> future = executor.submit(task);
 		LOGGER.finer(() -> String.format("adding future %s", future));
@@ -68,16 +82,10 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	public ExitStatus waitForAll(Channel err) {
-		terminal.handle(Signal.INT, signal -> {
-			futures.forEach(this::cancelIfStillRunning);
-		});
+		cancelFuturesOnSigint();
 		try {
-			List<ExitStatus> results = new ArrayList<>();
-			for (Future<ExitStatus> future : futures) {
-				results.add(future.get());
-			}
-			ExitStatus firstErrorOrSuccess = results.stream().filter(es -> !es.isSuccess()).findFirst().orElse(ExitStatus.success());
-			return firstErrorOrSuccess;
+			List<ExitStatus> results = waitForCompletion();
+			return exitStatusFrom(results);
 		} catch (CancellationException e) {
 			LOGGER.log(Level.FINE, "got cancellation", e);
 			return ExitStatus.error();
@@ -87,29 +95,45 @@ public class Supervisor implements AutoCloseable {
 			return ExitStatus.error();
 		} catch (ExecutionException e) {
 			LOGGER.log(Level.SEVERE, "caught exception", e);
-			String details;
-			if (e.getCause() != null && e.getCause().getMessage() != null) {
-				details = e.getCause().getMessage();
-			} else {
-				details = "";
-			}
-			err.send(Record.of("error", Values.ofText(details)));
+			String message = messageFor(e);
+			err.send(Record.of("error", Values.ofText(message)));
 			return ExitStatus.error();
 		} finally {
-			terminal.handle(Signal.INT, SignalHandler.SIG_DFL);
+			restoreDefaultSigintHandler();
 		}
 	}
 
-	@Override
-	public void close() {
-		executor.shutdownNow();
+	private String messageFor(ExecutionException e) {
+		if (e.getCause() != null && e.getCause().getMessage() != null) {
+			return e.getCause().getMessage();
+		} else {
+			return "(no message provided)";
+		}
 	}
 
-	@Todo(description = "ideally this method should be private")
-	public void setThreadName(Statement statement) {
-		Thread.currentThread().setName(String.format("command='%s %s'",
-				statement.getCommand().getClass().getSimpleName(),
-				String.join(" ", statement.getArguments())));
+	private ExitStatus exitStatusFrom(List<ExitStatus> results) {
+		return results.stream()
+				.filter(es -> !es.isSuccess())
+				.findFirst()
+				.orElse(ExitStatus.success());
+	}
+
+	private List<ExitStatus> waitForCompletion() throws InterruptedException, ExecutionException, CancellationException {
+		List<ExitStatus> results = new ArrayList<>();
+		for (Future<ExitStatus> future : futures) {
+			results.add(future.get());
+		}
+		return results;
+	}
+
+	private void restoreDefaultSigintHandler() {
+		terminal.handle(Signal.INT, SignalHandler.SIG_DFL);
+	}
+
+	private void cancelFuturesOnSigint() {
+		terminal.handle(Signal.INT, signal -> {
+			futures.forEach(this::cancelIfStillRunning);
+		});
 	}
 
 	private void cancelIfStillRunning(Future<ExitStatus> future) {

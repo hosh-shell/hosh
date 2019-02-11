@@ -26,6 +26,9 @@ package org.hosh.runtime;
 import java.io.PrintWriter;
 
 public class Ansi {
+	private Ansi() {
+	}
+
 	public enum Style {
 		// special
 		NONE("", ""),
