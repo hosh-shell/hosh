@@ -39,8 +39,8 @@ import org.hosh.spi.Record;
 public class PipelineChannel implements Channel {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
-	private static final boolean QUEUE_FAIRNESS = true;
-	private static final int QUEUE_CAPACITY = 10;
+	private static final boolean QUEUE_FAIRNESS = false;
+	private static final int QUEUE_CAPACITY = 100;
 	private final BlockingQueue<Record> queue;
 	private final AtomicBoolean done;
 
@@ -51,10 +51,10 @@ public class PipelineChannel implements Channel {
 
 	@Override
 	public Optional<Record> recv() {
+		if (done.getAcquire()) {
+			return Optional.empty();
+		}
 		try {
-			if (done.getAcquire()) {
-				return Optional.empty();
-			}
 			LOGGER.finer("waiting for record... ");
 			Record record = queue.take();
 			if (POISON_PILL.equals(record)) {
