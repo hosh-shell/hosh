@@ -280,6 +280,18 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(0);
 	}
 
+	@Test
+	public void benchmark() throws Exception {
+		Path scriptPath = givenScript(
+				"benchmark 10 { rand | take 100 | count } "//
+		);
+		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).startsWith("10");
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
