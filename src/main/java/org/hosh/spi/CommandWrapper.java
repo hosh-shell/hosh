@@ -48,6 +48,6 @@ public interface CommandWrapper<T> extends Command {
 
 	@Override
 	default ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-		throw new IllegalStateException("implementation will be provided by the compiler");
+		throw new IllegalStateException("a suitable implementation will be provided by the compiler");
 	}
 }
