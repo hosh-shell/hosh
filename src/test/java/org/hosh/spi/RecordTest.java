@@ -103,4 +103,15 @@ public class RecordTest {
 		EqualsVerifier.forClass(Singleton.class).verify();
 		EqualsVerifier.forClass(Generic.class).verify();
 	}
+
+	@Test
+	public void value() {
+		Record record = Record.empty();
+		assertThat(record.value("some key")).isEmpty();
+		record = record.append("some key", Values.none());
+		assertThat(record.value("some key")).isNotEmpty().contains(Values.none());
+		record = record.append("another key", Values.none());
+		assertThat(record.value("some key")).isNotEmpty().contains(Values.none());
+		assertThat(record.value("another key")).isNotEmpty().contains(Values.none());
+	}
 }

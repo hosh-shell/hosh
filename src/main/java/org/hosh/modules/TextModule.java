@@ -97,8 +97,8 @@ public class TextModule implements Module {
 				String key = args.get(0);
 				String regex = args.get(1);
 				Record record = incoming.get();
-				Value value = record.value(key);
-				if (value != null && value.matches(regex)) {
+				Optional<Value> value = record.value(key);
+				if (value.isPresent() && value.get().matches(regex)) {
 					out.send(record);
 				}
 			}
@@ -151,7 +151,7 @@ public class TextModule implements Module {
 		}
 
 		private void sortBy(String key, List<Record> records) {
-			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key),
+			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key).orElse(null),
 					Comparator.nullsFirst(Comparator.naturalOrder()));
 			records.sort(comparator);
 		}
@@ -297,9 +297,9 @@ public class TextModule implements Module {
 			for (String key : keys) {
 				StringWriter writer = new StringWriter();
 				formatter.append(formatterFor(key));
-				Value value = record.value(key);
-				if (value != null) {
-					value.append(writer, locale);
+				Optional<Value> value = record.value(key);
+				if (value.isPresent()) {
+					value.get().append(writer, locale);
 				} else {
 					writer.append("");
 				}

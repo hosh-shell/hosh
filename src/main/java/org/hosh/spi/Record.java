@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * An immutable, persistent value object representing a record of key-value
@@ -42,7 +43,7 @@ public interface Record {
 
 	Collection<Value> values();
 
-	Value value(String key);
+	Optional<Value> value(String key);
 
 	static Record empty() {
 		return new Record.Empty();
@@ -78,13 +79,13 @@ public interface Record {
 		}
 
 		@Override
-		public Value value(String key) {
-			return null;
+		public Optional<Value> value(String key) {
+			return Optional.empty();
 		}
 
 		@Override
 		public final int hashCode() {
-			return Objects.hash();
+			return 17;
 		}
 
 		@Override
@@ -128,11 +129,11 @@ public interface Record {
 		}
 
 		@Override
-		public Value value(String key1) {
+		public Optional<Value> value(String key1) {
 			if (Objects.equals(this.key, key1)) {
-				return value;
+				return Optional.of(value);
 			} else {
-				return null;
+				return Optional.empty();
 			}
 		}
 
@@ -202,8 +203,8 @@ public interface Record {
 		}
 
 		@Override
-		public Value value(String key) {
-			return data.get(key);
+		public Optional<Value> value(String key) {
+			return Optional.ofNullable(data.get(key));
 		}
 
 		@Override
