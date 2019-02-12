@@ -35,7 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PipelineChannelTest {
-	@Mock
+	@Mock(stubOnly = true)
 	private Record one;
 
 	@Test
@@ -55,5 +55,17 @@ public class PipelineChannelTest {
 		sut.send(one);
 		Optional<Record> recv1 = sut.recv();
 		assertThat(recv1).contains(one);
+	}
+
+	@Test
+	public void stringRepr() { // this is quite important while debugging
+		PipelineChannel sut = new PipelineChannel();
+		assertThat(sut).hasToString("PipelineChannel[done=false,queue=[]]");
+		sut.send(one);
+		assertThat(sut).hasToString("PipelineChannel[done=false,queue=[one]]");
+		sut.stopProducer();
+		assertThat(sut).hasToString("PipelineChannel[done=true,queue=[one]]");
+		sut.consumeAnyRemainingRecord();
+		assertThat(sut).hasToString("PipelineChannel[done=true,queue=[]]");
 	}
 }
