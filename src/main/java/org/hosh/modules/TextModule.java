@@ -292,17 +292,12 @@ public class TextModule implements Module {
 		private void sendRow(Record record, Channel out) {
 			Locale locale = Locale.getDefault();
 			StringBuilder formatter = new StringBuilder();
-			Collection<String> keys = record.keys();
-			List<String> formattedValues = new ArrayList<>(keys.size());
-			for (String key : keys) {
+			Collection<Record.Entry> entries = record.entries();
+			List<String> formattedValues = new ArrayList<>(entries.size());
+			for (Record.Entry entry : entries) {
 				StringWriter writer = new StringWriter();
-				formatter.append(formatterFor(key));
-				Optional<Value> value = record.value(key);
-				if (value.isPresent()) {
-					value.get().append(writer, locale);
-				} else {
-					writer.append("");
-				}
+				formatter.append(formatterFor(entry.getKey()));
+				entry.getValue().append(writer, locale);
 				formattedValues.add(writer.toString());
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());

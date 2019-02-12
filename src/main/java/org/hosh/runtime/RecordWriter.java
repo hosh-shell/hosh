@@ -29,7 +29,7 @@ import java.util.Locale;
 
 import org.hosh.doc.Todo;
 import org.hosh.spi.Record;
-import org.hosh.spi.Value;
+import org.hosh.spi.Record.Entry;
 
 @Todo(description = "users cannot change separator by now")
 public class RecordWriter {
@@ -43,12 +43,12 @@ public class RecordWriter {
 
 	public void writeValues(Record record) {
 		Locale locale = Locale.getDefault();
-		Iterator<Value> values = record.values().iterator();
 		style.enable(pw);
-		while (values.hasNext()) {
-			Value value = values.next();
-			value.append(pw, locale);
-			if (values.hasNext()) {
+		Iterator<Record.Entry> entries = record.entries().iterator();
+		while (entries.hasNext()) {
+			Entry next = entries.next();
+			next.getValue().append(pw, locale);
+			if (entries.hasNext()) {
 				pw.append(" ");
 			}
 		}

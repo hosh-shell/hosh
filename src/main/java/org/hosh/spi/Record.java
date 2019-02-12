@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * An immutable, persistent value object representing a record of key-value
@@ -42,6 +43,8 @@ public interface Record {
 	Collection<String> keys();
 
 	Collection<Value> values();
+
+	Collection<Entry> entries();
 
 	Optional<Value> value(String key);
 
@@ -57,6 +60,24 @@ public interface Record {
 		return new Record.Generic().append(key1, value1).append(key2, value2);
 	}
 
+	class Entry {
+		private final String key;
+		private final Value value;
+
+		public Entry(String key, Value value) {
+			this.key = key;
+			this.value = value;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+		public Value getValue() {
+			return value;
+		}
+	}
+
 	class Empty implements Record {
 		@Override
 		public Collection<String> keys() {
@@ -65,6 +86,11 @@ public interface Record {
 
 		@Override
 		public Collection<Value> values() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public Collection<Entry> entries() {
 			return Collections.emptyList();
 		}
 
@@ -116,6 +142,11 @@ public interface Record {
 		@Override
 		public Collection<Value> values() {
 			return Collections.singletonList(value);
+		}
+
+		@Override
+		public Collection<Entry> entries() {
+			return Collections.singletonList(new Entry(key, value));
 		}
 
 		@Override
@@ -200,6 +231,15 @@ public interface Record {
 		@Override
 		public Collection<Value> values() {
 			return data.values();
+		}
+
+		@Override
+		public Collection<Entry> entries() {
+			return data
+					.entrySet()
+					.stream()
+					.map(kv -> new Entry(kv.getKey(), kv.getValue()))
+					.collect(Collectors.toList());
 		}
 
 		@Override
