@@ -36,6 +36,7 @@ public class AnsiTest {
 			style.enable(pw);
 			pw.println("test".repeat(10));
 			style.disable(pw);
+			pw.flush();
 		}
 		Style.RESET.enable(pw);
 	}
