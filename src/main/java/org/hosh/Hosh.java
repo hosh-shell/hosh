@@ -99,7 +99,7 @@ public class Hosh {
 		Logger logger = LoggerFactory.forEnclosingClass();
 		String version = Version.readVersion();
 		logger.info(() -> String.format("starting hosh v.%s", version));
-		try (Terminal terminal = TerminalBuilder.builder().build()) {
+		try (Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build()) {
 			runWithin(terminal, version, logger, args);
 		}
 	}
