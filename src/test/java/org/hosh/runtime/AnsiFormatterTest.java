@@ -56,7 +56,8 @@ public class AnsiFormatterTest {
 		given(logRecord.getThrown()).willReturn(new Stacktraceless());
 		String result = sut.format(logRecord);
 		assertThat(result)
-				.isEqualTo("1969-12-31T16:00:00 [[31mSEVERE[39m] [main] - [31mmessage[39m\norg.hosh.runtime.AnsiFormatterTest$Stacktraceless\n");
+				.isEqualTo(
+						"1969-12-31T16:00:00.000 [[31mSEVERE[39m] [main] - [31mmessage[39m\norg.hosh.runtime.AnsiFormatterTest$Stacktraceless\n");
 	}
 
 	@Test
@@ -65,7 +66,7 @@ public class AnsiFormatterTest {
 		given(logRecord.getLevel()).willReturn(Level.WARNING);
 		given(logRecord.getMessage()).willReturn("message");
 		String result = sut.format(logRecord);
-		assertThat(result).isEqualTo("1969-12-31T16:00:00 [[33mWARNING[39m] [main] - [33mmessage[39m\n");
+		assertThat(result).isEqualTo("1969-12-31T16:00:00.000 [[33mWARNING[39m] [main] - [33mmessage[39m\n");
 	}
 
 	@Test
@@ -74,7 +75,7 @@ public class AnsiFormatterTest {
 		given(logRecord.getLevel()).willReturn(Level.INFO);
 		given(logRecord.getMessage()).willReturn("message");
 		String result = sut.format(logRecord);
-		assertThat(result).isEqualTo("1969-12-31T16:00:00 [INFO] [main] - message\n");
+		assertThat(result).isEqualTo("1969-12-31T16:00:00.000 [INFO] [main] - message\n");
 	}
 
 	@SuppressWarnings("serial")

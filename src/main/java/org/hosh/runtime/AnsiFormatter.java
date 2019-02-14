@@ -34,13 +34,15 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 public class AnsiFormatter extends Formatter {
+	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS");
+
 	@Override
 	public String format(LogRecord record) {
 		StringWriter sw = new StringWriter();
 		try (PrintWriter pw = new PrintWriter(sw)) {
-			ZonedDateTime zdt = ZonedDateTime.ofInstant(record.getInstant().truncatedTo(ChronoUnit.MICROS), ZoneId.systemDefault());
+			ZonedDateTime zdt = ZonedDateTime.ofInstant(record.getInstant().truncatedTo(ChronoUnit.MILLIS), ZoneId.systemDefault());
 			Ansi.Style style = colorize(record.getLevel());
-			pw.append(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(zdt));
+			pw.append(FORMATTER.format(zdt));
 			pw.append(' ');
 			pw.append('[');
 			style.enable(pw);
