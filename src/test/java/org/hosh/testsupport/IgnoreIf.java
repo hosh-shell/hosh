@@ -70,4 +70,11 @@ public class IgnoreIf implements MethodRule {
 			return System.getProperty("os.name").startsWith("Windows");
 		}
 	}
+
+	public static class NotOnWindows implements Condition {
+		@Override
+		public boolean test() {
+			return !System.getProperty("os.name").startsWith("Windows");
+		}
+	}
 }

@@ -35,6 +35,9 @@ import java.util.Optional;
 
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
+import org.hosh.testsupport.IgnoreIf;
+import org.hosh.testsupport.IgnoreIf.IgnoredIf;
+import org.hosh.testsupport.IgnoreIf.NotOnWindows;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,6 +50,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class CommandResolversTest {
 	@Rule
 	public final TemporaryFolder folder = new TemporaryFolder();
+	@Rule
+	public final IgnoreIf ignoreIf = new IgnoreIf();
 	@Mock(stubOnly = true)
 	private Command command;
 	@Mock(stubOnly = true)
@@ -101,6 +106,7 @@ public class CommandResolversTest {
 		assertThat(result).isPresent();
 	}
 
+	@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
 	@Test
 	public void foundInPathAsExe() throws IOException {
 		folder.newFile("test.exe").setExecutable(true);
