@@ -208,6 +208,6 @@ public class ExternalCommandTest {
 		sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
-		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualTo("aaa 10\n");
+		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualToNormalizingNewlines("aaa 10\n");
 	}
 }

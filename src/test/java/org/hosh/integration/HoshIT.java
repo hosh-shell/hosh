@@ -42,6 +42,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Bug;
+import org.hosh.testsupport.IgnoreIf;
+import org.hosh.testsupport.IgnoreIf.IgnoredIf;
+import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,6 +52,8 @@ import org.junit.rules.TemporaryFolder;
 public class HoshIT {
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	@Rule
+	public final IgnoreIf ignoreIf = new IgnoreIf();
 
 	@Test
 	public void interactiveExitSuccess() throws Exception {
@@ -196,6 +201,7 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(0);
 	}
 
+	@IgnoredIf(description = "windows does not have 'wc'", condition = OnWindows.class)
 	@Test
 	public void pipelineWriteExternalCommand() throws Exception {
 		Path scriptPath = givenScript(

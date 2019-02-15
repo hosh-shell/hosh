@@ -28,6 +28,7 @@ import static org.mockito.BDDMockito.given;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -61,6 +62,7 @@ public class CommandResolversTest {
 	public void notFound() {
 		given(state.getCommands()).willReturn(Collections.emptyMap());
 		given(state.getPath()).willReturn(Collections.emptyList());
+		given(state.getCwd()).willReturn(Paths.get("."));
 		Optional<Command> result = sut.tryResolve("test");
 		assertThat(result).isEmpty();
 	}
@@ -92,16 +94,38 @@ public class CommandResolversTest {
 	@Test
 	public void foundInPath() throws IOException {
 		folder.newFile("test").setExecutable(true);
-		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 		given(state.getCommands()).willReturn(Collections.emptyMap());
+		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
+		given(state.getCwd()).willReturn(Paths.get("."));
 		Optional<Command> result = sut.tryResolve("test");
 		assertThat(result).isPresent();
 	}
 
 	@Test
-	public void notFoundInPath() {
-		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
+	public void foundInPathAsExe() throws IOException {
+		folder.newFile("test.exe").setExecutable(true);
 		given(state.getCommands()).willReturn(Collections.emptyMap());
+		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
+		given(state.getCwd()).willReturn(Paths.get("."));
+		Optional<Command> result = sut.tryResolve("test");
+		assertThat(result).isPresent();
+	}
+
+	@Test
+	public void foundInCwd() throws IOException {
+		folder.newFile("test").setExecutable(true);
+		given(state.getCommands()).willReturn(Collections.emptyMap());
+		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
+		given(state.getCwd()).willReturn(Paths.get("."));
+		Optional<Command> result = sut.tryResolve("./test");
+		assertThat(result).isPresent();
+	}
+
+	@Test
+	public void notFoundInPath() {
+		given(state.getCommands()).willReturn(Collections.emptyMap());
+		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
+		given(state.getCwd()).willReturn(Paths.get("."));
 		Optional<Command> result = sut.tryResolve("test");
 		assertThat(result).isEmpty();
 	}

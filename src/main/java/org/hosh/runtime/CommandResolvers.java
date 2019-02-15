@@ -26,6 +26,7 @@ package org.hosh.runtime;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -71,6 +72,7 @@ public class CommandResolvers {
 
 	public static class ExternalCommandResolver implements CommandResolver {
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+		private static final boolean IS_WINDOWS = System.getProperty("os.name").startsWith("Windows");
 		private final State state;
 
 		public ExternalCommandResolver(State state) {
@@ -80,21 +82,50 @@ public class CommandResolvers {
 		@Override
 		public Optional<Command> tryResolve(String commandName) {
 			LOGGER.info(() -> String.format("resolving commandName '%s' as system command", commandName));
-			final Path candidate = Paths.get(commandName).normalize();
-			if (candidate.isAbsolute() && Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
-				LOGGER.info(() -> String.format("  found in %s", candidate));
-				return Optional.of(new ExternalCommand(candidate));
+			final Path absoluteCandidate = Paths.get(commandName).normalize();
+			if (absoluteCandidate.isAbsolute()) {
+				Optional<Command> command = attemptResolution(absoluteCandidate);
+				if (command.isPresent()) {
+					return command;
+				}
+				if (IS_WINDOWS) {
+					Path absoluteExeCandidate = Paths.get(commandName + ".exe").normalize();
+					return attemptResolution(absoluteExeCandidate);
+				}
+				return Optional.empty();
 			}
-			for (Path dir : state.getPath()) {
-				Path dirCandidate = Paths.get(dir.toString(), commandName).normalize();
-				LOGGER.info(() -> String.format("  trying %s", dirCandidate));
-				if (Files.isRegularFile(dirCandidate) && Files.isExecutable(dirCandidate)) {
-					LOGGER.info(() -> String.format("  found in %s", dirCandidate));
-					return Optional.of(new ExternalCommand(dirCandidate));
+			List<Path> paths = new ArrayList<>(state.getPath());
+			paths.add(state.getCwd());
+			for (Path dir : paths) {
+				Path candidate = Paths.get(dir.toString(), commandName).normalize();
+				Optional<Command> command = attemptResolution(candidate);
+				if (command.isPresent()) {
+					return command;
+				}
+				if (IS_WINDOWS) {
+					Path exeCandidate = Paths.get(dir.toString(), commandName + ".exe").normalize();
+					Optional<Command> exeCommand = attemptResolution(exeCandidate);
+					if (exeCommand.isPresent()) {
+						return exeCommand;
+					}
 				}
 			}
 			LOGGER.info("  not found");
 			return Optional.empty();
+		}
+
+		private Optional<Command> attemptResolution(Path candidate) {
+			LOGGER.info(() -> String.format("  trying %s", candidate));
+			if (isExecutable(candidate)) {
+				LOGGER.info(() -> String.format("  found in %s", candidate));
+				return Optional.of(new ExternalCommand(candidate));
+			} else {
+				return Optional.empty();
+			}
+		}
+
+		private boolean isExecutable(Path candidate) {
+			return Files.isRegularFile(candidate) && Files.isExecutable(candidate);
 		}
 	}
 
