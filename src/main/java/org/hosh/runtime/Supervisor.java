@@ -50,7 +50,7 @@ import org.jline.terminal.Terminal.SignalHandler;
 /**
  * Manages runtime execution of built-in commands as well as external commands.
  *
- * SIGINT is handled as well, allowing to stop the current set of threads.
+ * SIGINT is handled as well.
  */
 public class Supervisor implements AutoCloseable {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
@@ -119,7 +119,7 @@ public class Supervisor implements AutoCloseable {
 				.orElse(ExitStatus.success());
 	}
 
-	private List<ExitStatus> waitForCompletion() throws InterruptedException, ExecutionException, CancellationException {
+	private List<ExitStatus> waitForCompletion() throws InterruptedException, ExecutionException {
 		List<ExitStatus> results = new ArrayList<>();
 		for (Future<ExitStatus> future : futures) {
 			results.add(future.get());
@@ -132,9 +132,7 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	private void cancelFuturesOnSigint() {
-		terminal.handle(Signal.INT, signal -> {
-			futures.forEach(this::cancelIfStillRunning);
-		});
+		terminal.handle(Signal.INT, signal -> futures.forEach(this::cancelIfStillRunning));
 	}
 
 	private void cancelIfStillRunning(Future<ExitStatus> future) {

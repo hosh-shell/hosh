@@ -128,7 +128,7 @@ public class SupervisorTest {
 		}
 	}
 
-	// cannot be a mock since we need a deterministic name
+	// cannot be a mock since we need a fixed name for testing purposes
 	private static class TestCommand implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
