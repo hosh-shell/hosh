@@ -52,6 +52,7 @@ import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
+import org.hosh.runtime.InterruptionChannel;
 import org.hosh.runtime.LineReaderIterator;
 import org.hosh.runtime.SimpleChannel;
 import org.hosh.runtime.SimpleCommandRegistry;
@@ -131,14 +132,14 @@ public class Hosh {
 					.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
 					.terminal(terminal)
 					.build();
-			Channel out = new ConsoleChannel(terminal, Ansi.Style.NONE);
-			Channel err = new ConsoleChannel(terminal, Ansi.Style.FG_RED);
+			Channel out = new InterruptionChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
+			Channel err = new InterruptionChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			welcome(out, version);
 			repl(state, lineReader, compiler, interpreter, err, logger);
 		} else {
-			Channel out = new SimpleChannel(new PrintWriter(System.out));
-			Channel err = new SimpleChannel(new PrintWriter(System.err));
+			Channel out = new InterruptionChannel(new SimpleChannel(new PrintWriter(System.out)));
+			Channel err = new InterruptionChannel(new SimpleChannel(new PrintWriter(System.err)));
 			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			String filePath = args[0];
 			script(filePath, compiler, interpreter, err, logger);

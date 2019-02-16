@@ -213,7 +213,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Experimental(description = "extends with seed, bounds, doubles, booleans, etc")
+	@Experimental(description = "extends with seed and bounds parameters, then add also 'doubles', 'booleans', etc")
 	public static class Rand implements Command {
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
@@ -232,16 +232,10 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			while (true) {
-				// this is needed to let ctrl-C interrupt the currently running thread
-				// later this could be improved (e.g. handling this logic in Channel#send
-				if (Thread.currentThread().isInterrupted()) {
-					break;
-				}
 				long next = secureRandom.nextLong();
 				Record of = Record.of("value", Values.ofNumeric(next));
 				out.send(of);
 			}
-			return ExitStatus.success();
 		}
 	}
 

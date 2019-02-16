@@ -275,11 +275,6 @@ public class SystemModule implements Module {
 
 		@Override
 		public boolean retry(Accumulator resource) {
-			// this is needed to let ctrl-C interrupt the currently running thread
-			// later this could be improved (e.g. handling this logic in Channel#send
-			if (Thread.currentThread().isInterrupted()) {
-				return false;
-			}
 			resource.takeTime();
 			return --resource.repeat > 0;
 		}
@@ -308,17 +303,9 @@ public class SystemModule implements Module {
 	public static class Source implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			// sending the same object to avoid excessive GC
-			Record record = Record.of("source", Values.none());
 			while (true) {
-				// this is needed to let ctrl-C interrupt the currently running thread
-				// later this could be improved (e.g. handling this logic in Channel#send
-				if (Thread.currentThread().isInterrupted()) {
-					break;
-				}
-				out.send(record);
+				out.send(Record.of("source", Values.none()));
 			}
-			return ExitStatus.success();
 		}
 	}
 
