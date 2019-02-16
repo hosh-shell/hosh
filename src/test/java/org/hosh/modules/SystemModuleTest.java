@@ -337,6 +337,20 @@ public class SystemModuleTest {
 		}
 
 		@Test
+		public void avoidDivideByZero() {
+			List<String> args = Arrays.asList("1");
+			Accumulator accumulator = sut.before(args, in, out, err);
+			sut.after(accumulator, in, out, err);
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Record.empty()
+					.append("count", Values.ofNumeric(0))
+					.append("best", Values.ofDuration(Duration.ZERO))
+					.append("worst", Values.ofDuration(Duration.ZERO))
+					.append("avg", Values.ofDuration(Duration.ZERO)));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
 		public void oneArg() {
 			List<String> args = Arrays.asList("1");
 			Accumulator accumulator = sut.before(args, in, out, err);

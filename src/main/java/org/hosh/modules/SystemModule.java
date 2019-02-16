@@ -266,8 +266,9 @@ public class SystemModule implements Module {
 		public void after(Accumulator resource, Channel in, Channel out, Channel err) {
 			Duration best = resource.results.stream().min(Comparator.naturalOrder()).orElse(Duration.ZERO);
 			Duration worst = resource.results.stream().max(Comparator.naturalOrder()).orElse(Duration.ZERO);
-			Duration avg = resource.results.stream().reduce(Duration.ZERO, (acc, d) -> acc.plus(d)).dividedBy(resource.results.size());
-			out.send(Record.of("count", Values.ofNumeric(resource.results.size()))
+			int runs = resource.results.size();
+			Duration avg = runs == 0 ? Duration.ZERO : resource.results.stream().reduce(Duration.ZERO, (acc, d) -> acc.plus(d)).dividedBy(runs);
+			out.send(Record.of("count", Values.ofNumeric(runs))
 					.append("best", Values.ofDuration(best))
 					.append("worst", Values.ofDuration(worst))
 					.append("avg", Values.ofDuration(avg)));
