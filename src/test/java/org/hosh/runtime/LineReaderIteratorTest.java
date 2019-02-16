@@ -28,8 +28,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
-import java.io.IOError;
-import java.io.InterruptedIOException;
 import java.util.NoSuchElementException;
 
 import org.hosh.spi.State;
@@ -90,22 +88,6 @@ public class LineReaderIteratorTest {
 	public void killsCurrentLineAtINT() throws Exception {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated INT"));
-		assertThat(sut.hasNext()).isTrue();
-		assertThat(sut.next()).isEqualTo("");
-	}
-
-	@Test
-	public void fixRaceConditionInJLines() throws Exception {
-		given(state.getId()).willReturn(0);
-		given(lineReader.readLine(anyString())).willThrow(new IOError(new InterruptedIOException("simulated INT")));
-		assertThat(sut.hasNext()).isTrue();
-		assertThat(sut.next()).isEqualTo("");
-	}
-
-	@Test(expected = IOError.class)
-	public void stopsAtGenericIOError() throws Exception {
-		given(state.getId()).willReturn(0);
-		given(lineReader.readLine(anyString())).willThrow(new IOError(new IllegalArgumentException("simulated exception")));
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("");
 	}
