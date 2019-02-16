@@ -302,6 +302,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Source implements Command {
+		@SuppressWarnings("squid:S2189")
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			while (true) {

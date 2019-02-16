@@ -217,6 +217,7 @@ public class TextModule implements Module {
 	public static class Rand implements Command {
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
+		@SuppressWarnings("squid:S2189")
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
