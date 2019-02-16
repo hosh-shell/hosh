@@ -1,0 +1,1 @@
+benchmark 50 { source | take 10000 | sink }

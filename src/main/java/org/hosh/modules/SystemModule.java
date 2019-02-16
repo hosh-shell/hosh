@@ -57,6 +57,8 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("kill", KillProcess.class);
 		commandRegistry.registerCommand("err", Err.class);
 		commandRegistry.registerCommand("benchmark", Benchmark.class);
+		commandRegistry.registerCommand("source", Source.class);
+		commandRegistry.registerCommand("sink", Sink.class);
 	}
 
 	public static class Echo implements Command {
@@ -269,6 +271,8 @@ public class SystemModule implements Module {
 
 		@Override
 		public boolean retry(Accumulator resource) {
+			// this is needed to let ctrl-C interrupt the currently running thread
+			// later this could be improved (e.g. handling this logic in Channel#send
 			if (Thread.currentThread().isInterrupted()) {
 				return false;
 			}
@@ -290,6 +294,36 @@ public class SystemModule implements Module {
 				results.add(elapsed);
 				start();
 			}
+		}
+	}
+
+	public static class Source implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			// sending the same object to avoid excessive GC
+			Record record = Record.of("source", Values.none());
+			while (true) {
+				// this is needed to let ctrl-C interrupt the currently running thread
+				// later this could be improved (e.g. handling this logic in Channel#send
+				if (Thread.currentThread().isInterrupted()) {
+					break;
+				}
+				out.send(record);
+			}
+			return ExitStatus.success();
+		}
+	}
+
+	public static class Sink implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			while (true) {
+				Optional<Record> recv = in.recv();
+				if (recv.isEmpty()) {
+					break;
+				}
+			}
+			return ExitStatus.success();
 		}
 	}
 }
