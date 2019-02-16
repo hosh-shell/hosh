@@ -54,6 +54,7 @@ public class Values {
 		return NONE;
 	}
 
+	@Experimental(description = "this constructor is a bit redundant in naming")
 	public static Value ofDuration(Duration duration) {
 		return new DurationValue(duration);
 	}

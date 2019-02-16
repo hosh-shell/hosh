@@ -28,11 +28,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.hosh.doc.Todo;
 import org.hosh.modules.SystemModule.Benchmark;
 import org.hosh.modules.SystemModule.Benchmark.Accumulator;
 import org.hosh.modules.SystemModule.Echo;
@@ -320,16 +320,48 @@ public class SystemModuleTest {
 		@InjectMocks
 		private Benchmark sut;
 
-		@Todo(description = "improve this test")
+		@Test
+		public void calculations() {
+			List<String> args = Arrays.asList("1");
+			Accumulator accumulator = sut.before(args, in, out, err);
+			accumulator.getResults().add(Duration.ofMillis(20));
+			accumulator.getResults().add(Duration.ofMillis(10));
+			sut.after(accumulator, in, out, err);
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Record.empty()
+					.append("count", Values.ofNumeric(2))
+					.append("best", Values.ofDuration(Duration.ofMillis(10)))
+					.append("worst", Values.ofDuration(Duration.ofMillis(20)))
+					.append("avg", Values.ofDuration(Duration.ofMillis(15))));
+			then(err).shouldHaveZeroInteractions();
+		}
+
 		@Test
 		public void oneArg() {
-			List<String> args = Arrays.asList("10");
+			List<String> args = Arrays.asList("1");
 			Accumulator accumulator = sut.before(args, in, out, err);
-			sut.retry(accumulator);
+			boolean retry = sut.retry(accumulator);
+			assertThat(retry).isFalse();
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Mockito.any());
 			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void zeroArgs() {
+			List<String> args = Arrays.asList();
+			assertThatThrownBy(() -> sut.before(args, in, out, err))
+					.hasMessage("requires one integer arg")
+					.isInstanceOf(IllegalArgumentException.class);
+		}
+
+		@Test
+		public void zeroArg() {
+			List<String> args = Arrays.asList("0");
+			assertThatThrownBy(() -> sut.before(args, in, out, err))
+					.hasMessage("repeat should be > 0")
+					.isInstanceOf(IllegalArgumentException.class);
 		}
 	}
 }

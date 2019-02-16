@@ -97,14 +97,8 @@ public class ValuesTest {
 		private Appendable appendable;
 
 		@Test
-		public void appendEnglishLocale() throws IOException {
+		public void append() throws IOException {
 			Values.ofDuration(Duration.ofMillis(1)).append(appendable, Locale.ENGLISH);
-			then(appendable).should().append("PT0.001S");
-		}
-
-		@Test
-		public void appendItalianLocale() throws IOException {
-			Values.ofDuration(Duration.ofMillis(1)).append(appendable, Locale.ITALIAN);
 			then(appendable).should().append("PT0.001S");
 		}
 

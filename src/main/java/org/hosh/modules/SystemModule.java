@@ -27,6 +27,7 @@ import java.lang.ProcessHandle.Info;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -248,10 +249,13 @@ public class SystemModule implements Module {
 		@Override
 		public Accumulator before(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				throw new IllegalArgumentException("benchmark requires one integer arg");
+				throw new IllegalArgumentException("requires one integer arg");
 			}
 			Accumulator accumulator = new Accumulator();
 			int repeat = Integer.parseInt(args.get(0));
+			if (repeat <= 0) {
+				throw new IllegalArgumentException("repeat should be > 0");
+			}
 			accumulator.repeat = repeat;
 			accumulator.results = new ArrayList<>(repeat);
 			accumulator.start();
@@ -260,13 +264,13 @@ public class SystemModule implements Module {
 
 		@Override
 		public void after(Accumulator resource, Channel in, Channel out, Channel err) {
-			long best = resource.results.stream().mapToLong(Long::valueOf).min().orElse(0);
-			long worst = resource.results.stream().mapToLong(Long::valueOf).max().orElse(0);
-			long avg = resource.results.stream().mapToLong(Long::valueOf).sum() / resource.results.size();
+			Duration best = resource.results.stream().min(Comparator.naturalOrder()).orElse(Duration.ZERO);
+			Duration worst = resource.results.stream().max(Comparator.naturalOrder()).orElse(Duration.ZERO);
+			Duration avg = resource.results.stream().reduce(Duration.ZERO, (acc, d) -> acc.plus(d)).dividedBy(resource.results.size());
 			out.send(Record.of("count", Values.ofNumeric(resource.results.size()))
-					.append("best", Values.ofDuration(Duration.ofNanos(best)))
-					.append("worst", Values.ofDuration(Duration.ofNanos(worst)))
-					.append("avg", Values.ofDuration(Duration.ofNanos(avg))));
+					.append("best", Values.ofDuration(best))
+					.append("worst", Values.ofDuration(worst))
+					.append("avg", Values.ofDuration(avg)));
 		}
 
 		@Override
@@ -281,7 +285,7 @@ public class SystemModule implements Module {
 		}
 
 		public static class Accumulator {
-			private List<Long> results;
+			private List<Duration> results;
 			private int repeat;
 			private long nanoTime;
 
@@ -290,9 +294,13 @@ public class SystemModule implements Module {
 			}
 
 			public void takeTime() {
-				long elapsed = System.nanoTime() - nanoTime;
+				Duration elapsed = Duration.ofNanos(System.nanoTime() - nanoTime);
 				results.add(elapsed);
 				start();
+			}
+
+			public List<Duration> getResults() {
+				return results;
 			}
 		}
 	}
