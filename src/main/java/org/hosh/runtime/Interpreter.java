@@ -25,6 +25,7 @@ package org.hosh.runtime;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
 import java.util.stream.Collectors;
 
 import org.hosh.runtime.Compiler.Program;
@@ -84,6 +85,8 @@ public class Interpreter {
 				runSupervised(statement, supervisor);
 			}
 			return supervisor.waitForAll(err);
+		} catch (CancellationException e) {
+			return ExitStatus.error();
 		}
 	}
 

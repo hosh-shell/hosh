@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -86,10 +85,6 @@ public class Supervisor implements AutoCloseable {
 		try {
 			List<ExitStatus> results = waitForCompletion();
 			return exitStatusFrom(results);
-		} catch (CancellationException e) {
-			LOGGER.log(Level.FINE, "got cancellation", e);
-			Thread.currentThread().interrupt();
-			return ExitStatus.error();
 		} catch (InterruptedException e) {
 			LOGGER.log(Level.FINE, "got interrupt", e);
 			Thread.currentThread().interrupt();

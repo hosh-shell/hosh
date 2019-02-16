@@ -26,16 +26,13 @@ package org.hosh.runtime;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 
-import org.hosh.doc.Experimental;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 
-@Experimental(description = "this could be a wrong solution but right now is very cheap to implement:" +
-		"perhaps a better solution would be to let Channel and Command to throw InterruptedException")
-public class InterruptionChannel implements Channel {
+public class CancellableChannel implements Channel {
 	private final Channel channel;
 
-	public InterruptionChannel(Channel channel) {
+	public CancellableChannel(Channel channel) {
 		this.channel = channel;
 	}
 
