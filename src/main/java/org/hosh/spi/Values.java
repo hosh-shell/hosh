@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
@@ -51,6 +52,10 @@ public class Values {
 	@Experimental(description = "it is useful to always provide a key, even if the value if missing. This simplifies a lot the pattern '| sort key | table'")
 	public static Value none() {
 		return NONE;
+	}
+
+	public static Value ofDuration(Duration duration) {
+		return new DurationValue(duration);
 	}
 
 	public static Value ofNumeric(long number) {
@@ -313,10 +318,65 @@ public class Values {
 		}
 	}
 
+	static final class DurationValue implements Value {
+		private final Duration duration;
+
+		public DurationValue(Duration duration) {
+			if (duration == null) {
+				throw new IllegalArgumentException("duration cannot be null");
+			}
+			this.duration = duration;
+		}
+
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof DurationValue) {
+				DurationValue that = (DurationValue) obj;
+				return this.duration.compareTo(that.duration);
+			} else if (obj instanceof None) {
+				return 1;
+			} else {
+				throw new IllegalArgumentException();
+			}
+		}
+
+		@Override
+		public void append(Appendable appendable, Locale locale) {
+			try {
+				appendable.append(duration.toString());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Duration[%s]", duration);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof DurationValue) {
+				DurationValue that = (DurationValue) obj;
+				return Objects.equals(this.duration, that.duration);
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(duration);
+		}
+	}
+
 	static final class LocalPath implements Value {
 		private final Path path;
 
 		public LocalPath(Path path) {
+			if (path == null) {
+				throw new IllegalArgumentException("path cannot be null");
+			}
 			this.path = path;
 		}
 

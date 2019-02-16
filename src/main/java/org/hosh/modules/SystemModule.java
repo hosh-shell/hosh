@@ -180,7 +180,7 @@ public class SystemModule implements Module {
 		public void after(Long startNanos, Channel in, Channel out, Channel err) {
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
-			out.send(Record.of("message", Values.ofText("took " + duration)));
+			out.send(Record.of("message", Values.ofDuration(duration)));
 		}
 	}
 
@@ -264,9 +264,9 @@ public class SystemModule implements Module {
 			long worst = resource.results.stream().mapToLong(Long::valueOf).max().orElse(0);
 			long avg = resource.results.stream().mapToLong(Long::valueOf).sum() / resource.results.size();
 			out.send(Record.of("count", Values.ofNumeric(resource.results.size()))
-					.append("best", Values.ofNumeric(Duration.ofNanos(best).toMillis()))
-					.append("worst", Values.ofNumeric(Duration.ofNanos(worst).toMillis()))
-					.append("avg", Values.ofNumeric(Duration.ofNanos(avg).toMillis())));
+					.append("best", Values.ofDuration(Duration.ofNanos(best)))
+					.append("worst", Values.ofDuration(Duration.ofNanos(worst)))
+					.append("avg", Values.ofDuration(Duration.ofNanos(avg))));
 		}
 
 		@Override

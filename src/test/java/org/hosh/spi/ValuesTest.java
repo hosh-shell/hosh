@@ -31,6 +31,7 @@ import static org.mockito.BDDMockito.then;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +40,7 @@ import java.util.stream.Stream;
 
 import org.hosh.spi.Values.AlphaNumericStringComparator;
 import org.hosh.spi.ValuesTest.AlphaNumericStringComparatorTest;
+import org.hosh.spi.ValuesTest.DurationValueTest;
 import org.hosh.spi.ValuesTest.LocalPathValueTest;
 import org.hosh.spi.ValuesTest.NoneValueTest;
 import org.hosh.spi.ValuesTest.NumericValueTest;
@@ -58,6 +60,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 @RunWith(Suite.class)
 @SuiteClasses({
 		NoneValueTest.class,
+		DurationValueTest.class,
 		TextValueTest.class,
 		NumericValueTest.class,
 		SizeValueTest.class,
@@ -85,6 +88,34 @@ public class ValuesTest {
 		@Test
 		public void asString() {
 			assertThat(Values.none()).hasToString("None");
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class DurationValueTest {
+		@Mock
+		private Appendable appendable;
+
+		@Test
+		public void appendEnglishLocale() throws IOException {
+			Values.ofDuration(Duration.ofMillis(1)).append(appendable, Locale.ENGLISH);
+			then(appendable).should().append("PT0.001S");
+		}
+
+		@Test
+		public void appendItalianLocale() throws IOException {
+			Values.ofDuration(Duration.ofMillis(1)).append(appendable, Locale.ITALIAN);
+			then(appendable).should().append("PT0.001S");
+		}
+
+		@Test
+		public void equalsContract() {
+			EqualsVerifier.forClass(Values.DurationValue.class).verify();
+		}
+
+		@Test
+		public void asString() {
+			assertThat(Values.ofDuration(Duration.ofMillis(1))).hasToString("Duration[PT0.001S]");
 		}
 	}
 
