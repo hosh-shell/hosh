@@ -298,6 +298,28 @@ public class HoshIT {
 		assertThat(output).startsWith("10");
 	}
 
+	@Test
+	public void unknownCommandScript() throws Exception {
+		Path scriptPath = givenScript(
+				"FOOBAR"//
+		);
+		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+		assertThat(output).startsWith("line 1: 'FOOBAR' unknown command");
+	}
+
+	@Test
+	public void unknownCommandInteractive() throws Exception {
+		Process hosh = givenHoshProcess();
+		sendInput(hosh, "FOOBAR\nexit\n");
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).contains("'FOOBAR' unknown command");
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
