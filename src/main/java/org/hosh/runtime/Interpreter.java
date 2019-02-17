@@ -84,8 +84,7 @@ public class Interpreter {
 	}
 
 	private void runSupervised(Statement statement, Supervisor supervisor) {
-		supervisor.submit(() -> {
-			supervisor.setThreadName(statement);
+		supervisor.submit(statement, () -> {
 			return run(statement);
 		});
 	}

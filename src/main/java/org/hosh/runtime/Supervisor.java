@@ -36,7 +36,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -59,16 +58,11 @@ public class Supervisor implements AutoCloseable {
 		executor.shutdownNow();
 	}
 
-	@Todo(description = "ideally this method should be called by submit() and never exposed outside")
-	public void setThreadName(Statement statement) {
-		String commandName = statement.getCommand().getClass().getSimpleName();
-		String arguments = String.join(" ", statement.getArguments());
-		String name = String.format("command='%s%s%s'", commandName, arguments.isEmpty() ? "" : " ", arguments);
-		Thread.currentThread().setName(name);
-	}
-
-	public void submit(Callable<ExitStatus> task) {
-		Future<ExitStatus> future = executor.submit(task);
+	public void submit(Statement statement, Callable<ExitStatus> task) {
+		Future<ExitStatus> future = executor.submit(() -> {
+			setThreadName(statement);
+			return task.call();
+		});
 		LOGGER.finer(() -> String.format("adding future %s", future));
 		futures.add(future);
 	}
@@ -130,5 +124,12 @@ public class Supervisor implements AutoCloseable {
 			LOGGER.finer(() -> String.format("cancelling future %s", future));
 			future.cancel(true);
 		}
+	}
+
+	private void setThreadName(Statement statement) {
+		String commandName = statement.getCommand().getClass().getSimpleName();
+		String arguments = String.join(" ", statement.getArguments());
+		String name = String.format("command='%s%s%s'", commandName, arguments.isEmpty() ? "" : " ", arguments);
+		Thread.currentThread().setName(name);
 	}
 }

@@ -52,13 +52,13 @@ import org.hosh.spi.Values;
 
 public class ExternalCommand implements Command, StateAware {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
-	private final Path command;
+	private final Path path;
 	private ProcessFactory processFactory = new DefaultProcessFactory();
 	private State state; // needed for current working directory
 	private boolean inheritIo = true;
 
-	public ExternalCommand(Path command) {
-		this.command = command;
+	public ExternalCommand(Path path) {
+		this.path = path;
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class ExternalCommand implements Command, StateAware {
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);
-		processArgs.add(command.toAbsolutePath().toString());
+		processArgs.add(path.toAbsolutePath().toString());
 		processArgs.addAll(args);
 		Path cwd = state.getCwd();
 		LOGGER.fine(() -> String.format("executing '%s' in directory %s", processArgs, cwd));

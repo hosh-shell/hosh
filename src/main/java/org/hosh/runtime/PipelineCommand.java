@@ -107,8 +107,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	}
 
 	private void submitProducer(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
-		supervisor.submit(() -> {
-			supervisor.setThreadName(statement);
+		supervisor.submit(statement, () -> {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
 			List<String> arguments = statement.getArguments();
@@ -125,8 +124,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	}
 
 	private void submitConsumer(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
-		supervisor.submit(() -> {
-			supervisor.setThreadName(statement);
+		supervisor.submit(statement, () -> {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
 			List<String> arguments = statement.getArguments();

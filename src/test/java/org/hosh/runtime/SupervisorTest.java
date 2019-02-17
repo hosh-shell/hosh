@@ -28,15 +28,16 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
-import org.jline.terminal.Terminal;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,8 +47,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SupervisorTest {
-	@Mock(stubOnly = true)
-	private Terminal terminal;
 	@Mock
 	private Channel err;
 	@Mock(stubOnly = true)
@@ -68,23 +67,29 @@ public class SupervisorTest {
 
 	@Test
 	public void allSubmitInSuccess() {
-		sut.submit(() -> ExitStatus.success());
-		sut.submit(() -> ExitStatus.success());
+		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getArguments()).willReturn(Collections.emptyList());
+		sut.submit(statement, () -> ExitStatus.success());
+		sut.submit(statement, () -> ExitStatus.success());
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus.value()).isEqualTo(0);
 	}
 
 	@Test
 	public void oneSubmitInError() {
-		sut.submit(() -> ExitStatus.success());
-		sut.submit(() -> ExitStatus.of(10));
+		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getArguments()).willReturn(Collections.emptyList());
+		sut.submit(statement, () -> ExitStatus.success());
+		sut.submit(statement, () -> ExitStatus.of(10));
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus.value()).isEqualTo(10);
 	}
 
 	@Test
 	public void oneSubmitWithException() {
-		sut.submit(() -> {
+		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getArguments()).willReturn(Collections.emptyList());
+		sut.submit(statement, () -> {
 			throw new NullPointerException("simulated error");
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
@@ -94,7 +99,9 @@ public class SupervisorTest {
 
 	@Test
 	public void oneSubmitWithExceptionButNoMessage() {
-		sut.submit(() -> {
+		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getArguments()).willReturn(Collections.emptyList());
+		sut.submit(statement, () -> {
 			throw new NullPointerException();
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
@@ -102,27 +109,37 @@ public class SupervisorTest {
 		then(err).should().send(Record.of("error", Values.ofText("(no message provided)")));
 	}
 
+	@Todo(description = "this test needs some love <3")
 	@Test
 	public void setThreadNameWithArgs() {
 		given(statement.getCommand()).willReturn(new TestCommand());
 		given(statement.getArguments()).willReturn(Arrays.asList("-a", "-b"));
 		String oldThreadName = Thread.currentThread().getName();
 		try {
-			sut.setThreadName(statement);
-			assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand -a -b'");
+			sut.submit(statement, () -> {
+				assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand -a -b'");
+				return ExitStatus.success();
+			});
+			sut.waitForAll(err);
+			then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
 		} finally {
 			Thread.currentThread().setName(oldThreadName);
 		}
 	}
 
+	@Todo(description = "this test needs some love <3")
 	@Test
 	public void setThreadNameWithoutArgs() {
 		given(statement.getCommand()).willReturn(new TestCommand());
 		given(statement.getArguments()).willReturn(Arrays.asList());
 		String oldThreadName = Thread.currentThread().getName();
 		try {
-			sut.setThreadName(statement);
-			assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand'");
+			sut.submit(statement, () -> {
+				assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand'");
+				return ExitStatus.success();
+			});
+			sut.waitForAll(err);
+			then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
 		} finally {
 			Thread.currentThread().setName(oldThreadName);
 		}
