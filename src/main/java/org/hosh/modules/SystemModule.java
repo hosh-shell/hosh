@@ -306,7 +306,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			while (true) {
-				out.send(Record.of("source", Values.none()));
+				out.send(Record.of("source", Values.ofText("test value")));
 			}
 		}
 	}

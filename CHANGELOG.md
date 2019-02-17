@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - improved Windows support (tested on Windows 7)
     + resolution of external commands such as "java" will be attempted as "java" then "java.exe"
     + test suite now is compatible with windows
+- 'source' and 'sink' commands
 
 ## [0.0.23] - 2019-02-11
 - improved ctrl-C handling (#44)
