@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.Token;
 import org.hosh.antlr4.HoshParser;
 import org.hosh.antlr4.HoshParser.ArgContext;
+import org.hosh.antlr4.HoshParser.CommandContext;
 import org.hosh.antlr4.HoshParser.InvocationContext;
 import org.hosh.antlr4.HoshParser.PipelineContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
@@ -61,14 +62,21 @@ public class Compiler {
 	}
 
 	private Statement compileStatement(StmtContext ctx) {
-		if (ctx.single() != null) {
-			return compileInvocation(ctx.single().invocation());
-		}
-		if (ctx.wrapped() != null) {
-			return compileWrappedCommand(ctx.wrapped());
+		if (ctx.command() != null) {
+			return compileCommand(ctx.command());
 		}
 		if (ctx.pipeline() != null) {
 			return compilePipeline(ctx.pipeline());
+		}
+		throw new InternalBug();
+	}
+
+	private Statement compileCommand(CommandContext ctx) {
+		if (ctx.simple() != null) {
+			return compileInvocation(ctx.simple().invocation());
+		}
+		if (ctx.wrapped() != null) {
+			return compileWrappedCommand(ctx.wrapped());
 		}
 		throw new InternalBug();
 	}
@@ -78,7 +86,7 @@ public class Compiler {
 			throw new CompileError(String.format("line %d:%d: incomplete pipeline near '%s'", ctx.getStart().getLine(),
 					ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
 		}
-		Statement producer = compileInvocation(ctx.invocation());
+		Statement producer = compileCommand(ctx.command());
 		Statement consumer = compileStatement(ctx.stmt());
 		Statement pipeline = new Statement();
 		pipeline.setCommand(new PipelineCommand(producer, consumer));

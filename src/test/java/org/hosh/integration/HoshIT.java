@@ -79,7 +79,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).hasLineCount(2);
+		assertThat(output).isEqualToNormalizingNewlines("2");
 		assertThat(exitCode).isEqualTo(0);
 	}
 

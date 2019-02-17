@@ -71,6 +71,8 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 
 	@Override
 	public void setArgumentResolver(ArgumentResolver argumentResolver) {
+		producer.getCommand().downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(argumentResolver));
+		consumer.getCommand().downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(argumentResolver));
 		this.argumentResolver = argumentResolver;
 	}
 

@@ -6,21 +6,25 @@ program
 
 stmt
     : pipeline NEWLINE?
-    | wrapped NEWLINE?
-    | single NEWLINE?
+    | command NEWLINE?
     ;
 
 pipeline
-    : invocation '|' stmt
-    | invocation '|' // will be rejected later by the compiler with a nice error message  
+    : command '|' stmt
+    | command '|' // will be rejected by the compiler with a nice error message
+    ;
+
+command
+    : wrapped
+    | simple
     ;
 
 wrapped
     : invocation '{' stmt '}'
-    | wrapped '}' // will be rejected later by the compiler with a nice error message
+    | wrapped '}' // will be rejected by the compiler with a nice error message
     ;
 
-single
+simple
     : invocation
     ;
 

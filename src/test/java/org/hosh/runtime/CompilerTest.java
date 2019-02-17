@@ -176,6 +176,16 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void wrappedCommandInPipeline() {
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
+		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("count");
+		Program program = sut.compile("withTime { git push } | count");
+		assertThat(program.getStatements()).hasSize(1);
+	}
+
+	@Test
 	public void strings() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 		Program program = sut.compile("vim 'file with spaces'");

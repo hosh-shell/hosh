@@ -41,7 +41,7 @@ public interface CommandWrapper<T> extends Command {
 	 */
 	void after(T resource, Channel in, Channel out, Channel err);
 
-	@Experimental(description = "retry the inner start if this method reports true, it has been abused to create 'repeat'")
+	@Experimental(description = "retry the inner start if this method reports true, required by 'benchmark'")
 	default boolean retry(@SuppressWarnings("unused") T resource) {
 		return false;
 	}
