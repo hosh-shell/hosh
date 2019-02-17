@@ -42,6 +42,7 @@ import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
 import org.hosh.modules.SystemModule.ProcessList;
 import org.hosh.modules.SystemModule.Sleep;
+import org.hosh.modules.SystemModule.WithTime;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
@@ -68,6 +69,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.ProcessListTest.class,
 		SystemModuleTest.ErrTest.class,
 		SystemModuleTest.BenchmarkTest.class,
+		SystemModuleTest.WithTimeTest.class,
 })
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -380,6 +382,45 @@ public class SystemModuleTest {
 			assertThatThrownBy(() -> sut.before(args, in, out, err))
 					.hasMessage("repeat should be > 0")
 					.isInstanceOf(IllegalArgumentException.class);
+		}
+
+		@Test
+		public void runIsMarkedAsError() {
+			assertThatThrownBy(() -> sut.run(Collections.emptyList(), in, out, err))
+					.isInstanceOf(UnsupportedOperationException.class);
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class WithTimeTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private WithTime sut;
+
+		@Test
+		public void usage() {
+			Long resource = sut.before(Collections.emptyList(), in, out, err);
+			sut.after(resource, in, out, err);
+			then(out).should().send(Mockito.any());
+			then(in).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void retryIsNotSupported() {
+			Long resource = sut.before(Collections.emptyList(), in, out, err);
+			assertThat(sut.retry(resource)).isFalse();
+		}
+
+		@Test
+		public void runIsMarkedAsError() {
+			assertThatThrownBy(() -> sut.run(Collections.emptyList(), in, out, err))
+					.isInstanceOf(UnsupportedOperationException.class);
 		}
 	}
 }
