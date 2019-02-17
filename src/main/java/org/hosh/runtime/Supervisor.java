@@ -44,12 +44,17 @@ import org.hosh.spi.Values;
 /**
  * Manages runtime execution of built-in commands as well as external commands.
  *
- * SIGINT is handled as well.
+ * SIGINT is handled as well, if requested.
  */
 public class Supervisor implements AutoCloseable {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private final List<Future<ExitStatus>> futures = new ArrayList<>();
+	private boolean handleSignals = true;
+
+	public void setHandleSignals(boolean handleSignals) {
+		this.handleSignals = handleSignals;
+	}
 
 	@Override
 	public void close() {
@@ -110,11 +115,19 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	private void restoreDefaultSigintHandler() {
-		org.jline.utils.Signals.registerDefault("INT");
+		if (handleSignals) {
+			org.jline.utils.Signals.registerDefault("INT");
+		}
 	}
 
 	private void cancelFuturesOnSigint() {
-		org.jline.utils.Signals.register("INT", () -> futures.forEach(this::cancelIfStillRunning));
+		if (handleSignals) {
+			LOGGER.info("register INT signal handler");
+			org.jline.utils.Signals.register("INT", () -> {
+				LOGGER.info("  got INT signal");
+				futures.forEach(this::cancelIfStillRunning);
+			});
+		}
 	}
 
 	private void cancelIfStillRunning(Future<ExitStatus> future) {

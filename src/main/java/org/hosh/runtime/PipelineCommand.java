@@ -83,6 +83,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		try (Supervisor supervisor = new Supervisor()) {
+			supervisor.setHandleSignals(false);
 			Channel pipeChannel = new PipelineChannel();
 			submitProducer(supervisor, producer, new NullChannel(), pipeChannel, err);
 			assemblePipeline(supervisor, consumer, pipeChannel, out, err);
