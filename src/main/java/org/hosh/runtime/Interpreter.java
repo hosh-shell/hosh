@@ -64,7 +64,7 @@ public class Interpreter {
 	}
 
 	private boolean lastCommandFailed(ExitStatus exitStatus) {
-		return exitStatus.value() != 0;
+		return exitStatus.isError();
 	}
 
 	private boolean userRequestedExit() {
@@ -84,9 +84,7 @@ public class Interpreter {
 	}
 
 	private void runSupervised(Statement statement, Supervisor supervisor) {
-		supervisor.submit(statement, () -> {
-			return run(statement);
-		});
+		supervisor.submit(statement, () -> run(statement));
 	}
 
 	private ExitStatus run(Statement statement) {

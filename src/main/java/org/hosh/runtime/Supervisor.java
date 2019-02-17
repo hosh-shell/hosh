@@ -101,7 +101,7 @@ public class Supervisor implements AutoCloseable {
 
 	private ExitStatus deriveExitStatus(List<ExitStatus> results) {
 		return results.stream()
-				.filter(es -> es.isError())
+				.filter(ExitStatus::isError)
 				.findFirst()
 				.orElse(ExitStatus.success());
 	}
