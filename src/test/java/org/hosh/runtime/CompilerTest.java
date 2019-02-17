@@ -196,6 +196,24 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void commandWrapperUsedAsCommand() {
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
+		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
+		assertThatThrownBy(() -> sut.compile("withTime"))
+				.isInstanceOf(CompileError.class)
+				.hasMessage("line 1: 'withTime' is a command wrapper");
+	}
+
+	@Test
+	public void emptyCommandWrapper() {
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
+		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
+		assertThatThrownBy(() -> sut.compile("withTime { }"))
+				.isInstanceOf(CompileError.class)
+				.hasMessage("line 1: 'withTime' with empty wrapping statement");
+	}
+
+	@Test
 	public void commandUsedAsCommandWrapper() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		assertThatThrownBy(() -> sut.compile("ls { grep pattern } "))

@@ -11,7 +11,7 @@ stmt
 
 pipeline
     : command '|' stmt
-    | command '|' // will be rejected by the compiler with a nice error message
+    | command '|' // will be rejected by compiler
     ;
 
 command
@@ -21,7 +21,8 @@ command
 
 wrapped
     : invocation '{' stmt '}'
-    | wrapped '}' // will be rejected by the compiler with a nice error message
+    | invocation '{' '}' // will be rejected by compiler
+    | wrapped '}' // will be rejected by compiler 
     ;
 
 simple

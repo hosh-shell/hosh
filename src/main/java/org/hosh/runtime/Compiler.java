@@ -35,6 +35,7 @@ import org.hosh.antlr4.HoshParser.ArgContext;
 import org.hosh.antlr4.HoshParser.CommandContext;
 import org.hosh.antlr4.HoshParser.InvocationContext;
 import org.hosh.antlr4.HoshParser.PipelineContext;
+import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
 import org.hosh.doc.Todo;
@@ -73,7 +74,7 @@ public class Compiler {
 
 	private Statement compileCommand(CommandContext ctx) {
 		if (ctx.simple() != null) {
-			return compileInvocation(ctx.simple().invocation());
+			return compileSimple(ctx.simple());
 		}
 		if (ctx.wrapped() != null) {
 			return compileWrappedCommand(ctx.wrapped());
@@ -94,13 +95,16 @@ public class Compiler {
 		return pipeline;
 	}
 
-	private Statement compileInvocation(InvocationContext ctx) {
-		Token token = ctx.ID().getSymbol();
+	private Statement compileSimple(SimpleContext ctx) {
+		Token token = ctx.invocation().ID().getSymbol();
 		String commandName = token.getText();
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
 				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
-		List<String> commandArgs = compileArguments(ctx);
+		command.downCast(CommandWrapper.class).ifPresent(cmd -> {
+			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
+		});
+		List<String> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
@@ -119,6 +123,10 @@ public class Compiler {
 				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
 		CommandWrapper<?> commandWrapper = command.downCast(CommandWrapper.class)
 				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName)));
+		if (ctx.stmt() == null) {
+			int line = ctx.start.getLine();
+			throw new CompileError(String.format("line %d: '%s' with empty wrapping statement", line, commandName));
+		}
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		List<String> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
