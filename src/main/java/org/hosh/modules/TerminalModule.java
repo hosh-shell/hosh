@@ -56,12 +56,14 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			Attributes attributes = terminal.getAttributes();
-			out.send(Record.of("type", Values.ofText(terminal.getType()))
-					.append("lflags", Values.ofText(attributes.getLocalFlags().toString()))
-					.append("iflags", Values.ofText(attributes.getInputFlags().toString()))
-					.append("oflags", Values.ofText(attributes.getOutputFlags().toString()))
-					.append("cflags", Values.ofText(attributes.getControlFlags().toString()))
-					.append("cchars", Values.ofText(attributes.getControlChars().toString())));
+			out.send(Record.builder()
+					.entry("type", Values.ofText(terminal.getType()))
+					.entry("lflags", Values.ofText(attributes.getLocalFlags().toString()))
+					.entry("iflags", Values.ofText(attributes.getInputFlags().toString()))
+					.entry("oflags", Values.ofText(attributes.getOutputFlags().toString()))
+					.entry("cflags", Values.ofText(attributes.getControlFlags().toString()))
+					.entry("cchars", Values.ofText(attributes.getControlChars().toString()))
+					.build());
 			return ExitStatus.success();
 		}
 	}

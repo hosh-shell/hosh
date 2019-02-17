@@ -196,7 +196,7 @@ public class ExternalCommandTest {
 	public void processRecordsFromIn() throws Exception {
 		ByteArrayOutputStream value = new ByteArrayOutputStream();
 		given(in.recv()).willReturn(
-				Optional.of(Record.of("name", Values.ofText("aaa"), "size", Values.ofNumeric(10))),
+				Optional.of(Record.builder().entry("name", Values.ofText("aaa")).entry("size", Values.ofNumeric(10)).build()),
 				Optional.empty());
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);

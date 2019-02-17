@@ -24,8 +24,8 @@
 package org.hosh.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.hosh.spi.Record.Builder;
 import org.hosh.spi.Record.Empty;
 import org.hosh.spi.Record.Generic;
 import org.hosh.spi.Record.Singleton;
@@ -79,25 +79,6 @@ public class RecordTest {
 	}
 
 	@Test
-	public void addNonUniqueKey() {
-		Value value = Values.ofText("value");
-		Value anotherValue = Values.ofText("another_value");
-		Record a = Record.of("kkk", value);
-		assertThatThrownBy(() -> {
-			a.append("kkk", anotherValue);
-		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("duplicated key: kkk");
-	}
-
-	@Test
-	public void ofNonUniqueKey() {
-		Value value = Values.ofText("value");
-		Value anotherValue = Values.ofText("another_value");
-		assertThatThrownBy(() -> {
-			Record.of("kkk", value, "kkk", anotherValue);
-		}).isInstanceOf(IllegalArgumentException.class).hasMessageContaining("duplicated key: kkk");
-	}
-
-	@Test
 	public void equalsContract() {
 		EqualsVerifier.forClass(Empty.class).verify();
 		EqualsVerifier.forClass(Singleton.class).verify();
@@ -113,5 +94,15 @@ public class RecordTest {
 		record = record.append("another key", Values.none());
 		assertThat(record.value("some key")).isNotEmpty().contains(Values.none());
 		assertThat(record.value("another key")).isNotEmpty().contains(Values.none());
+	}
+
+	@Test
+	public void instanceIsDetachedFromBuilder() {
+		Builder builder = Record.builder();
+		builder.entry("key", Values.none());
+		Record record = builder.build();
+		builder.entry("another_key", Values.none());
+		assertThat(record.value("key")).isPresent();
+		assertThat(record.value("another_key")).isEmpty();
 	}
 }

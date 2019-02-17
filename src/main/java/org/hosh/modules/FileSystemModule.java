@@ -91,7 +91,10 @@ public class FileSystemModule implements Module {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(realDir)) {
 				for (Path path : stream) {
 					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
-					Record entry = Record.of("path", Values.ofLocalPath(path.getFileName()), "size", size);
+					Record entry = Record.builder()
+							.entry("path", Values.ofLocalPath(path.getFileName()))
+							.entry("size", size)
+							.build();
 					out.send(entry);
 				}
 				return ExitStatus.success();

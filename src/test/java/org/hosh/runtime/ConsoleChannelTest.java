@@ -66,7 +66,7 @@ public class ConsoleChannelTest {
 
 	@Test
 	public void twoValues() {
-		sut.send(Record.of("key", Values.ofText("foo")).append("another_key", Values.ofText("bar")));
+		sut.send(Record.builder().entry("key", Values.ofText("foo")).entry("another_key", Values.ofText("bar")).build());
 		then(printWriter).should().append("foo");
 		then(printWriter).should().append(" ");
 		then(printWriter).should().append("bar");

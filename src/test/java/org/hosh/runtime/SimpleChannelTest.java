@@ -57,7 +57,10 @@ public class SimpleChannelTest {
 
 	@Test
 	public void twoValues() {
-		sut.send(Record.of("key", Values.ofText("foo"), "another_key", Values.ofText("bar")));
+		sut.send(Record.builder()
+				.entry("key", Values.ofText("foo"))
+				.entry("another_key", Values.ofText("bar"))
+				.build());
 		then(pw).should().append("foo");
 		then(pw).should().append(" ");
 		then(pw).should().append("bar");

@@ -118,7 +118,7 @@ public class TextModuleTest {
 			Record record = Record.of("key", Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Record.empty()), Optional.empty());
 			sut.run(Arrays.asList(), in, out, err);
-			then(out).should().send(Record.of("index", Values.ofNumeric(1)).append("key", Values.ofText("some data")));
+			then(out).should().send(Record.builder().entry("index", Values.ofNumeric(1)).entry("key", Values.ofText("some data")).build());
 			then(out).should().send(Record.of("index", Values.ofNumeric(2)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -355,7 +355,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void table() {
-			Record record1 = Record.of("age", Values.ofNumeric(2), "name", Values.ofText("zvrnv"));
+			Record record1 = Record.builder().entry("age", Values.ofNumeric(2)).entry("name", Values.ofText("zvrnv")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -370,7 +370,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void tableWithNone() {
-			Record record1 = Record.of("age", Values.none(), "name", Values.ofText("zvrnv"));
+			Record record1 = Record.builder().entry("age", Values.none()).entry("name", Values.ofText("zvrnv")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();

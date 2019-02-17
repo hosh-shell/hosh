@@ -145,7 +145,7 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList(), null, out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
-			Record record = Record.of("key", Values.ofText("HOSH_VERSION"), "value", Values.ofText("1.0"));
+			Record record = Record.builder().entry("key", Values.ofText("HOSH_VERSION")).entry("value", Values.ofText("1.0")).build();
 			assertThat(records.getAllValues()).contains(record);
 		}
 
@@ -328,11 +328,13 @@ public class SystemModuleTest {
 			accumulator.getResults().add(Duration.ofMillis(10));
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Record.empty()
-					.append("count", Values.ofNumeric(2))
-					.append("best", Values.ofDuration(Duration.ofMillis(10)))
-					.append("worst", Values.ofDuration(Duration.ofMillis(20)))
-					.append("avg", Values.ofDuration(Duration.ofMillis(15))));
+			then(out).should().send(
+					Record.builder()
+							.entry("count", Values.ofNumeric(2))
+							.entry("best", Values.ofDuration(Duration.ofMillis(10)))
+							.entry("worst", Values.ofDuration(Duration.ofMillis(20)))
+							.entry("avg", Values.ofDuration(Duration.ofMillis(15)))
+							.build());
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -342,11 +344,13 @@ public class SystemModuleTest {
 			Accumulator accumulator = sut.before(args, in, out, err);
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Record.empty()
-					.append("count", Values.ofNumeric(0))
-					.append("best", Values.ofDuration(Duration.ZERO))
-					.append("worst", Values.ofDuration(Duration.ZERO))
-					.append("avg", Values.ofDuration(Duration.ZERO)));
+			then(out).should().send(
+					Record.builder()
+							.entry("count", Values.ofNumeric(0))
+							.entry("best", Values.ofDuration(Duration.ZERO))
+							.entry("worst", Values.ofDuration(Duration.ZERO))
+							.entry("avg", Values.ofDuration(Duration.ZERO))
+							.build());
 			then(err).shouldHaveZeroInteractions();
 		}
 

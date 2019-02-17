@@ -36,8 +36,14 @@ import java.util.stream.Collectors;
  * pairs.
  */
 public interface Record {
+	/**
+	 * Yields a new Record with the specified mapping as last one.
+	 */
 	Record append(String key, Value value);
 
+	/**
+	 * Yields a new Record with the specified mapping as first one.
+	 */
 	Record prepend(String key, Value value);
 
 	Collection<String> keys();
@@ -56,8 +62,8 @@ public interface Record {
 		return new Record.Singleton(key, value);
 	}
 
-	static Record of(String key1, Value value1, String key2, Value value2) {
-		return new Record.Generic().append(key1, value1).append(key2, value2);
+	static Builder builder() {
+		return new Builder();
 	}
 
 	class Entry {
@@ -150,18 +156,24 @@ public interface Record {
 		}
 
 		@Override
-		public Record append(String key2, Value value2) {
-			return new Generic().append(this.key, this.value).append(key2, value2);
+		public Record append(String newKey, Value newValue) {
+			return new Builder()
+					.entry(this.key, this.value)
+					.entry(newKey, newValue)
+					.build();
 		}
 
 		@Override
-		public Record prepend(String key2, Value value2) {
-			return new Generic().prepend(this.key, this.value).prepend(key2, value2);
+		public Record prepend(String newKey, Value newValue) {
+			return new Builder()
+					.entry(newKey, newValue)
+					.entry(this.key, this.value)
+					.build();
 		}
 
 		@Override
-		public Optional<Value> value(String key1) {
-			if (Objects.equals(this.key, key1)) {
+		public Optional<Value> value(String wantedKey) {
+			if (Objects.equals(this.key, wantedKey)) {
 				return Optional.of(value);
 			} else {
 				return Optional.empty();
@@ -192,10 +204,6 @@ public interface Record {
 	static class Generic implements Record {
 		private final Map<String, Value> data;
 
-		private Generic() {
-			this(new LinkedHashMap<>(0));
-		}
-
 		private Generic(Map<String, Value> data) {
 			this.data = data;
 		}
@@ -204,7 +212,7 @@ public interface Record {
 		public Record append(String key, Value value) {
 			Map<String, Value> copy = new LinkedHashMap<>(data.size() + 1);
 			copy.putAll(this.data);
-			addUniqueMapping(copy, key, value);
+			copy.put(key, value);
 			return new Generic(copy);
 		}
 
@@ -214,13 +222,6 @@ public interface Record {
 			copy.put(key, value);
 			copy.putAll(this.data);
 			return new Generic(copy);
-		}
-
-		private static void addUniqueMapping(Map<String, Value> data, String key, Value value) {
-			Value previous = data.put(key, value);
-			if (previous != null) {
-				throw new IllegalArgumentException("duplicated key: " + key);
-			}
 		}
 
 		@Override
@@ -248,11 +249,6 @@ public interface Record {
 		}
 
 		@Override
-		public String toString() {
-			return String.format("Record[data=%s]", data);
-		}
-
-		@Override
 		public final int hashCode() {
 			return Objects.hash(data);
 		}
@@ -265,6 +261,30 @@ public interface Record {
 			} else {
 				return false;
 			}
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Record[data=%s]", data);
+		}
+	}
+
+	/**
+	 * Mutable builder of Record objects, retaining insertion order.
+	 */
+	class Builder {
+		private final LinkedHashMap<String, Value> data = new LinkedHashMap<>(2);
+
+		private Builder() {
+		}
+
+		public Builder entry(String key, Value value) {
+			data.put(key, value);
+			return this;
+		}
+
+		public Record build() {
+			return new Record.Generic(new LinkedHashMap<>(data));
 		}
 	}
 }

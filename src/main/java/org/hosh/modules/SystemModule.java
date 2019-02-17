@@ -87,9 +87,10 @@ public class SystemModule implements Module {
 			}
 			Map<String, String> env = state.getVariables();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
-				Record record = Record.of(
-						"key", Values.ofText(entry.getKey()),
-						"value", Values.ofText(entry.getValue()));
+				Record record = Record.builder()
+						.entry("key", Values.ofText(entry.getKey()))
+						.entry("value", Values.ofText(entry.getValue()))
+						.build();
 				out.send(record);
 			}
 			return ExitStatus.success();
@@ -194,12 +195,13 @@ public class SystemModule implements Module {
 			}
 			ProcessHandle.allProcesses().forEach(process -> {
 				Info info = process.info();
-				Record result = Record.empty()
-						.append("pid", Values.ofNumeric(process.pid()))
-						.append("user", Values.ofText(info.user().orElse("-")))
-						.append("start", Values.ofText(info.startInstant().map(Instant::toString).orElse("-")))
-						.append("command", Values.ofText(info.command().orElse("-")))
-						.append("arguments", Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))));
+				Record result = Record.builder()
+						.entry("pid", Values.ofNumeric(process.pid()))
+						.entry("user", Values.ofText(info.user().orElse("-")))
+						.entry("start", Values.ofText(info.startInstant().map(Instant::toString).orElse("-")))
+						.entry("command", Values.ofText(info.command().orElse("-")))
+						.entry("arguments", Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
+						.build();
 				out.send(result);
 			});
 			return ExitStatus.success();
@@ -268,10 +270,12 @@ public class SystemModule implements Module {
 			Duration worst = resource.results.stream().max(Comparator.naturalOrder()).orElse(Duration.ZERO);
 			int runs = resource.results.size();
 			Duration avg = runs == 0 ? Duration.ZERO : resource.results.stream().reduce(Duration.ZERO, (acc, d) -> acc.plus(d)).dividedBy(runs);
-			out.send(Record.of("count", Values.ofNumeric(runs))
-					.append("best", Values.ofDuration(best))
-					.append("worst", Values.ofDuration(worst))
-					.append("avg", Values.ofDuration(avg)));
+			out.send(Record.builder()
+					.entry("count", Values.ofNumeric(runs))
+					.entry("best", Values.ofDuration(best))
+					.entry("worst", Values.ofDuration(worst))
+					.entry("avg", Values.ofDuration(avg))
+					.build());
 		}
 
 		@Override
