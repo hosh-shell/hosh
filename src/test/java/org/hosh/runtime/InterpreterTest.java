@@ -35,15 +35,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CancellationException;
 
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
+import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +65,7 @@ public class InterpreterTest {
 	private Terminal terminal;
 	@Mock(stubOnly = true)
 	private Channel out;
-	@Mock(stubOnly = true)
+	@Mock
 	private Channel err;
 	@Mock(stubOnly = true)
 	private Program program;
@@ -114,6 +117,41 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
 		then(terminalAwareCommand).should().setTerminal(terminal);
+	}
+
+	@Test
+	public void handleCancellations() throws Exception {
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+				.willThrow(new CancellationException());
+		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(statement.getCommand()).willReturn(command);
+		given(statement.getArguments()).willReturn(args);
+		ExitStatus exitStatus = sut.eval(program);
+		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+	}
+
+	@Test
+	public void handleExceptionWithoutMessage() throws Exception {
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+				.willThrow(new NullPointerException());
+		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(statement.getCommand()).willReturn(command);
+		given(statement.getArguments()).willReturn(args);
+		ExitStatus exitStatus = sut.eval(program);
+		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+		then(err).should().send(Record.of("error", Values.ofText("(no message provided)")));
+	}
+
+	@Test
+	public void handleExceptionWithMessage() throws Exception {
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+				.willThrow(new IllegalArgumentException("simulated error"));
+		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(statement.getCommand()).willReturn(command);
+		given(statement.getArguments()).willReturn(args);
+		ExitStatus exitStatus = sut.eval(program);
+		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+		then(err).should().send(Record.of("error", Values.ofText("simulated error")));
 	}
 
 	@Test
