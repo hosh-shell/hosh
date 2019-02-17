@@ -19,7 +19,7 @@ Main features:
 Inspired by:
 - https://michaelfeathers.silvrback.com/collection-pipelines-the-revenge-of-c
 - https://www.martinfowler.com/articles/collection-pipeline/
-- https://www.brianstorti.com/the-actor-model/
+- https://fishshell.com/
 
 ## Requirements
 

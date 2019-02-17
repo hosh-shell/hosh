@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.hosh.doc.Experimental;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
@@ -41,6 +42,7 @@ public class PipelineChannel implements Channel {
 	private static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
 	private static final boolean QUEUE_FAIRNESS = false;
 	private static final int QUEUE_CAPACITY = 100;
+	@Todo(description = "have a try with SynchronousQueue too")
 	private final BlockingQueue<Record> queue;
 	private final AtomicBoolean done;
 

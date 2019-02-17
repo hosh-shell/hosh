@@ -74,7 +74,7 @@ public class Supervisor implements AutoCloseable {
 		cancelFuturesOnSigint();
 		try {
 			List<ExitStatus> results = waitForCompletion();
-			return exitStatusFrom(results);
+			return deriveExitStatus(results);
 		} catch (CancellationException e) {
 			return ExitStatus.error();
 		} catch (InterruptedException e) {
@@ -99,9 +99,9 @@ public class Supervisor implements AutoCloseable {
 		}
 	}
 
-	private ExitStatus exitStatusFrom(List<ExitStatus> results) {
+	private ExitStatus deriveExitStatus(List<ExitStatus> results) {
 		return results.stream()
-				.filter(es -> !es.isSuccess())
+				.filter(es -> es.isError())
 				.findFirst()
 				.orElse(ExitStatus.success());
 	}
@@ -116,6 +116,7 @@ public class Supervisor implements AutoCloseable {
 
 	private void restoreDefaultSigintHandler() {
 		if (handleSignals) {
+			LOGGER.info("restoring default INT signal handler");
 			org.jline.utils.Signals.registerDefault("INT");
 		}
 	}
