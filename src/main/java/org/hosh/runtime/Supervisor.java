@@ -24,8 +24,6 @@
 package org.hosh.runtime;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -51,7 +49,7 @@ import org.hosh.spi.Values;
 public class Supervisor implements AutoCloseable {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final ExecutorService executor = Executors.newCachedThreadPool();
-	private final List<Future<ExitStatus>> futures = Collections.synchronizedList(new LinkedList<>());
+	private final List<Future<ExitStatus>> futures = new ArrayList<>();
 
 	@Override
 	public void close() {
