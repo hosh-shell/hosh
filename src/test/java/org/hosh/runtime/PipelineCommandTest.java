@@ -80,7 +80,6 @@ public class PipelineCommandTest {
 		sut.setState(state);
 		sut.setTerminal(terminal);
 		sut.setArgumentResolver(argumentResolver);
-		sut.setSupervisor(supervisor);
 		return sut;
 	}
 

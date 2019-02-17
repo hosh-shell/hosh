@@ -35,7 +35,7 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 
-public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAware, ArgumentResolverAware, SupervisorAware {
+public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAware, ArgumentResolverAware {
 	private final Statement nested;
 	private final CommandWrapper<T> commandWrapper;
 	private ArgumentResolver argumentResolver;
@@ -87,10 +87,5 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 	public void setArgumentResolver(ArgumentResolver argumentResolver) {
 		nested.getCommand().downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(argumentResolver));
 		this.argumentResolver = argumentResolver;
-	}
-
-	@Override
-	public void setSupervisor(Supervisor supervisor) {
-		nested.getCommand().downCast(SupervisorAware.class).ifPresent(cmd -> cmd.setSupervisor(supervisor));
 	}
 }

@@ -25,7 +25,6 @@ package org.hosh.runtime;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
 import java.util.stream.Collectors;
 
 import org.hosh.runtime.Compiler.Program;
@@ -78,41 +77,30 @@ public class Interpreter {
 	}
 
 	private ExitStatus execute(Statement statement) {
-		try (Supervisor supervisor = new Supervisor(terminal)) {
-			if (skipSupervision(statement)) {
-				run(statement, supervisor);
-			} else {
-				runSupervised(statement, supervisor);
-			}
+		try (Supervisor supervisor = new Supervisor()) {
+			runSupervised(statement, supervisor);
 			return supervisor.waitForAll(err);
-		} catch (CancellationException e) {
-			return ExitStatus.error();
 		}
-	}
-
-	private boolean skipSupervision(Statement statement) {
-		return statement.getCommand() instanceof SupervisorAware;
 	}
 
 	private void runSupervised(Statement statement, Supervisor supervisor) {
 		supervisor.submit(() -> {
 			supervisor.setThreadName(statement);
-			return run(statement, supervisor);
+			return run(statement);
 		});
 	}
 
-	private ExitStatus run(Statement statement, Supervisor supervisor) {
+	private ExitStatus run(Statement statement) {
 		Command command = statement.getCommand();
-		injectDeps(command, supervisor);
+		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		return command.run(resolvedArguments, new NullChannel(), out, err);
 	}
 
-	private void injectDeps(Command command, Supervisor supervisor) {
+	private void injectDeps(Command command) {
 		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 		command.downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(this::resolveArguments));
-		command.downCast(SupervisorAware.class).ifPresent(cmd -> cmd.setSupervisor(supervisor));
 	}
 
 	private List<String> resolveArguments(List<String> arguments) {

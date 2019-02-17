@@ -38,12 +38,11 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 
-public class PipelineCommand implements Command, TerminalAware, StateAware, ArgumentResolverAware, SupervisorAware {
+public class PipelineCommand implements Command, TerminalAware, StateAware, ArgumentResolverAware {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final Statement producer;
 	private final Statement consumer;
 	private ArgumentResolver argumentResolver;
-	private Supervisor supervisor;
 
 	public PipelineCommand(Statement producer, Statement consumer) {
 		this.producer = producer;
@@ -71,13 +70,6 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	}
 
 	@Override
-	public void setSupervisor(Supervisor supervisor) {
-		this.supervisor = supervisor;
-		producer.getCommand().downCast(SupervisorAware.class).ifPresent(cmd -> cmd.setSupervisor(supervisor));
-		consumer.getCommand().downCast(SupervisorAware.class).ifPresent(cmd -> cmd.setSupervisor(supervisor));
-	}
-
-	@Override
 	public void setArgumentResolver(ArgumentResolver argumentResolver) {
 		this.argumentResolver = argumentResolver;
 	}
@@ -90,29 +82,31 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	@Todo(description = "error channel is unbuffered by now, waiting for implementation of 2>&1")
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-		Channel pipeChannel = new PipelineChannel();
-		submitProducer(producer, new NullChannel(), pipeChannel, err);
-		assemblePipeline(consumer, pipeChannel, out, err);
-		return supervisor.waitForAll(err);
-	}
-
-	@Todo(description = "recursion here could be simplified?")
-	private void assemblePipeline(Statement statement, Channel in, Channel out, Channel err) {
-		if (statement.getCommand() instanceof PipelineCommand) {
-			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
-			Channel pipelineChannel = new PipelineChannel();
-			submitConsumer(pipelineCommand.producer, in, pipelineChannel, err);
-			if (pipelineCommand.consumer.getCommand() instanceof PipelineCommand) {
-				assemblePipeline(pipelineCommand.consumer, pipelineChannel, out, err);
-			} else {
-				submitConsumer(pipelineCommand.consumer, pipelineChannel, out, err);
-			}
-		} else {
-			submitConsumer(statement, in, out, err);
+		try (Supervisor supervisor = new Supervisor()) {
+			Channel pipeChannel = new PipelineChannel();
+			submitProducer(supervisor, producer, new NullChannel(), pipeChannel, err);
+			assemblePipeline(supervisor, consumer, pipeChannel, out, err);
+			return supervisor.waitForAll(err);
 		}
 	}
 
-	private void submitProducer(Statement statement, Channel in, Channel out, Channel err) {
+	@Todo(description = "recursion here could be simplified?")
+	private void assemblePipeline(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
+		if (statement.getCommand() instanceof PipelineCommand) {
+			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
+			Channel pipelineChannel = new PipelineChannel();
+			submitConsumer(supervisor, pipelineCommand.producer, in, pipelineChannel, err);
+			if (pipelineCommand.consumer.getCommand() instanceof PipelineCommand) {
+				assemblePipeline(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
+			} else {
+				submitConsumer(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
+			}
+		} else {
+			submitConsumer(supervisor, statement, in, out, err);
+		}
+	}
+
+	private void submitProducer(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
 		supervisor.submit(() -> {
 			supervisor.setThreadName(statement);
 			Command command = statement.getCommand();
@@ -130,7 +124,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 		});
 	}
 
-	private void submitConsumer(Statement statement, Channel in, Channel out, Channel err) {
+	private void submitConsumer(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
 		supervisor.submit(() -> {
 			supervisor.setThreadName(statement);
 			Command command = statement.getCommand();

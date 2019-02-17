@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,9 +43,6 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.Terminal.Signal;
-import org.jline.terminal.Terminal.SignalHandler;
 
 /**
  * Manages runtime execution of built-in commands as well as external commands.
@@ -55,11 +53,6 @@ public class Supervisor implements AutoCloseable {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 	private final List<Future<ExitStatus>> futures = Collections.synchronizedList(new LinkedList<>());
-	private final Terminal terminal;
-
-	public Supervisor(Terminal terminal) {
-		this.terminal = terminal;
-	}
 
 	@Override
 	public void close() {
@@ -85,6 +78,8 @@ public class Supervisor implements AutoCloseable {
 		try {
 			List<ExitStatus> results = waitForCompletion();
 			return exitStatusFrom(results);
+		} catch (CancellationException e) {
+			return ExitStatus.error();
 		} catch (InterruptedException e) {
 			LOGGER.log(Level.FINE, "got interrupt", e);
 			Thread.currentThread().interrupt();
@@ -123,11 +118,11 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	private void restoreDefaultSigintHandler() {
-		terminal.handle(Signal.INT, SignalHandler.SIG_DFL);
+		org.jline.utils.Signals.registerDefault("INT");
 	}
 
 	private void cancelFuturesOnSigint() {
-		terminal.handle(Signal.INT, signal -> futures.forEach(this::cancelIfStillRunning));
+		org.jline.utils.Signals.register("INT", () -> futures.forEach(this::cancelIfStillRunning));
 	}
 
 	private void cancelIfStillRunning(Future<ExitStatus> future) {
