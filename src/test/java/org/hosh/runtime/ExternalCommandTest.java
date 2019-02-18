@@ -46,7 +46,7 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
-import org.junit.After;
+import org.hosh.testsupport.WithThread;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,6 +57,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ExternalCommandTest {
+	@Rule
+	public final WithThread withThread = new WithThread();
 	@Rule
 	public final TemporaryFolder folder = new TemporaryFolder();
 	@Mock(name = "in")
@@ -80,13 +82,6 @@ public class ExternalCommandTest {
 		sut = new ExternalCommand(executable);
 		sut.setProcessFactory(processFactory);
 		sut.setState(state);
-	}
-
-	@After
-	public void after() {
-		// this is needed since a test could set the current thread interrupted
-		// otherwise random failures will be observed during the build
-		Thread.interrupted();
 	}
 
 	@Test

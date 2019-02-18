@@ -39,7 +39,9 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.SneakySignal;
+import org.hosh.testsupport.WithThread;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -48,6 +50,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SupervisorTest {
+	@Rule
+	public final WithThread withThread = new WithThread();
 	@Mock
 	private Channel err;
 	@Mock(stubOnly = true)
@@ -58,8 +62,6 @@ public class SupervisorTest {
 	@After
 	public void cleanup() {
 		sut.close();
-		// reset any interrupted status of this thread
-		Thread.interrupted();
 	}
 
 	@Test
@@ -142,17 +144,12 @@ public class SupervisorTest {
 	public void setThreadNameWithArgs() {
 		given(statement.getCommand()).willReturn(new TestCommand());
 		given(statement.getArguments()).willReturn(Arrays.asList("-a", "-b"));
-		String oldThreadName = Thread.currentThread().getName();
-		try {
-			sut.submit(statement, () -> {
-				assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand -a -b'");
-				return ExitStatus.success();
-			});
-			sut.waitForAll(err);
-			then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
-		} finally {
-			Thread.currentThread().setName(oldThreadName);
-		}
+		sut.submit(statement, () -> {
+			assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand -a -b'");
+			return ExitStatus.success();
+		});
+		sut.waitForAll(err);
+		then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
 	}
 
 	@Todo(description = "this test needs some love <3")
@@ -160,17 +157,12 @@ public class SupervisorTest {
 	public void setThreadNameWithoutArgs() {
 		given(statement.getCommand()).willReturn(new TestCommand());
 		given(statement.getArguments()).willReturn(Arrays.asList());
-		String oldThreadName = Thread.currentThread().getName();
-		try {
-			sut.submit(statement, () -> {
-				assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand'");
-				return ExitStatus.success();
-			});
-			sut.waitForAll(err);
-			then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
-		} finally {
-			Thread.currentThread().setName(oldThreadName);
-		}
+		sut.submit(statement, () -> {
+			assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand'");
+			return ExitStatus.success();
+		});
+		sut.waitForAll(err);
+		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
 	}
 
 	// cannot be a mock since we need a fixed name for testing purposes
