@@ -34,9 +34,6 @@ public class ExitStatus {
 	private final int value;
 
 	private ExitStatus(int value) {
-		if (value < 0 || value > 255) {
-			throw new InvalidExitCode("illegal exit status: " + value);
-		}
 		this.value = value;
 	}
 
@@ -52,15 +49,11 @@ public class ExitStatus {
 		return new ExitStatus(value);
 	}
 
-	/**
-	 * Malformed (e.g. 'not a number') or invalid exit values (e.g. -1)
-	 * yield no value.
-	 */
 	public static Optional<ExitStatus> parse(String str) {
 		try {
 			int value = Integer.parseInt(str, 10);
 			return Optional.of(new ExitStatus(value));
-		} catch (NumberFormatException | InvalidExitCode e) {
+		} catch (NumberFormatException e) {
 			return Optional.empty();
 		}
 	}
@@ -95,13 +88,5 @@ public class ExitStatus {
 	@Override
 	public String toString() {
 		return String.format("ExitStatus[value=%s]", value);
-	}
-
-	public static class InvalidExitCode extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-
-		public InvalidExitCode(String message) {
-			super(message);
-		}
 	}
 }
