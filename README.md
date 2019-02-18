@@ -2,9 +2,9 @@
 
 Main features:
 - written in Java 11
-- portable (tested in Windows, MacOS and Linux)
+- portable, works out-of-the-box in Windows, MacOS and Linux (although much more work is needed here)
 - pipelines built around schemaless records
-    - interoperability is achieved by using single-key records with just text
+    - interoperability is achieved by using single-key records with "line" as value
     - `lines pom.xml | enumerate | take 10`
 - wrappers
     - `withTime { lines pom.xml | sink }`
@@ -20,6 +20,7 @@ Inspired by:
 - https://michaelfeathers.silvrback.com/collection-pipelines-the-revenge-of-c
 - https://www.martinfowler.com/articles/collection-pipeline/
 - https://fishshell.com/
+- http://mywiki.wooledge.org/BashPitfalls
 
 ## Requirements
 
