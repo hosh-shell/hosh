@@ -1,6 +1,6 @@
 # Human Oriented SHell
 
-Main features:
+## Main features
 - written in Java 11
 - portable, works out-of-the-box in Windows, MacOS and Linux (although much more work is needed here)
 - pipelines built around schemaless records
@@ -16,7 +16,7 @@ Main features:
 - distributed as single-jar
 - MIT license
 
-Inspired by:
+## Inspired by
 - https://michaelfeathers.silvrback.com/collection-pipelines-the-revenge-of-c
 - https://www.martinfowler.com/articles/collection-pipeline/
 - https://fishshell.com/
@@ -24,15 +24,11 @@ Inspired by:
 
 ## Requirements
 
-JDK11 for build. JRE11 to run.
+Java 11
 
 ## Build
 
 `$ ./mvnw clean verify`
-
-## Pitest
-
-`$ ./mvnw org.pitest:pitest-maven:mutationCoverage`
 
 ## Run
 
@@ -44,8 +40,8 @@ JDK11 for build. JRE11 to run.
 
 ## Logging
 
-`HOSH_LOG_LEVEL=debug java -jar target/dist/hosh.jar`
+`$ HOSH_LOG_LEVEL=debug java -jar target/dist/hosh.jar`
 
 ## Eclipse support
 
-Project specific settings can be found under './eclipse' directory.
+Project specific settings can be found under `./eclipse` directory.
