@@ -29,12 +29,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Document a known bug.
+ * Links to an existing bug in github.
+ *
+ * For production code means that the bug is still unresolved.
+ *
+ * For test code means that the bug has been fixed and the test method is the
+ * regression test.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface Bug {
 	String description();
 
-	String issue() default "";
+	String issue();
 }
