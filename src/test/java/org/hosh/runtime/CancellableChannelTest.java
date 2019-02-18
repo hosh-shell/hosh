@@ -23,31 +23,45 @@
  */
 package org.hosh.runtime;
 
-import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.then;
+
 import java.util.concurrent.CancellationException;
 
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-/** A decorator that makes any channel implementation cancellable on send() */
-public class CancellableChannel implements Channel {
-	private final Channel channel;
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
+public class CancellableChannelTest {
+	@Mock(stubOnly = true)
+	private Record record;
+	@Mock
+	private Channel channel;
+	@InjectMocks
+	private CancellableChannel sut;
 
-	public CancellableChannel(Channel channel) {
-		this.channel = channel;
+	@Test
+	public void recv() {
+		sut.recv();
+		then(channel).should().recv();
 	}
 
-	@Override
-	public void send(Record record) {
-		// this is needed to let ctrl-C interrupt the currently running thread
-		if (Thread.interrupted()) {
-			throw new CancellationException("thread has been interrupted");
-		}
-		channel.send(record);
+	@Test
+	public void send() {
+		sut.send(record);
+		then(channel).should().send(record);
 	}
 
-	@Override
-	public Optional<Record> recv() {
-		return channel.recv();
+	@Test
+	public void interrupted() {
+		Thread.currentThread().interrupt();
+		assertThatThrownBy(() -> sut.send(record))
+				.hasMessage("thread has been interrupted")
+				.isInstanceOf(CancellationException.class);
 	}
 }
