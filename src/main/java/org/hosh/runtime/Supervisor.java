@@ -133,10 +133,14 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	private void cancelIfStillRunning(Future<ExitStatus> future) {
-		if (!future.isCancelled()) {
-			LOGGER.finer(() -> String.format("cancelling future %s", future));
-			future.cancel(true);
+		if (future.isDone()) {
+			return;
 		}
+		if (future.isCancelled()) {
+			return;
+		}
+		LOGGER.finer(() -> String.format("cancelling future %s", future));
+		future.cancel(true);
 	}
 
 	private void setThreadName(Statement statement) {

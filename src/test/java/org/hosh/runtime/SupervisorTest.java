@@ -58,6 +58,8 @@ public class SupervisorTest {
 	@After
 	public void cleanup() {
 		sut.close();
+		// reset any interrupted status of this thread
+		Thread.interrupted();
 	}
 
 	@Test
@@ -74,6 +76,19 @@ public class SupervisorTest {
 			SneakySignal.raise("INT");
 			return ExitStatus.success();
 		});
+		ExitStatus waitForAll = sut.waitForAll(err);
+		assertThat(waitForAll.isError()).isTrue();
+	}
+
+	@Test
+	public void handleInterruptions() {
+		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getArguments()).willReturn(Collections.emptyList());
+		sut.submit(statement, () -> {
+			Thread.sleep(10_000);
+			return ExitStatus.success();
+		});
+		Thread.currentThread().interrupt(); // next call to Future.get() will throw InterruptedException
 		ExitStatus waitForAll = sut.waitForAll(err);
 		assertThat(waitForAll.isError()).isTrue();
 	}

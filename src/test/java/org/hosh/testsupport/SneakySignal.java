@@ -36,8 +36,8 @@ public class SneakySignal {
 		Class<?> signalClass = Class.forName("sun.misc.Signal");
 		Object signal = signalClass.getConstructor(String.class).newInstance(signalName);
 		signalClass.getMethod("raise", signalClass).invoke(null, signal);
-		// this is inherently unstable and ugly but it is needed to make sure the signal
-		// is delivered to this process
+		// this is inherently unstable and ugly but it is needed
+		// to make sure the signal is delivered to this process
 		Thread.sleep(100);
 	}
 }
