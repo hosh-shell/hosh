@@ -76,9 +76,10 @@ public class Supervisor implements AutoCloseable {
 			List<ExitStatus> results = waitForCompletion();
 			return deriveExitStatus(results);
 		} catch (CancellationException e) {
+			LOGGER.log(Level.INFO, "got cancellation", e);
 			return ExitStatus.error();
 		} catch (InterruptedException e) {
-			LOGGER.log(Level.FINE, "got interrupt", e);
+			LOGGER.log(Level.INFO, "got interrupt", e);
 			Thread.currentThread().interrupt();
 			return ExitStatus.error();
 		} catch (ExecutionException e) {
@@ -116,14 +117,14 @@ public class Supervisor implements AutoCloseable {
 
 	private void restoreDefaultSigintHandler() {
 		if (handleSignals) {
-			LOGGER.info("restoring default INT signal handler");
+			LOGGER.fine("restoring default INT signal handler");
 			org.jline.utils.Signals.registerDefault("INT");
 		}
 	}
 
 	private void cancelFuturesOnSigint() {
 		if (handleSignals) {
-			LOGGER.info("register INT signal handler");
+			LOGGER.fine("register INT signal handler");
 			org.jline.utils.Signals.register("INT", () -> {
 				LOGGER.info("  got INT signal");
 				futures.forEach(this::cancelIfStillRunning);
@@ -132,7 +133,7 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	private void cancelIfStillRunning(Future<ExitStatus> future) {
-		if (!future.isCancelled() && !future.isDone()) {
+		if (!future.isCancelled()) {
 			LOGGER.finer(() -> String.format("cancelling future %s", future));
 			future.cancel(true);
 		}

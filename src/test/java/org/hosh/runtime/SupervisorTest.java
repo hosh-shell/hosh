@@ -38,6 +38,7 @@ import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.SneakySignal;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,6 +64,18 @@ public class SupervisorTest {
 	public void noSubmit() {
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus.value()).isEqualTo(0);
+	}
+
+	@Test
+	public void handleSignals() {
+		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getArguments()).willReturn(Collections.emptyList());
+		sut.submit(statement, () -> {
+			SneakySignal.raise("INT");
+			return ExitStatus.success();
+		});
+		ExitStatus waitForAll = sut.waitForAll(err);
+		assertThat(waitForAll.isError()).isTrue();
 	}
 
 	@Test
