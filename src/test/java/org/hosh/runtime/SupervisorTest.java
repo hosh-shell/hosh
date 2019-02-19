@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -139,7 +138,6 @@ public class SupervisorTest {
 		then(err).should().send(Record.of("error", Values.ofText("(no message provided)")));
 	}
 
-	@Todo(description = "this test needs some love <3")
 	@Test
 	public void setThreadNameWithArgs() {
 		given(statement.getCommand()).willReturn(new TestCommand());
@@ -152,7 +150,6 @@ public class SupervisorTest {
 		then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
 	}
 
-	@Todo(description = "this test needs some love <3")
 	@Test
 	public void setThreadNameWithoutArgs() {
 		given(statement.getCommand()).willReturn(new TestCommand());
