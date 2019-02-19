@@ -28,6 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 import org.hosh.spi.Record;
+import org.hosh.testsupport.WithThread;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -35,16 +37,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PipelineChannelTest {
+	@Rule
+	public final WithThread withThread = new WithThread();
 	@Mock(stubOnly = true)
-	private Record one;
+	private Record record;
 
 	@Test
 	public void stopConsumer() {
 		PipelineChannel sut = new PipelineChannel();
-		sut.send(one);
+		sut.send(record);
 		sut.stopConsumer();
 		Optional<Record> recv1 = sut.recv();
-		assertThat(recv1).contains(one);
+		assertThat(recv1).contains(record);
 		Optional<Record> recv2 = sut.recv();
 		assertThat(recv2).isEmpty();
 	}
@@ -52,19 +56,44 @@ public class PipelineChannelTest {
 	@Test
 	public void sendRecv() {
 		PipelineChannel sut = new PipelineChannel();
-		sut.send(one);
+		sut.send(record);
 		Optional<Record> recv1 = sut.recv();
-		assertThat(recv1).contains(one);
+		assertThat(recv1).contains(record);
+	}
+
+	@Test
+	public void sendInterrupted() {
+		PipelineChannel sut = new PipelineChannel();
+		Thread.currentThread().interrupt();
+		sut.send(record);
+		boolean stillInterrupted = Thread.currentThread().isInterrupted();
+		assertThat(stillInterrupted).isTrue();
+	}
+
+	@Test
+	public void recvInterrupted() {
+		PipelineChannel sut = new PipelineChannel();
+		Thread.currentThread().interrupt();
+		Optional<Record> recv = sut.recv();
+		assertThat(recv).isEmpty();
+	}
+
+	@Test
+	public void recvDone() {
+		PipelineChannel sut = new PipelineChannel();
+		sut.stopProducer();
+		Optional<Record> recv = sut.recv();
+		assertThat(recv).isEmpty();
 	}
 
 	@Test
 	public void stringRepr() { // this is quite important while debugging
 		PipelineChannel sut = new PipelineChannel();
 		assertThat(sut).hasToString("PipelineChannel[done=false,queue=[]]");
-		sut.send(one);
-		assertThat(sut).hasToString("PipelineChannel[done=false,queue=[one]]");
+		sut.send(record);
+		assertThat(sut).hasToString("PipelineChannel[done=false,queue=[record]]");
 		sut.stopProducer();
-		assertThat(sut).hasToString("PipelineChannel[done=true,queue=[one]]");
+		assertThat(sut).hasToString("PipelineChannel[done=true,queue=[record]]");
 		sut.consumeAnyRemainingRecord();
 		assertThat(sut).hasToString("PipelineChannel[done=true,queue=[]]");
 	}
