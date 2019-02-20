@@ -134,6 +134,9 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 			List<String> resolvedArguments = argumentResolver.resolve(arguments);
 			try {
 				return command.run(resolvedArguments, in, out, err);
+			} catch (ProducerPoisonPill e) {
+				LOGGER.finer("got poison pill");
+				return ExitStatus.success();
 			} finally {
 				((PipelineChannel) in).stopProducer();
 				((PipelineChannel) in).consumeAnyRemainingRecord();

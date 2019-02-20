@@ -114,11 +114,5 @@ public class PipelineChannel implements Channel {
 	@Experimental(description = "best solution found so far to stop a very fast producer")
 	public static class ProducerPoisonPill extends RuntimeException {
 		private static final long serialVersionUID = 1L;
-
-		// stacktrace is not needed
-		@Override
-		public synchronized Throwable fillInStackTrace() {
-			return this;
-		}
 	}
 }
