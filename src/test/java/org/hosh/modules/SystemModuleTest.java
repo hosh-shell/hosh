@@ -48,6 +48,8 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.WithThread;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -230,6 +232,10 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SleepTest {
+		@Rule
+		public final WithThread withThread = new WithThread();
+		@Mock
+		private Channel in;
 		@Mock
 		private Channel out;
 		@Mock
@@ -238,29 +244,43 @@ public class SystemModuleTest {
 		private Sleep sut;
 
 		@Test
+		public void interrupts() {
+			Thread.currentThread().interrupt();
+			ExitStatus exitStatus = sut.run(Arrays.asList("1000"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("interrupted")));
+		}
+
+		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), null, out, err);
+			sut.run(Arrays.asList(), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
 		}
 
 		@Test
 		public void oneArgNumber() {
-			sut.run(Arrays.asList("1"), null, out, err);
+			sut.run(Arrays.asList("1"), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArgNotNumber() {
-			sut.run(Arrays.asList("a"), null, out, err);
+			sut.run(Arrays.asList("a"), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("not millis: a")));
 		}
 
 		@Test
 		public void twoArgs() {
-			sut.run(Arrays.asList("a", "b"), null, out, err);
+			sut.run(Arrays.asList("a", "b"), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
 		}
