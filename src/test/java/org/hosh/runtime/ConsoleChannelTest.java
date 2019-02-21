@@ -23,6 +23,7 @@
  */
 package org.hosh.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -71,5 +72,10 @@ public class ConsoleChannelTest {
 		then(printWriter).should().append(" ");
 		then(printWriter).should().append("bar");
 		then(printWriter).should().append(System.lineSeparator());
+	}
+
+	@Test
+	public void repr() {
+		assertThat(sut).hasToString("ConsoleChannel[style=NONE]");
 	}
 }

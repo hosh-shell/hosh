@@ -25,7 +25,6 @@ package org.hosh;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -54,7 +53,6 @@ import org.hosh.runtime.ConsoleChannel;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.LineReaderIterator;
-import org.hosh.runtime.SimpleChannel;
 import org.hosh.runtime.SimpleCommandRegistry;
 import org.hosh.runtime.Version;
 import org.hosh.spi.Channel;
@@ -122,6 +120,9 @@ public class Hosh {
 		}
 		CommandResolver commandResolver = CommandResolvers.builtinsThenSystem(state);
 		Compiler compiler = new Compiler(commandResolver);
+		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
+		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
+		Interpreter interpreter = new Interpreter(state, terminal, out, err);
 		if (args.length == 0) {
 			LineReader lineReader = LineReaderBuilder
 					.builder()
@@ -132,15 +133,9 @@ public class Hosh {
 					.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
 					.terminal(terminal)
 					.build();
-			Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
-			Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
-			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			welcome(out, version);
 			repl(state, lineReader, compiler, interpreter, err, logger);
 		} else {
-			Channel out = new CancellableChannel(new SimpleChannel(new PrintWriter(System.out)));
-			Channel err = new CancellableChannel(new SimpleChannel(new PrintWriter(System.err)));
-			Interpreter interpreter = new Interpreter(state, terminal, out, err);
 			String filePath = args[0];
 			script(filePath, compiler, interpreter, err, logger);
 		}
