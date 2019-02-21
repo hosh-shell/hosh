@@ -220,7 +220,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).isEqualTo("unable to load: missing.hosh");
+		assertThat(output).contains("unable to load: missing.hosh");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
@@ -307,7 +307,7 @@ public class HoshIT {
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(1);
-		assertThat(output).startsWith("line 1: 'FOOBAR' unknown command");
+		assertThat(output).contains("line 1: 'FOOBAR' unknown command");
 	}
 
 	@Test
