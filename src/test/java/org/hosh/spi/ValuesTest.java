@@ -89,6 +89,12 @@ public class ValuesTest {
 		public void asString() {
 			assertThat(Values.none()).hasToString("None");
 		}
+
+		// matches it's still an experimental API
+		@Test
+		public void matches() {
+			assertThat(Values.none().matches(Values.none())).isFalse();
+		}
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)

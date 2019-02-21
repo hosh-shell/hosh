@@ -50,4 +50,9 @@ public class NullChannelTest {
 		sut.send(record);
 		then(record).shouldHaveZeroInteractions();
 	}
+
+	@Test
+	public void repr() {
+		assertThat(sut).hasToString("NullChannel[]");
+	}
 }
