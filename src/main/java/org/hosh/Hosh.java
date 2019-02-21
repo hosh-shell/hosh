@@ -75,6 +75,16 @@ public class Hosh {
 	private Hosh() {
 	}
 
+	public static void main(String[] args) throws Exception {
+		configureLogging();
+		Logger logger = LoggerFactory.forEnclosingClass();
+		String version = Version.readVersion();
+		logger.info(() -> String.format("starting hosh v.%s", version));
+		try (Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build()) {
+			runWithin(terminal, version, logger, args);
+		}
+	}
+
 	// enabling logging to $HOME/.hosh.log
 	// if and only if HOSH_LOG_LEVEL is defined
 	// by default logging is disabled
@@ -93,16 +103,6 @@ public class Hosh {
 		logger.setLevel(Level.parse(logLevel));
 	}
 
-	public static void main(String[] args) throws Exception {
-		configureLogging();
-		Logger logger = LoggerFactory.forEnclosingClass();
-		String version = Version.readVersion();
-		logger.info(() -> String.format("starting hosh v.%s", version));
-		try (Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build()) {
-			runWithin(terminal, version, logger, args);
-		}
-	}
-
 	private static void runWithin(Terminal terminal, String version, Logger logger, String[] args) {
 		List<Path> path = Stream
 				.of(System.getenv("PATH").split(File.pathSeparator))
@@ -118,23 +118,14 @@ public class Hosh {
 		for (Module module : modules) {
 			module.onStartup(commandRegistry);
 		}
-		CommandResolver commandResolver = CommandResolvers.builtinsThenSystem(state);
-		Compiler compiler = new Compiler(commandResolver);
 		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
 		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
+		CommandResolver commandResolver = CommandResolvers.builtinsThenSystem(state);
+		Compiler compiler = new Compiler(commandResolver);
 		Interpreter interpreter = new Interpreter(state, terminal, out, err);
 		if (args.length == 0) {
-			LineReader lineReader = LineReaderBuilder
-					.builder()
-					.appName("hosh")
-					.history(new DefaultHistory())
-					.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
-					.variable(LineReader.HISTORY_FILE_SIZE, "1000")
-					.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
-					.terminal(terminal)
-					.build();
 			welcome(out, version);
-			repl(state, lineReader, compiler, interpreter, err, logger);
+			repl(state, terminal, compiler, interpreter, err, logger);
 		} else {
 			String filePath = args[0];
 			script(filePath, compiler, interpreter, err, logger);
@@ -162,8 +153,18 @@ public class Hosh {
 		}
 	}
 
-	private static void repl(State state, LineReader lineReader, Compiler compiler, Interpreter interpreter,
+	private static void repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter,
 			Channel err, Logger logger) {
+		LineReader lineReader1 = LineReaderBuilder
+				.builder()
+				.appName("hosh")
+				.history(new DefaultHistory())
+				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
+				.variable(LineReader.HISTORY_FILE_SIZE, "1000")
+				.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
+				.terminal(terminal)
+				.build();
+		LineReader lineReader = lineReader1;
 		LineReaderIterator read = new LineReaderIterator(state, lineReader);
 		while (read.hasNext()) {
 			state.setId(state.getId() + 1);
