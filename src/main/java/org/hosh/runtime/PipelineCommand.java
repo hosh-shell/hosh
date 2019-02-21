@@ -110,6 +110,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	}
 
 	private void submitProducer(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
+		PipelineChannel pipeOut = (PipelineChannel) out;
 		supervisor.submit(statement, () -> {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
@@ -121,12 +122,13 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 				LOGGER.finer("got poison pill");
 				return ExitStatus.success();
 			} finally {
-				((PipelineChannel) out).stopConsumer();
+				pipeOut.stopConsumer();
 			}
 		});
 	}
 
 	private void submitConsumer(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
+		PipelineChannel pipeIn = (PipelineChannel) in;
 		supervisor.submit(statement, () -> {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
@@ -138,10 +140,11 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 				LOGGER.finer("got poison pill");
 				return ExitStatus.success();
 			} finally {
-				((PipelineChannel) in).stopProducer();
-				((PipelineChannel) in).consumeAnyRemainingRecord();
+				pipeIn.stopProducer();
+				pipeIn.consumeAnyRemainingRecord();
 				if (out instanceof PipelineChannel) {
-					((PipelineChannel) out).stopConsumer();
+					PipelineChannel pipeOut = (PipelineChannel) out;
+					pipeOut.stopConsumer();
 				}
 			}
 		});
