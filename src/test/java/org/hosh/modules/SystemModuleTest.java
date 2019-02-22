@@ -32,6 +32,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.hosh.modules.SystemModule.Benchmark;
 import org.hosh.modules.SystemModule.Benchmark.Accumulator;
@@ -41,7 +42,9 @@ import org.hosh.modules.SystemModule.Err;
 import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
 import org.hosh.modules.SystemModule.ProcessList;
+import org.hosh.modules.SystemModule.Sink;
 import org.hosh.modules.SystemModule.Sleep;
+import org.hosh.modules.SystemModule.Source;
 import org.hosh.modules.SystemModule.WithTime;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -49,6 +52,7 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,6 +76,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.ErrTest.class,
 		SystemModuleTest.BenchmarkTest.class,
 		SystemModuleTest.WithTimeTest.class,
+		SystemModuleTest.SourceTest.class,
+		SystemModuleTest.SinkTest.class,
 })
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -326,6 +332,53 @@ public class SystemModuleTest {
 			assertThatThrownBy(() -> sut.run(Arrays.asList(), in, out, err))
 					.hasMessage("injected error: please do not report")
 					.isInstanceOf(NullPointerException.class);
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class SourceTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Source sut;
+
+		@Ignore("WIP")
+		@Test
+		public void canBeInterrupted() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class SinkTest {
+		@Mock(stubOnly = true)
+		private Record record;
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Sink sut;
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void canBeInterrupted() {
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(2)).recv();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
 		}
 	}
 
