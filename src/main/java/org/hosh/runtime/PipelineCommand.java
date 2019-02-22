@@ -87,7 +87,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 		try (Supervisor supervisor = new Supervisor()) {
 			supervisor.setHandleSignals(false);
 			Channel pipeChannel = new PipelineChannel();
-			submitProducer(supervisor, producer, new NullChannel(), pipeChannel, err);
+			runAsync(supervisor, producer, new NullChannel(), pipeChannel, err);
 			assemblePipeline(supervisor, consumer, pipeChannel, out, err);
 			return supervisor.waitForAll(err);
 		}
@@ -98,19 +98,18 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 		if (statement.getCommand() instanceof PipelineCommand) {
 			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
 			Channel pipelineChannel = new PipelineChannel();
-			submitConsumer(supervisor, pipelineCommand.producer, in, pipelineChannel, err);
+			runAsync(supervisor, pipelineCommand.producer, in, pipelineChannel, err);
 			if (pipelineCommand.consumer.getCommand() instanceof PipelineCommand) {
 				assemblePipeline(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
 			} else {
-				submitConsumer(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
+				runAsync(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
 			}
 		} else {
-			submitConsumer(supervisor, statement, in, out, err);
+			runAsync(supervisor, statement, in, out, err);
 		}
 	}
 
-	private void submitProducer(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
-		PipelineChannel pipeOut = (PipelineChannel) out;
+	private void runAsync(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
 		supervisor.submit(statement, () -> {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
@@ -122,31 +121,24 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 				LOGGER.finer("got poison pill");
 				return ExitStatus.success();
 			} finally {
-				pipeOut.stopConsumer();
+				stopProducer(in);
+				stopConsumer(out);
 			}
 		});
 	}
 
-	private void submitConsumer(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
-		PipelineChannel pipeIn = (PipelineChannel) in;
-		supervisor.submit(statement, () -> {
-			Command command = statement.getCommand();
-			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
-			List<String> arguments = statement.getArguments();
-			List<String> resolvedArguments = argumentResolver.resolve(arguments);
-			try {
-				return command.run(resolvedArguments, in, out, err);
-			} catch (ProducerPoisonPill e) {
-				LOGGER.finer("got poison pill");
-				return ExitStatus.success();
-			} finally {
-				pipeIn.stopProducer();
-				pipeIn.consumeAnyRemainingRecord();
-				if (out instanceof PipelineChannel) {
-					PipelineChannel pipeOut = (PipelineChannel) out;
-					pipeOut.stopConsumer();
-				}
-			}
-		});
+	private void stopConsumer(Channel out) {
+		if (out instanceof PipelineChannel) {
+			PipelineChannel pipeOut = (PipelineChannel) out;
+			pipeOut.stopConsumer();
+		}
+	}
+
+	private void stopProducer(Channel in) {
+		if (in instanceof PipelineChannel) {
+			PipelineChannel pipeIn = (PipelineChannel) in;
+			pipeIn.stopProducer();
+			pipeIn.consumeAnyRemainingRecord();
+		}
 	}
 }
