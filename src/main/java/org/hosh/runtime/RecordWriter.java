@@ -27,11 +27,9 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Locale;
 
-import org.hosh.doc.Todo;
 import org.hosh.spi.Record;
 import org.hosh.spi.Record.Entry;
 
-@Todo(description = "users cannot change separator by now")
 public class RecordWriter {
 	private final PrintWriter pw;
 	private final Ansi.Style style;

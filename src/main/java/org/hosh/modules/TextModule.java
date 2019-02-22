@@ -49,7 +49,6 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
-@Todo(description = "this module has a bloody wrong name")
 public class TextModule implements Module {
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
@@ -312,7 +311,6 @@ public class TextModule implements Module {
 			out.send(Record.of("header", Values.ofText(header)));
 		}
 
-		@Todo(description = "should be user configurable")
 		private final Map<String, Integer> paddings = Map.of("path", 30, "size", 5);
 	}
 }
