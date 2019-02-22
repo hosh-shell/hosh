@@ -93,17 +93,12 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 		}
 	}
 
-	@Todo(description = "recursion here could be simplified?")
 	private void assemblePipeline(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
 		if (statement.getCommand() instanceof PipelineCommand) {
 			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
 			Channel pipelineChannel = new PipelineChannel();
 			runAsync(supervisor, pipelineCommand.producer, in, pipelineChannel, err);
-			if (pipelineCommand.consumer.getCommand() instanceof PipelineCommand) {
-				assemblePipeline(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
-			} else {
-				runAsync(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
-			}
+			assemblePipeline(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
 		} else {
 			runAsync(supervisor, statement, in, out, err);
 		}
@@ -118,7 +113,7 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 			try {
 				return command.run(resolvedArguments, in, out, err);
 			} catch (ProducerPoisonPill e) {
-				LOGGER.finer("got poison pill");
+				LOGGER.finer(() -> String.format("got poison pill from %s", command));
 				return ExitStatus.success();
 			} finally {
 				stopProducer(in);

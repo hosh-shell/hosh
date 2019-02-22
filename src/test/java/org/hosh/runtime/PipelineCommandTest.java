@@ -39,7 +39,6 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -166,7 +165,6 @@ public class PipelineCommandTest {
 		then(err).shouldHaveZeroInteractions();
 	}
 
-	@Ignore("WIP")
 	@Test
 	public void recursive() {
 		PipelineCommand producerConsumer = setupSut();
