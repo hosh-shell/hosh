@@ -45,15 +45,24 @@ import org.hosh.doc.Bug;
 import org.hosh.testsupport.IgnoreIf;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
 import org.hosh.testsupport.IgnoreIf.OnWindows;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestName;
 
 public class HoshIT {
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 	@Rule
 	public final IgnoreIf ignoreIf = new IgnoreIf();
+	@Rule
+	public final TestName testName = new TestName();
+
+	@Before
+	public void showTest() {
+		System.out.println("  " + testName.getMethodName());
+	}
 
 	@Test
 	public void interactiveExitSuccess() throws Exception {
@@ -138,8 +147,10 @@ public class HoshIT {
 				"echo hello"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).isEqualTo("hello");
 	}
 
 	@Test
@@ -224,7 +235,7 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
-	@Bug(description = "output should be 'hello world!'", issue = "https://github.com/dfa1/hosh/issues/23")
+	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
 	public void pipelinesDontExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
@@ -237,7 +248,7 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(0);
 	}
 
-	@Bug(description = "output should be 'hello world!'", issue = "https://github.com/dfa1/hosh/issues/23")
+	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
 	public void wrappersDontExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
@@ -358,7 +369,8 @@ public class HoshIT {
 
 	private void sendInput(Process hosh, String line) throws IOException {
 		try (Writer writer = new OutputStreamWriter(hosh.getOutputStream(), StandardCharsets.UTF_8)) {
-			writer.write(line + "\n");
+			writer.write(line);
+			writer.write(System.lineSeparator());
 			writer.flush();
 		}
 	}
