@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org</groupId>
 	<artifactId>hosh</artifactId>
@@ -381,6 +383,66 @@
 							</execution>
 						</executions>
 					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>launch4j</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.8</version>
+						<executions>
+							<execution>
+								<id>parse-version</id>
+								<goals>
+									<goal>parse-version</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.akathist.maven.plugins.launch4j</groupId>
+						<artifactId>launch4j-maven-plugin</artifactId>
+						<version>1.7.25</version>
+						<executions>
+							<execution>
+								<id>l4j-clui</id>
+								<phase>package</phase>
+								<goals>
+									<goal>launch4j</goal>
+								</goals>
+								<configuration>
+									<headerType>console</headerType>
+									<outfile>target/dist/hosh.exe</outfile>
+									<jar>target/dist/hosh.jar</jar>
+									<errTitle>hosh</errTitle>
+									<classPath>
+										<mainClass>org.hosh.Hosh</mainClass>
+										<addDependencies>false</addDependencies>
+										<preCp>anything</preCp>
+									</classPath>
+									<jre>
+										<minVersion>11</minVersion>
+									</jre>
+									<versionInfo>
+										<fileVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.0</fileVersion>
+										<txtFileVersion>${project.version}</txtFileVersion>
+										<fileDescription>hosh</fileDescription>
+										<copyright>Davide Angelocola</copyright>
+										<productVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.0</productVersion>
+										<txtProductVersion>${project.version}</txtProductVersion>
+										<productName>H-O-S-H</productName>
+										<internalName>hosh</internalName>
+										<originalFilename>hosh.exe</originalFilename>
+									</versionInfo>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
 				</plugins>
 			</build>
 		</profile>
