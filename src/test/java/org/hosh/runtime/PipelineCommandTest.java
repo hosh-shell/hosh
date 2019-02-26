@@ -26,9 +26,10 @@ package org.hosh.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willReturn;
+import static org.mockito.BDDMockito.willThrow;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.runtime.PipelineChannel.ProducerPoisonPill;
@@ -36,15 +37,12 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Record;
-import org.hosh.spi.State;
 import org.hosh.spi.Values;
-import org.jline.terminal.Terminal;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -56,135 +54,118 @@ public class PipelineCommandTest {
 	@Mock
 	private Channel err;
 	@Mock(stubOnly = true)
-	private Terminal terminal;
+	private Statement producer;
 	@Mock(stubOnly = true)
-	private Command producer;
+	private Statement consumer;
 	@Mock(stubOnly = true)
-	private Command consumer;
+	private Statement consumerProducer;
 	@Mock(stubOnly = true)
-	private ArgumentResolver argumentResolver;
-	@InjectMocks
-	@Spy
-	private Supervisor supervisor;
+	private Command command;
 	@Mock(stubOnly = true)
-	private State state;
+	private Interpreter interpreter;
+	private PipelineCommand sut;
 
-	private PipelineCommand setupSut() {
-		Statement producerStatement = new Statement();
-		producerStatement.setCommand(producer);
-		producerStatement.setArguments(Collections.emptyList());
-		Statement consumerStatement = new Statement();
-		consumerStatement.setCommand(consumer);
-		consumerStatement.setArguments(Collections.emptyList());
-		PipelineCommand sut = new PipelineCommand(producerStatement, consumerStatement);
-		sut.setState(state);
-		sut.setTerminal(terminal);
-		sut.setArgumentResolver(argumentResolver);
-		return sut;
+	@Before
+	public void setup() {
+		given(producer.getCommand()).willReturn(command);
+		given(consumer.getCommand()).willReturn(command);
+		sut = new PipelineCommand(producer, consumer);
+		sut.setInterpreter(interpreter);
+	}
+
+	@Test
+	public void repr() {
+		assertThat(sut).hasToString("PipelineCommand[producer=producer,consumer=consumer]");
 	}
 
 	@Test
 	public void producerAndConsumerSuccess() {
-		given(producer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(consumer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		PipelineCommand sut = setupSut();
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-		then(err).shouldHaveZeroInteractions();
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
+		then(in).shouldHaveZeroInteractions();
+		then(out).shouldHaveZeroInteractions();
+		then(err).shouldHaveZeroInteractions();
 	}
 
 	@Test
-	public void producerFailure() {
-		given(producer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
-		given(consumer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		PipelineCommand sut = setupSut();
+	public void producerError() {
+		willReturn(ExitStatus.error()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 		then(err).shouldHaveZeroInteractions();
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 
 	@Test
-	public void consumerFailure() {
-		given(producer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(consumer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
-		PipelineCommand sut = setupSut();
+	public void consumerError() {
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.error()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-		then(err).shouldHaveZeroInteractions();
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
+		then(in).shouldHaveZeroInteractions();
+		then(out).shouldHaveZeroInteractions();
+		then(err).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void producerUnhandledException() {
-		given(producer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			throw new NullPointerException("simulated exception");
-		});
-		PipelineCommand sut = setupSut();
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willThrow(new NullPointerException("simulated exception")).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(),
+				Mockito.any());
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
+		then(in).shouldHaveZeroInteractions();
+		then(out).shouldHaveZeroInteractions();
+		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
 	}
 
 	@Test
 	public void consumerUnhandledException() {
-		given(consumer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			throw new NullPointerException("simulated exception");
-		});
-		PipelineCommand sut = setupSut();
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willThrow(new NullPointerException("simulated exception")).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(),
+				Mockito.any());
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
+		then(in).shouldHaveZeroInteractions();
+		then(out).shouldHaveZeroInteractions();
+		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
 	}
 
 	@Test
 	public void producerPoisonPill() {
-		given(producer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			throw new ProducerPoisonPill();
-		});
-		given(consumer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			return ExitStatus.success();
-		});
-		PipelineCommand sut = setupSut();
+		willThrow(new ProducerPoisonPill()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(),
+				Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
+		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void consumerPoisonPill() {
-		given(producer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			return ExitStatus.success();
-		});
-		given(consumer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			throw new ProducerPoisonPill();
-		});
-		PipelineCommand sut = setupSut();
+		willThrow(new ProducerPoisonPill()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(),
+				Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
+		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void recursive() {
-		PipelineCommand producerConsumer = setupSut();
-		Statement producerStatement = new Statement();
-		producerStatement.setCommand(producer);
-		producerStatement.setArguments(Collections.emptyList());
-		Statement consumerStatement = new Statement();
-		consumerStatement.setCommand(producerConsumer);
-		consumerStatement.setArguments(Collections.emptyList());
-		PipelineCommand sut = new PipelineCommand(producerStatement, consumerStatement);
-		sut.setState(state);
-		sut.setTerminal(terminal);
-		sut.setArgumentResolver(argumentResolver);
-		given(producer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			return ExitStatus.success();
-		});
-		given(consumer.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willAnswer(inv -> {
-			return ExitStatus.success();
-		});
-		ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+		PipelineCommand downStream = new PipelineCommand(producer, consumer);
+		downStream.setInterpreter(interpreter);
+		willReturn(downStream).given(consumerProducer).getCommand();
+		PipelineCommand pipeline = new PipelineCommand(producer, consumerProducer);
+		pipeline.setInterpreter(interpreter);
+		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+		ExitStatus exitStatus = pipeline.run(Arrays.asList(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();

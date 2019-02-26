@@ -30,15 +30,11 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
-import org.hosh.spi.State;
-import org.hosh.spi.StateAware;
-import org.hosh.spi.TerminalAware;
-import org.jline.terminal.Terminal;
 
-public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAware, ArgumentResolverAware {
+public class DefaultCommandWrapper<T> implements Command, InterpreterAware {
 	private final Statement nested;
 	private final CommandWrapper<T> commandWrapper;
-	private ArgumentResolver argumentResolver;
+	private Interpreter interpreter;
 
 	public DefaultCommandWrapper(Statement nested, CommandWrapper<T> commandWrapper) {
 		this.nested = nested;
@@ -50,8 +46,7 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 		T resource = commandWrapper.before(args, in, out, err);
 		try {
 			while (true) {
-				List<String> resolvedArguments = resolveArguments();
-				ExitStatus exitStatus = nested.getCommand().run(resolvedArguments, in, out, err);
+				ExitStatus exitStatus = interpreter.run(nested, in, out, err);
 				if (commandWrapper.retry(resource)) {
 					continue;
 				}
@@ -62,30 +57,13 @@ public class DefaultCommandWrapper<T> implements Command, StateAware, TerminalAw
 		}
 	}
 
-	private List<String> resolveArguments() {
-		List<String> arguments = nested.getArguments();
-		List<String> resolvedArguments = argumentResolver.resolve(arguments);
-		return resolvedArguments;
-	}
-
 	@Override
 	public String toString() {
 		return String.format("DefaultCommandWrapper[nested=%s,commandWrapper=%s]", nested, commandWrapper);
 	}
 
 	@Override
-	public void setState(State state) {
-		nested.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
-	}
-
-	@Override
-	public void setTerminal(Terminal terminal) {
-		nested.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
-	}
-
-	@Override
-	public void setArgumentResolver(ArgumentResolver argumentResolver) {
-		nested.getCommand().downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(argumentResolver));
-		this.argumentResolver = argumentResolver;
+	public void setInterpreter(Interpreter interpreter) {
+		this.interpreter = interpreter;
 	}
 }

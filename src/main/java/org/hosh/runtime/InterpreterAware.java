@@ -23,7 +23,13 @@
  */
 package org.hosh.runtime;
 
-/** Marker interface for command needing special care of arguments */
-public interface ArgumentResolverAware {
-	void setArgumentResolver(ArgumentResolver argumentResolver);
+/**
+ * Marker interface for special commands like 'PipelineCommand' or
+ * 'DefaultCommandWrapper'.
+ *
+ * This is an implementation detail and should be never exposed to the outside
+ * (spi or modules).
+ */
+public interface InterpreterAware {
+	void setInterpreter(Interpreter interpreter);
 }

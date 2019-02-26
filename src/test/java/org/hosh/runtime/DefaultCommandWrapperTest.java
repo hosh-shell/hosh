@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
-import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
 import org.junit.Before;
@@ -53,18 +52,15 @@ public class DefaultCommandWrapperTest {
 	@Mock(stubOnly = true)
 	private Statement statement;
 	@Mock(stubOnly = true)
-	private Command command;
-	@Mock(stubOnly = true)
-	private ArgumentResolver argumentResolver;
+	private Interpreter interpreter;
 	@Mock
 	private CommandWrapper<Object> commandWrapper;
 	private DefaultCommandWrapper<Object> sut;
 
 	@Before
 	public void setup() {
-		given(statement.getCommand()).willReturn(command);
 		sut = new DefaultCommandWrapper<>(statement, commandWrapper);
-		sut.setArgumentResolver(argumentResolver);
+		sut.setInterpreter(interpreter);
 	}
 
 	@Test
@@ -72,7 +68,7 @@ public class DefaultCommandWrapperTest {
 		Object resource = new Object();
 		List<String> args = Collections.emptyList();
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
-		given(command.run(args, in, out, err)).willReturn(ExitStatus.success());
+		given(interpreter.run(statement, in, out, err)).willReturn(ExitStatus.success());
 		ExitStatus exitStatus = sut.run(args, in, out, err);
 		then(commandWrapper).should().before(args, in, out, err);
 		then(commandWrapper).should().after(resource, in, out, err);
@@ -84,7 +80,7 @@ public class DefaultCommandWrapperTest {
 		Object resource = new Object();
 		List<String> args = Collections.emptyList();
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
-		given(command.run(args, in, out, err)).willThrow(NullPointerException.class);
+		given(interpreter.run(statement, in, out, err)).willThrow(NullPointerException.class);
 		assertThatThrownBy(() -> sut.run(args, in, out, err))
 				.isInstanceOf(NullPointerException.class);
 		then(commandWrapper).should().before(args, in, out, err);

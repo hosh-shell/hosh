@@ -33,16 +33,12 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.LoggerFactory;
-import org.hosh.spi.State;
-import org.hosh.spi.StateAware;
-import org.hosh.spi.TerminalAware;
-import org.jline.terminal.Terminal;
 
-public class PipelineCommand implements Command, TerminalAware, StateAware, ArgumentResolverAware {
+public class PipelineCommand implements Command, InterpreterAware {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final Statement producer;
 	private final Statement consumer;
-	private ArgumentResolver argumentResolver;
+	private Interpreter interpreter;
 
 	public PipelineCommand(Statement producer, Statement consumer) {
 		this.producer = producer;
@@ -58,27 +54,13 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 	}
 
 	@Override
-	public void setTerminal(Terminal terminal) {
-		producer.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
-		consumer.getCommand().downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
-	}
-
-	@Override
-	public void setState(State state) {
-		producer.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
-		consumer.getCommand().downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
-	}
-
-	@Override
-	public void setArgumentResolver(ArgumentResolver argumentResolver) {
-		producer.getCommand().downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(argumentResolver));
-		consumer.getCommand().downCast(ArgumentResolverAware.class).ifPresent(cmd -> cmd.setArgumentResolver(argumentResolver));
-		this.argumentResolver = argumentResolver;
-	}
-
-	@Override
 	public String toString() {
 		return String.format("PipelineCommand[producer=%s,consumer=%s]", producer, consumer);
+	}
+
+	@Override
+	public void setInterpreter(Interpreter interpreter) {
+		this.interpreter = interpreter;
 	}
 
 	@Todo(description = "error channel is unbuffered by now, waiting for implementation of 2>&1")
@@ -108,10 +90,9 @@ public class PipelineCommand implements Command, TerminalAware, StateAware, Argu
 		supervisor.submit(statement, () -> {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
-			List<String> arguments = statement.getArguments();
-			List<String> resolvedArguments = argumentResolver.resolve(arguments);
 			try {
-				return command.run(resolvedArguments, in, out, err);
+				ExitStatus exitStatus = interpreter.run(statement, in, out, err);
+				return exitStatus;
 			} catch (ProducerPoisonPill e) {
 				LOGGER.finer(() -> String.format("got poison pill from %s", command));
 				return ExitStatus.success();
