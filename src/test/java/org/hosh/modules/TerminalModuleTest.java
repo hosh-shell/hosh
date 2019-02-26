@@ -55,7 +55,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class TerminalModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ClearTest {
-		@Mock(stubOnly = true)
+		@Mock
 		private Channel in;
 		@Mock
 		private Channel out;
@@ -90,7 +90,7 @@ public class TerminalModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class BellTest {
-		@Mock(stubOnly = true)
+		@Mock
 		private Channel in;
 		@Mock
 		private Channel out;
@@ -125,7 +125,7 @@ public class TerminalModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class DumpTest {
-		@Mock(stubOnly = true)
+		@Mock
 		private Channel in;
 		@Mock
 		private Channel out;

@@ -386,7 +386,7 @@ public class SystemModuleTest {
 	public static class BenchmarkTest {
 		@Mock
 		private State state;
-		@Mock(stubOnly = true)
+		@Mock
 		private Channel in;
 		@Mock
 		private Channel out;
