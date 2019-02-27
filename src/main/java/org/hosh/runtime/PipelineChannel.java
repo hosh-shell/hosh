@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.hosh.spi.Channel;
@@ -42,16 +41,16 @@ public class PipelineChannel implements Channel {
 	private static final int QUEUE_CAPACITY = 100;
 	private final Record poisonPill = Record.of("__POISON_PILL__", Values.none());
 	private final BlockingQueue<Record> queue;
-	private final AtomicBoolean done;
+	private volatile boolean done;
 
 	public PipelineChannel() {
 		queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY, QUEUE_FAIRNESS);
-		done = new AtomicBoolean(false);
+		done = false;
 	}
 
 	@Override
 	public Optional<Record> recv() {
-		if (done.getAcquire()) {
+		if (done) {
 			return Optional.empty();
 		}
 		try {
@@ -59,7 +58,7 @@ public class PipelineChannel implements Channel {
 			Record record = queue.take();
 			if (record == poisonPill) {
 				LOGGER.finer("got POISON_PILL... ");
-				done.compareAndSet(false, true);
+				done = true;
 				return Optional.empty();
 			}
 			LOGGER.finer("got record");
@@ -72,7 +71,7 @@ public class PipelineChannel implements Channel {
 
 	@Override
 	public void send(Record record) {
-		if (done.getAcquire()) {
+		if (done) {
 			throw new ProducerPoisonPill();
 		}
 		LOGGER.finer("sending record");
@@ -84,12 +83,12 @@ public class PipelineChannel implements Channel {
 	}
 
 	public void stopProducer() {
-		done.compareAndSet(false, true);
+		done = true;
 		LOGGER.fine("producer stop requested");
 	}
 
 	public void stopConsumer() {
-		if (!done.getAcquire()) {
+		if (!done) {
 			send(poisonPill);
 		}
 	}
