@@ -31,7 +31,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import org.hosh.doc.Experimental;
 import org.hosh.spi.Channel;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
@@ -83,20 +82,17 @@ public class PipelineChannel implements Channel {
 		}
 	}
 
-	// sent by consumer to signal "do not produce anything"
 	public void stopProducer() {
 		done.compareAndSet(false, true);
 		LOGGER.fine("producer stop requested");
 	}
 
-	// sent by the producer to signal "end of channel"
 	public void stopConsumer() {
 		if (!done.getAcquire()) {
 			send(POISON_PILL);
 		}
 	}
 
-	// let the producer to get unblocked in put()
 	public void consumeAnyRemainingRecord() {
 		LOGGER.finer("consuming remaining records");
 		List<Record> consumer = new ArrayList<>();
@@ -109,7 +105,13 @@ public class PipelineChannel implements Channel {
 		return String.format("PipelineChannel[done=%s,queue=%s]", done, queue);
 	}
 
-	@Experimental(description = "best solution found so far to stop a very fast producer")
+	/**
+	 * Since send() is a void method an exception is needed
+	 * to forcibly stop a producer.
+	 *
+	 * This is the dual of __POISON_PILL_ record, sent by a producer to
+	 * stop any downstream readers.
+	 */
 	public static class ProducerPoisonPill extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 	}
