@@ -34,12 +34,13 @@ import java.util.logging.Logger;
 import org.hosh.spi.Channel;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
+import org.hosh.spi.Values;
 
 public class PipelineChannel implements Channel {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
-	private static final Record POISON_PILL = Record.of("__POISON_PILL__", null);
 	private static final boolean QUEUE_FAIRNESS = false;
 	private static final int QUEUE_CAPACITY = 100;
+	private final Record poisonPill = Record.of("__POISON_PILL__", Values.none());
 	private final BlockingQueue<Record> queue;
 	private final AtomicBoolean done;
 
@@ -56,7 +57,7 @@ public class PipelineChannel implements Channel {
 		try {
 			LOGGER.finer("waiting for record... ");
 			Record record = queue.take();
-			if (POISON_PILL.equals(record)) {
+			if (record == poisonPill) {
 				LOGGER.finer("got POISON_PILL... ");
 				done.compareAndSet(false, true);
 				return Optional.empty();
@@ -89,7 +90,7 @@ public class PipelineChannel implements Channel {
 
 	public void stopConsumer() {
 		if (!done.getAcquire()) {
-			send(POISON_PILL);
+			send(poisonPill);
 		}
 	}
 
