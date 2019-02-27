@@ -123,25 +123,26 @@ public class Hosh {
 		CommandResolver commandResolver = CommandResolvers.builtinsThenSystem(state);
 		Compiler compiler = new Compiler(commandResolver);
 		Interpreter interpreter = new Interpreter(state, terminal, out, err);
+		ExitStatus exitStatus;
 		if (args.length == 0) {
 			welcome(out, version);
-			repl(state, terminal, compiler, interpreter, err, logger);
+			exitStatus = repl(state, terminal, compiler, interpreter, err, logger);
 		} else {
 			String filePath = args[0];
-			script(filePath, compiler, interpreter, err, logger);
+			exitStatus = script(filePath, compiler, interpreter, err, logger);
 		}
+		System.exit(exitStatus.value());
 	}
 
-	private static void script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger) {
+	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger) {
 		try {
 			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);
-			ExitStatus exitStatus = interpreter.eval(program);
-			System.exit(exitStatus.value());
+			return interpreter.eval(program);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "caught exception", e);
 			err.send(Record.of("message", Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
-			System.exit(1);
+			return ExitStatus.error();
 		}
 	}
 
@@ -153,7 +154,7 @@ public class Hosh {
 		}
 	}
 
-	private static void repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter,
+	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter,
 			Channel err, Logger logger) {
 		LineReader lineReader1 = LineReaderBuilder
 				.builder()
@@ -173,14 +174,14 @@ public class Hosh {
 				Program program = compiler.compile(line);
 				ExitStatus exitStatus = interpreter.eval(program);
 				if (state.isExit()) {
-					System.exit(exitStatus.value());
+					return exitStatus;
 				}
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line), e);
 				err.send(Record.of("message", Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
 			}
 		}
-		System.exit(0);
+		return ExitStatus.success();
 	}
 
 	private static void welcome(Channel out, String version) {

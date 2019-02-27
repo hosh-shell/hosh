@@ -91,8 +91,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
 			try {
-				ExitStatus exitStatus = interpreter.run(statement, in, out, err);
-				return exitStatus;
+				return interpreter.run(statement, in, out, err);
 			} catch (ProducerPoisonPill e) {
 				LOGGER.finer(() -> String.format("got poison pill from %s", command));
 				return ExitStatus.success();
