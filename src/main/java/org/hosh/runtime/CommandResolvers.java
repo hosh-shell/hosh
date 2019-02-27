@@ -23,11 +23,11 @@
  */
 package org.hosh.runtime;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -45,9 +45,13 @@ public class CommandResolvers {
 	}
 
 	public static CommandResolver builtinsThenSystem(State state) {
-		List<CommandResolver> order = Arrays.asList(
-				new BuiltinCommandResolver(state),
-				new ExternalCommandResolver(state));
+		boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+		List<CommandResolver> order = new ArrayList<>();
+		order.add(new BuiltinCommandResolver(state));
+		order.add(new ExternalCommandResolver(state));
+		if (isWindows) {
+			order.add(new WindowsCommandResolver(state));
+		}
 		return new AggregateCommandResolver(order);
 	}
 
@@ -72,7 +76,6 @@ public class CommandResolvers {
 
 	public static class ExternalCommandResolver implements CommandResolver {
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
-		private static final boolean IS_WINDOWS = System.getProperty("os.name").startsWith("Windows");
 		private final State state;
 
 		public ExternalCommandResolver(State state) {
@@ -88,10 +91,6 @@ public class CommandResolvers {
 				if (command.isPresent()) {
 					return command;
 				}
-				if (IS_WINDOWS) {
-					Path absoluteExeCandidate = Paths.get(commandName + ".exe").normalize();
-					return attemptResolution(absoluteExeCandidate);
-				}
 				return Optional.empty();
 			}
 			List<Path> paths = new ArrayList<>(state.getPath());
@@ -101,13 +100,6 @@ public class CommandResolvers {
 				Optional<Command> command = attemptResolution(candidate);
 				if (command.isPresent()) {
 					return command;
-				}
-				if (IS_WINDOWS) {
-					Path exeCandidate = Paths.get(dir.toString(), commandName + ".exe").normalize();
-					Optional<Command> exeCommand = attemptResolution(exeCandidate);
-					if (exeCommand.isPresent()) {
-						return exeCommand;
-					}
 				}
 			}
 			LOGGER.info("  not found");
@@ -156,6 +148,28 @@ public class CommandResolvers {
 			} catch (ReflectiveOperationException e) {
 				throw new IllegalArgumentException("cannot create instance of " + commandClass, e);
 			}
+		}
+	}
+
+	public static class WindowsCommandResolver implements CommandResolver {
+		private final State state;
+		private final ExternalCommandResolver resolver;
+
+		public WindowsCommandResolver(State state) {
+			this.state = state;
+			resolver = new ExternalCommandResolver(state);
+		}
+
+		@Override
+		public Optional<Command> tryResolve(String commandName) {
+			String[] exts = state.getVariables().get("PATHEXT").split(File.pathSeparator);
+			for (String ext : exts) {
+				Optional<Command> resolved = resolver.tryResolve(commandName + ext.strip());
+				if (resolved.isPresent()) {
+					return resolved;
+				}
+			}
+			return Optional.empty();
 		}
 	}
 }
