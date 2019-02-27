@@ -205,4 +205,14 @@ public class ExternalCommandTest {
 		then(err).shouldHaveZeroInteractions();
 		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualToNormalizingNewlines("aaa 10\n");
 	}
+
+	@Test
+	public void throwsIoException() throws Exception {
+		given(processFactory.create(any(), any(), any(), any())).willThrow(new IOException("simulated error"));
+		given(state.getCwd()).willReturn(Paths.get("."));
+		given(state.getVariables()).willReturn(Collections.emptyMap());
+		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		then(out).shouldHaveZeroInteractions();
+		then(err).should().send(Record.of("error", Values.ofText("simulated error")));
+	}
 }
