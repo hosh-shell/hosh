@@ -24,6 +24,7 @@
 package org.hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import java.io.File;
@@ -31,13 +32,17 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.State;
 import org.hosh.testsupport.IgnoreIf;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
 import org.hosh.testsupport.IgnoreIf.NotOnWindows;
+import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +51,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CommandResolversTest {
 	@Rule
 	public final TemporaryFolder folder = new TemporaryFolder();
@@ -97,7 +102,28 @@ public class CommandResolversTest {
 	}
 
 	@Test
-	public void foundInPath() throws IOException {
+	public void invalidSkipDirectory() throws IOException {
+		folder.newFolder("test");
+		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
+		given(state.getCwd()).willReturn(Paths.get("."));
+		given(state.getCommands()).willReturn(Collections.emptyMap());
+		Optional<Command> result = sut.tryResolve("test");
+		assertThat(result).isEmpty();
+	}
+
+	@Test
+	@IgnoredIf(description = "in Windows this file is marked as executable, why?", condition = OnWindows.class)
+	public void foundNonExecutableInPath() throws IOException {
+		folder.newFile("test").setExecutable(false);
+		given(state.getCommands()).willReturn(Collections.emptyMap());
+		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
+		given(state.getCwd()).willReturn(Paths.get("."));
+		Optional<Command> result = sut.tryResolve("test");
+		assertThat(result).isNotPresent();
+	}
+
+	@Test
+	public void foundExecutableInPath() throws IOException {
 		folder.newFile("test").setExecutable(true);
 		given(state.getCommands()).willReturn(Collections.emptyMap());
 		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
@@ -109,7 +135,7 @@ public class CommandResolversTest {
 	@Test
 	@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
 	public void notFoundInPathAsSpecifiedByPathExt() throws IOException {
-		folder.newFile("test.vbs").setExecutable(true);
+		folder.newFile("test.vbs").setExecutable(true); // VBS in not PATHEXT
 		given(state.getCommands()).willReturn(Collections.emptyMap());
 		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 		given(state.getCwd()).willReturn(Paths.get("."));
@@ -147,5 +173,24 @@ public class CommandResolversTest {
 		given(state.getCwd()).willReturn(Paths.get("."));
 		Optional<Command> result = sut.tryResolve("test");
 		assertThat(result).isEmpty();
+	}
+
+	@Test
+	public void builtinClassWithoutNoArgsConstructor() {
+		given(state.getCommands()).willReturn(Collections.singletonMap("test", InvalidCommand.class));
+		assertThatThrownBy(() -> sut.tryResolve("test"))
+				.hasMessageStartingWith("cannot create instance of class")
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	private static class InvalidCommand implements Command {
+		@SuppressWarnings("unused")
+		public InvalidCommand(String arg) {
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			return ExitStatus.success();
+		}
 	}
 }
