@@ -31,10 +31,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hosh.doc.Experimental;
+import org.hosh.doc.Todo;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
+@Todo(description = "this is not working properly")
 @Experimental(description = "JUnit 5 provides a much more complete solution to this problem")
 public class IgnoreIf implements MethodRule {
 	interface Condition {
@@ -60,6 +62,7 @@ public class IgnoreIf implements MethodRule {
 			public void evaluate() throws Throwable {
 				Condition condition = annotation.condition().getDeclaredConstructor().newInstance();
 				assumeFalse("ignored by condition: " + annotation.condition(), condition.test());
+				base.evaluate();
 			}
 		};
 	}
