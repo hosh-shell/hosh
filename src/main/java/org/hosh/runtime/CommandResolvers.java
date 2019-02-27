@@ -162,7 +162,7 @@ public class CommandResolvers {
 
 		@Override
 		public Optional<Command> tryResolve(String commandName) {
-			String[] exts = state.getVariables().get("PATHEXT").split(File.pathSeparator);
+			String[] exts = state.getVariables().getOrDefault("PATHEXT", "").split(File.pathSeparator);
 			for (String ext : exts) {
 				Optional<Command> resolved = resolver.tryResolve(commandName + ext.strip());
 				if (resolved.isPresent()) {

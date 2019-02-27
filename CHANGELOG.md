@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- support for 'PATHEXT' in Windows
 - 'PipelineCommand' has been polished
 
 ## [0.0.24] - 2019-02-18

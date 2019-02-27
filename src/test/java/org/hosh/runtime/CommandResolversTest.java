@@ -106,13 +106,26 @@ public class CommandResolversTest {
 		assertThat(result).isPresent();
 	}
 
-	@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
 	@Test
-	public void foundInPathAsExe() throws IOException {
+	@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
+	public void notFoundInPathAsSpecifiedByPathExt() throws IOException {
+		folder.newFile("test.vbs").setExecutable(true);
+		given(state.getCommands()).willReturn(Collections.emptyMap());
+		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
+		given(state.getCwd()).willReturn(Paths.get("."));
+		given(state.getVariables()).willReturn(Collections.singletonMap("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
+		Optional<Command> result = sut.tryResolve("test");
+		assertThat(result).isNotPresent();
+	}
+
+	@Test
+	@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
+	public void foundInPathAsSpecifiedByPathExt() throws IOException {
 		folder.newFile("test.exe").setExecutable(true);
 		given(state.getCommands()).willReturn(Collections.emptyMap());
 		given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 		given(state.getCwd()).willReturn(Paths.get("."));
+		given(state.getVariables()).willReturn(Collections.singletonMap("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
 		Optional<Command> result = sut.tryResolve("test");
 		assertThat(result).isPresent();
 	}

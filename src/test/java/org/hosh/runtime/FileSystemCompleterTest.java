@@ -32,6 +32,7 @@ import java.util.List;
 import org.hosh.spi.State;
 import org.hosh.testsupport.IgnoreIf;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
+import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
@@ -88,7 +89,7 @@ public class FileSystemCompleterTest {
 	}
 
 	@Test
-	@IgnoredIf(description = "fails on windows, / should be C:/", condition = IgnoreIf.OnWindows.class)
+	@IgnoredIf(description = "fails on windows, / should be C:/", condition = OnWindows.class)
 	public void slash() {
 		given(line.word()).willReturn("/");
 		sut.complete(lineReader, line, candidates);
