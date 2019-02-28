@@ -65,6 +65,14 @@ public class HoshIT {
 	}
 
 	@Test
+	public void interactiveEndOfFile() throws Exception {
+		Process hosh = givenHoshProcess();
+		closeInput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
 	public void interactiveExitSuccess() throws Exception {
 		Process hosh = givenHoshProcess();
 		sendInput(hosh, "exit");
@@ -373,5 +381,10 @@ public class HoshIT {
 			writer.write(System.lineSeparator());
 			writer.flush();
 		}
+	}
+
+	// send end of file to the process
+	private void closeInput(Process hosh) throws IOException {
+		hosh.getOutputStream().close();
 	}
 }
