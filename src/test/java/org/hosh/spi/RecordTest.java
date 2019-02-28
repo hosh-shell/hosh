@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hosh.spi.Record.Builder;
 import org.hosh.spi.Record.Empty;
+import org.hosh.spi.Record.Entry;
 import org.hosh.spi.Record.Generic;
 import org.hosh.spi.Record.Singleton;
 import org.junit.Test;
@@ -67,15 +68,22 @@ public class RecordTest {
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
 		Record b = a.append("size", Values.ofHumanizedSize(10));
 		assertThat(b.toString()).isEqualTo("Record[data={size=Size[10B]}]");
+		Record c = b.append("links", Values.ofNumeric(1));
+		assertThat(c.toString()).isEqualTo("Record[data={size=Size[10B], links=Numeric[1]}]");
 	}
 
 	@Test
 	public void retainInsertOrder() {
 		Value value = Values.ofText("value");
 		Value anotherValue = Values.ofText("another_value");
-		Record a = Record.empty().append("key", value).append("another_key", anotherValue).prepend("first", value);
-		assertThat(a.keys()).containsExactly("first", "key", "another_key");
-		assertThat(a.values()).containsExactly(value, value, anotherValue);
+		Value lastValue = Values.ofText("lastValue");
+		Record a = Record.empty()
+				.append("key", value)
+				.append("another_key", anotherValue)
+				.prepend("first", value)
+				.append("last", lastValue);
+		assertThat(a.keys()).containsExactly("first", "key", "another_key", "last");
+		assertThat(a.values()).containsExactly(value, value, anotherValue, lastValue);
 	}
 
 	@Test
@@ -83,6 +91,7 @@ public class RecordTest {
 		EqualsVerifier.forClass(Empty.class).verify();
 		EqualsVerifier.forClass(Singleton.class).verify();
 		EqualsVerifier.forClass(Generic.class).verify();
+		EqualsVerifier.forClass(Entry.class).verify();
 	}
 
 	@Test
@@ -91,6 +100,7 @@ public class RecordTest {
 		assertThat(record.value("some key")).isEmpty();
 		record = record.append("some key", Values.none());
 		assertThat(record.value("some key")).isNotEmpty().contains(Values.none());
+		assertThat(record.value("missing key")).isEmpty();
 		record = record.append("another key", Values.none());
 		assertThat(record.value("some key")).isNotEmpty().contains(Values.none());
 		assertThat(record.value("another key")).isNotEmpty().contains(Values.none());
@@ -104,5 +114,37 @@ public class RecordTest {
 		builder.entry("another_key", Values.none());
 		assertThat(record.value("key")).isPresent();
 		assertThat(record.value("another_key")).isEmpty();
+	}
+
+	@Test
+	public void empty() {
+		Record a = Record.empty();
+		assertThat(a.keys()).isEmpty();
+		assertThat(a.values()).isEmpty();
+		assertThat(a.entries()).isEmpty();
+	}
+
+	@Test
+	public void singleton() {
+		Record a = Record.of("key", Values.none());
+		assertThat(a.keys()).containsExactly("key");
+		assertThat(a.values()).containsExactly(Values.none());
+		assertThat(a.entries()).containsExactly(new Entry("key", Values.none()));
+	}
+
+	@Test
+	public void generic() {
+		Record a = Record.of("key", Values.none()).prepend("aaa", Values.none());
+		assertThat(a.keys()).containsExactly("aaa", "key");
+		assertThat(a.values()).containsExactly(Values.none(), Values.none());
+		assertThat(a.entries()).containsExactly(new Entry("aaa", Values.none()), new Entry("key", Values.none()));
+	}
+
+	@Test
+	public void entry() {
+		Entry entry = new Entry("key", Values.none());
+		assertThat(entry).hasToString("Entry[key=key,value=None]");
+		assertThat(entry.getKey()).isEqualTo("key");
+		assertThat(entry.getValue()).isEqualTo(Values.none());
 	}
 }

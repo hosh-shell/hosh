@@ -23,17 +23,17 @@
  */
 package org.hosh.spi;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * An immutable, persistent value object representing a record of key-value
- * pairs.
+ * An immutable, persistent value object representing
+ * a list of key-value pairs.
  */
 public interface Record {
 	/**
@@ -46,11 +46,11 @@ public interface Record {
 	 */
 	Record prepend(String key, Value value);
 
-	Collection<String> keys();
+	List<String> keys();
 
-	Collection<Value> values();
+	List<Value> values();
 
-	Collection<Entry> entries();
+	List<Entry> entries();
 
 	Optional<Value> value(String key);
 
@@ -82,21 +82,41 @@ public interface Record {
 		public Value getValue() {
 			return value;
 		}
+
+		@Override
+		public final boolean equals(Object obj) {
+			if (obj instanceof Entry) {
+				Entry that = (Entry) obj;
+				return Objects.equals(this.key, that.key) && Objects.equals(this.value, that.value);
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public final int hashCode() {
+			return Objects.hash(key, value);
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Entry[key=%s,value=%s]", key, value);
+		}
 	}
 
 	class Empty implements Record {
 		@Override
-		public Collection<String> keys() {
+		public List<String> keys() {
 			return Collections.emptyList();
 		}
 
 		@Override
-		public Collection<Value> values() {
+		public List<Value> values() {
 			return Collections.emptyList();
 		}
 
 		@Override
-		public Collection<Entry> entries() {
+		public List<Entry> entries() {
 			return Collections.emptyList();
 		}
 
@@ -141,17 +161,17 @@ public interface Record {
 		}
 
 		@Override
-		public Collection<String> keys() {
+		public List<String> keys() {
 			return Collections.singletonList(key);
 		}
 
 		@Override
-		public Collection<Value> values() {
+		public List<Value> values() {
 			return Collections.singletonList(value);
 		}
 
 		@Override
-		public Collection<Entry> entries() {
+		public List<Entry> entries() {
 			return Collections.singletonList(new Entry(key, value));
 		}
 
@@ -225,17 +245,23 @@ public interface Record {
 		}
 
 		@Override
-		public Collection<String> keys() {
-			return data.keySet();
+		public List<String> keys() {
+			return data
+					.keySet()
+					.stream()
+					.collect(Collectors.toUnmodifiableList());
 		}
 
 		@Override
-		public Collection<Value> values() {
-			return data.values();
+		public List<Value> values() {
+			return data
+					.values()
+					.stream()
+					.collect(Collectors.toUnmodifiableList());
 		}
 
 		@Override
-		public Collection<Entry> entries() {
+		public List<Entry> entries() {
 			return data
 					.entrySet()
 					.stream()
@@ -270,7 +296,7 @@ public interface Record {
 	}
 
 	/**
-	 * Mutable builder of Record objects, retaining insertion order.
+	 * Mutable builder of Record objects. Retains insertion order.
 	 */
 	class Builder {
 		private final LinkedHashMap<String, Value> data = new LinkedHashMap<>(2);
