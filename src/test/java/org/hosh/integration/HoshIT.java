@@ -199,7 +199,7 @@ public class HoshIT {
 	@Test
 	public void pipelineWithInternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"cwd | count"//
+				"source | take 1 | count"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
@@ -274,7 +274,7 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"err | count"//
 		);
-		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(output).contains("injected error: please do not report");
@@ -286,7 +286,7 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"ls | err"//
 		);
-		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(output).contains("injected error: please do not report");
@@ -298,7 +298,7 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"rand | take 100 | count"//
 		);
-		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(output).isEqualTo("100");
@@ -310,7 +310,7 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"benchmark 10 { rand | take 100 | count } "//
 		);
-		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
@@ -322,7 +322,7 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"FOOBAR"//
 		);
-		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(1);

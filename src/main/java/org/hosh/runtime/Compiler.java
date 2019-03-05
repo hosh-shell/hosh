@@ -38,7 +38,6 @@ import org.hosh.antlr4.HoshParser.PipelineContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
-import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 
@@ -182,7 +181,6 @@ public class Compiler {
 		}
 	}
 
-	@Todo(description = "rename to invocation or something different from statement")
 	public static class Statement {
 		private Command command;
 		private List<String> arguments;

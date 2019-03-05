@@ -238,11 +238,6 @@ public class SystemModule implements Module {
 	public static class Err implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			simulateNullPointer();
-			return ExitStatus.success();
-		}
-
-		private void simulateNullPointer() {
 			throw new NullPointerException("injected error: please do not report");
 		}
 	}

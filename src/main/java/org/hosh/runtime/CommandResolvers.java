@@ -23,7 +23,6 @@
  */
 package org.hosh.runtime;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -162,7 +161,7 @@ public class CommandResolvers {
 
 		@Override
 		public Optional<Command> tryResolve(String commandName) {
-			String[] exts = state.getVariables().getOrDefault("PATHEXT", "").split(File.pathSeparator);
+			String[] exts = state.getVariables().getOrDefault("PATHEXT", "").split(";");
 			for (String ext : exts) {
 				Optional<Command> resolved = resolver.tryResolve(commandName + ext.strip());
 				if (resolved.isPresent()) {

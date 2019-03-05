@@ -337,8 +337,10 @@ public class FileSystemModuleTest {
 	public static class FindTest {
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-		@Mock
+		@Mock(stubOnly = true)
 		private State state;
+		@Mock
+		private Channel in;
 		@Mock
 		private Channel out;
 		@Mock
@@ -352,16 +354,18 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(err).should().send(Record.of("error", Values.ofText("expecting one argument")));
 			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void relativePath() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
-			ExitStatus exitStatus = sut.run(Arrays.asList("."), null, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("."), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(0);
 			then(out).should().send(Record.of("path", Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
 			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveZeroInteractions();
 		}
 
 		@Test
@@ -369,10 +373,32 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			newFile.delete();
-			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getName()), null, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getName()), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(err).should().send(Record.of("error", Values.ofText("path does not exist: " + newFile)));
 			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void absolutePath() throws IOException {
+			File newFile = temporaryFolder.newFile("file.txt");
+			ExitStatus exitStatus = sut.run(Arrays.asList(temporaryFolder.getRoot().getAbsolutePath()), in, out, err);
+			assertThat(exitStatus.value()).isEqualTo(0);
+			then(out).should().send(Record.of("path", Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
+			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void nonExistentAbsolutePath() throws IOException {
+			File newFile = temporaryFolder.newFile("file.txt");
+			newFile.delete();
+			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getAbsolutePath()), in, out, err);
+			assertThat(exitStatus.value()).isEqualTo(1);
+			then(err).should().send(Record.of("error", Values.ofText("path does not exist: " + newFile)));
+			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveZeroInteractions();
 		}
 	}
 }
