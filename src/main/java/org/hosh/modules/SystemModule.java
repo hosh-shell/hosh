@@ -60,6 +60,8 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("benchmark", Benchmark.class);
 		commandRegistry.registerCommand("source", Source.class);
 		commandRegistry.registerCommand("sink", Sink.class);
+		commandRegistry.registerCommand("set", SetVariable.class);
+		commandRegistry.registerCommand("unset", UnsetVariable.class);
 	}
 
 	public static class Echo implements Command {
@@ -321,6 +323,47 @@ public class SystemModule implements Module {
 					break;
 				}
 			}
+			return ExitStatus.success();
+		}
+	}
+
+	public static class SetVariable implements Command, StateAware {
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 2) {
+				err.send(Record.of("message", Values.ofText("requires 2 arguments: key value")));
+				return ExitStatus.error();
+			}
+			String key = args.get(0);
+			String value = args.get(1);
+			state.getVariables().put(key, value);
+			return ExitStatus.success();
+		}
+	}
+
+	public static class UnsetVariable implements Command, StateAware {
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of("message", Values.ofText("requires 1 argument: key")));
+				return ExitStatus.error();
+			}
+			String key = args.get(0);
+			state.getVariables().remove(key);
 			return ExitStatus.success();
 		}
 	}

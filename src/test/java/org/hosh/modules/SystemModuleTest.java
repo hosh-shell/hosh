@@ -42,9 +42,11 @@ import org.hosh.modules.SystemModule.Err;
 import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
 import org.hosh.modules.SystemModule.ProcessList;
+import org.hosh.modules.SystemModule.SetVariable;
 import org.hosh.modules.SystemModule.Sink;
 import org.hosh.modules.SystemModule.Sleep;
 import org.hosh.modules.SystemModule.Source;
+import org.hosh.modules.SystemModule.UnsetVariable;
 import org.hosh.modules.SystemModule.WithTime;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -63,6 +65,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(Suite.class)
@@ -78,6 +81,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.WithTimeTest.class,
 		SystemModuleTest.SourceTest.class,
 		SystemModuleTest.SinkTest.class,
+		SystemModuleTest.SetVariableTest.class,
+		SystemModuleTest.UnsetVariableTest.class,
 })
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -494,6 +499,103 @@ public class SystemModuleTest {
 		public void runIsMarkedAsError() {
 			assertThatThrownBy(() -> sut.run(Collections.emptyList(), in, out, err))
 					.isInstanceOf(UnsupportedOperationException.class);
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class SetVariableTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@Spy
+		private State state = new State();
+		@InjectMocks
+		private SetVariable sut;
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("message", Values.ofText("requires 2 arguments: key value")));
+		}
+
+		@Test
+		public void oneArg() {
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("message", Values.ofText("requires 2 arguments: key value")));
+		}
+
+		@Test
+		public void createsNewBinding() {
+			ExitStatus exitStatus = sut.run(List.of("FOO", "BAR"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+			assertThat(state.getVariables()).containsEntry("FOO", "BAR");
+		}
+
+		@Test
+		public void updatesExistingBinding() {
+			state.getVariables().put("FOO", "BAR");
+			ExitStatus exitStatus = sut.run(List.of("FOO", "BAZ"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+			assertThat(state.getVariables()).containsEntry("FOO", "BAZ");
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class UnsetVariableTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@Spy
+		private State state = new State();
+		@InjectMocks
+		private UnsetVariable sut;
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of("message", Values.ofText("requires 1 argument: key")));
+		}
+
+		@Test
+		public void removesExistingBinding() {
+			state.getVariables().put("FOO", "BAR");
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+			assertThat(state.getVariables()).doesNotContainKey("FOO");
+		}
+
+		@Test
+		public void doesNothingWhenUnexistingBinding() {
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+			assertThat(state.getVariables()).doesNotContainKey("FOO");
 		}
 	}
 }
