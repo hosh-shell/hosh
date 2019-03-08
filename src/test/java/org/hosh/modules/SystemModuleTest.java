@@ -236,7 +236,7 @@ public class SystemModuleTest {
 		@Test
 		public void twoArgs() {
 			sut.run(Arrays.asList("a", "b"), null, out, err);
-			then(out).should().send(Record.of("text", Values.ofText("ab")));
+			then(out).should().send(Record.of("text", Values.ofText("a b")));
 			then(err).shouldHaveZeroInteractions();
 		}
 	}

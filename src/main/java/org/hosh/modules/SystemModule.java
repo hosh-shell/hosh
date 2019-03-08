@@ -67,7 +67,7 @@ public class SystemModule implements Module {
 	public static class Echo implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			Record record = Record.of("text", Values.ofText(String.join("", args)));
+			Record record = Record.of("text", Values.ofText(String.join(" ", args)));
 			out.send(record);
 			return ExitStatus.success();
 		}
