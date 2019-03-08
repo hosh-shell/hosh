@@ -80,9 +80,11 @@ public class Hosh {
 		Logger logger = LoggerFactory.forEnclosingClass();
 		String version = Version.readVersion();
 		logger.info(() -> String.format("starting hosh v.%s", version));
+		ExitStatus exitStatus = ExitStatus.error();
 		try (Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build()) {
-			runWithin(terminal, version, logger, args);
+			exitStatus = run(terminal, version, logger, args);
 		}
+		System.exit(exitStatus.value());
 	}
 
 	// enabling logging to $HOME/.hosh.log
@@ -103,7 +105,7 @@ public class Hosh {
 		logger.setLevel(Level.parse(logLevel));
 	}
 
-	private static void runWithin(Terminal terminal, String version, Logger logger, String[] args) {
+	private static ExitStatus run(Terminal terminal, String version, Logger logger, String[] args) {
 		List<Path> path = Stream
 				.of(System.getenv("PATH").split(File.pathSeparator))
 				.map(Paths::get)
@@ -131,7 +133,7 @@ public class Hosh {
 			String filePath = args[0];
 			exitStatus = script(filePath, compiler, interpreter, err, logger);
 		}
-		System.exit(exitStatus.value());
+		return exitStatus;
 	}
 
 	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger) {
