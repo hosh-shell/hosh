@@ -23,14 +23,31 @@
  */
 package org.hosh.runtime;
 
+import java.util.Objects;
+
 import org.jline.reader.Candidate;
 
 /**
- * This class is just a workaround for missing toString() in {@link Candidate}.
+ * {@link Candidate} as value object
  */
 public class DebuggableCandidate extends Candidate {
 	public DebuggableCandidate(String value) {
 		super(value);
+	}
+
+	@Override
+	public final boolean equals(Object obj) {
+		if (obj instanceof DebuggableCandidate) {
+			DebuggableCandidate that = (DebuggableCandidate) obj;
+			return Objects.equals(this.value(), that.value());
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hash(this.value());
 	}
 
 	@Override

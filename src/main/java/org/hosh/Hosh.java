@@ -54,6 +54,7 @@ import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.LineReaderIterator;
 import org.hosh.runtime.SimpleCommandRegistry;
+import org.hosh.runtime.VariableExpansionCompleter;
 import org.hosh.runtime.Version;
 import org.hosh.spi.Channel;
 import org.hosh.spi.CommandRegistry;
@@ -164,7 +165,7 @@ public class Hosh {
 				.history(new DefaultHistory())
 				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
 				.variable(LineReader.HISTORY_FILE_SIZE, "1000")
-				.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state)))
+				.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state), new VariableExpansionCompleter(state)))
 				.terminal(terminal)
 				.build();
 		LineReader lineReader = lineReader1;

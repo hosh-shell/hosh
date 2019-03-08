@@ -23,24 +23,30 @@
  */
 package org.hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
 
-import org.junit.Test;
+import org.hosh.spi.State;
+import org.jline.reader.Candidate;
+import org.jline.reader.Completer;
+import org.jline.reader.LineReader;
+import org.jline.reader.ParsedLine;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
+public class VariableExpansionCompleter implements Completer {
+	private final State state;
 
-public class DebuggableCandidateTest {
-	@Test
-	public void equalsContract() {
-		EqualsVerifier.configure()
-				.suppress(Warning.ALL_FIELDS_SHOULD_BE_USED)
-				.forClass(DebuggableCandidate.class)
-				.verify();
+	public VariableExpansionCompleter(State state) {
+		this.state = state;
 	}
 
-	@Test
-	public void stringValue() {
-		assertThat(new DebuggableCandidate("aa")).hasToString("Candidate[value='aa']");
+	@Override
+	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
+		if (line.word().startsWith("${")) {
+			state.getVariables()
+					.keySet()
+					.stream()
+					.map(s -> "${" + s + "}")
+					.map(DebuggableCandidate::new)
+					.forEach(candidate -> candidates.add(candidate));
+		}
 	}
 }
