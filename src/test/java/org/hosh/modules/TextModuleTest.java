@@ -31,6 +31,7 @@ import static org.mockito.Mockito.verify;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.hosh.modules.TextModule.Count;
 import org.hosh.modules.TextModule.Distinct;
 import org.hosh.modules.TextModule.Drop;
 import org.hosh.modules.TextModule.Duplicated;
@@ -40,6 +41,7 @@ import org.hosh.modules.TextModule.Schema;
 import org.hosh.modules.TextModule.Sort;
 import org.hosh.modules.TextModule.Table;
 import org.hosh.modules.TextModule.Take;
+import org.hosh.modules.TextModuleTest.CountTest;
 import org.hosh.modules.TextModuleTest.DistinctTest;
 import org.hosh.modules.TextModuleTest.DropTest;
 import org.hosh.modules.TextModuleTest.DuplicatedTest;
@@ -67,6 +69,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(Suite.class)
 @SuiteClasses({
 		SchemaTest.class,
+		CountTest.class,
 		EnumerateTest.class,
 		DropTest.class,
 		TakeTest.class,
@@ -95,6 +98,60 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			sut.run(Arrays.asList(), in, out, err);
 			then(out).should().send(Record.of("keys", Values.ofText("[key1, key2]")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void oneArg() {
+			sut.run(Arrays.asList("asd"), in, out, err);
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expected 0 parameters")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class CountTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Count sut;
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void twoRecords() {
+			Record record = Record.of("key", Values.ofText("some data"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
+			then(out).should().send(Record.of("count", Values.ofNumeric(2)));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void oneRecord() {
+			Record record = Record.of("key", Values.ofText("some data"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(2)).recv();
+			then(out).should().send(Record.of("count", Values.ofNumeric(1)));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void zeroRecords() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(1)).recv();
+			then(out).should().send(Record.of("count", Values.ofNumeric(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
