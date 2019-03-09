@@ -58,7 +58,7 @@ public class FileSystemCompleter implements Completer {
 	private void tryComplete(ParsedLine line, List<Candidate> candidates) throws IOException {
 		Path path = Paths.get(line.word());
 		if (line.word().endsWith(File.separator)) {
-			listCandidates(path, Path::toAbsolutePath, candidates);
+			listCandidates(path, p -> p, candidates);
 		} else if (path.isAbsolute()) {
 			listCandidates(parent(path), Path::toAbsolutePath, candidates);
 		} else {
