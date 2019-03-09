@@ -79,10 +79,10 @@ public class RecordTest {
 		Value lastValue = Values.ofText("lastValue");
 		Record a = Record.empty()
 				.append(Keys.of("key"), value)
-				.append(Keys.of("another_key"), anotherValue)
+				.append(Keys.of("anotherkey"), anotherValue)
 				.prepend(Keys.of("first"), value)
 				.append(Keys.of("last"), lastValue);
-		assertThat(a.keys()).containsExactly(Keys.of("first"), Keys.of("key"), Keys.of("another_key"), Keys.of("last"));
+		assertThat(a.keys()).containsExactly(Keys.of("first"), Keys.of("key"), Keys.of("anotherkey"), Keys.of("last"));
 		assertThat(a.values()).containsExactly(value, value, anotherValue, lastValue);
 	}
 

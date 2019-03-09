@@ -23,6 +23,7 @@
  */
 package org.hosh.spi;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.Test;
@@ -32,6 +33,33 @@ public class KeysTest {
 	public void nullKey() {
 		assertThatThrownBy(() -> Keys.of(null))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("name is null");
+				.hasMessage("name must be not null");
+	}
+
+	@Test
+	public void emptyKey() {
+		assertThatThrownBy(() -> Keys.of(""))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("name must be a single lowercase word");
+	}
+
+	@Test
+	public void uppercaseKey() {
+		assertThatThrownBy(() -> Keys.of("AAA"))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("name must be a single lowercase word");
+	}
+
+	@Test
+	public void twoWordsKey() {
+		assertThatThrownBy(() -> Keys.of("aaa bbb"))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("name must be a single lowercase word");
+	}
+
+	@Test
+	public void representation() {
+		assertThat(Keys.of("name"))
+				.hasToString("Key[name]");
 	}
 }

@@ -40,7 +40,7 @@ public class PipelineChannel implements Channel {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private static final boolean QUEUE_FAIRNESS = false;
 	private static final int QUEUE_CAPACITY = 100;
-	private final Record poisonPill = Record.of(Keys.of("__POISON_PILL__"), Values.none());
+	private final Record poisonPill = Record.of(Keys.of("poisonpill"), Values.none());
 	private final BlockingQueue<Record> queue;
 	private volatile boolean done;
 
@@ -110,7 +110,7 @@ public class PipelineChannel implements Channel {
 	 * Since send() is a void method an exception is needed
 	 * to forcibly stop a producer.
 	 *
-	 * This is the dual of __POISON_PILL_ record, sent by a producer to
+	 * This is the dual of poison pill record, sent by a producer to
 	 * stop any downstream readers.
 	 */
 	public static class ProducerPoisonPill extends RuntimeException {

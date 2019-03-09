@@ -384,7 +384,7 @@ public class TextModuleTest {
 		public void sortByNonExistingKey() {
 			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
-			ExitStatus exitStatus = sut.run(Arrays.asList("another_key"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(2)).recv();
 			then(err).shouldHaveNoMoreInteractions();
@@ -421,7 +421,7 @@ public class TextModuleTest {
 			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(Arrays.asList("anotherKey"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
@@ -486,7 +486,7 @@ public class TextModuleTest {
 			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(Arrays.asList("anotherKey"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();

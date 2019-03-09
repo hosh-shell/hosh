@@ -25,8 +25,6 @@ package org.hosh.spi;
 
 import java.util.Objects;
 
-import org.hosh.doc.Todo;
-
 /**
  * Standard keys used over and over through all commands. Usually such keys
  * convey some semantic information
@@ -84,16 +82,18 @@ public class Keys {
 	}
 
 	public static Key of(String key) {
-		return new StringKey(key);
+		return new SingleWordKey(key);
 	}
 
-	@Todo(description = "should be also non-empty and a single word in order to be used as config key")
-	private static class StringKey implements Key {
+	private static class SingleWordKey implements Key {
 		private final String name;
 
-		public StringKey(String name) {
+		public SingleWordKey(String name) {
 			if (name == null) {
-				throw new IllegalArgumentException("name is null");
+				throw new IllegalArgumentException("name must be not null");
+			}
+			if (!name.matches("[a-z]+")) {
+				throw new IllegalArgumentException("name must be a single lowercase word");
 			}
 			this.name = name;
 		}
@@ -106,7 +106,7 @@ public class Keys {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof Key) {
-				StringKey that = (StringKey) obj;
+				SingleWordKey that = (SingleWordKey) obj;
 				return this.name.equals(that.name);
 			} else {
 				return false;
