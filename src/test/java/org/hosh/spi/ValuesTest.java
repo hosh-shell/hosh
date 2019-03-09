@@ -117,6 +117,13 @@ public class ValuesTest {
 		public void asString() {
 			assertThat(Values.ofDuration(Duration.ofMillis(1))).hasToString("Duration[PT0.001S]");
 		}
+
+		@Test
+		public void nullDuration() {
+			assertThatThrownBy(() -> Values.ofDuration(null))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("duration cannot be null");
+		}
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -417,6 +424,22 @@ public class ValuesTest {
 					Values.ofLocalPath(Paths.get("aaa")),
 					Values.ofLocalPath(Paths.get("bbb")),
 					Values.ofLocalPath(Paths.get("ccc")));
+		}
+
+		@Test
+		public void durationWithNone() {
+			List<Value> sorted = Stream.of(
+					Values.ofDuration(Duration.ofMillis(2)),
+					Values.ofDuration(Duration.ofMillis(1)),
+					Values.none(),
+					Values.none())
+					.sorted()
+					.collect(Collectors.toList());
+			assertThat(sorted).containsExactly(
+					Values.none(),
+					Values.none(),
+					Values.ofDuration(Duration.ofMillis(1)),
+					Values.ofDuration(Duration.ofMillis(2)));
 		}
 	}
 }
