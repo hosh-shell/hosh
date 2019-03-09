@@ -31,14 +31,18 @@ import static org.mockito.Mockito.verify;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.hosh.modules.TextModule.Distinct;
 import org.hosh.modules.TextModule.Drop;
+import org.hosh.modules.TextModule.Duplicated;
 import org.hosh.modules.TextModule.Enumerate;
 import org.hosh.modules.TextModule.Filter;
 import org.hosh.modules.TextModule.Schema;
 import org.hosh.modules.TextModule.Sort;
 import org.hosh.modules.TextModule.Table;
 import org.hosh.modules.TextModule.Take;
+import org.hosh.modules.TextModuleTest.DistinctTest;
 import org.hosh.modules.TextModuleTest.DropTest;
+import org.hosh.modules.TextModuleTest.DuplicatedTest;
 import org.hosh.modules.TextModuleTest.EnumerateTest;
 import org.hosh.modules.TextModuleTest.FilterTest;
 import org.hosh.modules.TextModuleTest.SchemaTest;
@@ -68,6 +72,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 		TakeTest.class,
 		FilterTest.class,
 		SortTest.class,
+		DistinctTest.class,
+		DuplicatedTest.class,
 		TableTest.class,
 })
 public class TextModuleTest {
@@ -324,6 +330,136 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("another_key"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(2)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(1)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
+		}
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class DistinctTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Distinct sut;
+		@Captor
+		private ArgumentCaptor<Record> records;
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void missingKey() {
+			Record record1 = Record.of("key", Values.ofNumeric(2));
+			Record record2 = Record.of("key", Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("anotherKey"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(0)).send(records.capture());
+			assertThat(records.getAllValues()).isEmpty();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void distinctValues() {
+			Record record1 = Record.of("key", Values.ofNumeric(2));
+			Record record2 = Record.of("key", Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(2)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1, record2);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void duplicatedValues() {
+			Record record1 = Record.of("key", Values.ofNumeric(1));
+			Record record2 = Record.of("key", Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(1)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
+		}
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class DuplicatedTest {
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private Duplicated sut;
+		@Captor
+		private ArgumentCaptor<Record> records;
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void missingKey() {
+			Record record1 = Record.of("key", Values.ofNumeric(2));
+			Record record2 = Record.of("key", Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("anotherKey"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(0)).send(records.capture());
+			assertThat(records.getAllValues()).isEmpty();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void distinctValues() {
+			Record record1 = Record.of("key", Values.ofNumeric(2));
+			Record record2 = Record.of("key", Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
+			then(err).shouldHaveNoMoreInteractions();
+			verify(out, Mockito.times(0)).send(records.capture());
+			assertThat(records.getAllValues()).isEmpty();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void duplicatedValues() {
+			Record record1 = Record.of("key", Values.ofNumeric(1));
+			Record record2 = Record.of("key", Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(1)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);

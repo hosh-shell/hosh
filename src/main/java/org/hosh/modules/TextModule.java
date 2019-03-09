@@ -29,10 +29,12 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -56,6 +58,8 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("filter", Filter.class);
 		commandRegistry.registerCommand("enumerate", Enumerate.class);
 		commandRegistry.registerCommand("sort", Sort.class);
+		commandRegistry.registerCommand("distinct", Distinct.class);
+		commandRegistry.registerCommand("duplicated", Duplicated.class);
 		commandRegistry.registerCommand("take", Take.class);
 		commandRegistry.registerCommand("drop", Drop.class);
 		commandRegistry.registerCommand("rand", Rand.class);
@@ -120,6 +124,60 @@ public class TextModule implements Module {
 				Record record = incoming.get();
 				out.send(record.prepend("index", Values.ofNumeric(i++)));
 			}
+		}
+	}
+
+	@Experimental(description = "uniq")
+	public static class Distinct implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+				return ExitStatus.error();
+			}
+			Set<Value> seen = new HashSet<>();
+			String key = args.get(0);
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				Record record = incoming.get();
+				record.value(key).ifPresent(v -> {
+					boolean neverSeenBefore = seen.add(v);
+					if (neverSeenBefore) {
+						out.send(record);
+					}
+				});
+			}
+			return ExitStatus.success();
+		}
+	}
+
+	@Experimental(description = "uniq -d")
+	public static class Duplicated implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+				return ExitStatus.error();
+			}
+			Set<Value> seen = new HashSet<>();
+			String key = args.get(0);
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				Record record = incoming.get();
+				record.value(key).ifPresent(v -> {
+					boolean seenBefore = !seen.add(v);
+					if (seenBefore) {
+						out.send(record);
+					}
+				});
+			}
+			return ExitStatus.success();
 		}
 	}
 
