@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -182,7 +181,7 @@ public class FileSystemModule implements Module {
 						path = Paths.get(state.getCwd().toString(), args.get(0));
 					}
 					if (Files.isRegularFile(path)) {
-						readLines(path, out, err);
+						readLines(path, out);
 						return ExitStatus.success();
 					} else {
 						err.send(Record.of(Keys.ERROR, Values.ofText("not readable file")));
@@ -194,12 +193,11 @@ public class FileSystemModule implements Module {
 			}
 		}
 
-		@Todo(description = "throw exception instead of sending record")
-		private void readLines(Path path, Channel out, Channel err) {
+		private void readLines(Path path, Channel out) {
 			try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
 				lines.forEach(line -> out.send(Record.of(Keys.LINE, Values.ofText(line))));
 			} catch (IOException e) {
-				err.send(Record.of(Keys.of("exception"), Values.ofText(e.getMessage())));
+				throw new UncheckedIOException(e);
 			}
 		}
 	}
