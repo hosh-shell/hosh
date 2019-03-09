@@ -53,6 +53,7 @@ import org.hosh.modules.TextModuleTest.TableTest;
 import org.hosh.modules.TextModuleTest.TakeTest;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.junit.Test;
@@ -94,10 +95,10 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void zeroArg() {
-			Record record = Record.of("key1", null).append("key2", null);
+			Record record = Record.of(Keys.COUNT, null).append(Keys.INDEX, null);
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			sut.run(Arrays.asList(), in, out, err);
-			then(out).should().send(Record.of("keys", Values.ofText("[key1, key2]")));
+			then(out).should().send(Record.of(Keys.of("schema"), Values.ofText("count index")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -105,7 +106,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			sut.run(Arrays.asList("asd"), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 0 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -124,24 +125,24 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoRecords() {
-			Record record = Record.of("key", Values.ofText("some data"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(3)).recv();
-			then(out).should().send(Record.of("count", Values.ofNumeric(2)));
+			then(out).should().send(Record.of(Keys.COUNT, Values.ofNumeric(2)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void oneRecord() {
-			Record record = Record.of("key", Values.ofText("some data"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(2)).recv();
-			then(out).should().send(Record.of("count", Values.ofNumeric(1)));
+			then(out).should().send(Record.of(Keys.COUNT, Values.ofNumeric(1)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -151,7 +152,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(1)).recv();
-			then(out).should().send(Record.of("count", Values.ofNumeric(0)));
+			then(out).should().send(Record.of(Keys.COUNT, Values.ofNumeric(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -159,7 +160,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			sut.run(Arrays.asList("asd"), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 0 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -178,11 +179,11 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void zeroArg() {
-			Record record = Record.of("key", Values.ofText("some data"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Record.empty()), Optional.empty());
 			sut.run(Arrays.asList(), in, out, err);
-			then(out).should().send(Record.builder().entry("index", Values.ofNumeric(1)).entry("key", Values.ofText("some data")).build());
-			then(out).should().send(Record.of("index", Values.ofNumeric(2)));
+			then(out).should().send(Record.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.LINE, Values.ofText("some data")).build());
+			then(out).should().send(Record.of(Keys.INDEX, Values.ofNumeric(2)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -190,7 +191,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			sut.run(Arrays.asList("asd"), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 0 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -209,7 +210,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void dropZero() {
-			Record record = Record.of("key", Values.ofText("some data"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			sut.run(Arrays.asList("0"), in, out, err);
 			then(out).should().send(record);
@@ -219,7 +220,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void dropOne() {
-			Record record = Record.of("key", Values.ofText("some data"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			sut.run(Arrays.asList("1"), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
@@ -230,7 +231,7 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			sut.run(Arrays.asList(), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -258,7 +259,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void takeExactly() {
-			Record record = Record.of("key", Values.ofText("some data"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -270,9 +271,8 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void takeLess() {
-			Record record = Record.of("key", Values.ofText("some data"));
-			Record record2 = record.append("another key", Values.ofText("another value"));
-			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
+			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(1)).recv();
@@ -283,8 +283,8 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void takeMore() {
-			Record record = Record.of("key", Values.ofText("some data"));
-			Record record2 = record.append("another key", Values.ofText("another value"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			Record record2 = Record.of(Keys.LINE, Values.ofText("another value"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("5"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -299,7 +299,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -318,9 +318,9 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void printMatchingLines() {
-			Record record = Record.of("key", Values.ofText("some string"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
-			sut.run(Arrays.asList("key", ".*string.*"), in, out, err);
+			sut.run(Arrays.asList("line", ".*string.*"), in, out, err);
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -328,7 +328,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void ignoreNonMatchingLines() {
-			Record record = Record.of("key", Values.ofText("some string"));
+			Record record = Record.of(Keys.LINE, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			sut.run(Arrays.asList("key", ".*number.*"), in, out, err);
 			then(out).shouldHaveZeroInteractions();
@@ -339,7 +339,7 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			sut.run(Arrays.asList(), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 2 parameters: key regex")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters: key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -347,7 +347,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			sut.run(Arrays.asList("key"), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 2 parameters: key regex")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters: key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -368,10 +368,10 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void sortByExistingKey() {
-			Record record1 = Record.of("key", Values.ofNumeric(2));
-			Record record2 = Record.of("key", Values.ofNumeric(1));
+			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
+			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
@@ -382,7 +382,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void sortByNonExistingKey() {
-			Record record1 = Record.of("key", Values.ofNumeric(2));
+			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("another_key"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -397,7 +397,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -418,8 +418,8 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void missingKey() {
-			Record record1 = Record.of("key", Values.ofNumeric(2));
-			Record record2 = Record.of("key", Values.ofNumeric(1));
+			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
+			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("anotherKey"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -432,10 +432,10 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void distinctValues() {
-			Record record1 = Record.of("key", Values.ofNumeric(2));
-			Record record2 = Record.of("key", Values.ofNumeric(1));
+			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
+			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
@@ -446,10 +446,10 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void duplicatedValues() {
-			Record record1 = Record.of("key", Values.ofNumeric(1));
-			Record record2 = Record.of("key", Values.ofNumeric(1));
+			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(1));
+			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
@@ -462,7 +462,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -483,8 +483,8 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void missingKey() {
-			Record record1 = Record.of("key", Values.ofNumeric(2));
-			Record record2 = Record.of("key", Values.ofNumeric(1));
+			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
+			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("anotherKey"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -497,10 +497,10 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void distinctValues() {
-			Record record1 = Record.of("key", Values.ofNumeric(2));
-			Record record2 = Record.of("key", Values.ofNumeric(1));
+			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
+			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
@@ -511,10 +511,10 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void duplicatedValues() {
-			Record record1 = Record.of("key", Values.ofNumeric(1));
-			Record record2 = Record.of("key", Values.ofNumeric(1));
+			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(1));
+			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
@@ -527,7 +527,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -548,7 +548,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void table() {
-			Record record1 = Record.builder().entry("age", Values.ofNumeric(2)).entry("name", Values.ofText("zvrnv")).build();
+			Record record1 = Record.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.NAME, Values.ofText("zvrnv")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -556,14 +556,14 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Record.of("header", Values.ofText("age        name      ")),
-					Record.of("row", Values.ofText("2         zvrnv     ")));
+					Record.of(Keys.of("header"), Values.ofText("count      name      ")),
+					Record.of(Keys.of("row"), Values.ofText("2         zvrnv     ")));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void tableWithNone() {
-			Record record1 = Record.builder().entry("age", Values.none()).entry("name", Values.ofText("zvrnv")).build();
+			Record record1 = Record.builder().entry(Keys.COUNT, Values.none()).entry(Keys.NAME, Values.ofText("zvrnv")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -571,8 +571,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Record.of("header", Values.ofText("age        name      ")),
-					Record.of("row", Values.ofText("          zvrnv     ")));
+					Record.of(Keys.of("header"), Values.ofText("count      name      ")),
+					Record.of(Keys.of("row"), Values.ofText("          zvrnv     ")));
 		}
 
 		@Test
@@ -580,7 +580,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("a"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expected 0 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

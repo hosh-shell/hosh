@@ -50,6 +50,7 @@ import org.hosh.modules.SystemModule.UnsetVariable;
 import org.hosh.modules.SystemModule.WithTime;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
@@ -119,7 +120,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), null, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(state).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("not a valid exit status: asd")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a valid exit status: asd")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
@@ -128,7 +129,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("1", "2"), null, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(state).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("too many parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("too many parameters")));
 			then(out).shouldHaveZeroInteractions();
 		}
 	}
@@ -160,7 +161,7 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList(), null, out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
-			Record record = Record.builder().entry("key", Values.ofText("HOSH_VERSION")).entry("value", Values.ofText("1.0")).build();
+			Record record = Record.builder().entry(Keys.NAME, Values.ofText("HOSH_VERSION")).entry(Keys.VALUE, Values.ofText("1.0")).build();
 			assertThat(records.getAllValues()).contains(record);
 		}
 
@@ -168,7 +169,7 @@ public class SystemModuleTest {
 		public void oneArg() {
 			sut.run(Arrays.asList("1"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expecting no parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 		}
 	}
 
@@ -191,7 +192,7 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList(), null, out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
-			assertThat(records.getAllValues()).contains(Record.of("command", Values.ofText("name")));
+			assertThat(records.getAllValues()).contains(Record.of(Keys.of("command"), Values.ofText("name")));
 		}
 
 		@Test
@@ -206,7 +207,7 @@ public class SystemModuleTest {
 		public void oneArg() {
 			sut.run(Arrays.asList("1"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expecting no parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 		}
 	}
 
@@ -222,21 +223,21 @@ public class SystemModuleTest {
 		@Test
 		public void noArgs() {
 			sut.run(Arrays.asList(), null, out, err);
-			then(out).should().send(Record.of("text", Values.ofText("")));
+			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("")));
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			sut.run(Arrays.asList("a"), null, out, err);
-			then(out).should().send(Record.of("text", Values.ofText("a")));
+			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("a")));
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
 			sut.run(Arrays.asList("a", "b"), null, out, err);
-			then(out).should().send(Record.of("text", Values.ofText("a b")));
+			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("a b")));
 			then(err).shouldHaveZeroInteractions();
 		}
 	}
@@ -261,7 +262,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("interrupted")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("interrupted")));
 		}
 
 		@Test
@@ -269,7 +270,7 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList(), in, out, err);
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting just one argument millis")));
 		}
 
 		@Test
@@ -285,7 +286,7 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList("a"), in, out, err);
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("not millis: a")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not millis: a")));
 		}
 
 		@Test
@@ -293,7 +294,7 @@ public class SystemModuleTest {
 			sut.run(Arrays.asList("a", "b"), in, out, err);
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expecting just one argument millis")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting just one argument millis")));
 		}
 	}
 
@@ -317,7 +318,7 @@ public class SystemModuleTest {
 		public void oneArgNumber() {
 			sut.run(Arrays.asList("1"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("expecting zero arguments")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting zero arguments")));
 		}
 	}
 
@@ -410,10 +411,10 @@ public class SystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(
 					Record.builder()
-							.entry("count", Values.ofNumeric(2))
-							.entry("best", Values.ofDuration(Duration.ofMillis(10)))
-							.entry("worst", Values.ofDuration(Duration.ofMillis(20)))
-							.entry("avg", Values.ofDuration(Duration.ofMillis(15)))
+							.entry(Keys.COUNT, Values.ofNumeric(2))
+							.entry(Benchmark.BEST, Values.ofDuration(Duration.ofMillis(10)))
+							.entry(Benchmark.WORST, Values.ofDuration(Duration.ofMillis(20)))
+							.entry(Benchmark.AVERAGE, Values.ofDuration(Duration.ofMillis(15)))
 							.build());
 			then(err).shouldHaveZeroInteractions();
 		}
@@ -426,10 +427,10 @@ public class SystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(
 					Record.builder()
-							.entry("count", Values.ofNumeric(0))
-							.entry("best", Values.ofDuration(Duration.ZERO))
-							.entry("worst", Values.ofDuration(Duration.ZERO))
-							.entry("avg", Values.ofDuration(Duration.ZERO))
+							.entry(Keys.COUNT, Values.ofNumeric(0))
+							.entry(Benchmark.BEST, Values.ofDuration(Duration.ZERO))
+							.entry(Benchmark.WORST, Values.ofDuration(Duration.ZERO))
+							.entry(Benchmark.AVERAGE, Values.ofDuration(Duration.ZERO))
 							.build());
 			then(err).shouldHaveZeroInteractions();
 		}
@@ -521,7 +522,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("message", Values.ofText("requires 2 arguments: key value")));
+			then(err).should().send(Record.of(Keys.MESSAGE, Values.ofText("requires 2 arguments: key value")));
 		}
 
 		@Test
@@ -530,7 +531,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("message", Values.ofText("requires 2 arguments: key value")));
+			then(err).should().send(Record.of(Keys.MESSAGE, Values.ofText("requires 2 arguments: key value")));
 		}
 
 		@Test
@@ -574,7 +575,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("message", Values.ofText("requires 1 argument: key")));
+			then(err).should().send(Record.of(Keys.MESSAGE, Values.ofText("requires 1 argument: key")));
 		}
 
 		@Test

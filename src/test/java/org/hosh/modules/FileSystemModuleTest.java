@@ -42,6 +42,7 @@ import org.hosh.modules.FileSystemModule.Lines;
 import org.hosh.modules.FileSystemModule.ListFiles;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
@@ -82,7 +83,7 @@ public class FileSystemModuleTest {
 		public void errorTwoOrMoreArgs() {
 			sut.run(Arrays.asList("dir1", "dir2"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("message", Values.ofText("expected at most 1 argument")));
+			then(err).should().send(Record.of(Keys.MESSAGE, Values.ofText("expected at most 1 argument")));
 		}
 
 		@Test
@@ -100,8 +101,8 @@ public class FileSystemModuleTest {
 			sut.run(Arrays.asList(), null, out, err);
 			then(out).should().send(
 					Record.builder()
-							.entry("path", Values.ofLocalPath(Paths.get("dir")))
-							.entry("size", Values.none())
+							.entry(Keys.PATH, Values.ofLocalPath(Paths.get("dir")))
+							.entry(Keys.SIZE, Values.none())
 							.build());
 			then(err).shouldHaveZeroInteractions();
 		}
@@ -112,7 +113,7 @@ public class FileSystemModuleTest {
 			temporaryFolder.newFile("file").createNewFile();
 			sut.run(Arrays.asList(), null, out, err);
 			then(out).should()
-					.send(Record.builder().entry("path", Values.ofLocalPath(Paths.get("file"))).entry("size", Values.ofHumanizedSize(0)).build());
+					.send(Record.builder().entry(Keys.PATH, Values.ofLocalPath(Paths.get("file"))).entry(Keys.SIZE, Values.ofHumanizedSize(0)).build());
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -122,7 +123,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			sut.run(Arrays.asList(file.getFileName().toString()), null, out, err);
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("not a directory: " + file.toAbsolutePath().toString())));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a directory: " + file.toAbsolutePath().toString())));
 		}
 
 		@Test
@@ -151,8 +152,8 @@ public class FileSystemModuleTest {
 			sut.run(Arrays.asList("."), null, out, err);
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should().send(Record.builder()
-					.entry("path", Values.ofLocalPath(Paths.get("aaa")))
-					.entry("size", Values.ofHumanizedSize(0))
+					.entry(Keys.PATH, Values.ofLocalPath(Paths.get("aaa")))
+					.entry(Keys.SIZE, Values.ofHumanizedSize(0))
 					.build());
 		}
 
@@ -163,7 +164,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
 			sut.run(Arrays.asList(path.toString()), null, out, err);
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("not a directory: " + path)));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a directory: " + path)));
 		}
 
 		@Test
@@ -174,8 +175,8 @@ public class FileSystemModuleTest {
 			sut.run(Arrays.asList(newFolder.getAbsolutePath()), null, out, err);
 			then(out).should().send(
 					Record.builder()
-							.entry("path", Values.ofLocalPath(Paths.get("aaa")))
-							.entry("size", Values.ofHumanizedSize(0))
+							.entry(Keys.PATH, Values.ofLocalPath(Paths.get("aaa")))
+							.entry(Keys.SIZE, Values.ofHumanizedSize(0))
 							.build());
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -197,14 +198,14 @@ public class FileSystemModuleTest {
 		@Test
 		public void noArgs() {
 			sut.run(Arrays.asList(), null, out, err);
-			then(err).should().send(Record.of("error", Values.ofText("missing path argument")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("missing path argument")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
 			sut.run(Arrays.asList("asd", "asd"), null, out, err);
-			then(err).should().send(Record.of("error", Values.ofText("expecting one path argument")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
@@ -237,7 +238,7 @@ public class FileSystemModuleTest {
 			sut.run(Arrays.asList("file"), null, out, err);
 			then(state).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("not a directory")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a directory")));
 		}
 	}
 
@@ -258,14 +259,14 @@ public class FileSystemModuleTest {
 		public void noArgs() {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			sut.run(Arrays.asList(), null, out, err);
-			then(out).should().send(Record.of("cwd", Values.ofLocalPath(temporaryFolder.getRoot().toPath())));
+			then(out).should().send(Record.of(Keys.PATH, Values.ofLocalPath(temporaryFolder.getRoot().toPath())));
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			sut.run(Arrays.asList("asd"), null, out, err);
-			then(err).should().send(Record.of("error", Values.ofText("expecting no parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 			then(out).shouldHaveZeroInteractions();
 		}
 	}
@@ -299,8 +300,8 @@ public class FileSystemModuleTest {
 				writer.write("b 2\n");
 			}
 			sut.run(Arrays.asList(newFile.getAbsolutePath()), null, out, err);
-			then(out).should().send(Record.of("line", Values.ofText("a 1")));
-			then(out).should().send(Record.of("line", Values.ofText("b 2")));
+			then(out).should().send(Record.of(Keys.LINE, Values.ofText("a 1")));
+			then(out).should().send(Record.of(Keys.LINE, Values.ofText("b 2")));
 			then(err).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
@@ -313,7 +314,7 @@ public class FileSystemModuleTest {
 				writer.write("a 1\n");
 			}
 			sut.run(Arrays.asList(newFile.getName()), null, out, err);
-			then(out).should().send(Record.of("line", Values.ofText("a 1")));
+			then(out).should().send(Record.of(Keys.LINE, Values.ofText("a 1")));
 			then(err).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
@@ -322,13 +323,13 @@ public class FileSystemModuleTest {
 		public void directory() {
 			sut.run(Arrays.asList(temporaryFolder.getRoot().getAbsolutePath()), null, out, err);
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("not readable file")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not readable file")));
 		}
 
 		@Test
 		public void noArgs() {
 			sut.run(Arrays.asList(), null, out, err);
-			then(err).should().send(Record.of("error", Values.ofText("expecting one path argument")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
 			then(out).shouldHaveZeroInteractions();
 		}
 	}
@@ -352,7 +353,7 @@ public class FileSystemModuleTest {
 		public void noArgs() throws Exception {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), null, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
-			then(err).should().send(Record.of("error", Values.ofText("expecting one argument")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
 			then(out).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}
@@ -363,7 +364,7 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(Arrays.asList("."), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(0);
-			then(out).should().send(Record.of("path", Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
+			then(out).should().send(Record.of(Keys.PATH, Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
 			then(err).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}
@@ -375,7 +376,7 @@ public class FileSystemModuleTest {
 			newFile.delete();
 			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getName()), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
-			then(err).should().send(Record.of("error", Values.ofText("path does not exist: " + newFile)));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
 			then(out).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}
@@ -385,7 +386,7 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(Arrays.asList(temporaryFolder.getRoot().getAbsolutePath()), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(0);
-			then(out).should().send(Record.of("path", Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
+			then(out).should().send(Record.of(Keys.PATH, Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
 			then(err).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}
@@ -396,7 +397,7 @@ public class FileSystemModuleTest {
 			newFile.delete();
 			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
-			then(err).should().send(Record.of("error", Values.ofText("path does not exist: " + newFile)));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
 			then(out).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}

@@ -44,6 +44,7 @@ import java.util.logging.Logger;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
@@ -88,11 +89,11 @@ public class ExternalCommand implements Command, StateAware {
 			return ExitStatus.of(exitCode);
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, "caught exception", e);
-			err.send(Record.of("error", Values.ofText(e.getMessage())));
+			err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
 			return ExitStatus.error();
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			err.send(Record.of("error", Values.ofText("interrupted")));
+			err.send(Record.of(Keys.ERROR, Values.ofText("interrupted")));
 			return ExitStatus.error();
 		}
 	}
@@ -130,7 +131,7 @@ public class ExternalCommand implements Command, StateAware {
 				if (readLine == null) {
 					break;
 				}
-				channel.send(Record.of("line", Values.ofText(readLine)));
+				channel.send(Record.of(Keys.LINE, Values.ofText(readLine)));
 			}
 		}
 	}

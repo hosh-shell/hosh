@@ -32,6 +32,7 @@ import org.hosh.modules.TerminalModule.Bell;
 import org.hosh.modules.TerminalModule.Clear;
 import org.hosh.modules.TerminalModule.Dump;
 import org.hosh.spi.Channel;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.jline.terminal.Attributes;
@@ -82,7 +83,7 @@ public class TerminalModuleTest {
 			sut.run(Arrays.asList("asd"), in, out, err);
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("no parameters expected")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
 			then(err).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}
@@ -117,7 +118,7 @@ public class TerminalModuleTest {
 			sut.run(Arrays.asList("asd"), in, out, err);
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of("error", Values.ofText("no parameters expected")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
 			then(err).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}

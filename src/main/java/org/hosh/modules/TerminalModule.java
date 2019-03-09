@@ -29,6 +29,7 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.TerminalAware;
@@ -57,12 +58,12 @@ public class TerminalModule implements Module {
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			Attributes attributes = terminal.getAttributes();
 			out.send(Record.builder()
-					.entry("type", Values.ofText(terminal.getType()))
-					.entry("lflags", Values.ofText(attributes.getLocalFlags().toString()))
-					.entry("iflags", Values.ofText(attributes.getInputFlags().toString()))
-					.entry("oflags", Values.ofText(attributes.getOutputFlags().toString()))
-					.entry("cflags", Values.ofText(attributes.getControlFlags().toString()))
-					.entry("cchars", Values.ofText(attributes.getControlChars().toString()))
+					.entry(Keys.of("type"), Values.ofText(terminal.getType()))
+					.entry(Keys.of("lflags"), Values.ofText(attributes.getLocalFlags().toString()))
+					.entry(Keys.of("iflags"), Values.ofText(attributes.getInputFlags().toString()))
+					.entry(Keys.of("oflags"), Values.ofText(attributes.getOutputFlags().toString()))
+					.entry(Keys.of("cflags"), Values.ofText(attributes.getControlFlags().toString()))
+					.entry(Keys.of("cchars"), Values.ofText(attributes.getControlChars().toString()))
 					.build());
 			return ExitStatus.success();
 		}
@@ -79,7 +80,7 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of("error", Values.ofText("no parameters expected")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
 				return ExitStatus.error();
 			}
 			terminal.puts(InfoCmp.Capability.clear_screen);
@@ -99,7 +100,7 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of("error", Values.ofText("no parameters expected")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
 				return ExitStatus.error();
 			}
 			terminal.puts(InfoCmp.Capability.bell);

@@ -33,11 +33,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Key;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
@@ -67,7 +70,7 @@ public class SystemModule implements Module {
 	public static class Echo implements Command {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			Record record = Record.of("text", Values.ofText(String.join(" ", args)));
+			Record record = Record.of(Keys.VALUE, Values.ofText(String.join(" ", args)));
 			out.send(record);
 			return ExitStatus.success();
 		}
@@ -84,14 +87,14 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of("error", Values.ofText("expecting no parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 				return ExitStatus.error();
 			}
 			Map<String, String> env = state.getVariables();
 			for (Map.Entry<String, String> entry : env.entrySet()) {
 				Record record = Record.builder()
-						.entry("key", Values.ofText(entry.getKey()))
-						.entry("value", Values.ofText(entry.getValue()))
+						.entry(Keys.NAME, Values.ofText(entry.getKey()))
+						.entry(Keys.VALUE, Values.ofText(entry.getValue()))
 						.build();
 				out.send(record);
 			}
@@ -120,11 +123,11 @@ public class SystemModule implements Module {
 						state.setExit(true);
 						return exitStatus.get();
 					} else {
-						err.send(Record.of("error", Values.ofText("not a valid exit status: " + arg)));
+						err.send(Record.of(Keys.ERROR, Values.ofText("not a valid exit status: " + arg)));
 						return ExitStatus.error();
 					}
 				default:
-					err.send(Record.of("error", Values.ofText("too many parameters")));
+					err.send(Record.of(Keys.ERROR, Values.ofText("too many parameters")));
 					return ExitStatus.error();
 			}
 		}
@@ -141,12 +144,12 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of("error", Values.ofText("expecting no parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 				return ExitStatus.error();
 			}
 			Set<String> commands = state.getCommands().keySet();
 			for (String command : commands) {
-				out.send(Record.of("command", Values.ofText(command)));
+				out.send(Record.of(Keys.of("command"), Values.ofText(command)));
 			}
 			return ExitStatus.success();
 		}
@@ -156,7 +159,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expecting just one argument millis")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting just one argument millis")));
 				return ExitStatus.error();
 			}
 			String arg = args.get(0);
@@ -164,11 +167,11 @@ public class SystemModule implements Module {
 				Thread.sleep(Long.parseLong(arg));
 				return ExitStatus.success();
 			} catch (NumberFormatException e) {
-				err.send(Record.of("error", Values.ofText("not millis: " + arg)));
+				err.send(Record.of(Keys.ERROR, Values.ofText("not millis: " + arg)));
 				return ExitStatus.error();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				err.send(Record.of("error", Values.ofText("interrupted")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("interrupted")));
 				return ExitStatus.error();
 			}
 		}
@@ -184,7 +187,7 @@ public class SystemModule implements Module {
 		public void after(Long startNanos, Channel in, Channel out, Channel err) {
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
-			out.send(Record.of("message", Values.ofDuration(duration)));
+			out.send(Record.of(Keys.MESSAGE, Values.ofDuration(duration)));
 		}
 	}
 
@@ -192,17 +195,17 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of("error", Values.ofText("expecting zero arguments")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting zero arguments")));
 				return ExitStatus.error();
 			}
 			ProcessHandle.allProcesses().forEach(process -> {
 				Info info = process.info();
 				Record result = Record.builder()
-						.entry("pid", Values.ofNumeric(process.pid()))
-						.entry("user", Values.ofText(info.user().orElse("-")))
-						.entry("start", Values.ofText(info.startInstant().map(Instant::toString).orElse("-")))
-						.entry("command", Values.ofText(info.command().orElse("-")))
-						.entry("arguments", Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
+						.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
+						.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
+						.entry(Keys.of("start"), Values.ofText(info.startInstant().map(Instant::toString).orElse("-")))
+						.entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
+						.entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
 						.build();
 				out.send(result);
 			});
@@ -214,24 +217,24 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expecting one argument")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
 			try {
 				long pid = Long.parseLong(args.get(0));
 				Optional<ProcessHandle> process = ProcessHandle.of(pid);
 				if (process.isEmpty()) {
-					err.send(Record.of("error", Values.ofText("cannot find pid: " + pid)));
+					err.send(Record.of(Keys.ERROR, Values.ofText("cannot find pid: " + pid)));
 					return ExitStatus.error();
 				}
 				boolean destroyed = process.get().destroy();
 				if (!destroyed) {
-					err.send(Record.of("error", Values.ofText("cannot destroy pid: " + pid)));
+					err.send(Record.of(Keys.ERROR, Values.ofText("cannot destroy pid: " + pid)));
 					return ExitStatus.error();
 				}
 				return ExitStatus.success();
 			} catch (NumberFormatException e) {
-				err.send(Record.of("error", Values.ofText("not a valid pid: " + args.get(0))));
+				err.send(Record.of(Keys.ERROR, Values.ofText("not a valid pid: " + args.get(0))));
 				return ExitStatus.error();
 			}
 		}
@@ -245,6 +248,10 @@ public class SystemModule implements Module {
 	}
 
 	public static class Benchmark implements CommandWrapper<SystemModule.Benchmark.Accumulator> {
+		public static final Key BEST = Keys.of("best");
+		public static final Key WORST = Keys.of("worst");
+		public static final Key AVERAGE = Keys.of("avg");
+
 		@Override
 		public Accumulator before(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
@@ -261,6 +268,7 @@ public class SystemModule implements Module {
 			return accumulator;
 		}
 
+		@Todo(description = "remove COUNT key")
 		@Override
 		public void after(Accumulator resource, Channel in, Channel out, Channel err) {
 			Duration best = resource.results.stream().min(Comparator.naturalOrder()).orElse(Duration.ZERO);
@@ -268,10 +276,10 @@ public class SystemModule implements Module {
 			int runs = resource.results.size();
 			Duration avg = runs == 0 ? Duration.ZERO : resource.results.stream().reduce(Duration.ZERO, (acc, d) -> acc.plus(d)).dividedBy(runs);
 			out.send(Record.builder()
-					.entry("count", Values.ofNumeric(runs))
-					.entry("best", Values.ofDuration(best))
-					.entry("worst", Values.ofDuration(worst))
-					.entry("avg", Values.ofDuration(avg))
+					.entry(Keys.COUNT, Values.ofNumeric(runs))
+					.entry(BEST, Values.ofDuration(best))
+					.entry(WORST, Values.ofDuration(worst))
+					.entry(AVERAGE, Values.ofDuration(avg))
 					.build());
 		}
 
@@ -309,7 +317,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			while (true) {
-				out.send(Record.of("source", Values.ofText("test value")));
+				out.send(Record.of(Keys.VALUE, Values.ofText("test value")));
 			}
 		}
 	}
@@ -338,7 +346,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of("message", Values.ofText("requires 2 arguments: key value")));
+				err.send(Record.of(Keys.MESSAGE, Values.ofText("requires 2 arguments: key value")));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
@@ -359,7 +367,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("message", Values.ofText("requires 1 argument: key")));
+				err.send(Record.of(Keys.MESSAGE, Values.ofText("requires 1 argument: key")));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);

@@ -42,6 +42,7 @@ import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
@@ -139,7 +140,7 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
-		then(err).should().send(Record.of("error", Values.ofText("(no message provided)")));
+		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("(no message provided)")));
 	}
 
 	@Test
@@ -151,7 +152,7 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
-		then(err).should().send(Record.of("error", Values.ofText("simulated error")));
+		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("simulated error")));
 	}
 
 	@Test

@@ -36,10 +36,12 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
@@ -70,7 +72,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() > 1) {
-				err.send(Record.of("message", Values.ofText("expected at most 1 argument")));
+				err.send(Record.of(Keys.MESSAGE, Values.ofText("expected at most 1 argument")));
 				return ExitStatus.error();
 			}
 			final Path cwd = state.getCwd();
@@ -92,17 +94,17 @@ public class FileSystemModule implements Module {
 				for (Path path : stream) {
 					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
 					Record entry = Record.builder()
-							.entry("path", Values.ofLocalPath(path.getFileName()))
-							.entry("size", size)
+							.entry(Keys.PATH, Values.ofLocalPath(path.getFileName()))
+							.entry(Keys.SIZE, size)
 							.build();
 					out.send(entry);
 				}
 				return ExitStatus.success();
 			} catch (NotDirectoryException e) {
-				err.send(Record.of("error", Values.ofText("not a directory: " + e.getMessage())));
+				err.send(Record.of(Keys.ERROR, Values.ofText("not a directory: " + e.getMessage())));
 				return ExitStatus.error();
 			} catch (IOException e) {
-				err.send(Record.of("error", Values.ofText("error: " + e.getMessage())));
+				err.send(Record.of(Keys.ERROR, Values.ofText("error: " + e.getMessage())));
 				return ExitStatus.error();
 			}
 		}
@@ -119,10 +121,10 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of("error", Values.ofText("expecting no parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 				return ExitStatus.error();
 			}
-			out.send(Record.of("cwd", Values.ofLocalPath(state.getCwd())));
+			out.send(Record.of(Keys.PATH, Values.ofLocalPath(state.getCwd())));
 			return ExitStatus.success();
 		}
 	}
@@ -139,7 +141,7 @@ public class FileSystemModule implements Module {
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			switch (args.size()) {
 				case 0:
-					err.send(Record.of("error", Values.ofText("missing path argument")));
+					err.send(Record.of(Keys.ERROR, Values.ofText("missing path argument")));
 					return ExitStatus.error();
 				case 1:
 					Path arg = Paths.get(args.get(0));
@@ -153,11 +155,11 @@ public class FileSystemModule implements Module {
 						state.setCwd(newCwd);
 						return ExitStatus.success();
 					} else {
-						err.send(Record.of("error", Values.ofText("not a directory")));
+						err.send(Record.of(Keys.ERROR, Values.ofText("not a directory")));
 						return ExitStatus.error();
 					}
 				default:
-					err.send(Record.of("error", Values.ofText("expecting one path argument")));
+					err.send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
 					return ExitStatus.error();
 			}
 		}
@@ -183,20 +185,21 @@ public class FileSystemModule implements Module {
 						readLines(path, out, err);
 						return ExitStatus.success();
 					} else {
-						err.send(Record.of("error", Values.ofText("not readable file")));
+						err.send(Record.of(Keys.ERROR, Values.ofText("not readable file")));
 						return ExitStatus.error();
 					}
 				default:
-					err.send(Record.of("error", Values.ofText("expecting one path argument")));
+					err.send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
 					return ExitStatus.error();
 			}
 		}
 
+		@Todo(description = "throw exception instead of sending record")
 		private void readLines(Path path, Channel out, Channel err) {
 			try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-				lines.forEach(line -> out.send(Record.of("line", Values.ofText(line))));
+				lines.forEach(line -> out.send(Record.of(Keys.LINE, Values.ofText(line))));
 			} catch (IOException e) {
-				err.send(Record.of("exception", Values.ofText(e.getMessage())));
+				err.send(Record.of(Keys.of("exception"), Values.ofText(e.getMessage())));
 			}
 		}
 	}
@@ -213,7 +216,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expecting one argument")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
 			final Path arg = Path.of(args.get(0));
@@ -228,15 +231,15 @@ public class FileSystemModule implements Module {
 			LOGGER.fine(() -> String.format("resolved '%s'", realStart));
 			try (Stream<Path> stream = Files.walk(realStart)) {
 				stream.forEach(path -> {
-					Record result = Record.of("path", Values.ofLocalPath(path.toAbsolutePath()));
+					Record result = Record.of(Keys.PATH, Values.ofLocalPath(path.toAbsolutePath()));
 					out.send(result);
 				});
 				return ExitStatus.success();
 			} catch (NoSuchFileException e) {
-				err.send(Record.of("error", Values.ofText("path does not exist: " + e.getFile())));
+				err.send(Record.of(Keys.ERROR, Values.ofText("path does not exist: " + e.getFile())));
 				return ExitStatus.error();
 			} catch (IOException e) {
-				err.send(Record.of("error", Values.ofText(e.getMessage())));
+				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
 				return ExitStatus.error();
 			}
 		}

@@ -36,6 +36,7 @@ import org.hosh.runtime.PipelineChannel.ProducerPoisonPill;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.junit.Before;
@@ -118,7 +119,7 @@ public class PipelineCommandTest {
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
+		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("simulated exception")));
 	}
 
 	@Test
@@ -130,7 +131,7 @@ public class PipelineCommandTest {
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Record.of("error", Values.ofText("simulated exception")));
+		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("simulated exception")));
 	}
 
 	@Test

@@ -37,8 +37,8 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 public class RecordTest {
 	@Test
 	public void copy() {
-		Record a = Record.of("key", Values.ofText("a"));
-		Record b = Record.of("key", Values.ofText("a"));
+		Record a = Record.of(Keys.NAME, Values.ofText("a"));
+		Record b = Record.of(Keys.NAME, Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
 		assertThat(a).hasSameHashCodeAs(b);
 		assertThat(a.toString()).isEqualTo(b.toString());
@@ -48,7 +48,7 @@ public class RecordTest {
 	public void valueObject() {
 		Record a = Record.empty();
 		Record b = a;
-		Record c = a.append("test", Values.ofText("a"));
+		Record c = a.append(Keys.NAME, Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
 		assertThat(a).isNotEqualTo(c);
 		assertThat(b).isNotEqualTo(c);
@@ -57,7 +57,7 @@ public class RecordTest {
 	@Test
 	public void mutation() {
 		Record a = Record.empty();
-		Record b = Record.of("key", Values.ofText("a"));
+		Record b = Record.of(Keys.NAME, Values.ofText("a"));
 		assertThat(a).isNotEqualTo(b);
 		assertThat(a).isNotSameAs(b);
 	}
@@ -66,10 +66,10 @@ public class RecordTest {
 	public void representation() {
 		Record a = Record.empty();
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
-		Record b = a.append("size", Values.ofHumanizedSize(10));
-		assertThat(b.toString()).isEqualTo("Record[data={size=Size[10B]}]");
-		Record c = b.append("links", Values.ofNumeric(1));
-		assertThat(c.toString()).isEqualTo("Record[data={size=Size[10B], links=Numeric[1]}]");
+		Record b = a.append(Keys.SIZE, Values.ofHumanizedSize(10));
+		assertThat(b.toString()).isEqualTo("Record[data={Key[size]=Size[10B]}]");
+		Record c = b.append(Keys.NAME, Values.ofText("foo"));
+		assertThat(c.toString()).isEqualTo("Record[data={Key[size]=Size[10B], Key[name]=Text[foo]}]");
 	}
 
 	@Test
@@ -78,11 +78,11 @@ public class RecordTest {
 		Value anotherValue = Values.ofText("another_value");
 		Value lastValue = Values.ofText("lastValue");
 		Record a = Record.empty()
-				.append("key", value)
-				.append("another_key", anotherValue)
-				.prepend("first", value)
-				.append("last", lastValue);
-		assertThat(a.keys()).containsExactly("first", "key", "another_key", "last");
+				.append(Keys.of("key"), value)
+				.append(Keys.of("another_key"), anotherValue)
+				.prepend(Keys.of("first"), value)
+				.append(Keys.of("last"), lastValue);
+		assertThat(a.keys()).containsExactly(Keys.of("first"), Keys.of("key"), Keys.of("another_key"), Keys.of("last"));
 		assertThat(a.values()).containsExactly(value, value, anotherValue, lastValue);
 	}
 
@@ -97,23 +97,19 @@ public class RecordTest {
 	@Test
 	public void value() {
 		Record record = Record.empty();
-		assertThat(record.value("some key")).isEmpty();
-		record = record.append("some key", Values.none());
-		assertThat(record.value("some key")).isNotEmpty().contains(Values.none());
-		assertThat(record.value("missing key")).isEmpty();
-		record = record.append("another key", Values.none());
-		assertThat(record.value("some key")).isNotEmpty().contains(Values.none());
-		assertThat(record.value("another key")).isNotEmpty().contains(Values.none());
+		assertThat(record.value(Keys.NAME)).isEmpty();
+		record = record.append(Keys.NAME, Values.none());
+		assertThat(record.value(Keys.NAME)).isNotEmpty().contains(Values.none());
 	}
 
 	@Test
 	public void instanceIsDetachedFromBuilder() {
 		Builder builder = Record.builder();
-		builder.entry("key", Values.none());
+		builder.entry(Keys.NAME, Values.none());
 		Record record = builder.build();
-		builder.entry("another_key", Values.none());
-		assertThat(record.value("key")).isPresent();
-		assertThat(record.value("another_key")).isEmpty();
+		builder.entry(Keys.COUNT, Values.none()); // please note that this has been added after build()
+		assertThat(record.value(Keys.NAME)).isPresent();
+		assertThat(record.value(Keys.COUNT)).isEmpty();
 	}
 
 	@Test
@@ -126,25 +122,25 @@ public class RecordTest {
 
 	@Test
 	public void singleton() {
-		Record a = Record.of("key", Values.none());
-		assertThat(a.keys()).containsExactly("key");
+		Record a = Record.of(Keys.NAME, Values.none());
+		assertThat(a.keys()).containsExactly(Keys.NAME);
 		assertThat(a.values()).containsExactly(Values.none());
-		assertThat(a.entries()).containsExactly(new Entry("key", Values.none()));
+		assertThat(a.entries()).containsExactly(new Entry(Keys.NAME, Values.none()));
 	}
 
 	@Test
 	public void generic() {
-		Record a = Record.of("key", Values.none()).prepend("aaa", Values.none());
-		assertThat(a.keys()).containsExactly("aaa", "key");
+		Record a = Record.of(Keys.NAME, Values.none()).prepend(Keys.COUNT, Values.none());
+		assertThat(a.keys()).containsExactly(Keys.COUNT, Keys.NAME);
 		assertThat(a.values()).containsExactly(Values.none(), Values.none());
-		assertThat(a.entries()).containsExactly(new Entry("aaa", Values.none()), new Entry("key", Values.none()));
+		assertThat(a.entries()).containsExactly(new Entry(Keys.COUNT, Values.none()), new Entry(Keys.NAME, Values.none()));
 	}
 
 	@Test
 	public void entry() {
-		Entry entry = new Entry("key", Values.none());
-		assertThat(entry).hasToString("Entry[key=key,value=None]");
-		assertThat(entry.getKey()).isEqualTo("key");
+		Entry entry = new Entry(Keys.NAME, Values.none());
+		assertThat(entry).hasToString("Entry[key=Key[name],value=None]");
+		assertThat(entry.getKey()).isEqualTo(Keys.NAME);
 		assertThat(entry.getValue()).isEqualTo(Values.none());
 	}
 }

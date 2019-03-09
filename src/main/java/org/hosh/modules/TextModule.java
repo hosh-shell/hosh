@@ -45,6 +45,8 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Key;
+import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
@@ -71,7 +73,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -80,7 +82,8 @@ public class TextModule implements Module {
 					return ExitStatus.success();
 				}
 				Record record = incoming.get();
-				out.send(Record.of("keys", Values.ofText(record.keys().toString())));
+				String schema = record.keys().stream().map(Key::name).collect(Collectors.joining(" "));
+				out.send(Record.of(Keys.of("schema"), Values.ofText(schema)));
 			}
 		}
 	}
@@ -89,7 +92,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of("error", Values.ofText("expected 2 parameters: key regex")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters: key regex")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -97,7 +100,7 @@ public class TextModule implements Module {
 				if (incoming.isEmpty()) {
 					return ExitStatus.success();
 				}
-				String key = args.get(0);
+				Key key = Keys.of(args.get(0));
 				String regex = args.get(1);
 				Record record = incoming.get();
 				Optional<Value> value = record.value(key);
@@ -112,7 +115,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
 			long i = 1;
@@ -122,7 +125,7 @@ public class TextModule implements Module {
 					return ExitStatus.success();
 				}
 				Record record = incoming.get();
-				out.send(record.prepend("index", Values.ofNumeric(i++)));
+				out.send(record.prepend(Keys.INDEX, Values.ofNumeric(i++)));
 			}
 		}
 	}
@@ -132,11 +135,11 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
-			String key = args.get(0);
+			Key key = Keys.of(args.get(0));
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
@@ -159,11 +162,11 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
-			String key = args.get(0);
+			Key key = Keys.of(args.get(0));
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
@@ -185,10 +188,10 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expected 1 parameter: key")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
 			}
-			String key = args.get(0);
+			Key key = Keys.of(args.get(0));
 			List<Record> records = new ArrayList<>();
 			accumulate(in, records);
 			sortBy(key, records);
@@ -207,7 +210,7 @@ public class TextModule implements Module {
 			}
 		}
 
-		private void sortBy(String key, List<Record> records) {
+		private void sortBy(Key key, List<Record> records) {
 			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key).orElse(null),
 					Comparator.nullsFirst(Comparator.naturalOrder()));
 			records.sort(comparator);
@@ -225,7 +228,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expected 1 parameter")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
 			}
 			int take = Integer.parseInt(args.get(0));
@@ -250,7 +253,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of("error", Values.ofText("expected 1 parameter")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
 			}
 			int drop = Integer.parseInt(args.get(0));
@@ -278,7 +281,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
 			SecureRandom secureRandom;
@@ -286,12 +289,12 @@ public class TextModule implements Module {
 				secureRandom = SecureRandom.getInstanceStrong();
 			} catch (NoSuchAlgorithmException e) {
 				LOGGER.log(Level.SEVERE, "failed to get SecureRandom instance", e);
-				err.send(Record.of("error", Values.ofText(e.getMessage())));
+				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
 				return ExitStatus.error();
 			}
 			while (true) {
 				long next = secureRandom.nextLong();
-				Record of = Record.of("value", Values.ofNumeric(next));
+				Record of = Record.of(Keys.RAND, Values.ofNumeric(next));
 				out.send(of);
 			}
 		}
@@ -301,14 +304,14 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
 			long count = 0;
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					out.send(Record.of("count", Values.ofNumeric(count)));
+					out.send(Record.of(Keys.COUNT, Values.ofNumeric(count)));
 					return ExitStatus.success();
 				} else {
 					count++;
@@ -321,7 +324,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of("error", Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
 			boolean headerSent = false;
@@ -353,22 +356,22 @@ public class TextModule implements Module {
 				formattedValues.add(writer.toString());
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
-			out.send(Record.of("row", Values.ofText(row)));
+			out.send(Record.of(Keys.of("row"), Values.ofText(row)));
 		}
 
-		private String formatterFor(String key) {
+		private String formatterFor(Key key) {
 			return String.format("%%-%ds", paddings.getOrDefault(key, 10));
 		}
 
-		private void sendHeader(Collection<String> keys, Channel out) {
+		private void sendHeader(Collection<Key> keys, Channel out) {
 			Locale locale = Locale.getDefault();
 			String format = keys.stream()
 					.map(this::formatterFor)
 					.collect(Collectors.joining(" "));
-			String header = String.format(locale, format, keys.toArray());
-			out.send(Record.of("header", Values.ofText(header)));
+			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
+			out.send(Record.of(Keys.of("header"), Values.ofText(header)));
 		}
 
-		private final Map<String, Integer> paddings = Map.of("path", 30, "size", 5);
+		private final Map<Key, Integer> paddings = Map.of(Keys.PATH, 30, Keys.SIZE, 5);
 	}
 }

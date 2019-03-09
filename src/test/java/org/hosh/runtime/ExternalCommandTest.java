@@ -43,6 +43,7 @@ import java.util.Optional;
 import org.hosh.runtime.ExternalCommand.ProcessFactory;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
@@ -168,7 +169,7 @@ public class ExternalCommandTest {
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), in, out, err);
-		then(out).should().send(Record.of("line", Values.ofText("test")));
+		then(out).should().send(Record.of(Keys.LINE, Values.ofText("test")));
 		then(err).shouldHaveZeroInteractions();
 	}
 
@@ -183,7 +184,7 @@ public class ExternalCommandTest {
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Record.of("line", Values.ofText("test")));
+		then(err).should().send(Record.of(Keys.LINE, Values.ofText("test")));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -191,7 +192,7 @@ public class ExternalCommandTest {
 	public void processRecordsFromIn() throws Exception {
 		ByteArrayOutputStream value = new ByteArrayOutputStream();
 		given(in.recv()).willReturn(
-				Optional.of(Record.builder().entry("name", Values.ofText("aaa")).entry("size", Values.ofNumeric(10)).build()),
+				Optional.of(Record.builder().entry(Keys.PATH, Values.ofText("aaa")).entry(Keys.SIZE, Values.ofNumeric(10)).build()),
 				Optional.empty());
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
@@ -213,6 +214,6 @@ public class ExternalCommandTest {
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Record.of("error", Values.ofText("simulated error")));
+		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("simulated error")));
 	}
 }

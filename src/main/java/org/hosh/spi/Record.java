@@ -39,26 +39,26 @@ public interface Record {
 	/**
 	 * Yields a new Record with the specified mapping as last one.
 	 */
-	Record append(String key, Value value);
+	Record append(Key key, Value value);
 
 	/**
 	 * Yields a new Record with the specified mapping as first one.
 	 */
-	Record prepend(String key, Value value);
+	Record prepend(Key key, Value value);
 
-	List<String> keys();
+	List<Key> keys();
 
 	List<Value> values();
 
 	List<Entry> entries();
 
-	Optional<Value> value(String key);
+	Optional<Value> value(Key key);
 
 	static Record empty() {
 		return new Record.Empty();
 	}
 
-	static Record of(String key, Value value) {
+	static Record of(Key key, Value value) {
 		return new Record.Singleton(key, value);
 	}
 
@@ -67,15 +67,15 @@ public interface Record {
 	}
 
 	class Entry {
-		private final String key;
+		private final Key key;
 		private final Value value;
 
-		public Entry(String key, Value value) {
+		public Entry(Key key, Value value) {
 			this.key = key;
 			this.value = value;
 		}
 
-		public String getKey() {
+		public Key getKey() {
 			return key;
 		}
 
@@ -106,7 +106,7 @@ public interface Record {
 
 	class Empty implements Record {
 		@Override
-		public List<String> keys() {
+		public List<Key> keys() {
 			return Collections.emptyList();
 		}
 
@@ -121,17 +121,17 @@ public interface Record {
 		}
 
 		@Override
-		public Record append(String key, Value value) {
+		public Record append(Key key, Value value) {
 			return new Singleton(key, value);
 		}
 
 		@Override
-		public Record prepend(String key, Value value) {
+		public Record prepend(Key key, Value value) {
 			return new Singleton(key, value);
 		}
 
 		@Override
-		public Optional<Value> value(String key) {
+		public Optional<Value> value(Key key) {
 			return Optional.empty();
 		}
 
@@ -152,16 +152,16 @@ public interface Record {
 	}
 
 	static class Singleton implements Record {
-		private final String key;
+		private final Key key;
 		private final Value value;
 
-		public Singleton(String key, Value value) {
+		public Singleton(Key key, Value value) {
 			this.key = key;
 			this.value = value;
 		}
 
 		@Override
-		public List<String> keys() {
+		public List<Key> keys() {
 			return Collections.singletonList(key);
 		}
 
@@ -176,7 +176,7 @@ public interface Record {
 		}
 
 		@Override
-		public Record append(String newKey, Value newValue) {
+		public Record append(Key newKey, Value newValue) {
 			return new Builder()
 					.entry(this.key, this.value)
 					.entry(newKey, newValue)
@@ -184,7 +184,7 @@ public interface Record {
 		}
 
 		@Override
-		public Record prepend(String newKey, Value newValue) {
+		public Record prepend(Key newKey, Value newValue) {
 			return new Builder()
 					.entry(newKey, newValue)
 					.entry(this.key, this.value)
@@ -192,7 +192,7 @@ public interface Record {
 		}
 
 		@Override
-		public Optional<Value> value(String wantedKey) {
+		public Optional<Value> value(Key wantedKey) {
 			if (Objects.equals(this.key, wantedKey)) {
 				return Optional.of(value);
 			} else {
@@ -222,30 +222,30 @@ public interface Record {
 	}
 
 	static class Generic implements Record {
-		private final Map<String, Value> data;
+		private final Map<Key, Value> data;
 
-		private Generic(Map<String, Value> data) {
+		private Generic(Map<Key, Value> data) {
 			this.data = data;
 		}
 
 		@Override
-		public Record append(String key, Value value) {
-			Map<String, Value> copy = new LinkedHashMap<>(data.size() + 1);
+		public Record append(Key key, Value value) {
+			Map<Key, Value> copy = new LinkedHashMap<>(data.size() + 1);
 			copy.putAll(this.data);
 			copy.put(key, value);
 			return new Generic(copy);
 		}
 
 		@Override
-		public Record prepend(String key, Value value) {
-			Map<String, Value> copy = new LinkedHashMap<>(data.size() + 1);
+		public Record prepend(Key key, Value value) {
+			Map<Key, Value> copy = new LinkedHashMap<>(data.size() + 1);
 			copy.put(key, value);
 			copy.putAll(this.data);
 			return new Generic(copy);
 		}
 
 		@Override
-		public List<String> keys() {
+		public List<Key> keys() {
 			return data
 					.keySet()
 					.stream()
@@ -270,7 +270,7 @@ public interface Record {
 		}
 
 		@Override
-		public Optional<Value> value(String key) {
+		public Optional<Value> value(Key key) {
 			return Optional.ofNullable(data.get(key));
 		}
 
@@ -299,12 +299,12 @@ public interface Record {
 	 * Mutable builder of Record objects. Retains insertion order.
 	 */
 	class Builder {
-		private final LinkedHashMap<String, Value> data = new LinkedHashMap<>(2);
+		private final LinkedHashMap<Key, Value> data = new LinkedHashMap<>(2);
 
 		private Builder() {
 		}
 
-		public Builder entry(String key, Value value) {
+		public Builder entry(Key key, Value value) {
 			data.put(key, value);
 			return this;
 		}

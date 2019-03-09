@@ -31,6 +31,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.logging.Logger;
 
 import org.hosh.spi.Channel;
+import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
@@ -39,7 +40,7 @@ public class PipelineChannel implements Channel {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private static final boolean QUEUE_FAIRNESS = false;
 	private static final int QUEUE_CAPACITY = 100;
-	private final Record poisonPill = Record.of("__POISON_PILL__", Values.none());
+	private final Record poisonPill = Record.of(Keys.of("__POISON_PILL__"), Values.none());
 	private final BlockingQueue<Record> queue;
 	private volatile boolean done;
 
