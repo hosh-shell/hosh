@@ -213,29 +213,41 @@ public class SystemModule implements Module {
 	}
 
 	public static class KillProcess implements Command {
+		/**
+		 * Allows unit testing by breaking hard dependency to ProcessHandle.
+		 */
+		public interface ProcessLookup {
+			Optional<ProcessHandle> of(long pid);
+		}
+
+		private ProcessLookup processLookup = ProcessHandle::of;
+
+		public void setProcessLookup(ProcessLookup processLookup) {
+			this.processLookup = processLookup;
+		}
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
-			try {
-				long pid = Long.parseLong(args.get(0));
-				Optional<ProcessHandle> process = ProcessHandle.of(pid);
-				if (process.isEmpty()) {
-					err.send(Record.of(Keys.ERROR, Values.ofText("cannot find pid: " + pid)));
-					return ExitStatus.error();
-				}
-				boolean destroyed = process.get().destroy();
-				if (!destroyed) {
-					err.send(Record.of(Keys.ERROR, Values.ofText("cannot destroy pid: " + pid)));
-					return ExitStatus.error();
-				}
-				return ExitStatus.success();
-			} catch (NumberFormatException e) {
+			if (!args.get(0).matches("[0-9]+")) {
 				err.send(Record.of(Keys.ERROR, Values.ofText("not a valid pid: " + args.get(0))));
 				return ExitStatus.error();
 			}
+			long pid = Long.parseLong(args.get(0));
+			Optional<ProcessHandle> process = processLookup.of(pid);
+			if (process.isEmpty()) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("cannot find pid: " + pid)));
+				return ExitStatus.error();
+			}
+			boolean destroyed = process.get().destroy();
+			if (!destroyed) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("cannot destroy pid: " + pid)));
+				return ExitStatus.error();
+			}
+			return ExitStatus.success();
 		}
 	}
 

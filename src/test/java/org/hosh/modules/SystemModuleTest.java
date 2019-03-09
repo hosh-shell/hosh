@@ -41,6 +41,8 @@ import org.hosh.modules.SystemModule.Env;
 import org.hosh.modules.SystemModule.Err;
 import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
+import org.hosh.modules.SystemModule.KillProcess;
+import org.hosh.modules.SystemModule.KillProcess.ProcessLookup;
 import org.hosh.modules.SystemModule.ProcessList;
 import org.hosh.modules.SystemModule.SetVariable;
 import org.hosh.modules.SystemModule.Sink;
@@ -84,6 +86,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.SinkTest.class,
 		SystemModuleTest.SetVariableTest.class,
 		SystemModuleTest.UnsetVariableTest.class,
+		SystemModuleTest.KillProcessTest.class,
 })
 public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -597,6 +600,72 @@ public class SystemModuleTest {
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 			assertThat(state.getVariables()).doesNotContainKey("FOO");
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class KillProcessTest {
+		@Mock(stubOnly = true)
+		private ProcessHandle processHandle;
+		@Mock(stubOnly = true)
+		private ProcessLookup processLookup;
+		@Mock
+		private Channel in;
+		@Mock
+		private Channel out;
+		@Mock
+		private Channel err;
+		@InjectMocks
+		private KillProcess sut;
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
+		}
+
+		@Test
+		public void nonNumericPid() {
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a valid pid: FOO")));
+		}
+
+		@Test
+		public void numericPidOfNotExistingProcess() {
+			given(processLookup.of(42L)).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("cannot find pid: 42")));
+		}
+
+		@Test
+		public void numericPidOfExistingProcessWithDestroyFailure() {
+			given(processLookup.of(42L)).willReturn(Optional.of(processHandle));
+			given(processHandle.destroy()).willReturn(false);
+			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isFalse();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("cannot destroy pid: 42")));
+		}
+
+		@Test
+		public void numericPidOfExistingProcessWithDestroySuccess() {
+			given(processLookup.of(42L)).willReturn(Optional.of(processHandle));
+			given(processHandle.destroy()).willReturn(true);
+			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
+			assertThat(exitStatus.isSuccess()).isTrue();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
 		}
 	}
 }
