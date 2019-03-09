@@ -31,8 +31,12 @@ import org.jline.reader.Candidate;
  * {@link Candidate} as value object
  */
 public class DebuggableCandidate extends Candidate {
+	public DebuggableCandidate(String value, boolean complete) {
+		super(value, value, null, null, null, null, complete);
+	}
+
 	public DebuggableCandidate(String value) {
-		super(value);
+		this(value, true);
 	}
 
 	@Override

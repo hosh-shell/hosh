@@ -23,13 +23,13 @@
  */
 package org.hosh.runtime;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
@@ -57,7 +57,9 @@ public class FileSystemCompleter implements Completer {
 
 	private void tryComplete(ParsedLine line, List<Candidate> candidates) throws IOException {
 		Path path = Paths.get(line.word());
-		if (path.isAbsolute()) {
+		if (line.word().endsWith(File.separator)) {
+			listCandidates(path, Path::toAbsolutePath, candidates);
+		} else if (path.isAbsolute()) {
 			listCandidates(parent(path), Path::toAbsolutePath, candidates);
 		} else {
 			listCandidates(state.getCwd(), Path::getFileName, candidates);
@@ -69,13 +71,20 @@ public class FileSystemCompleter implements Completer {
 		return path.getParent() == null ? path : path.getParent();
 	}
 
-	private void listCandidates(Path dir, UnaryOperator<Path> toCandidate, List<Candidate> candidates) throws IOException {
+	private void listCandidates(Path dir, UnaryOperator<Path> toPath, List<Candidate> candidates) throws IOException {
 		try (Stream<Path> list = Files.list(dir)) {
 			list
-					.map(toCandidate)
-					.map(Objects::toString)
-					.map(DebuggableCandidate::new)
+					.map(toPath)
+					.map(this::toCandidate)
 					.forEach(candidates::add);
+		}
+	}
+
+	private DebuggableCandidate toCandidate(Path path) {
+		if (Files.isDirectory(path)) {
+			return new DebuggableCandidate(path.toString() + File.separator, false);
+		} else {
+			return new DebuggableCandidate(path.toString());
 		}
 	}
 }
