@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -250,7 +249,7 @@ public class SystemModule implements Module {
 	public static class Benchmark implements CommandWrapper<SystemModule.Benchmark.Accumulator> {
 		public static final Key BEST = Keys.of("best");
 		public static final Key WORST = Keys.of("worst");
-		public static final Key AVERAGE = Keys.of("avg");
+		public static final Key AVERAGE = Keys.of("average");
 
 		@Override
 		public Accumulator before(List<String> args, Channel in, Channel out, Channel err) {
@@ -268,7 +267,6 @@ public class SystemModule implements Module {
 			return accumulator;
 		}
 
-		@Todo(description = "remove COUNT key")
 		@Override
 		public void after(Accumulator resource, Channel in, Channel out, Channel err) {
 			Duration best = resource.results.stream().min(Comparator.naturalOrder()).orElse(Duration.ZERO);
