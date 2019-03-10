@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - new text commands: 'distinct' and 'duplicated'
 - autocompletion of variable expansion, triggered by '${'
 - improved autocompletion of directories
+- introducing docker support
 
 ## [0.0.25] - 2019-03-01
 - support for 'PATHEXT' in Windows

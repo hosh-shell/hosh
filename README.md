@@ -42,6 +42,15 @@ Java 11
 
 `$ HOSH_LOG_LEVEL=debug java -jar target/dist/hosh.jar`
 
+## Docker support
+
+Preliminary docker support (openjdk:11-jre-slim-stretch):
+
+` ./mvnw -Pdocker clean package`
+`docker image ls hosh`
+`docker run -it  docker run -it $IMAGE`
+
+
 ## Eclipse support
 
 Project specific settings can be found under `./eclipse` directory.
