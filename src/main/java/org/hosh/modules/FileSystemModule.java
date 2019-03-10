@@ -140,29 +140,23 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			switch (args.size()) {
-				case 0:
-					err.send(Record.of(Keys.ERROR, Values.ofText("missing path argument")));
-					return ExitStatus.error();
-				case 1:
-					Path arg = Paths.get(args.get(0));
-					final Path newCwd;
-					if (arg.isAbsolute()) {
-						newCwd = arg;
-					} else {
-						newCwd = Paths.get(state.getCwd().toString(), args.get(0));
-					}
-					if (Files.isDirectory(newCwd)) {
-						state.setCwd(newCwd);
-						return ExitStatus.success();
-					} else {
-						err.send(Record.of(Keys.ERROR, Values.ofText("not a directory")));
-						return ExitStatus.error();
-					}
-				default:
-					err.send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
-					return ExitStatus.error();
+			if (args.size() != 1) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
+				return ExitStatus.error();
 			}
+			Path arg = Paths.get(args.get(0));
+			final Path newCwd;
+			if (arg.isAbsolute()) {
+				newCwd = arg;
+			} else {
+				newCwd = Paths.get(state.getCwd().toString(), args.get(0));
+			}
+			if (!Files.isDirectory(newCwd)) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("not a directory")));
+				return ExitStatus.error();
+			}
+			state.setCwd(newCwd);
+			return ExitStatus.success();
 		}
 	}
 

@@ -199,14 +199,14 @@ public class FileSystemModuleTest {
 		@Test
 		public void noArgs() {
 			sut.run(Arrays.asList(), null, out, err);
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("missing path argument")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
 			sut.run(Arrays.asList("asd", "asd"), null, out, err);
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
