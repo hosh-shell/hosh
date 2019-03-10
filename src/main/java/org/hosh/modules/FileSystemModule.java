@@ -33,6 +33,7 @@ import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -103,7 +104,8 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("not a directory: " + e.getMessage())));
 				return ExitStatus.error();
 			} catch (IOException e) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("error: " + e.getMessage())));
+				LOGGER.log(Level.WARNING, "caught I/O error", e);
+				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
 				return ExitStatus.error();
 			}
 		}
@@ -237,6 +239,7 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("path does not exist: " + e.getFile())));
 				return ExitStatus.error();
 			} catch (IOException e) {
+				LOGGER.log(Level.WARNING, "caught I/O error", e);
 				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
 				return ExitStatus.error();
 			}
