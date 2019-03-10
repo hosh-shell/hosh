@@ -2,18 +2,19 @@
 
 ## Main features
 - written in Java 11
-- portable, works out-of-the-box in Windows, MacOS and Linux (although much more work is needed here)
+- portable, works out-of-the-box in Windows, MacOS and Linux
 - pipelines built around schemaless records
+    - built-in commands produce strongly typed records with well defined keys
     - interoperability is achieved by using single-key records with "line" as value
     - `lines pom.xml | enumerate | take 10`
 - wrappers
     - `withTime { lines pom.xml | sink }`
-- usability features (much more work is needed here)
+- usability features (although much more work is needed in this area)
     - ANSI colors
     - stderr always colored in red
     - sorting using http://davekoelle.com/alphanum.html
     - file sizes reported using KB, MB, etc
-- distributed as single-jar
+- distributed as single-jar or docker image
 - MIT license
 
 ## Inspired by
@@ -21,6 +22,7 @@
 - https://www.martinfowler.com/articles/collection-pipeline/
 - https://fishshell.com/
 - http://mywiki.wooledge.org/BashPitfalls
+- http://minifesto.org/
 
 ## Requirements
 
