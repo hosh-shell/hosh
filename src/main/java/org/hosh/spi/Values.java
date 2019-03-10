@@ -149,7 +149,7 @@ public class Values {
 			} else if (obj instanceof None) {
 				return 1;
 			} else {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
 
@@ -229,7 +229,7 @@ public class Values {
 			} else if (obj instanceof None) {
 				return 1;
 			} else {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
 	}
@@ -279,7 +279,7 @@ public class Values {
 			} else if (obj instanceof None) {
 				return 1;
 			} else {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
 	}
@@ -337,7 +337,7 @@ public class Values {
 			} else if (obj instanceof None) {
 				return 1;
 			} else {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
 
@@ -421,7 +421,7 @@ public class Values {
 			} else if (obj instanceof None) {
 				return 1;
 			} else {
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
 	}

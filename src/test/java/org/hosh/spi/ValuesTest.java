@@ -90,7 +90,6 @@ public class ValuesTest {
 			assertThat(Values.none()).hasToString("None");
 		}
 
-		// matches it's still an experimental API
 		@Test
 		public void matches() {
 			assertThat(Values.none().matches(Values.none())).isFalse();
@@ -123,6 +122,13 @@ public class ValuesTest {
 			assertThatThrownBy(() -> Values.ofDuration(null))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("duration cannot be null");
+		}
+
+		@Test
+		public void compareToAnotherValueType() {
+			assertThatThrownBy(() -> Values.ofDuration(Duration.ofHours(1)).compareTo(Values.ofText("2")))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Duration[PT1H] to Text[2]");
 		}
 	}
 
@@ -167,6 +173,13 @@ public class ValuesTest {
 			assertThat(text.matches(".*b.*")).isTrue();
 			assertThat(text.matches(".*c.*")).isFalse();
 		}
+
+		@Test
+		public void compareToAnotherValueType() {
+			assertThatThrownBy(() -> Values.ofText("2").compareTo(Values.ofDuration(Duration.ofHours(1))))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Text[2] to Duration[PT1H]");
+		}
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -200,6 +213,13 @@ public class ValuesTest {
 		@Test
 		public void asString() {
 			assertThat(Values.ofNumeric(1)).hasToString("Numeric[1]");
+		}
+
+		@Test
+		public void compareToAnotherValueType() {
+			assertThatThrownBy(() -> Values.ofNumeric(42).compareTo(Values.ofText("2")))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Numeric[42] to Text[2]");
 		}
 	}
 
@@ -258,6 +278,13 @@ public class ValuesTest {
 		public void equalsContract() {
 			EqualsVerifier.forClass(Values.Size.class).verify();
 		}
+
+		@Test
+		public void compareToAnotherValueType() {
+			assertThatThrownBy(() -> Values.ofHumanizedSize(1000).compareTo(Values.ofText("2")))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Size[1000B] to Text[2]");
+		}
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
@@ -285,6 +312,13 @@ public class ValuesTest {
 		@Test
 		public void asString() {
 			assertThat(Values.ofLocalPath(Paths.get("file"))).hasToString("LocalPath[file]");
+		}
+
+		@Test
+		public void compareToAnotherValueType() {
+			assertThatThrownBy(() -> Values.ofLocalPath(Paths.get("file")).compareTo(Values.ofText("2")))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare LocalPath[file] to Text[2]");
 		}
 	}
 
@@ -429,10 +463,10 @@ public class ValuesTest {
 		@Test
 		public void durationWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.ofDuration(Duration.ofMillis(2)),
+					Values.none(),
 					Values.ofDuration(Duration.ofMillis(1)),
 					Values.none(),
-					Values.none())
+					Values.ofDuration(Duration.ofMillis(2)))
 					.sorted()
 					.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
