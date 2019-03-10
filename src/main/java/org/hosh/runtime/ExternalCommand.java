@@ -131,7 +131,7 @@ public class ExternalCommand implements Command, StateAware {
 				if (readLine == null) {
 					break;
 				}
-				channel.send(Record.of(Keys.LINE, Values.ofText(readLine)));
+				channel.send(Record.of(Keys.TEXT, Values.ofText(readLine)));
 			}
 		}
 	}

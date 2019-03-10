@@ -195,7 +195,7 @@ public class FileSystemModule implements Module {
 
 		private void readLines(Path path, Channel out) {
 			try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-				lines.forEach(line -> out.send(Record.of(Keys.LINE, Values.ofText(line))));
+				lines.forEach(line -> out.send(Record.of(Keys.TEXT, Values.ofText(line))));
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}

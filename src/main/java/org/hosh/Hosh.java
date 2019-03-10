@@ -189,10 +189,10 @@ public class Hosh {
 	}
 
 	private static void welcome(Channel out, String version) {
-		out.send(Record.of(Keys.LINE, Values.ofText("hosh v." + version)));
-		out.send(Record.of(Keys.LINE, Values.ofText("Running on Java " + System.getProperty("java.version"))));
-		out.send(Record.of(Keys.LINE, Values.ofText("PID is " + ProcessHandle.current().pid())));
-		out.send(Record.of(Keys.LINE, Values.ofText("Locale is " + Locale.getDefault().toString())));
-		out.send(Record.of(Keys.LINE, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
+		out.send(Record.of(Keys.TEXT, Values.ofText("hosh v." + version)));
+		out.send(Record.of(Keys.TEXT, Values.ofText("Running on Java " + System.getProperty("java.version"))));
+		out.send(Record.of(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));
+		out.send(Record.of(Keys.TEXT, Values.ofText("Locale is " + Locale.getDefault().toString())));
+		out.send(Record.of(Keys.TEXT, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
 	}
 }

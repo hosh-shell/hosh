@@ -169,7 +169,7 @@ public class ExternalCommandTest {
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), in, out, err);
-		then(out).should().send(Record.of(Keys.LINE, Values.ofText("test")));
+		then(out).should().send(Record.of(Keys.TEXT, Values.ofText("test")));
 		then(err).shouldHaveZeroInteractions();
 	}
 
@@ -184,7 +184,7 @@ public class ExternalCommandTest {
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Record.of(Keys.LINE, Values.ofText("test")));
+		then(err).should().send(Record.of(Keys.TEXT, Values.ofText("test")));
 	}
 
 	@SuppressWarnings("unchecked")

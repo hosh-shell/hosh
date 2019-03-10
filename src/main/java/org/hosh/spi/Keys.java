@@ -48,10 +48,11 @@ public class Keys {
 	 */
 	public static final Key ERROR = Keys.of("error");
 	/**
-	 * Denotes an external input (e.g. output of a native command). Usually contains
-	 * an unstructured text value.
+	 * Denotes an unstructured text value. Usually text is the output of a native
+	 * command but also some built-it commands are using this standard key (e.g.
+	 * lines).
 	 */
-	public static final Key LINE = Keys.of("line");
+	public static final Key TEXT = Keys.of("text");
 	/**
 	 * Denotes a local path to system.
 	 */

@@ -125,7 +125,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoRecords() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -137,7 +137,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void oneRecord() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -179,10 +179,10 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void zeroArg() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Record.empty()), Optional.empty());
 			sut.run(Arrays.asList(), in, out, err);
-			then(out).should().send(Record.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.LINE, Values.ofText("some data")).build());
+			then(out).should().send(Record.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.TEXT, Values.ofText("some data")).build());
 			then(out).should().send(Record.of(Keys.INDEX, Values.ofNumeric(2)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -210,7 +210,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void dropZero() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			sut.run(Arrays.asList("0"), in, out, err);
 			then(out).should().send(record);
@@ -220,7 +220,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void dropOne() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			sut.run(Arrays.asList("1"), in, out, err);
 			then(out).shouldHaveNoMoreInteractions();
@@ -259,7 +259,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void takeExactly() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -271,7 +271,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void takeLess() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -283,8 +283,8 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void takeMore() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some data"));
-			Record record2 = Record.of(Keys.LINE, Values.ofText("another value"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
+			Record record2 = Record.of(Keys.TEXT, Values.ofText("another value"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("5"), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -318,9 +318,9 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void printMatchingLines() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some string"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
-			sut.run(Arrays.asList("line", ".*string.*"), in, out, err);
+			sut.run(Arrays.asList(Keys.TEXT.name(), ".*string.*"), in, out, err);
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -328,7 +328,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void ignoreNonMatchingLines() {
-			Record record = Record.of(Keys.LINE, Values.ofText("some string"));
+			Record record = Record.of(Keys.TEXT, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			sut.run(Arrays.asList("key", ".*number.*"), in, out, err);
 			then(out).shouldHaveZeroInteractions();

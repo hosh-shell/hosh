@@ -301,8 +301,8 @@ public class FileSystemModuleTest {
 				writer.write("b 2\n");
 			}
 			sut.run(Arrays.asList(newFile.getAbsolutePath()), null, out, err);
-			then(out).should().send(Record.of(Keys.LINE, Values.ofText("a 1")));
-			then(out).should().send(Record.of(Keys.LINE, Values.ofText("b 2")));
+			then(out).should().send(Record.of(Keys.TEXT, Values.ofText("a 1")));
+			then(out).should().send(Record.of(Keys.TEXT, Values.ofText("b 2")));
 			then(err).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
@@ -315,7 +315,7 @@ public class FileSystemModuleTest {
 				writer.write("a 1\n");
 			}
 			sut.run(Arrays.asList(newFile.getName()), null, out, err);
-			then(out).should().send(Record.of(Keys.LINE, Values.ofText("a 1")));
+			then(out).should().send(Record.of(Keys.TEXT, Values.ofText("a 1")));
 			then(err).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
