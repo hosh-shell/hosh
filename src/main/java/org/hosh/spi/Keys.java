@@ -86,7 +86,7 @@ public class Keys {
 		return new SingleWordKey(key);
 	}
 
-	private static class SingleWordKey implements Key {
+	static final class SingleWordKey implements Key {
 		private final String name;
 
 		public SingleWordKey(String name) {
@@ -106,9 +106,9 @@ public class Keys {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof Key) {
+			if (obj instanceof SingleWordKey) {
 				SingleWordKey that = (SingleWordKey) obj;
-				return this.name.equals(that.name);
+				return Objects.equals(this.name, that.name);
 			} else {
 				return false;
 			}

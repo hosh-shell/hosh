@@ -26,7 +26,10 @@ package org.hosh.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.hosh.spi.Keys.SingleWordKey;
 import org.junit.Test;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class KeysTest {
 	@Test
@@ -61,5 +64,12 @@ public class KeysTest {
 	public void representation() {
 		assertThat(Keys.of("name"))
 				.hasToString("Key[name]");
+	}
+
+	@Test
+	public void equalContract() {
+		EqualsVerifier.configure()
+				.forClass(SingleWordKey.class)
+				.verify();
 	}
 }
