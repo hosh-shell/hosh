@@ -83,7 +83,7 @@ public class FileSystemModuleTest {
 		public void errorTwoOrMoreArgs() {
 			sut.run(Arrays.asList("dir1", "dir2"), null, out, err);
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.MESSAGE, Values.ofText("expected at most 1 argument")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected at most 1 argument")));
 		}
 
 		@Test

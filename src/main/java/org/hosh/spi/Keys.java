@@ -44,13 +44,9 @@ public class Keys {
 	 */
 	public static final Key VALUE = Keys.of("value");
 	/**
-	 * An error message.
+	 * A human readable error message.
 	 */
 	public static final Key ERROR = Keys.of("error");
-	/**
-	 * An informative message.
-	 */
-	public static final Key MESSAGE = Keys.of("message");
 	/**
 	 * Denotes an external input (e.g. output of a native command). Usually contains
 	 * an unstructured text value.
@@ -77,6 +73,10 @@ public class Keys {
 	 * Denotes a random generated value.
 	 */
 	public static final Key RAND = Keys.of("rand");
+	/**
+	 * Denotes a duration value
+	 */
+	public static final Key DURATION = Keys.of("duration");
 
 	private Keys() {
 	}

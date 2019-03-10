@@ -525,7 +525,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.MESSAGE, Values.ofText("requires 2 arguments: key value")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
 		}
 
 		@Test
@@ -534,7 +534,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.MESSAGE, Values.ofText("requires 2 arguments: key value")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
 		}
 
 		@Test
@@ -578,7 +578,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus.isSuccess()).isFalse();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.MESSAGE, Values.ofText("requires 1 argument: key")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 1 argument: key")));
 		}
 
 		@Test

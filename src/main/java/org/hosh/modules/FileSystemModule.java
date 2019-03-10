@@ -71,7 +71,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() > 1) {
-				err.send(Record.of(Keys.MESSAGE, Values.ofText("expected at most 1 argument")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected at most 1 argument")));
 				return ExitStatus.error();
 			}
 			final Path cwd = state.getCwd();

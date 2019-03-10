@@ -186,7 +186,7 @@ public class SystemModule implements Module {
 		public void after(Long startNanos, Channel in, Channel out, Channel err) {
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
-			out.send(Record.of(Keys.MESSAGE, Values.ofDuration(duration)));
+			out.send(Record.of(Keys.DURATION, Values.ofDuration(duration)));
 		}
 	}
 
@@ -356,7 +356,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of(Keys.MESSAGE, Values.ofText("requires 2 arguments: key value")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
@@ -377,7 +377,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.MESSAGE, Values.ofText("requires 1 argument: key")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("requires 1 argument: key")));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);

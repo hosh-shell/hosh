@@ -145,7 +145,7 @@ public class Hosh {
 			return interpreter.eval(program);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "caught exception", e);
-			err.send(Record.of(Keys.MESSAGE, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+			err.send(Record.of(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
 			return ExitStatus.error();
 		}
 	}
@@ -182,17 +182,17 @@ public class Hosh {
 				}
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line), e);
-				err.send(Record.of(Keys.MESSAGE, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+				err.send(Record.of(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
 			}
 		}
 		return ExitStatus.success();
 	}
 
 	private static void welcome(Channel out, String version) {
-		out.send(Record.of(Keys.MESSAGE, Values.ofText("hosh v." + version)));
-		out.send(Record.of(Keys.MESSAGE, Values.ofText("Running on Java " + System.getProperty("java.version"))));
-		out.send(Record.of(Keys.MESSAGE, Values.ofText("PID is " + ProcessHandle.current().pid())));
-		out.send(Record.of(Keys.MESSAGE, Values.ofText("Locale is " + Locale.getDefault().toString())));
-		out.send(Record.of(Keys.MESSAGE, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
+		out.send(Record.of(Keys.LINE, Values.ofText("hosh v." + version)));
+		out.send(Record.of(Keys.LINE, Values.ofText("Running on Java " + System.getProperty("java.version"))));
+		out.send(Record.of(Keys.LINE, Values.ofText("PID is " + ProcessHandle.current().pid())));
+		out.send(Record.of(Keys.LINE, Values.ofText("Locale is " + Locale.getDefault().toString())));
+		out.send(Record.of(Keys.LINE, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
 	}
 }
