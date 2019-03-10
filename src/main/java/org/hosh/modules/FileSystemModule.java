@@ -24,7 +24,6 @@
 package org.hosh.modules;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -87,10 +86,7 @@ public class FileSystemModule implements Module {
 			} else {
 				dir = cwd;
 			}
-			LOGGER.fine(() -> String.format("requested '%s'", dir));
-			final Path realDir = followSymlinksRecursively(dir);
-			LOGGER.fine(() -> String.format("resolved '%s'", realDir));
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(realDir)) {
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(followSymlinksRecursively(dir))) {
 				for (Path path : stream) {
 					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
 					Record entry = Record.builder()
@@ -216,10 +212,7 @@ public class FileSystemModule implements Module {
 			} else {
 				start = state.getCwd().resolve(arg).normalize().toAbsolutePath();
 			}
-			LOGGER.fine(() -> String.format("requested '%s'", start));
-			final Path realStart = followSymlinksRecursively(start);
-			LOGGER.fine(() -> String.format("resolved '%s'", realStart));
-			try (Stream<Path> stream = Files.walk(realStart)) {
+			try (Stream<Path> stream = Files.walk(followSymlinksRecursively(start))) {
 				stream.forEach(path -> {
 					Record result = Record.of(Keys.PATH, Values.ofLocalPath(path.toAbsolutePath()));
 					out.send(result);
@@ -236,17 +229,16 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	private static Path followSymlinksRecursively(Path path) {
-		try {
-			if (Files.isSymbolicLink(path)) {
-				Path target = Files.readSymbolicLink(path);
-				Path resolvedPath = path.getParent().resolve(target);
-				return followSymlinksRecursively(resolvedPath);
-			} else {
-				return path;
-			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
+	private static Path followSymlinksRecursively(Path path) throws IOException {
+		if (Files.isSymbolicLink(path)) {
+			Path target = Files.readSymbolicLink(path);
+			Path resolvedPath = path.getParent().resolve(target);
+			LOGGER.fine(() -> String.format("'%s' -> '%s'", path, resolvedPath));
+			return followSymlinksRecursively(resolvedPath);
+		} else {
+			return path;
 		}
 	}
 }
