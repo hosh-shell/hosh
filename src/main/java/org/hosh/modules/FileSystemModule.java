@@ -161,6 +161,7 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class Lines implements Command, StateAware {
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private State state;
 
 		@Override
@@ -170,30 +171,25 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			switch (args.size()) {
-				case 1:
-					Path path = Paths.get(args.get(0));
-					if (!path.isAbsolute()) {
-						path = Paths.get(state.getCwd().toString(), args.get(0));
-					}
-					if (Files.isRegularFile(path)) {
-						readLines(path, out);
-						return ExitStatus.success();
-					} else {
-						err.send(Record.of(Keys.ERROR, Values.ofText("not readable file")));
-						return ExitStatus.error();
-					}
-				default:
-					err.send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
-					return ExitStatus.error();
+			if (args.size() != 1) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
+				return ExitStatus.error();
 			}
-		}
-
-		private void readLines(Path path, Channel out) {
+			Path path = Paths.get(args.get(0));
+			if (!path.isAbsolute()) {
+				path = Paths.get(state.getCwd().toString(), args.get(0));
+			}
+			if (!Files.isRegularFile(path)) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("not readable file")));
+				return ExitStatus.error();
+			}
 			try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
 				lines.forEach(line -> out.send(Record.of(Keys.TEXT, Values.ofText(line))));
+				return ExitStatus.success();
 			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				LOGGER.log(Level.WARNING, "caught I/O error", e);
+				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
+				return ExitStatus.error();
 			}
 		}
 	}
