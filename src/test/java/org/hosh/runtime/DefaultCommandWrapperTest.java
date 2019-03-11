@@ -86,4 +86,10 @@ public class DefaultCommandWrapperTest {
 		then(commandWrapper).should().before(args, in, out, err);
 		then(commandWrapper).should().after(resource, in, out, err);
 	}
+
+	@Test
+	public void representation() {
+		assertThat(sut)
+				.hasToString("DefaultCommandWrapper[nested=statement,commandWrapper=commandWrapper]");
+	}
 }
