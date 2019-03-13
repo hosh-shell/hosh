@@ -37,16 +37,16 @@ public class AnsiFormatter extends Formatter {
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS");
 
 	@Override
-	public String format(LogRecord record) {
+	public String format(LogRecord logRecord) {
 		StringWriter sw = new StringWriter();
 		try (PrintWriter pw = new PrintWriter(sw)) {
-			ZonedDateTime zdt = ZonedDateTime.ofInstant(record.getInstant().truncatedTo(ChronoUnit.MILLIS), ZoneId.systemDefault());
-			Ansi.Style style = colorize(record.getLevel());
+			ZonedDateTime zdt = ZonedDateTime.ofInstant(logRecord.getInstant().truncatedTo(ChronoUnit.MILLIS), ZoneId.systemDefault());
+			Ansi.Style style = colorize(logRecord.getLevel());
 			pw.append(FORMATTER.format(zdt));
 			pw.append(' ');
 			pw.append('[');
 			style.enable(pw);
-			pw.append(record.getLevel().toString());
+			pw.append(logRecord.getLevel().toString());
 			style.disable(pw);
 			pw.append(']');
 			pw.append(' ');
@@ -57,11 +57,11 @@ public class AnsiFormatter extends Formatter {
 			pw.append('-');
 			pw.append(' ');
 			style.enable(pw);
-			pw.append(record.getMessage());
+			pw.append(logRecord.getMessage());
 			style.disable(pw);
 			pw.println();
-			if (record.getThrown() != null) {
-				record.getThrown().printStackTrace(pw);
+			if (logRecord.getThrown() != null) {
+				logRecord.getThrown().printStackTrace(pw);
 			}
 			return sw.toString();
 		}
