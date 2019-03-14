@@ -21,38 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package org.hosh.script;
 
-import hosh.spi.Ansi;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.PrintWriter;
-import java.util.Locale;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
-public class ConsoleChannel implements OutputChannel {
+import org.junit.jupiter.api.Test;
 
-	private final PrintWriter printWriter;
+public class HoshScriptEngineFactoryTest {
 
-	private final Ansi.Style style;
-
-	public ConsoleChannel(PrintWriter printWriter, Ansi.Style style) {
-		this.printWriter = printWriter;
-		this.style = style;
+	@Test
+	public void getEngineByName() throws Exception {
+		ScriptEngineManager scriptManager = new ScriptEngineManager();
+		ScriptEngine scriptEngine = scriptManager.getEngineByName("hosh");
+		assertThat(scriptEngine)
+				.isInstanceOf(HoshScriptEngine.class);
 	}
 
-	@Override
-	public void send(Record record) {
-		Locale locale = Locale.getDefault();
-		style.enable(printWriter);
-		record.print(printWriter, locale);
-		style.disable(printWriter);
-		printWriter.append(System.lineSeparator());
-		printWriter.flush();
-	}
-
-	@Override
-	public String toString() {
-		return String.format("ConsoleChannel[style=%s]", style);
+	@Test
+	public void getEngineByExtension() throws Exception {
+		ScriptEngineManager scriptManager = new ScriptEngineManager();
+		ScriptEngine scriptEngine = scriptManager.getEngineByExtension("hosh");
+		assertThat(scriptEngine)
+				.isInstanceOf(HoshScriptEngine.class);
 	}
 }

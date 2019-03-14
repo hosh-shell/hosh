@@ -134,8 +134,8 @@ public class Hosh {
 		bootstrap.registerAllBuiltins(state);
 		CommandResolver commandResolver = CommandResolvers.builtinsThenExternal(state, injector);
 		Compiler compiler = new Compiler(commandResolver);
-		OutputChannel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
-		OutputChannel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
+		OutputChannel out = new CancellableChannel(new ConsoleChannel(terminal.writer(), Ansi.Style.NONE));
+		OutputChannel err = new CancellableChannel(new ConsoleChannel(terminal.writer(), Ansi.Style.FG_RED));
 		Interpreter interpreter = new Interpreter(state);
 		CommandLine commandLine;
 		Options options = createOptions();

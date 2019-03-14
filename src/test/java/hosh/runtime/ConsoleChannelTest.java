@@ -24,7 +24,6 @@
 package hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import hosh.spi.Ansi;
@@ -34,7 +33,6 @@ import hosh.spi.Values;
 
 import java.io.PrintWriter;
 
-import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,9 +42,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class ConsoleChannelTest {
 
-	@Mock(stubOnly = true)
-	private Terminal terminal;
-
 	@Mock
 	private PrintWriter printWriter;
 
@@ -54,8 +49,7 @@ public class ConsoleChannelTest {
 
 	@BeforeEach
 	public void setup() {
-		given(terminal.writer()).willReturn(printWriter);
-		sut = new ConsoleChannel(terminal, Ansi.Style.NONE);
+		sut = new ConsoleChannel(printWriter, Ansi.Style.NONE);
 	}
 
 	@Test

@@ -21,38 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package org.hosh.script;
 
-import hosh.spi.Ansi;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.PrintWriter;
-import java.util.Locale;
+import hosh.spi.ExitStatus;
 
-public class ConsoleChannel implements OutputChannel {
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
-	private final PrintWriter printWriter;
+import org.junit.jupiter.api.Test;
 
-	private final Ansi.Style style;
+public class HoshScriptEngineTest {
 
-	public ConsoleChannel(PrintWriter printWriter, Ansi.Style style) {
-		this.printWriter = printWriter;
-		this.style = style;
-	}
-
-	@Override
-	public void send(Record record) {
-		Locale locale = Locale.getDefault();
-		style.enable(printWriter);
-		record.print(printWriter, locale);
-		style.disable(printWriter);
-		printWriter.append(System.lineSeparator());
-		printWriter.flush();
-	}
-
-	@Override
-	public String toString() {
-		return String.format("ConsoleChannel[style=%s]", style);
+	@Test
+	public void helloWorld() throws ScriptException {
+		ScriptEngine hosh = new ScriptEngineManager().getEngineByName("hosh");
+		Object result = hosh.eval("echo hello world");
+		// TODO: assert that something happened on out channel
+		assertThat(result)
+				.isInstanceOf(ExitStatus.class)
+				.isEqualTo(ExitStatus.success());
 	}
 }
