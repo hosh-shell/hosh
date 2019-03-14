@@ -32,6 +32,10 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +44,7 @@ import java.util.stream.Stream;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
+import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
@@ -58,6 +63,7 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("cwd", CurrentWorkingDirectory.class);
 		commandRegistry.registerCommand("lines", Lines.class);
 		commandRegistry.registerCommand("find", Find.class);
+		commandRegistry.registerCommand("watch", Watch.class);
 	}
 
 	public static class ListFiles implements Command, StateAware {
@@ -226,6 +232,64 @@ public class FileSystemModule implements Module {
 				LOGGER.log(Level.WARNING, "caught I/O error", e);
 				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
 				return ExitStatus.error();
+			}
+		}
+	}
+
+	public static class Watch implements CommandWrapper<WatchKey>, StateAware {
+		private WatchService watchService;
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public WatchKey before(List<String> args, Channel in, Channel out, Channel err) {
+			try {
+				Path dir = state.getCwd();
+				watchService = dir.getFileSystem().newWatchService();
+				return dir.register(watchService,
+						StandardWatchEventKinds.ENTRY_CREATE,
+						StandardWatchEventKinds.ENTRY_DELETE,
+						StandardWatchEventKinds.ENTRY_MODIFY);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+
+		@Override
+		public void after(WatchKey resource, Channel in, Channel out, Channel err) {
+			try {
+				resource.cancel();
+				watchService.close();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+
+		@Override
+		public boolean retry(WatchKey ignored, Channel in, Channel out, Channel err) {
+			try {
+				out.send(Record.of(Keys.TEXT, Values.ofText("Waiting for events...")));
+				WatchKey key = watchService.take();
+				for (var event : key.pollEvents()) {
+					if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
+						continue;
+					}
+					@SuppressWarnings("unchecked")
+					WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
+					out.send(Record.builder()
+							.entry(Keys.PATH, Values.ofLocalPath(pathEvent.context()))
+							.entry(Keys.of("type"), Values.ofText(event.kind().name()))
+							.build());
+				}
+				boolean stillValid = key.reset();
+				return stillValid;
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+				return false;
 			}
 		}
 	}

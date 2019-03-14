@@ -99,7 +99,7 @@ public class Interpreter {
 		return command.run(resolvedArguments, in, out, err);
 	}
 
-	private void injectDeps(Command command) {
+	public void injectDeps(Command command) {
 		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 		command.downCast(InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));

@@ -442,7 +442,7 @@ public class SystemModuleTest {
 		public void oneArg() {
 			List<String> args = Arrays.asList("1");
 			Accumulator accumulator = sut.before(args, in, out, err);
-			boolean retry = sut.retry(accumulator);
+			boolean retry = sut.retry(accumulator, in, out, err);
 			assertThat(retry).isFalse();
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveZeroInteractions();
@@ -496,7 +496,7 @@ public class SystemModuleTest {
 		@Test
 		public void retryIsNotSupported() {
 			Long resource = sut.before(Collections.emptyList(), in, out, err);
-			assertThat(sut.retry(resource)).isFalse();
+			assertThat(sut.retry(resource, in, out, err)).isFalse();
 		}
 
 		@Test
