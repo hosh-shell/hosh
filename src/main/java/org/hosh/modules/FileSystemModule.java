@@ -41,10 +41,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
-import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
@@ -236,8 +236,9 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	public static class Watch implements CommandWrapper<WatchKey>, StateAware {
-		private WatchService watchService;
+	@Todo(description = "should be recursive? should be possible to specify which type of events to watch")
+	public static class Watch implements Command, StateAware {
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private State state;
 
 		@Override
@@ -246,50 +247,48 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public WatchKey before(List<String> args, Channel in, Channel out, Channel err) {
-			try {
-				Path dir = state.getCwd();
-				watchService = dir.getFileSystem().newWatchService();
-				return dir.register(watchService,
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (!args.isEmpty()) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
+				return ExitStatus.error();
+			}
+			Path dir = state.getCwd();
+			try (WatchService watchService = dir.getFileSystem().newWatchService()) {
+				dir.register(watchService,
 						StandardWatchEventKinds.ENTRY_CREATE,
 						StandardWatchEventKinds.ENTRY_DELETE,
 						StandardWatchEventKinds.ENTRY_MODIFY);
+				withService(watchService, out);
+				return ExitStatus.success();
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+				return ExitStatus.error();
 			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				LOGGER.log(Level.WARNING, "caught I/O error", e);
+				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
+				return ExitStatus.error();
 			}
 		}
 
-		@Override
-		public void after(WatchKey resource, Channel in, Channel out, Channel err) {
-			try {
-				resource.cancel();
-				watchService.close();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		}
-
-		@Override
-		public boolean retry(WatchKey ignored, Channel in, Channel out, Channel err) {
-			try {
-				out.send(Record.of(Keys.TEXT, Values.ofText("Waiting for events...")));
+		private void withService(WatchService watchService, Channel out) throws InterruptedException {
+			for (;;) {
+				LOGGER.info("waiting for events");
 				WatchKey key = watchService.take();
 				for (var event : key.pollEvents()) {
 					if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
+						LOGGER.warning("got overflow");
 						continue;
 					}
 					@SuppressWarnings("unchecked")
 					WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
 					out.send(Record.builder()
+							.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
 							.entry(Keys.PATH, Values.ofLocalPath(pathEvent.context()))
-							.entry(Keys.of("type"), Values.ofText(event.kind().name()))
 							.build());
 				}
-				boolean stillValid = key.reset();
-				return stillValid;
-			} catch (InterruptedException ex) {
-				Thread.currentThread().interrupt();
-				return false;
+				if (!key.reset()) {
+					break;
+				}
 			}
 		}
 	}

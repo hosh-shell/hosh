@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -62,6 +63,7 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("schema", Schema.class);
 		commandRegistry.registerCommand("filter", Filter.class);
 		commandRegistry.registerCommand("enumerate", Enumerate.class);
+		commandRegistry.registerCommand("timestamp", Timestamp.class);
 		commandRegistry.registerCommand("sort", Sort.class);
 		commandRegistry.registerCommand("distinct", Distinct.class);
 		commandRegistry.registerCommand("duplicated", Duplicated.class);
@@ -129,6 +131,26 @@ public class TextModule implements Module {
 				}
 				Record record = incoming.get();
 				out.send(record.prepend(Keys.INDEX, Values.ofNumeric(i++)));
+			}
+		}
+	}
+
+	@Todo(description = "use local time?")
+	public static class Timestamp implements Command {
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 0) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+				return ExitStatus.error();
+			}
+			Key timestamp = Keys.of("timestamp");
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					return ExitStatus.success();
+				}
+				Record record = incoming.get();
+				out.send(record.prepend(timestamp, Values.ofText(Instant.now().toString())));
 			}
 		}
 	}
