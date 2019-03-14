@@ -42,7 +42,7 @@ public class CommandCompleter implements Completer {
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
 		state.getCommands().keySet()
 				.stream()
-				.map(DebuggableCandidate::new)
+				.map(command -> DebuggableCandidate.completeWithDescription(command, "built-in"))
 				.forEach(candidates::add);
 	}
 }

@@ -65,7 +65,7 @@ public class VariableExpansionCompleterTest {
 		given(parsedLine.word()).willReturn("${");
 		given(state.getVariables()).willReturn(Map.of("FOO", "whatever"));
 		sut.complete(lineReader, parsedLine, candidates);
-		then(candidates).should().add(new DebuggableCandidate("${FOO}"));
+		then(candidates).should().add(DebuggableCandidate.complete("${FOO}"));
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class VariableExpansionCompleterTest {
 		given(parsedLine.word()).willReturn("${");
 		given(state.getVariables()).willReturn(Map.of("FOO", "whatever", "BAR", "whatever"));
 		sut.complete(lineReader, parsedLine, candidates);
-		then(candidates).should().add(new DebuggableCandidate("${FOO}"));
-		then(candidates).should().add(new DebuggableCandidate("${BAR}"));
+		then(candidates).should().add(DebuggableCandidate.complete("${FOO}"));
+		then(candidates).should().add(DebuggableCandidate.complete("${BAR}"));
 	}
 }

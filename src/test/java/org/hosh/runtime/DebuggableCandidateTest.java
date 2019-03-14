@@ -41,6 +41,7 @@ public class DebuggableCandidateTest {
 
 	@Test
 	public void stringValue() {
-		assertThat(new DebuggableCandidate("aa")).hasToString("Candidate[value='aa']");
+		assertThat(DebuggableCandidate.complete("aa")).hasToString("Candidate[value='aa',complete=true]");
+		assertThat(DebuggableCandidate.incomplete("aa")).hasToString("Candidate[value='aa',complete=false]");
 	}
 }

@@ -31,8 +31,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.UnaryOperator;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.State;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
@@ -40,6 +42,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
 public class FileSystemCompleter implements Completer {
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private final State state;
 
 	public FileSystemCompleter(State state) {
@@ -48,14 +51,6 @@ public class FileSystemCompleter implements Completer {
 
 	@Override
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-		try {
-			tryComplete(line, candidates);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	private void tryComplete(ParsedLine line, List<Candidate> candidates) throws IOException {
 		Path path = Paths.get(line.word());
 		if (line.word().endsWith(File.separator)) {
 			listCandidates(path, p -> p, candidates);
@@ -71,20 +66,23 @@ public class FileSystemCompleter implements Completer {
 		return path.getParent() == null ? path : path.getParent();
 	}
 
-	private void listCandidates(Path dir, UnaryOperator<Path> toPath, List<Candidate> candidates) throws IOException {
+	private void listCandidates(Path dir, UnaryOperator<Path> toPath, List<Candidate> candidates) {
+		LOGGER.fine(() -> String.format("completing %s", dir));
 		try (Stream<Path> list = Files.list(dir)) {
 			list
 					.map(toPath)
 					.map(this::toCandidate)
 					.forEach(candidates::add);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
 	private DebuggableCandidate toCandidate(Path path) {
 		if (Files.isDirectory(path)) {
-			return new DebuggableCandidate(path.toString() + File.separator, false);
+			return DebuggableCandidate.incomplete(path.toString() + File.separator);
 		} else {
-			return new DebuggableCandidate(path.toString());
+			return DebuggableCandidate.complete(path.toString());
 		}
 	}
 }

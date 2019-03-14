@@ -31,12 +31,24 @@ import org.jline.reader.Candidate;
  * {@link Candidate} as value object
  */
 public class DebuggableCandidate extends Candidate {
-	public DebuggableCandidate(String value, boolean complete) {
-		super(value, value, null, null, null, null, complete);
+	public static DebuggableCandidate incomplete(String value) {
+		return new DebuggableCandidate(value, false);
 	}
 
-	public DebuggableCandidate(String value) {
-		this(value, true);
+	public static DebuggableCandidate complete(String value) {
+		return new DebuggableCandidate(value, true);
+	}
+
+	public static DebuggableCandidate completeWithDescription(String value, String description) {
+		return new DebuggableCandidate(value, description, true);
+	}
+
+	private DebuggableCandidate(String value, String desc, boolean complete) {
+		super(value, value, null, desc, null, null, complete);
+	}
+
+	private DebuggableCandidate(String value, boolean complete) {
+		this(value, null, complete);
 	}
 
 	@Override
@@ -56,6 +68,6 @@ public class DebuggableCandidate extends Candidate {
 
 	@Override
 	public String toString() {
-		return String.format("Candidate[value='%s']", value());
+		return String.format("Candidate[value='%s',complete=%s]", value(), complete());
 	}
 }
