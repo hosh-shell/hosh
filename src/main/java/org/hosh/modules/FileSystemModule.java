@@ -24,6 +24,7 @@
 package org.hosh.modules;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -182,7 +183,7 @@ public class FileSystemModule implements Module {
 			try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
 				lines.forEach(line -> out.send(Record.of(Keys.TEXT, Values.ofText(line))));
 				return ExitStatus.success();
-			} catch (IOException e) {
+			} catch (IOException | UncheckedIOException e) {
 				LOGGER.log(Level.WARNING, "caught I/O error", e);
 				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
 				return ExitStatus.error();

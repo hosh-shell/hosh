@@ -36,12 +36,10 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hosh.doc.Experimental;
-
 /**
  * Built-in values to be used in Records.
  *
- * NB: concrete types are not exposed by purpose
+ * NB: concrete types are not exposed by design
  */
 public class Values {
 	private Values() {
@@ -49,12 +47,10 @@ public class Values {
 
 	private static final None NONE = new None();
 
-	@Experimental(description = "it is useful to always provide a key, even if the value if missing. This simplifies a lot the pattern '| sort key | table'")
 	public static Value none() {
 		return NONE;
 	}
 
-	@Experimental(description = "this constructor is a bit redundant in naming")
 	public static Value ofDuration(Duration duration) {
 		return new DurationValue(duration);
 	}
@@ -71,12 +67,12 @@ public class Values {
 		B, KB, MB, GB, TB
 	}
 
-	// indexed units table
-	private static final Unit[] UNITS = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
 	/**
 	 * One kibibyte (1024 bytes), this is in contrast to the SI system (1000 bytes)
 	 */
 	public static final int KIB = 1024;
+	// log-indexed units table
+	private static final Unit[] UNITS = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
 
 	/**
 	 * Select the appropriate unit for measuring bytes.
