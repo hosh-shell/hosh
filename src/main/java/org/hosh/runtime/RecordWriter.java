@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Locale;
 
+import org.hosh.spi.Ansi;
 import org.hosh.spi.Record;
 import org.hosh.spi.Record.Entry;
 

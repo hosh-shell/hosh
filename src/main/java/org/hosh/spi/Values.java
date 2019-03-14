@@ -23,8 +23,7 @@
  */
 package org.hosh.spi;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Path;
@@ -61,6 +60,10 @@ public class Values {
 
 	public static Value ofText(String text) {
 		return new Text(text);
+	}
+
+	public static Value ofStyledText(String text, Ansi.Style... styles) {
+		return new Text(text, styles);
 	}
 
 	public enum Unit {
@@ -100,20 +103,27 @@ public class Values {
 	 */
 	static final class Text implements Value {
 		private final String value;
+		private final Ansi.Style[] styles;
 
-		public Text(String value) {
+		public Text(String value, Ansi.Style... styles) {
+			if (styles == null) {
+				throw new IllegalArgumentException("styles cannot be null");
+			}
 			if (value == null) {
 				throw new IllegalArgumentException("text cannot be null");
 			}
+			this.styles = styles;
 			this.value = value;
 		}
 
 		@Override
-		public void append(Appendable appendable, Locale locale) {
-			try {
-				appendable.append(value);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+		public void append(PrintWriter printWriter, Locale locale) {
+			for (var style : styles) {
+				style.enable(printWriter);
+			}
+			printWriter.append(value);
+			for (var style : styles) {
+				style.disable(printWriter);
 			}
 		}
 
@@ -175,14 +185,10 @@ public class Values {
 		}
 
 		@Override
-		public void append(Appendable appendable, Locale locale) {
+		public void append(PrintWriter printWriter, Locale locale) {
 			NumberFormat instance = NumberFormat.getInstance(locale);
-			try {
-				appendable.append(instance.format(value));
-				appendable.append(unit.toString());
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			printWriter.append(instance.format(value));
+			printWriter.append(unit.toString());
 		}
 
 		@Override
@@ -238,13 +244,9 @@ public class Values {
 		}
 
 		@Override
-		public void append(Appendable appendable, Locale locale) {
+		public void append(PrintWriter printWriter, Locale locale) {
 			NumberFormat instance = NumberFormat.getInstance(locale);
-			try {
-				appendable.append(instance.format(number));
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			printWriter.append(instance.format(number));
 		}
 
 		@Override
@@ -282,12 +284,8 @@ public class Values {
 
 	static final class None implements Value {
 		@Override
-		public void append(Appendable appendable, Locale locale) {
-			try {
-				appendable.append("");
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+		public void append(PrintWriter printWriter, Locale locale) {
+			printWriter.append("");
 		}
 
 		@Override
@@ -338,12 +336,8 @@ public class Values {
 		}
 
 		@Override
-		public void append(Appendable appendable, Locale locale) {
-			try {
-				appendable.append(duration.toString());
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+		public void append(PrintWriter printWriter, Locale locale) {
+			printWriter.append(duration.toString());
 		}
 
 		@Override
@@ -378,12 +372,8 @@ public class Values {
 		}
 
 		@Override
-		public void append(Appendable appendable, Locale locale) {
-			try {
-				appendable.append(path.toString());
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+		public void append(PrintWriter printWriter, Locale locale) {
+			printWriter.append(path.toString());
 		}
 
 		@Override

@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.runtime;
+package org.hosh.spi;
 
 import java.io.PrintWriter;
 
-import org.hosh.runtime.Ansi.Style;
+import org.hosh.spi.Ansi;
+import org.hosh.spi.Ansi.Style;
 import org.junit.Test;
 
 public class AnsiTest {

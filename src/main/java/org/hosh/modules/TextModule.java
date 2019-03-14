@@ -23,6 +23,7 @@
  */
 package org.hosh.modules;
 
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -41,6 +42,8 @@ import java.util.stream.Collectors;
 
 import org.hosh.doc.Experimental;
 import org.hosh.doc.Todo;
+import org.hosh.spi.Ansi;
+import org.hosh.spi.Ansi.Style;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -321,6 +324,8 @@ public class TextModule implements Module {
 	}
 
 	public static class Table implements Command {
+		private int i = 0;
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
@@ -351,12 +356,17 @@ public class TextModule implements Module {
 			List<String> formattedValues = new ArrayList<>(entries.size());
 			for (Record.Entry entry : entries) {
 				StringWriter writer = new StringWriter();
+				PrintWriter printWriter = new PrintWriter(writer);
 				formatter.append(formatterFor(entry.getKey()));
-				entry.getValue().append(writer, locale);
+				entry.getValue().append(printWriter, locale);
 				formattedValues.add(writer.toString());
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
-			out.send(Record.of(Keys.of("row"), Values.ofText(row)));
+			out.send(Record.of(Keys.of("row"), Values.ofStyledText(row, alternateColor())));
+		}
+
+		private Style alternateColor() {
+			return ++i % 2 == 0 ? Ansi.Style.BG_WHITE : Ansi.Style.BG_CYAN;
 		}
 
 		private String formatterFor(Key key) {
@@ -369,9 +379,12 @@ public class TextModule implements Module {
 					.map(this::formatterFor)
 					.collect(Collectors.joining(" "));
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
-			out.send(Record.of(Keys.of("header"), Values.ofText(header)));
+			out.send(Record.of(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.BOLD, Ansi.Style.FG_CYAN)));
 		}
 
-		private final Map<Key, Integer> paddings = Map.of(Keys.PATH, 30, Keys.SIZE, 5);
+		private final Map<Key, Integer> paddings = Map.of(
+				Keys.NAME, 30,
+				Keys.PATH, 30,
+				Keys.SIZE, 5);
 	}
 }

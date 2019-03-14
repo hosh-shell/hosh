@@ -29,6 +29,7 @@ import static org.mockito.BDDMockito.then;
 
 import java.io.PrintWriter;
 
+import org.hosh.spi.Ansi;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;

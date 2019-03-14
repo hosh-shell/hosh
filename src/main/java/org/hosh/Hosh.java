@@ -41,7 +41,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hosh.runtime.Ansi;
 import org.hosh.runtime.AnsiFormatter;
 import org.hosh.runtime.CancellableChannel;
 import org.hosh.runtime.CommandCompleter;
@@ -56,6 +55,7 @@ import org.hosh.runtime.LineReaderIterator;
 import org.hosh.runtime.SimpleCommandRegistry;
 import org.hosh.runtime.VariableExpansionCompleter;
 import org.hosh.runtime.Version;
+import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
 import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;

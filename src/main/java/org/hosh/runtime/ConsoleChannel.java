@@ -23,6 +23,7 @@
  */
 package org.hosh.runtime;
 
+import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.jline.terminal.Terminal;

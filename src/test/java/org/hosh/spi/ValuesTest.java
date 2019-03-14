@@ -25,11 +25,9 @@ package org.hosh.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
@@ -51,7 +49,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -72,12 +69,12 @@ public class ValuesTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class NoneValueTest {
 		@Mock
-		private Appendable appendable;
+		private PrintWriter printWriter;
 
 		@Test
-		public void append() throws IOException {
-			Values.none().append(appendable, Locale.ENGLISH);
-			then(appendable).should().append("");
+		public void append() {
+			Values.none().append(printWriter, Locale.ENGLISH);
+			then(printWriter).should().append("");
 		}
 
 		@Test
@@ -99,12 +96,12 @@ public class ValuesTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class DurationValueTest {
 		@Mock
-		private Appendable appendable;
+		private PrintWriter printWriter;
 
 		@Test
-		public void append() throws IOException {
-			Values.ofDuration(Duration.ofMillis(1)).append(appendable, Locale.ENGLISH);
-			then(appendable).should().append("PT0.001S");
+		public void append() {
+			Values.ofDuration(Duration.ofMillis(1)).append(printWriter, Locale.ENGLISH);
+			then(printWriter).should().append("PT0.001S");
 		}
 
 		@Test
@@ -135,7 +132,7 @@ public class ValuesTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class TextValueTest {
 		@Mock
-		private Appendable appendable;
+		private PrintWriter printWriter;
 
 		@Test
 		public void nullIsReject() {
@@ -145,20 +142,16 @@ public class ValuesTest {
 		}
 
 		@Test
-		public void appendOk() throws IOException {
-			Values.ofText("aaa").append(appendable, Locale.getDefault());
-			then(appendable).should().append("aaa");
-		}
-
-		@Test(expected = UncheckedIOException.class)
-		public void appendError() throws IOException {
-			given(appendable.append(ArgumentMatchers.any())).willThrow(IOException.class);
-			Values.ofText("aaa").append(appendable, Locale.getDefault());
+		public void appendOk() {
+			Values.ofText("aaa").append(printWriter, Locale.getDefault());
+			then(printWriter).should().append("aaa");
 		}
 
 		@Test
 		public void equalsContract() {
-			EqualsVerifier.forClass(Values.Text.class).verify();
+			EqualsVerifier.forClass(Values.Text.class)
+					.withIgnoredFields("styles")
+					.verify();
 		}
 
 		@Test
@@ -185,24 +178,18 @@ public class ValuesTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class NumericValueTest {
 		@Mock
-		private Appendable appendable;
+		private PrintWriter printWriter;
 
 		@Test
-		public void englishLocale() throws IOException {
-			Values.ofNumeric(1_000_000).append(appendable, Locale.ENGLISH);
-			then(appendable).should().append("1,000,000");
+		public void englishLocale() {
+			Values.ofNumeric(1_000_000).append(printWriter, Locale.ENGLISH);
+			then(printWriter).should().append("1,000,000");
 		}
 
 		@Test
-		public void italianLocale() throws IOException {
-			Values.ofNumeric(1_000_000).append(appendable, Locale.ITALIAN);
-			then(appendable).should().append("1.000.000");
-		}
-
-		@Test(expected = UncheckedIOException.class)
-		public void appendError() throws IOException {
-			given(appendable.append(ArgumentMatchers.any())).willThrow(IOException.class);
-			Values.ofNumeric(1_000_000).append(appendable, Locale.getDefault());
+		public void italianLocale() {
+			Values.ofNumeric(1_000_000).append(printWriter, Locale.ITALIAN);
+			then(printWriter).should().append("1.000.000");
 		}
 
 		@Test
@@ -226,26 +213,20 @@ public class ValuesTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SizeValueTest {
 		@Mock
-		private Appendable appendable;
+		private PrintWriter printWriter;
 
 		@Test
-		public void appendWithUkLocale() throws IOException {
-			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).append(appendable, Locale.UK);
-			then(appendable).should().append("2.5");
-			then(appendable).should().append("KB");
+		public void appendWithUkLocale() {
+			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).append(printWriter, Locale.UK);
+			then(printWriter).should().append("2.5");
+			then(printWriter).should().append("KB");
 		}
 
 		@Test
-		public void appendWithItalianLocale() throws IOException {
-			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).append(appendable, Locale.ITALIAN);
-			then(appendable).should().append("2,5");
-			then(appendable).should().append("KB");
-		}
-
-		@Test(expected = UncheckedIOException.class)
-		public void appendError() throws IOException {
-			given(appendable.append(ArgumentMatchers.any())).willThrow(IOException.class);
-			Values.ofHumanizedSize(10).append(appendable, Locale.getDefault());
+		public void appendWithItalianLocale() {
+			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).append(printWriter, Locale.ITALIAN);
+			then(printWriter).should().append("2,5");
+			then(printWriter).should().append("KB");
 		}
 
 		@Test
@@ -290,18 +271,12 @@ public class ValuesTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class LocalPathValueTest {
 		@Mock
-		private Appendable appendable;
+		private PrintWriter printWriter;
 
 		@Test
-		public void appendOk() throws IOException {
-			Values.ofLocalPath(Paths.get(".")).append(appendable, Locale.getDefault());
-			then(appendable).should().append(".");
-		}
-
-		@Test(expected = UncheckedIOException.class)
-		public void appendError() throws IOException {
-			given(appendable.append(ArgumentMatchers.any())).willThrow(IOException.class);
-			Values.ofLocalPath(Paths.get(".")).append(appendable, Locale.getDefault());
+		public void appendOk() {
+			Values.ofLocalPath(Paths.get(".")).append(printWriter, Locale.getDefault());
+			then(printWriter).should().append(".");
 		}
 
 		@Test

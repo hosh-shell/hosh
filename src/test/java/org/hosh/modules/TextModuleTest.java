@@ -548,7 +548,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void table() {
-			Record record1 = Record.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.NAME, Values.ofText("zvrnv")).build();
+			Record record1 = Record.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("zvrnv")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -556,14 +556,14 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Record.of(Keys.of("header"), Values.ofText("count      name      ")),
+					Record.of(Keys.of("header"), Values.ofText("count      text      ")),
 					Record.of(Keys.of("row"), Values.ofText("2         zvrnv     ")));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void tableWithNone() {
-			Record record1 = Record.builder().entry(Keys.COUNT, Values.none()).entry(Keys.NAME, Values.ofText("zvrnv")).build();
+			Record record1 = Record.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("zvrnv")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.isSuccess()).isTrue();
@@ -571,7 +571,7 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Record.of(Keys.of("header"), Values.ofText("count      name      ")),
+					Record.of(Keys.of("header"), Values.ofText("count      text      ")),
 					Record.of(Keys.of("row"), Values.ofText("          zvrnv     ")));
 		}
 
