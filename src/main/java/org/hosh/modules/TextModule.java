@@ -146,7 +146,7 @@ public class TextModule implements Module {
 					return ExitStatus.success();
 				}
 				Record record = incoming.get();
-				out.send(record.prepend(timestamp, Values.ofText(Instant.now().toString())));
+				out.send(record.prepend(timestamp, Values.ofInstant(Instant.now())));
 			}
 		}
 	}

@@ -29,11 +29,14 @@ import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.hosh.doc.Todo;
 
 /**
  * Built-in values to be used in Records.
@@ -52,6 +55,10 @@ public class Values {
 
 	public static Value ofDuration(Duration duration) {
 		return new DurationValue(duration);
+	}
+
+	public static Value ofInstant(Instant instant) {
+		return new InstantValue(instant);
 	}
 
 	public static Value ofNumeric(long number) {
@@ -358,6 +365,55 @@ public class Values {
 		@Override
 		public int hashCode() {
 			return Objects.hash(duration);
+		}
+	}
+
+	static final class InstantValue implements Value {
+		private final Instant instant;
+
+		public InstantValue(Instant instant) {
+			if (instant == null) {
+				throw new IllegalArgumentException("instant cannot be null");
+			}
+			this.instant = instant;
+		}
+
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof InstantValue) {
+				InstantValue that = (InstantValue) obj;
+				return this.instant.compareTo(that.instant);
+			} else if (obj instanceof None) {
+				return 1;
+			} else {
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+			}
+		}
+
+		@Todo(description = "use Locale to print in a more readable manner")
+		@Override
+		public void append(PrintWriter printWriter, Locale locale) {
+			printWriter.append(instant.toString());
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Instant[%s]", instant);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof InstantValue) {
+				InstantValue that = (InstantValue) obj;
+				return Objects.equals(this.instant, that.instant);
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(instant);
 		}
 	}
 

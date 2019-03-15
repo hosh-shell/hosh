@@ -25,7 +25,6 @@ package org.hosh.modules;
 
 import java.lang.ProcessHandle.Info;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -202,7 +201,7 @@ public class SystemModule implements Module {
 				Record result = Record.builder()
 						.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
 						.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
-						.entry(Keys.of("start"), Values.ofText(info.startInstant().map(Instant::toString).orElse("-")))
+						.entry(Keys.of("start"), info.startInstant().map(Values::ofInstant).orElse(Values.none()))
 						.entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
 						.entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
 						.build();
