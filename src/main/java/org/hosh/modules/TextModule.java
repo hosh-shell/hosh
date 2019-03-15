@@ -25,8 +25,6 @@ package org.hosh.modules;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,9 +34,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Experimental;
@@ -51,7 +48,6 @@ import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Key;
 import org.hosh.spi.Keys;
-import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.Value;
@@ -298,10 +294,8 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Experimental(description = "extends with seed and bounds parameters, then add also 'doubles', 'booleans', etc")
+	@Experimental(description = "extends with seed, bounds parameters; later add also 'doubles', 'booleans', etc")
 	public static class Rand implements Command {
-		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
-
 		@SuppressWarnings("squid:S2189")
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -309,16 +303,9 @@ public class TextModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
-			SecureRandom secureRandom;
-			try {
-				secureRandom = SecureRandom.getInstanceStrong();
-			} catch (NoSuchAlgorithmException e) {
-				LOGGER.log(Level.SEVERE, "failed to get SecureRandom instance", e);
-				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
-				return ExitStatus.error();
-			}
+			Random random = new Random();
 			while (true) {
-				long next = secureRandom.nextLong();
+				long next = random.nextLong();
 				Record of = Record.of(Keys.RAND, Values.ofNumeric(next));
 				out.send(of);
 			}
