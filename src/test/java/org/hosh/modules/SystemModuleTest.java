@@ -95,6 +95,8 @@ public class SystemModuleTest {
 		@Mock
 		private State state;
 		@Mock
+		private Channel in;
+		@Mock
 		private Channel out;
 		@Mock
 		private Channel err;
@@ -103,36 +105,40 @@ public class SystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			ExitStatus exitStatus = sut.run(Arrays.asList(), null, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(0);
 			then(state).should().setExit(true);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneValidArg() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("21"), null, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("21"), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(21);
 			then(state).should().setExit(true);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneInvalidArg() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), null, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(state).shouldHaveZeroInteractions();
+			then(in).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a valid exit status: asd")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("1", "2"), null, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("1", "2"), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(1);
 			then(state).shouldHaveZeroInteractions();
+			then(in).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("too many parameters")));
 			then(out).shouldHaveZeroInteractions();
 		}
@@ -142,6 +148,8 @@ public class SystemModuleTest {
 	public static class EnvTest {
 		@Mock(stubOnly = true)
 		private State state;
+		@Mock
+		private Channel in;
 		@Mock
 		private Channel out;
 		@Mock
@@ -154,16 +162,18 @@ public class SystemModuleTest {
 		@Test
 		public void noArgsWithNoEnvVariables() {
 			given(state.getVariables()).willReturn(Collections.emptyMap());
-			sut.run(Arrays.asList(), null, out, err);
-			then(out).shouldHaveNoMoreInteractions();
+			sut.run(Arrays.asList(), in, out, err);
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void noArgsWithSomeEnvVariables() {
 			given(state.getVariables()).willReturn(Collections.singletonMap("HOSH_VERSION", "1.0"));
-			sut.run(Arrays.asList(), null, out, err);
+			sut.run(Arrays.asList(), in, out, err);
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
+			then(in).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 			Record record = Record.builder().entry(Keys.NAME, Values.ofText("HOSH_VERSION")).entry(Keys.VALUE, Values.ofText("1.0")).build();
 			assertThat(records.getAllValues()).contains(record);
@@ -171,7 +181,8 @@ public class SystemModuleTest {
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("1"), null, out, err);
+			sut.run(Arrays.asList("1"), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 		}
@@ -179,6 +190,8 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class HelpTest {
+		@Mock
+		private Channel in;
 		@Mock
 		private Channel out;
 		@Mock
@@ -193,7 +206,8 @@ public class SystemModuleTest {
 		@Test
 		public void oneCommand() {
 			given(state.getCommands()).willReturn(Collections.singletonMap("name", null));
-			sut.run(Arrays.asList(), null, out, err);
+			sut.run(Arrays.asList(), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
 			assertThat(records.getAllValues()).contains(Record.of(Keys.of("command"), Values.ofText("name")));
@@ -202,14 +216,16 @@ public class SystemModuleTest {
 		@Test
 		public void noCommands() {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			sut.run(Arrays.asList(), null, out, err);
+			sut.run(Arrays.asList(), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("1"), null, out, err);
+			sut.run(Arrays.asList("1"), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 		}
@@ -217,6 +233,8 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class EchoTest {
+		@Mock
+		private Channel in;
 		@Mock
 		private Channel out;
 		@Mock
@@ -226,21 +244,24 @@ public class SystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), null, out, err);
+			sut.run(Arrays.asList(), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("")));
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("a"), null, out, err);
+			sut.run(Arrays.asList("a"), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("a")));
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
-			sut.run(Arrays.asList("a", "b"), null, out, err);
+			sut.run(Arrays.asList("a", "b"), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("a b")));
 			then(err).shouldHaveZeroInteractions();
 		}
@@ -305,6 +326,8 @@ public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ProcessListTest {
 		@Mock
+		private Channel in;
+		@Mock
 		private Channel out;
 		@Mock
 		private Channel err;
@@ -313,14 +336,16 @@ public class SystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), null, out, err);
+			sut.run(Arrays.asList(), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(Mockito.any());
 			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArgNumber() {
-			sut.run(Arrays.asList("1"), null, out, err);
+			sut.run(Arrays.asList("1"), in, out, err);
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting zero arguments")));
 		}
