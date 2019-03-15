@@ -24,6 +24,7 @@
 package org.hosh.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
@@ -128,7 +129,7 @@ public class TextModuleTest {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(out).should().send(Record.of(Keys.COUNT, Values.ofNumeric(2)));
 			then(err).shouldHaveNoMoreInteractions();
@@ -140,7 +141,7 @@ public class TextModuleTest {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(2)).recv();
 			then(out).should().send(Record.of(Keys.COUNT, Values.ofNumeric(1)));
 			then(err).shouldHaveNoMoreInteractions();
@@ -150,7 +151,7 @@ public class TextModuleTest {
 		public void zeroRecords() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(1)).recv();
 			then(out).should().send(Record.of(Keys.COUNT, Values.ofNumeric(0)));
 			then(err).shouldHaveNoMoreInteractions();
@@ -250,7 +251,7 @@ public class TextModuleTest {
 		@Test
 		public void takeZero() {
 			ExitStatus exitStatus = sut.run(Arrays.asList("0"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -262,7 +263,7 @@ public class TextModuleTest {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(1)).recv();
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
@@ -274,7 +275,7 @@ public class TextModuleTest {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(1)).recv();
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
@@ -287,7 +288,7 @@ public class TextModuleTest {
 			Record record2 = Record.of(Keys.TEXT, Values.ofText("another value"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("5"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(out).should().send(record);
 			then(out).should().send(record2);
@@ -297,7 +298,7 @@ public class TextModuleTest {
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -372,7 +373,7 @@ public class TextModuleTest {
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
@@ -385,7 +386,7 @@ public class TextModuleTest {
 			Record record1 = Record.of(Keys.NAME, Values.ofNumeric(2));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(2)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(1)).send(records.capture());
@@ -395,7 +396,7 @@ public class TextModuleTest {
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -422,7 +423,7 @@ public class TextModuleTest {
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(0)).send(records.capture());
@@ -436,7 +437,7 @@ public class TextModuleTest {
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
@@ -450,7 +451,7 @@ public class TextModuleTest {
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(1)).send(records.capture());
@@ -460,7 +461,7 @@ public class TextModuleTest {
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -487,7 +488,7 @@ public class TextModuleTest {
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(0)).send(records.capture());
@@ -501,7 +502,7 @@ public class TextModuleTest {
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(0)).send(records.capture());
@@ -515,7 +516,7 @@ public class TextModuleTest {
 			Record record2 = Record.of(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(3)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(1)).send(records.capture());
@@ -525,7 +526,7 @@ public class TextModuleTest {
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -551,7 +552,7 @@ public class TextModuleTest {
 			Record record1 = Record.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("zvrnv")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(2)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
@@ -566,7 +567,7 @@ public class TextModuleTest {
 			Record record1 = Record.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("zvrnv")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(2)).recv();
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
@@ -578,7 +579,7 @@ public class TextModuleTest {
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList("a"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();

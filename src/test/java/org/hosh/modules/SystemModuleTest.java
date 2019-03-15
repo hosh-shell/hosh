@@ -25,6 +25,7 @@ package org.hosh.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -262,7 +263,7 @@ public class SystemModuleTest {
 		public void interrupts() {
 			Thread.currentThread().interrupt();
 			ExitStatus exitStatus = sut.run(Arrays.asList("1000"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("interrupted")));
@@ -359,7 +360,7 @@ public class SystemModuleTest {
 		@Test
 		public void canBeInterrupted() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
@@ -384,7 +385,7 @@ public class SystemModuleTest {
 		public void canBeInterrupted() {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).should(Mockito.times(2)).recv();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
@@ -522,7 +523,7 @@ public class SystemModuleTest {
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
@@ -531,7 +532,7 @@ public class SystemModuleTest {
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
@@ -540,7 +541,7 @@ public class SystemModuleTest {
 		@Test
 		public void createsNewBinding() {
 			ExitStatus exitStatus = sut.run(List.of("FOO", "BAR"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
@@ -551,7 +552,7 @@ public class SystemModuleTest {
 		public void updatesExistingBinding() {
 			state.getVariables().put("FOO", "BAR");
 			ExitStatus exitStatus = sut.run(List.of("FOO", "BAZ"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
@@ -575,7 +576,7 @@ public class SystemModuleTest {
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 1 argument: key")));
@@ -585,7 +586,7 @@ public class SystemModuleTest {
 		public void removesExistingBinding() {
 			state.getVariables().put("FOO", "BAR");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
@@ -595,7 +596,7 @@ public class SystemModuleTest {
 		@Test
 		public void doesNothingWhenUnexistingBinding() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
@@ -621,7 +622,7 @@ public class SystemModuleTest {
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
@@ -630,7 +631,7 @@ public class SystemModuleTest {
 		@Test
 		public void nonNumericPid() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a valid pid: FOO")));
@@ -640,7 +641,7 @@ public class SystemModuleTest {
 		public void numericPidOfNotExistingProcess() {
 			given(processLookup.of(42L)).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("cannot find pid: 42")));
@@ -651,7 +652,7 @@ public class SystemModuleTest {
 			given(processLookup.of(42L)).willReturn(Optional.of(processHandle));
 			given(processHandle.destroy()).willReturn(false);
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isFalse();
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("cannot destroy pid: 42")));
@@ -662,7 +663,7 @@ public class SystemModuleTest {
 			given(processLookup.of(42L)).willReturn(Optional.of(processHandle));
 			given(processHandle.destroy()).willReturn(true);
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();

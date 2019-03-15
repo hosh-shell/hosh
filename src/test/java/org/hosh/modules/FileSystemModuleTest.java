@@ -24,6 +24,7 @@
 package org.hosh.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -410,7 +411,7 @@ public class FileSystemModuleTest {
 			File symlink = new File(temporaryFolder.getRoot(), "symlink");
 			Files.createSymbolicLink(symlink.toPath(), newFolder.toPath());
 			ExitStatus exitStatus = sut.run(Arrays.asList("symlink"), in, out, err);
-			assertThat(exitStatus.isSuccess()).isTrue();
+			assertThat(exitStatus).isSuccess();
 			then(err).shouldHaveZeroInteractions();
 			then(out).should().send(Record.of(Keys.PATH, Values.ofLocalPath(newFolder.toPath())));
 			then(in).shouldHaveZeroInteractions();
