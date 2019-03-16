@@ -23,15 +23,28 @@
  */
 package org.hosh.modules;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.ProcessHandle.Info;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hosh.doc.Experimental;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -43,6 +56,7 @@ import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
+import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
 public class SystemModule implements Module {
@@ -63,6 +77,8 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("sink", Sink.class);
 		commandRegistry.registerCommand("set", SetVariable.class);
 		commandRegistry.registerCommand("unset", UnsetVariable.class);
+		commandRegistry.registerCommand("capture", CaptureVariable.class);
+		commandRegistry.registerCommand("open", Open.class);
 	}
 
 	public static class Echo implements Command {
@@ -382,6 +398,103 @@ public class SystemModule implements Module {
 			String key = args.get(0);
 			state.getVariables().remove(key);
 			return ExitStatus.success();
+		}
+	}
+
+	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
+	@Experimental(description = "too low level compared to simply VARNAME=$(ls)")
+	public static class CaptureVariable implements Command, StateAware {
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
+				return ExitStatus.error();
+			}
+			Locale locale = Locale.getDefault();
+			String key = args.get(0);
+			StringWriter result = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(result);
+			for (;;) {
+				Optional<Record> recv = in.recv();
+				if (recv.isEmpty()) {
+					break;
+				}
+				Record record = recv.get();
+				// see RecordWriter
+				Iterator<Value> iterator = record.values().iterator();
+				while (iterator.hasNext()) {
+					Value value = iterator.next();
+					value.append(printWriter, locale);
+					if (iterator.hasNext()) {
+						printWriter.append(' ');
+					}
+				}
+			}
+			state.getVariables().put(key, result.toString());
+			return ExitStatus.success();
+		}
+	}
+
+	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
+	@Experimental(description = "too low level compared to simply > file.txt or >> file.txt? too much power for end user (e.g. they could use DSYNC or READ)?")
+	public static class Open implements Command, StateAware {
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() <= 2) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("usage: filename [WRITE|APPEND|...]")));
+				return ExitStatus.error();
+			}
+			Locale locale = Locale.getDefault();
+			Path path = state.getCwd().resolve(Paths.get(args.get(0)));
+			try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args))))) {
+				for (;;) {
+					Optional<Record> recv = in.recv();
+					if (recv.isEmpty()) {
+						break;
+					}
+					Record record = recv.get();
+					// see RecordWriter
+					Iterator<Value> iterator = record.values().iterator();
+					while (iterator.hasNext()) {
+						Value value = iterator.next();
+						value.append(writer, locale);
+						if (iterator.hasNext()) {
+							writer.append(' ');
+						}
+					}
+					writer.append(System.lineSeparator());
+				}
+				return ExitStatus.success();
+			} catch (IOException e) {
+				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
+				return ExitStatus.error();
+			}
+		}
+
+		private OpenOption[] toOpenOptions(List<String> args) {
+			return args
+					.stream()
+					.skip(1)
+					.map(arg -> parseOption(arg))
+					.toArray(OpenOption[]::new);
+		}
+
+		private OpenOption parseOption(String arg) {
+			return Enum.valueOf(StandardOpenOption.class, arg);
 		}
 	}
 }
