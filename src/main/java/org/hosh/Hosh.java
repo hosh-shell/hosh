@@ -54,7 +54,7 @@ import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.LineReaderIterator;
 import org.hosh.runtime.SimpleCommandRegistry;
 import org.hosh.runtime.VariableExpansionCompleter;
-import org.hosh.runtime.Version;
+import org.hosh.runtime.VersionLoader;
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
 import org.hosh.spi.CommandRegistry;
@@ -80,7 +80,7 @@ public class Hosh {
 	public static void main(String[] args) throws Exception {
 		configureLogging();
 		Logger logger = LoggerFactory.forEnclosingClass();
-		String version = Version.readVersion();
+		String version = VersionLoader.loadVersion();
 		logger.info(() -> String.format("starting hosh v.%s", version));
 		ExitStatus exitStatus = ExitStatus.error();
 		try (Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build()) {
@@ -189,7 +189,7 @@ public class Hosh {
 	}
 
 	private static void welcome(Channel out, String version) {
-		out.send(Record.of(Keys.TEXT, Values.ofText("hosh v." + version)));
+		out.send(Record.of(Keys.TEXT, Values.ofText("hosh " + version)));
 		out.send(Record.of(Keys.TEXT, Values.ofText("Running on Java " + System.getProperty("java.version"))));
 		out.send(Record.of(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));
 		out.send(Record.of(Keys.TEXT, Values.ofText("Locale is " + Locale.getDefault().toString())));

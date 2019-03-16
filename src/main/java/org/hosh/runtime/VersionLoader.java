@@ -23,16 +23,19 @@
  */
 package org.hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
-import org.junit.Test;
+public class VersionLoader {
+	private VersionLoader() {
+	}
 
-public class VersionTest {
-	@Test
-	public void readVersion() throws IOException {
-		String readVersion = Version.readVersion();
-		assertThat(readVersion).isNotBlank();
+	public static String loadVersion() throws IOException {
+		try (InputStream is = VersionLoader.class.getResourceAsStream("/git.properties")) {
+			Properties properties = new Properties();
+			properties.load(is);
+			return String.format("%s", properties.getProperty("git.commit.id.describe"));
+		}
 	}
 }
