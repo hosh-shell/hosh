@@ -162,9 +162,9 @@ public class ValuesTest {
 		@Test
 		public void matches() {
 			Value text = Values.ofText("aaabaaa");
-			assertThat(text.matches("a+ba+")).isTrue();
-			assertThat(text.matches(".*b.*")).isTrue();
-			assertThat(text.matches(".*c.*")).isFalse();
+			assertThat(text.matches(Values.ofText("a+ba+"))).isTrue();
+			assertThat(text.matches(Values.ofText(".*b.*"))).isTrue();
+			assertThat(text.matches(Values.ofText(".*c.*"))).isFalse();
 		}
 
 		@Test

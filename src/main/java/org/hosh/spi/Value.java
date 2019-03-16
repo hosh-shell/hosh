@@ -26,18 +26,17 @@ package org.hosh.spi;
 import java.io.PrintWriter;
 import java.util.Locale;
 
-import org.hosh.doc.Experimental;
+import org.hosh.doc.Todo;
 
 /**
  * Any value produced by commands such as text, size or path.
- *
- * Values are immutable.
  */
+@Todo(description = "imho this should be dropped later, right now it is adding a lot of complexity "
+		+ "(i.e. wrapping immutable values like Duration, String or String) to just define 'append' and 'matches' methods")
 public interface Value extends Comparable<Value> {
 	void append(PrintWriter printWriter, Locale locale);
 
-	@Experimental(description = "not sure about this design, maybe is better to pass another Value-type object?")
-	default boolean matches(@SuppressWarnings("unused") Object obj) {
+	default boolean matches(@SuppressWarnings("unused") Value that) {
 		return false;
 	}
 }

@@ -167,9 +167,9 @@ public class Values {
 		}
 
 		@Override
-		public boolean matches(Object obj) {
-			if (obj instanceof String) {
-				return value.matches((String) obj);
+		public boolean matches(Value that) {
+			if (that instanceof Text) {
+				return value.matches(((Text) that).value);
 			} else {
 				return false;
 			}

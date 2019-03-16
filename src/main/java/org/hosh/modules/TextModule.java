@@ -102,7 +102,7 @@ public class TextModule implements Module {
 					return ExitStatus.success();
 				}
 				Key key = Keys.of(args.get(0));
-				String regex = args.get(1);
+				Value regex = Values.ofText(args.get(1));
 				Record record = incoming.get();
 				Optional<Value> value = record.value(key);
 				if (value.isPresent() && value.get().matches(regex)) {
