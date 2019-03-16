@@ -38,4 +38,6 @@ import java.lang.annotation.Target;
 @Experimental(description = "just because it's allowed in Java ;-)")
 public @interface Experimental {
 	String description();
+
+	String issue() default "";
 }

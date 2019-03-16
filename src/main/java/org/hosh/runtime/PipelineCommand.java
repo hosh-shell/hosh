@@ -63,7 +63,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 		this.interpreter = interpreter;
 	}
 
-	@Todo(description = "error channel is unbuffered by now, waiting for implementation of 2>&1")
+	@Todo(description = "error channel it not sent downstream", issue = "https://github.com/dfa1/hosh/issues/66")
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		try (Supervisor supervisor = new Supervisor()) {

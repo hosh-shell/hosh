@@ -37,4 +37,6 @@ import java.lang.annotation.Target;
 })
 public @interface Todo {
 	String description();
+
+	String issue() default "";
 }
