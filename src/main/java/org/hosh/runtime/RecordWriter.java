@@ -24,13 +24,13 @@
 package org.hosh.runtime;
 
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.Locale;
 
+import org.hosh.doc.Todo;
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Record;
-import org.hosh.spi.Record.Entry;
 
+@Todo(description = "perhaps this should be moved into the spi package?")
 public class RecordWriter {
 	private final PrintWriter pw;
 	private final Ansi.Style style;
@@ -43,11 +43,11 @@ public class RecordWriter {
 	public void writeValues(Record record) {
 		Locale locale = Locale.getDefault();
 		style.enable(pw);
-		Iterator<Record.Entry> entries = record.entries().iterator();
-		while (entries.hasNext()) {
-			Entry next = entries.next();
-			next.getValue().append(pw, locale);
-			if (entries.hasNext()) {
+		var iterator = record.values().iterator();
+		while (iterator.hasNext()) {
+			var value = iterator.next();
+			value.append(pw, locale);
+			if (iterator.hasNext()) {
 				pw.append(" ");
 			}
 		}
