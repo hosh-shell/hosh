@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ProcessHandle.Info;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -460,7 +461,8 @@ public class SystemModule implements Module {
 			}
 			Locale locale = Locale.getDefault();
 			Path path = state.getCwd().resolve(Paths.get(args.get(0)));
-			try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args))))) {
+			try (PrintWriter writer = new PrintWriter(
+					new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
 				for (;;) {
 					Optional<Record> recv = in.recv();
 					if (recv.isEmpty()) {
