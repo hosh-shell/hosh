@@ -236,6 +236,12 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	// JVM on MacOS uses sun.nio.fs.PollingWatchService with poll interval of 10
+	// seconds. This could be lowered to 2 seconds by using an internal JDK class
+	// (com.sun.nio.file.SensitivityWatchEventModifier.HIGH).
+	//
+	// Would be also possible to register recursively by using another internal
+	// class com.sun.nio.file.ExtendedWatchEventModifier.FILE_TREE.
 	@Todo(description = "should be recursive? should be possible to specify which type of events to watch")
 	public static class Watch implements Command, StateAware {
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
