@@ -30,7 +30,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -143,9 +142,7 @@ public class ExternalCommand implements Command, StateAware {
 			ProcessBuilder processBuilder = new ProcessBuilder(args)
 					.directory(cwd.toFile());
 			if (inheritIo) {
-				processBuilder.redirectInput(Redirect.INHERIT);
-				processBuilder.redirectOutput(Redirect.INHERIT);
-				processBuilder.redirectError(Redirect.PIPE);
+				processBuilder.inheritIO();
 			}
 			processBuilder.environment().putAll(env);
 			return processBuilder.start();
