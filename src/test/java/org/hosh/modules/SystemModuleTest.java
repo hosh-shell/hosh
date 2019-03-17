@@ -488,7 +488,7 @@ public class SystemModuleTest {
 		public void zeroArg() {
 			List<String> args = Arrays.asList("0");
 			assertThatThrownBy(() -> sut.before(args, in, out, err))
-					.hasMessage("repeat should be > 0")
+					.hasMessage("repeat must be > 0")
 					.isInstanceOf(IllegalArgumentException.class);
 		}
 

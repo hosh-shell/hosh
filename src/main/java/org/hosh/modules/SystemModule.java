@@ -284,13 +284,8 @@ public class SystemModule implements Module {
 			if (args.size() != 1) {
 				throw new IllegalArgumentException("requires one integer arg");
 			}
-			Accumulator accumulator = new Accumulator();
 			int repeat = Integer.parseInt(args.get(0));
-			if (repeat <= 0) {
-				throw new IllegalArgumentException("repeat should be > 0");
-			}
-			accumulator.repeat = repeat;
-			accumulator.results = new ArrayList<>(repeat);
+			Accumulator accumulator = new Accumulator(repeat);
 			accumulator.start();
 			return accumulator;
 		}
@@ -318,9 +313,17 @@ public class SystemModule implements Module {
 		}
 
 		public static class Accumulator {
-			private List<Duration> results;
+			private final List<Duration> results;
 			private int repeat;
 			private long nanoTime;
+
+			public Accumulator(int repeat) {
+				if (repeat <= 0) {
+					throw new IllegalArgumentException("repeat must be > 0");
+				}
+				this.repeat = repeat;
+				this.results = new ArrayList<>(repeat);
+			}
 
 			public void start() {
 				nanoTime = System.nanoTime();
