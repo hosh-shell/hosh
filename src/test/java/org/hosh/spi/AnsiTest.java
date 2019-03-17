@@ -24,15 +24,15 @@
 package org.hosh.spi;
 
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
-import org.hosh.spi.Ansi;
 import org.hosh.spi.Ansi.Style;
 import org.junit.Test;
 
 public class AnsiTest {
 	@Test
 	public void coloring() {
-		PrintWriter pw = new PrintWriter(System.out);
+		PrintWriter pw = new PrintWriter(System.out, true, StandardCharsets.UTF_8);
 		for (Style style : Ansi.Style.values()) {
 			style.enable(pw);
 			pw.println("test".repeat(10));

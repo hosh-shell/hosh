@@ -30,6 +30,7 @@ import static org.mockito.BDDMockito.then;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -320,7 +321,7 @@ public class FileSystemModuleTest {
 		@Test
 		public void nonEmptyFile() throws IOException {
 			File newFile = temporaryFolder.newFile("data.txt");
-			try (FileWriter writer = new FileWriter(newFile)) {
+			try (FileWriter writer = new FileWriter(newFile, StandardCharsets.UTF_8)) {
 				writer.write("a 1\n");
 				writer.write("b 2\n");
 			}
@@ -336,7 +337,7 @@ public class FileSystemModuleTest {
 		public void nonEmptyFileInCwd() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
 			File newFile = temporaryFolder.newFile("data.txt");
-			try (FileWriter writer = new FileWriter(newFile)) {
+			try (FileWriter writer = new FileWriter(newFile, StandardCharsets.UTF_8)) {
 				writer.write("a 1\n");
 			}
 			sut.run(Arrays.asList(newFile.getName()), in, out, err);
