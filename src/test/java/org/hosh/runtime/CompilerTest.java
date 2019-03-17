@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -163,7 +162,9 @@ public class CompilerTest {
 		Program program = sut.compile("withTime -t -a { git push }");
 		assertThat(program.getStatements())
 				.hasSize(1)
-				.first().extracting(Statement::getArguments).containsExactly(Arrays.asList("-t", "-a"));
+				.first().satisfies(statement -> {
+					assertThat(statement.getArguments()).containsExactly("-t", "-a");
+				});
 	}
 
 	@Test
