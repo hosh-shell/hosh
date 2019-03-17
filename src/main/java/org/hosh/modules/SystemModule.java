@@ -37,7 +37,6 @@ import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -57,7 +56,6 @@ import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
-import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
 public class SystemModule implements Module {
@@ -424,22 +422,14 @@ public class SystemModule implements Module {
 			Locale locale = Locale.getDefault();
 			String key = args.get(0);
 			StringWriter result = new StringWriter();
-			PrintWriter printWriter = new PrintWriter(result);
+			PrintWriter pw = new PrintWriter(result);
 			for (;;) {
 				Optional<Record> recv = in.recv();
 				if (recv.isEmpty()) {
 					break;
 				}
 				Record record = recv.get();
-				// see RecordWriter
-				Iterator<Value> iterator = record.values().iterator();
-				while (iterator.hasNext()) {
-					Value value = iterator.next();
-					value.append(printWriter, locale);
-					if (iterator.hasNext()) {
-						printWriter.append(' ');
-					}
-				}
+				record.append(pw, locale);
 			}
 			state.getVariables().put(key, result.toString());
 			return ExitStatus.success();
@@ -464,24 +454,15 @@ public class SystemModule implements Module {
 			}
 			Locale locale = Locale.getDefault();
 			Path path = state.getCwd().resolve(Paths.get(args.get(0)));
-			try (PrintWriter writer = new PrintWriter(
-					new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
+			try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
 				for (;;) {
 					Optional<Record> recv = in.recv();
 					if (recv.isEmpty()) {
 						break;
 					}
 					Record record = recv.get();
-					// see RecordWriter
-					Iterator<Value> iterator = record.values().iterator();
-					while (iterator.hasNext()) {
-						Value value = iterator.next();
-						value.append(writer, locale);
-						if (iterator.hasNext()) {
-							writer.append(' ');
-						}
-					}
-					writer.append(System.lineSeparator());
+					record.append(pw, locale);
+					pw.append(System.lineSeparator());
 				}
 				return ExitStatus.success();
 			} catch (IOException e) {

@@ -23,23 +23,31 @@
  */
 package org.hosh.runtime;
 
+import java.io.PrintWriter;
+import java.util.Locale;
+
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 import org.jline.terminal.Terminal;
 
 public class ConsoleChannel implements Channel {
-	private final RecordWriter recordWriter;
+	private final PrintWriter printWriter;
 	private final Ansi.Style style;
 
 	public ConsoleChannel(Terminal terminal, Ansi.Style style) {
-		this.recordWriter = new RecordWriter(terminal.writer(), style);
+		this.printWriter = terminal.writer();
 		this.style = style;
 	}
 
 	@Override
 	public void send(Record record) {
-		recordWriter.writeValues(record);
+		Locale locale = Locale.getDefault();
+		style.enable(printWriter);
+		record.append(printWriter, locale);
+		style.disable(printWriter);
+		printWriter.append(System.lineSeparator());
+		printWriter.flush();
 	}
 
 	@Override

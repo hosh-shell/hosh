@@ -23,13 +23,18 @@
  */
 package org.hosh.spi;
 
+import java.io.PrintWriter;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.hosh.doc.Experimental;
 
 /**
  * An immutable, persistent value object representing
@@ -53,6 +58,9 @@ public interface Record {
 	List<Entry> entries();
 
 	Optional<Value> value(Key key);
+
+	@Experimental(description = "should have record_separator (hardcoded to ' ') and boolean newline, perhaps in a nice fluent interface")
+	void append(PrintWriter printWriter, Locale locale);
 
 	static Record empty() {
 		return new Record.Empty();
@@ -149,6 +157,11 @@ public interface Record {
 		public String toString() {
 			return "Record[data={}]";
 		}
+
+		@Override
+		public void append(PrintWriter printWriter, Locale locale) {
+			// no-op
+		}
 	}
 
 	static class Singleton implements Record {
@@ -218,6 +231,11 @@ public interface Record {
 		@Override
 		public String toString() {
 			return String.format("Record[data={%s=%s}]", key, value);
+		}
+
+		@Override
+		public void append(PrintWriter printWriter, Locale locale) {
+			value.append(printWriter, locale);
 		}
 	}
 
@@ -292,6 +310,18 @@ public interface Record {
 		@Override
 		public String toString() {
 			return String.format("Record[data=%s]", data);
+		}
+
+		@Override
+		public void append(PrintWriter printWriter, Locale locale) {
+			Iterator<Value> iterator = values().iterator();
+			while (iterator.hasNext()) {
+				Value value = iterator.next();
+				value.append(printWriter, locale);
+				if (iterator.hasNext()) {
+					printWriter.append(" ");
+				}
+			}
 		}
 	}
 

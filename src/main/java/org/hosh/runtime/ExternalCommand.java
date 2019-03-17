@@ -24,7 +24,6 @@
 package org.hosh.runtime;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,12 +35,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
@@ -104,15 +103,16 @@ public class ExternalCommand implements Command, StateAware {
 	}
 
 	private void pipeChannelToOutputStream(Channel in, OutputStream outputStream) {
-		try (PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)))) {
-			RecordWriter recordWriter = new RecordWriter(pw, Ansi.Style.NONE);
+		Locale locale = Locale.getDefault();
+		try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true)) {
 			while (true) {
 				Optional<Record> recv = in.recv();
 				if (recv.isEmpty()) {
 					break;
 				}
 				Record record = recv.get();
-				recordWriter.writeValues(record);
+				record.append(pw, locale);
+				pw.println();
 			}
 		}
 	}
