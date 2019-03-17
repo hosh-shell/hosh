@@ -42,16 +42,21 @@ public class DefaultCommandWrapper<T> implements Command, InterpreterAware {
 	}
 
 	@Override
+	public void setInterpreter(Interpreter interpreter) {
+		this.interpreter = interpreter;
+	}
+
+	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		interpreter.injectDeps(commandWrapper);
 		T resource = commandWrapper.before(args, in, out, err);
 		try {
-			while (true) {
+			for (;;) {
 				ExitStatus exitStatus = interpreter.run(nested, in, out, err);
-				if (commandWrapper.retry(resource, in, out, err)) {
-					continue;
+				boolean retry = commandWrapper.retry(resource, in, out, err);
+				if (!retry) {
+					return exitStatus;
 				}
-				return exitStatus;
 			}
 		} finally {
 			commandWrapper.after(resource, in, out, err);
@@ -61,10 +66,5 @@ public class DefaultCommandWrapper<T> implements Command, InterpreterAware {
 	@Override
 	public String toString() {
 		return String.format("DefaultCommandWrapper[nested=%s,commandWrapper=%s]", nested, commandWrapper);
-	}
-
-	@Override
-	public void setInterpreter(Interpreter interpreter) {
-		this.interpreter = interpreter;
 	}
 }

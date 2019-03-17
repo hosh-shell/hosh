@@ -229,4 +229,14 @@ public class CompilerTest {
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'ls' unknown command wrapper");
 	}
+
+	@Test
+	public void commandWrapperAsProducer() {
+		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("benchmark");
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
+		Program program = sut.compile("benchmark 50 { ls } | schema");
+		assertThat(program.getStatements()).hasSize(1);
+	}
 }
