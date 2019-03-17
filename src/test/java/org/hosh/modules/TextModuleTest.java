@@ -557,7 +557,7 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Record.of(Keys.of("header"), Values.ofText("count      text      ")),
+					Record.of(Keys.of("header"), Values.ofText("count     text      ")),
 					Record.of(Keys.of("row"), Values.ofText("2         zvrnv     ")));
 		}
 
@@ -572,7 +572,7 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			verify(out, Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Record.of(Keys.of("header"), Values.ofText("count      text      ")),
+					Record.of(Keys.of("header"), Values.ofText("count     text      ")),
 					Record.of(Keys.of("row"), Values.ofText("          zvrnv     ")));
 		}
 

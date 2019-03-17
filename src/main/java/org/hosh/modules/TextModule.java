@@ -386,7 +386,7 @@ public class TextModule implements Module {
 			Locale locale = Locale.getDefault();
 			String format = keys.stream()
 					.map(this::formatterFor)
-					.collect(Collectors.joining(" "));
+					.collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
 			out.send(Record.of(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.BOLD, Ansi.Style.FG_CYAN)));
 		}
