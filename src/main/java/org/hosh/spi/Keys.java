@@ -75,9 +75,13 @@ public class Keys {
 	 */
 	public static final Key RAND = Keys.of("rand");
 	/**
-	 * Denotes a duration value
+	 * Denotes a duration value (i.e. java.time.Duration).
 	 */
 	public static final Key DURATION = Keys.of("duration");
+	/**
+	 * Denotes an instant value (i.e. java.time.Instant).
+	 */
+	public static final Key TIMESTAMP = Keys.of("timestamp");
 
 	private Keys() {
 	}

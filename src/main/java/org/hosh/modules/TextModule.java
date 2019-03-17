@@ -140,14 +140,13 @@ public class TextModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
-			Key timestamp = Keys.of("timestamp");
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
 					return ExitStatus.success();
 				}
 				Record record = incoming.get();
-				out.send(record.prepend(timestamp, Values.ofInstant(Instant.now())));
+				out.send(record.prepend(Keys.TIMESTAMP, Values.ofInstant(Instant.now())));
 			}
 		}
 	}
@@ -395,6 +394,7 @@ public class TextModule implements Module {
 		private final Map<Key, Integer> paddings = Map.of(
 				Keys.NAME, 30,
 				Keys.PATH, 30,
-				Keys.SIZE, 5);
+				Keys.SIZE, 5,
+				Keys.TIMESTAMP, 30);
 	}
 }
