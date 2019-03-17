@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.0.27] - 2019-03-17
+- new system commands:
+   - 'capture' low-level command for implementing later $()
+   - 'open' low-level command for implementing later 'cmd > file' and 'cmd >> file'
+   - 'watch' preliminary version for watching file-system changes
+   - 'timestamp' to insert a timestamp into each incoming record
+- 'table' has been colorized
+
 ## [0.0.26] - 2019-03-10
 - new system commands: 'set' and 'unset'
 - new text commands: 'distinct' and 'duplicated'
