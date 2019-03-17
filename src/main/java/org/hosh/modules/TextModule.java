@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Experimental;
@@ -303,7 +304,7 @@ public class TextModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 				return ExitStatus.error();
 			}
-			Random random = new Random();
+			Random random = ThreadLocalRandom.current();
 			while (true) {
 				long next = random.nextLong();
 				Record of = Record.of(Keys.RAND, Values.ofNumeric(next));

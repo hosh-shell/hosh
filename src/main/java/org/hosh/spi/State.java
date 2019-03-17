@@ -29,10 +29,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hosh.doc.Todo;
+
 /**
  * The state of the shell: it has been modeled as explicit state,
  * in practice this is a global variable.
+ *
+ * This is not thread-safe by now.
  */
+@Todo(description = "must be thread-safe sooner or later; be aware that reads outnumber writes")
 public class State {
 	// variables
 	private final Map<String, String> variables = new HashMap<>();
