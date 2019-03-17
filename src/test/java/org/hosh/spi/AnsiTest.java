@@ -34,11 +34,11 @@ public class AnsiTest {
 	public void coloring() {
 		PrintWriter pw = new PrintWriter(System.out, true, StandardCharsets.UTF_8);
 		for (Style style : Ansi.Style.values()) {
+			pw.printf("%s ", style.name());
 			style.enable(pw);
-			pw.println("test".repeat(10));
+			pw.print("test".repeat(10));
 			style.disable(pw);
-			pw.flush();
+			pw.println();
 		}
-		Style.RESET.enable(pw);
 	}
 }
