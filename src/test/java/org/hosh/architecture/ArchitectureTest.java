@@ -45,8 +45,8 @@ public class ArchitectureTest {
 	@Test
 	public void enforceProperDependenciesBetweenPackages() {
 		JavaClasses importedClasses = new ClassFileImporter()
-				.withImportOption(ImportOption.Predefined.DONT_INCLUDE_JARS)
-				.withImportOption(ImportOption.Predefined.DONT_INCLUDE_ARCHIVES)
+				.withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
+				.withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_ARCHIVES)
 				.importPackages("org.hosh");
 		slices().matching("org.hosh").should().beFreeOfCycles();
 		classes().that().resideInAPackage("..modules..")
