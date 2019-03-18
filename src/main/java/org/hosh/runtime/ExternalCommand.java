@@ -144,6 +144,7 @@ public class ExternalCommand implements Command, StateAware {
 			if (inheritIo) {
 				processBuilder.inheritIO();
 			}
+			processBuilder.environment().clear();
 			processBuilder.environment().putAll(env);
 			return processBuilder.start();
 		}

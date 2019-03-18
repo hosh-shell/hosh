@@ -25,7 +25,7 @@ package org.hosh.spi;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +40,9 @@ import org.hosh.doc.Todo;
 @Todo(description = "must be thread-safe sooner or later; be aware that reads outnumber writes")
 public class State {
 	// variables
-	private final Map<String, String> variables = new HashMap<>();
+	private final Map<String, String> variables = new LinkedHashMap<>();
 	// registered commands
-	private final Map<String, Class<? extends Command>> commands = new HashMap<>();
+	private final Map<String, Class<? extends Command>> commands = new LinkedHashMap<>();
 	// current working directory
 	private Path cwd;
 	// current command id: used by the REPL
