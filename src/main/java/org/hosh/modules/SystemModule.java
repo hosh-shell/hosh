@@ -43,8 +43,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hosh.doc.Example;
+import org.hosh.doc.Examples;
 import org.hosh.doc.Experimental;
+import org.hosh.doc.Help;
 import org.hosh.doc.Todo;
+import org.hosh.spi.Ansi.Style;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -65,7 +69,7 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("env", Env.class);
 		commandRegistry.registerCommand("quit", Exit.class);
 		commandRegistry.registerCommand("exit", Exit.class);
-		commandRegistry.registerCommand("help", Help.class);
+		commandRegistry.registerCommand("help", HelpCommand.class);
 		commandRegistry.registerCommand("sleep", Sleep.class);
 		commandRegistry.registerCommand("withTime", WithTime.class);
 		commandRegistry.registerCommand("ps", ProcessList.class);
@@ -146,7 +150,10 @@ public class SystemModule implements Module {
 		}
 	}
 
-	public static class Help implements Command, StateAware {
+	@Help(description = "built-in help system")
+	@Example(description = "help")
+	@Example(description = "help command")
+	public static class HelpCommand implements Command, StateAware {
 		private State state;
 
 		@Override
@@ -156,15 +163,37 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
-				return ExitStatus.error();
+			if (args.isEmpty()) {
+				Set<String> commands = state.getCommands().keySet();
+				for (String command : commands) {
+					out.send(Record.of(Keys.of("command"), Values.ofText(command)));
+				}
+				return ExitStatus.success();
 			}
-			Set<String> commands = state.getCommands().keySet();
-			for (String command : commands) {
-				out.send(Record.of(Keys.of("command"), Values.ofText(command)));
+			if (args.size() == 1) {
+				String commandName = args.get(0);
+				Class<? extends Command> commandClass = state.getCommands().get(commandName);
+				if (commandClass == null) {
+					err.send(Record.of(Keys.ERROR, Values.ofText("command not found: " + commandName)));
+					return ExitStatus.error();
+				}
+				Help help = commandClass.getAnnotation(Help.class);
+				if (help == null) {
+					err.send(Record.of(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
+					return ExitStatus.error();
+				}
+				out.send(Record.of(Keys.TEXT, Values.ofStyledText(commandName + " - " + help.description(), Style.BOLD)));
+				Examples examples = commandClass.getAnnotation(Examples.class);
+				if (examples != null) {
+					out.send(Record.of(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
+					for (Example example : examples.value()) {
+						out.send(Record.of(Keys.TEXT, Values.ofStyledText(example.description(), Style.ITALIC)));
+					}
+				}
+				return ExitStatus.success();
 			}
-			return ExitStatus.success();
+			err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
+			return ExitStatus.error();
 		}
 	}
 

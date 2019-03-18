@@ -41,7 +41,7 @@ import org.hosh.modules.SystemModule.Echo;
 import org.hosh.modules.SystemModule.Env;
 import org.hosh.modules.SystemModule.Err;
 import org.hosh.modules.SystemModule.Exit;
-import org.hosh.modules.SystemModule.Help;
+import org.hosh.modules.SystemModule.HelpCommand;
 import org.hosh.modules.SystemModule.KillProcess;
 import org.hosh.modules.SystemModule.KillProcess.ProcessLookup;
 import org.hosh.modules.SystemModule.ProcessList;
@@ -77,7 +77,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.EchoTest.class,
 		SystemModuleTest.EnvTest.class,
 		SystemModuleTest.ExitTest.class,
-		SystemModuleTest.HelpTest.class,
+		SystemModuleTest.HelpCommandTest.class,
 		SystemModuleTest.SleepTest.class,
 		SystemModuleTest.ProcessListTest.class,
 		SystemModuleTest.ErrTest.class,
@@ -189,7 +189,7 @@ public class SystemModuleTest {
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class HelpTest {
+	public static class HelpCommandTest {
 		@Mock
 		private Channel in;
 		@Mock
@@ -201,7 +201,7 @@ public class SystemModuleTest {
 		@Captor
 		private ArgumentCaptor<Record> records;
 		@InjectMocks
-		private Help sut;
+		private HelpCommand sut;
 
 		@Test
 		public void oneCommand() {
@@ -224,10 +224,10 @@ public class SystemModuleTest {
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("1"), in, out, err);
+			sut.run(Arrays.asList("test"), in, out, err);
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("command not found: test")));
 		}
 	}
 

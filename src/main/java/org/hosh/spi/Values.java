@@ -74,7 +74,7 @@ public class Values {
 	}
 
 	public enum Unit {
-		B, KB, MB, GB, TB
+			B, KB, MB, GB, TB
 	}
 
 	/**
@@ -132,6 +132,7 @@ public class Values {
 			for (var style : styles) {
 				style.disable(printWriter);
 			}
+			printWriter.flush();
 		}
 
 		@Override

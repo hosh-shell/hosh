@@ -41,6 +41,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import org.hosh.doc.Example;
+import org.hosh.doc.Help;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -66,6 +68,10 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("watch", Watch.class);
 	}
 
+	@Help(description = "list files")
+	@Example(description = "ls")
+	@Example(description = "ls /tmp")
+	@Example(description = "ls directory")
 	public static class ListFiles implements Command, StateAware {
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private State state;

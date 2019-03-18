@@ -23,23 +23,19 @@
  */
 package org.hosh.doc;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks an experimental API, subject to change, removal, etc.
+ * This is used to produce user-facing documentation.
  */
-@Documented
-@Inherited
+@Experimental(description = "still not 100% about this approach")
+@Repeatable(Examples.class)
 @Retention(RetentionPolicy.SOURCE)
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.PACKAGE })
-@Experimental(description = "just because it's allowed in Java ;-)")
-public @interface Experimental {
+@Target({ ElementType.TYPE })
+public @interface Example {
 	String description();
-
-	String issue() default "";
 }
