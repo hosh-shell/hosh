@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.hosh.runtime.PipelineCommand.Position;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
@@ -55,7 +57,7 @@ public class ExternalCommand implements Command, StateAware {
 	private final Path path;
 	private ProcessFactory processFactory = new DefaultProcessFactory();
 	private State state; // needed for current working directory
-	private boolean inheritIo = true;
+	private PipelineCommand.Position position = Position.SOLE;
 
 	public ExternalCommand(Path path) {
 		this.path = path;
@@ -66,8 +68,8 @@ public class ExternalCommand implements Command, StateAware {
 		this.state = state;
 	}
 
-	public void pipeline() {
-		inheritIo = false;
+	public void pipeline(PipelineCommand.Position newPosition) {
+		this.position = newPosition;
 	}
 
 	@Override
@@ -79,7 +81,7 @@ public class ExternalCommand implements Command, StateAware {
 		LOGGER.fine(() -> String.format("executing '%s' in directory %s", processArgs, cwd));
 		LOGGER.fine(() -> String.format("in '%s', out '%s', err '%s'", in, out, err));
 		try {
-			Process process = processFactory.create(processArgs, cwd, state.getVariables(), inheritIo);
+			Process process = processFactory.create(processArgs, cwd, state.getVariables(), position);
 			writeStdin(in, process);
 			readStdout(out, process);
 			readStderr(err, process);
@@ -136,23 +138,29 @@ public class ExternalCommand implements Command, StateAware {
 		}
 	}
 
-	private static class DefaultProcessFactory implements ProcessFactory {
-		@Override
-		public Process create(List<String> args, Path cwd, Map<String, String> env, Boolean inheritIo) throws IOException {
-			ProcessBuilder processBuilder = new ProcessBuilder(args)
-					.directory(cwd.toFile());
-			if (inheritIo) {
-				processBuilder.inheritIO();
-			}
-			processBuilder.environment().clear();
-			processBuilder.environment().putAll(env);
-			return processBuilder.start();
-		}
-	}
-
 	// testing aid since we cannot mock ProcessBuilder
 	interface ProcessFactory {
-		Process create(List<String> args, Path cwd, Map<String, String> env, Boolean inheritIo) throws IOException;
+		Process create(List<String> args, Path cwd, Map<String, String> env, PipelineCommand.Position position) throws IOException;
+	}
+
+	private static class DefaultProcessFactory implements ProcessFactory {
+		@Override
+		public Process create(List<String> args, Path cwd, Map<String, String> env, PipelineCommand.Position position) throws IOException {
+			ProcessBuilder processBuilder = new ProcessBuilder(args)
+					.directory(cwd.toFile());
+			processBuilder.environment().clear();
+			processBuilder.environment().putAll(env);
+			processBuilder.inheritIO();
+			if (position.redirectInput()) {
+				LOGGER.fine("setting PIPE for input");
+				processBuilder.redirectInput(Redirect.PIPE);
+			}
+			if (position.redirectOutput()) {
+				LOGGER.fine("setting PIPE for output");
+				processBuilder.redirectOutput(Redirect.PIPE);
+			}
+			return processBuilder.start();
+		}
 	}
 
 	public void setProcessFactory(ProcessFactory processFactory) {

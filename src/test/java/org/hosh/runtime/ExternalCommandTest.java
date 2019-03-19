@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.hosh.runtime.ExternalCommand.ProcessFactory;
+import org.hosh.runtime.PipelineCommand.Position;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
@@ -99,7 +100,7 @@ public class ExternalCommandTest {
 				Arrays.asList(executable.toString()),
 				Paths.get("."),
 				Collections.emptyMap(),
-				true);
+				Position.SOLE);
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
@@ -118,7 +119,7 @@ public class ExternalCommandTest {
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
 				Collections.emptyMap(),
-				true);
+				Position.SOLE);
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
@@ -138,7 +139,7 @@ public class ExternalCommandTest {
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
 				Collections.emptyMap(),
-				true);
+				Position.SOLE);
 	}
 
 	@Test
@@ -155,7 +156,7 @@ public class ExternalCommandTest {
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
 				Collections.emptyMap(),
-				true);
+				Position.SOLE);
 		then(err).should().send(any());
 	}
 

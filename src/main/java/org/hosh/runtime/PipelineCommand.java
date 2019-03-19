@@ -63,13 +63,35 @@ public class PipelineCommand implements Command, InterpreterAware {
 		this.interpreter = interpreter;
 	}
 
+	public enum Position {
+			SOLE(false, false),
+			FIRST(false, true),
+			MIDDLE(false, false),
+			LAST(true, false);
+		private final boolean redirectInput;
+		private final boolean redirectOutput;
+
+		private Position(boolean redirectInput, boolean redirectOutput) {
+			this.redirectInput = redirectInput;
+			this.redirectOutput = redirectOutput;
+		}
+
+		public boolean redirectInput() {
+			return redirectInput;
+		}
+
+		public boolean redirectOutput() {
+			return redirectOutput;
+		}
+	}
+
 	@Todo(description = "error channel it not sent downstream", issue = "https://github.com/dfa1/hosh/issues/66")
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		try (Supervisor supervisor = new Supervisor()) {
 			supervisor.setHandleSignals(false);
 			Channel pipeChannel = new PipelineChannel();
-			runAsync(supervisor, producer, new NullChannel(), pipeChannel, err);
+			runAsync(supervisor, producer, in, pipeChannel, err, Position.FIRST);
 			assemblePipeline(supervisor, consumer, pipeChannel, out, err);
 			return supervisor.waitForAll(err);
 		}
@@ -79,17 +101,17 @@ public class PipelineCommand implements Command, InterpreterAware {
 		if (statement.getCommand() instanceof PipelineCommand) {
 			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
 			Channel pipelineChannel = new PipelineChannel();
-			runAsync(supervisor, pipelineCommand.producer, in, pipelineChannel, err);
+			runAsync(supervisor, pipelineCommand.producer, in, pipelineChannel, err, Position.MIDDLE);
 			assemblePipeline(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
 		} else {
-			runAsync(supervisor, statement, in, out, err);
+			runAsync(supervisor, statement, in, out, err, Position.LAST);
 		}
 	}
 
-	private void runAsync(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
+	private void runAsync(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err, Position position) {
 		supervisor.submit(statement, () -> {
 			Command command = statement.getCommand();
-			command.downCast(ExternalCommand.class).ifPresent(ExternalCommand::pipeline);
+			command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline(position));
 			try {
 				return interpreter.run(statement, in, out, err);
 			} catch (ProducerPoisonPill e) {
