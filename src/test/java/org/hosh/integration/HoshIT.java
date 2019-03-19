@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,6 +46,7 @@ import org.hosh.doc.Bug;
 import org.hosh.testsupport.IgnoreIf;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
 import org.hosh.testsupport.IgnoreIf.OnWindows;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,10 +60,17 @@ public class HoshIT {
 	public final IgnoreIf ignoreIf = new IgnoreIf();
 	@Rule
 	public final TestName testName = new TestName();
+	private long nanos;
 
 	@Before
-	public void showTest() {
-		System.out.println("  " + testName.getMethodName());
+	public void startTest() {
+		System.out.print("  " + testName.getMethodName());
+		nanos = System.nanoTime();
+	}
+
+	@After
+	public void stopTest() {
+		System.out.printf("...  %sms%n", Duration.ofNanos(System.nanoTime() - nanos).toMillis());
 	}
 
 	@Test
