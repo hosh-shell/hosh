@@ -146,7 +146,7 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	private void setThreadName(Statement statement) {
-		String commandName = statement.getCommand().getClass().getSimpleName();
+		String commandName = statement.getCommand().describe();
 		List<String> commandWithArguments = new ArrayList<>();
 		commandWithArguments.add(commandName);
 		commandWithArguments.addAll(statement.getArguments());

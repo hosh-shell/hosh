@@ -68,6 +68,11 @@ public class ExternalCommand implements Command, StateAware {
 		this.state = state;
 	}
 
+	@Override
+	public String describe() {
+		return path.toAbsolutePath().toString();
+	}
+
 	public void pipeline(PipelineCommand.Position newPosition) {
 		this.position = newPosition;
 	}

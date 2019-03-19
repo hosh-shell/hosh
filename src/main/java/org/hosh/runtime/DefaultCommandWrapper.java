@@ -64,6 +64,11 @@ public class DefaultCommandWrapper<T> implements Command, InterpreterAware {
 	}
 
 	@Override
+	public String describe() {
+		return String.format("%s { %s } ", commandWrapper.describe(), nested.getCommand().describe());
+	}
+
+	@Override
 	public String toString() {
 		return String.format("DefaultCommandWrapper[nested=%s,commandWrapper=%s]", nested, commandWrapper);
 	}
