@@ -34,6 +34,7 @@ import org.hosh.doc.Todo;
 @Todo(description = "imho this should be dropped later, right now it is adding a lot of complexity "
 		+ "(i.e. wrapping immutable values like Duration, String or String) to just define 'append' and 'matches' methods")
 public interface Value extends Comparable<Value> {
+
 	void append(PrintWriter printWriter, Locale locale);
 
 	default boolean matches(@SuppressWarnings("unused") Value that) {

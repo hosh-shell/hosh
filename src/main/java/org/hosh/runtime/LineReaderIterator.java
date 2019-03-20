@@ -36,8 +36,11 @@ import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
 
 public class LineReaderIterator implements Iterator<String> {
+
 	private final State state;
+
 	private final LineReader lineReader;
+
 	private String nextLine;
 
 	public LineReaderIterator(State state, LineReader lineReader) {

@@ -48,22 +48,31 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PipelineCommandTest {
+
 	@Mock
 	private Channel in;
+
 	@Mock
 	private Channel out;
+
 	@Mock
 	private Channel err;
+
 	@Mock(stubOnly = true)
 	private Statement producer;
+
 	@Mock(stubOnly = true)
 	private Statement consumer;
+
 	@Mock(stubOnly = true)
 	private Statement consumerProducer;
+
 	@Mock(stubOnly = true)
 	private Command command;
+
 	@Mock(stubOnly = true)
 	private Interpreter interpreter;
+
 	private PipelineCommand sut;
 
 	@Before

@@ -42,10 +42,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ConsoleChannelTest {
+
 	@Mock(stubOnly = true)
 	private Terminal terminal;
+
 	@Mock
 	private PrintWriter printWriter;
+
 	private ConsoleChannel sut;
 
 	@Before

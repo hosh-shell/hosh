@@ -32,8 +32,11 @@ import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
 
 public class DefaultCommandWrapper<T> implements Command, InterpreterAware {
+
 	private final Statement nested;
+
 	private final CommandWrapper<T> commandWrapper;
+
 	private Interpreter interpreter;
 
 	public DefaultCommandWrapper(Statement nested, CommandWrapper<T> commandWrapper) {

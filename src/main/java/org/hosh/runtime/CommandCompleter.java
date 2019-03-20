@@ -32,6 +32,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
 public class CommandCompleter implements Completer {
+
 	private final State state;
 
 	public CommandCompleter(State state) {

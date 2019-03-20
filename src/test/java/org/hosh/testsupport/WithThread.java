@@ -26,9 +26,10 @@ package org.hosh.testsupport;
 import org.junit.rules.ExternalResource;
 
 /**
- * To be used where a test is messing up with thread names and interrupted flag.
+ * To be used where a test is changing a thread names or interrupted flag.
  */
 public class WithThread extends ExternalResource {
+
 	private String backup;
 
 	@Override

@@ -58,26 +58,38 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.Strict.class)
 public class InterpreterTest {
-	private Map<String, String> variables = new HashMap<>();
-	private List<String> args = new ArrayList<>();
+
 	@Mock(stubOnly = true)
 	private State state;
+
 	@Mock(stubOnly = true)
 	private Terminal terminal;
+
 	@Mock(stubOnly = true)
 	private Channel out;
+
 	@Mock
 	private Channel err;
+
 	@Mock(stubOnly = true)
 	private Program program;
+
 	@Mock(stubOnly = true)
 	private Statement statement;
+
 	@Mock
 	private Command command;
+
 	@Mock
 	private StateAwareCommand stateAwareCommand;
+
 	@Mock
 	private TerminalAwareCommand terminalAwareCommand;
+
+	private Map<String, String> variables = new HashMap<>();
+
+	private List<String> args = new ArrayList<>();
+
 	private Interpreter sut;
 
 	@Before

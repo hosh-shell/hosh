@@ -59,23 +59,33 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ExternalCommandTest {
+
 	@Rule
 	public final WithThread withThread = new WithThread();
+
 	@Rule
 	public final TemporaryFolder folder = new TemporaryFolder();
+
 	@Mock(name = "in")
 	private Channel in;
+
 	@Mock(name = "out")
 	private Channel out;
+
 	@Mock(name = "err")
 	private Channel err;
+
 	@Mock(stubOnly = true)
 	private State state;
+
 	@Mock(stubOnly = true)
 	private Process process;
+
 	@Mock
 	private ProcessFactory processFactory;
+
 	private Path executable;
+
 	private ExternalCommand sut;
 
 	@Before

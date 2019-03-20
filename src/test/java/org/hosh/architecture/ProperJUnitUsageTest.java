@@ -36,6 +36,7 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 
 public class ProperJUnitUsageTest {
+
 	@Test
 	public void enforcePresenceOfTestAnnotation() {
 		try (ScanResult scanResult = new ClassGraph().whitelistPackages("org.hosh").scan()) {

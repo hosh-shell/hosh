@@ -37,13 +37,16 @@ import org.junit.runners.model.Statement;
 
 @Experimental(description = "JUnit 5 provides a much more complete solution to this problem")
 public class IgnoreIf implements MethodRule {
+
 	interface Condition {
+
 		boolean test();
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD })
 	public @interface IgnoredIf {
+
 		String description();
 
 		Class<? extends Condition> condition();
@@ -56,6 +59,7 @@ public class IgnoreIf implements MethodRule {
 			return base;
 		}
 		return new Statement() {
+
 			@Override
 			public void evaluate() throws Throwable {
 				Condition condition = annotation.condition().getDeclaredConstructor().newInstance();
@@ -66,6 +70,7 @@ public class IgnoreIf implements MethodRule {
 	}
 
 	public static class OnWindows implements Condition {
+
 		@Override
 		public boolean test() {
 			return System.getProperty("os.name").startsWith("Windows");
@@ -73,6 +78,7 @@ public class IgnoreIf implements MethodRule {
 	}
 
 	public static class NotOnWindows implements Condition {
+
 		@Override
 		public boolean test() {
 			return !System.getProperty("os.name").startsWith("Windows");

@@ -42,7 +42,9 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
 public class FileSystemCompleter implements Completer {
+
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 	private final State state;
 
 	public FileSystemCompleter(State state) {

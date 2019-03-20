@@ -31,6 +31,7 @@ import org.hosh.doc.Experimental;
  * A command specialization that performs set-up and clean-up.
  */
 public interface CommandWrapper<T> extends Command {
+
 	/**
 	 * Create and set-up a resource.
 	 */

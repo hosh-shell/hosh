@@ -53,10 +53,15 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
 
 public class ExternalCommand implements Command, StateAware {
+
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 	private final Path path;
+
 	private ProcessFactory processFactory = new DefaultProcessFactory();
+
 	private State state; // needed for current working directory
+
 	private PipelineCommand.Position position = Position.SOLE;
 
 	public ExternalCommand(Path path) {
@@ -145,10 +150,12 @@ public class ExternalCommand implements Command, StateAware {
 
 	// testing aid since we cannot mock ProcessBuilder
 	interface ProcessFactory {
+
 		Process create(List<String> args, Path cwd, Map<String, String> env, PipelineCommand.Position position) throws IOException;
 	}
 
 	private static class DefaultProcessFactory implements ProcessFactory {
+
 		@Override
 		public Process create(List<String> args, Path cwd, Map<String, String> env, PipelineCommand.Position position) throws IOException {
 			ProcessBuilder processBuilder = new ProcessBuilder(args)

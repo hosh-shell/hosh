@@ -26,6 +26,7 @@ package org.hosh.spi;
 import java.io.PrintWriter;
 
 public class Ansi {
+
 	private Ansi() {
 	}
 
@@ -58,9 +59,12 @@ public class Ansi {
 			BG_MAGENTA("45", "49"),
 			BG_CYAN("46", "49"),
 			BG_WHITE("47", "49");
+
 		/** The Control Sequence Introducer (CSI) escape sequence. */
 		private static final String CSI = "\u001b[";
+
 		private final String startCode;
+
 		private final String endCode;
 
 		private Style(String startCode, String endCode) {

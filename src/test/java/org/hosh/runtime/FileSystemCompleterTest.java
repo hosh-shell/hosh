@@ -48,18 +48,25 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class FileSystemCompleterTest {
+
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 	@Rule
 	public final IgnoreIf ignoreIf = new IgnoreIf();
+
 	@Mock
 	private State state;
+
 	@Mock(stubOnly = true)
 	private LineReader lineReader;
+
 	@Mock
 	private ParsedLine line;
+
 	@Mock
 	private List<Candidate> candidates;
+
 	@InjectMocks
 	private FileSystemCompleter sut;
 

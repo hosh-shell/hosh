@@ -63,6 +63,7 @@ import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
 
 public class SystemModule implements Module {
+
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("echo", Echo.class);
@@ -85,6 +86,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Echo implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			Record record = Record.of(Keys.VALUE, Values.ofText(String.join(" ", args)));
@@ -94,6 +96,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Env implements Command, StateAware {
+
 		private State state;
 
 		@Override
@@ -120,6 +123,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Exit implements Command, StateAware {
+
 		private State state;
 
 		@Override
@@ -154,6 +158,7 @@ public class SystemModule implements Module {
 	@Example(description = "help")
 	@Example(description = "help command")
 	public static class HelpCommand implements Command, StateAware {
+
 		private State state;
 
 		@Override
@@ -198,6 +203,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Sleep implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
@@ -220,6 +226,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class WithTime implements CommandWrapper<Long> {
+
 		@Override
 		public Long before(List<String> args, Channel in, Channel out, Channel err) {
 			return System.nanoTime();
@@ -234,6 +241,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class ProcessList implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
@@ -256,10 +264,12 @@ public class SystemModule implements Module {
 	}
 
 	public static class KillProcess implements Command {
+
 		/**
 		 * Allows unit testing by breaking hard dependency to ProcessHandle.
 		 */
 		public interface ProcessLookup {
+
 			Optional<ProcessHandle> of(long pid);
 		}
 
@@ -295,6 +305,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Err implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			throw new NullPointerException("injected error: please do not report");
@@ -302,8 +313,11 @@ public class SystemModule implements Module {
 	}
 
 	public static class Benchmark implements CommandWrapper<SystemModule.Benchmark.Accumulator> {
+
 		public static final Key BEST = Keys.of("best");
+
 		public static final Key WORST = Keys.of("worst");
+
 		public static final Key AVERAGE = Keys.of("average");
 
 		@Override
@@ -340,8 +354,11 @@ public class SystemModule implements Module {
 		}
 
 		public static class Accumulator {
+
 			private final List<Duration> results;
+
 			private int repeat;
+
 			private long nanoTime;
 
 			public Accumulator(int repeat) {
@@ -369,6 +386,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Source implements Command {
+
 		@SuppressWarnings("squid:S2189")
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -379,6 +397,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class Sink implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			while (true) {
@@ -392,6 +411,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class SetVariable implements Command, StateAware {
+
 		private State state;
 
 		@Override
@@ -413,6 +433,7 @@ public class SystemModule implements Module {
 	}
 
 	public static class UnsetVariable implements Command, StateAware {
+
 		private State state;
 
 		@Override
@@ -435,6 +456,7 @@ public class SystemModule implements Module {
 	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
 	@Experimental(description = "too low level compared to simply VARNAME=$(ls)")
 	public static class CaptureVariable implements Command, StateAware {
+
 		private State state;
 
 		@Override
@@ -468,6 +490,7 @@ public class SystemModule implements Module {
 	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
 	@Experimental(description = "too low level compared to simply > file.txt or >> file.txt? too much power for end user (e.g. they could use DSYNC or READ)?")
 	public static class Open implements Command, StateAware {
+
 		private State state;
 
 		@Override

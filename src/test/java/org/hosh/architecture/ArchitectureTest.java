@@ -42,6 +42,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
  * The short term goal is to prepare ground for modules.
  */
 public class ArchitectureTest {
+
 	@Test
 	public void enforceProperDependenciesBetweenPackages() {
 		JavaClasses importedClasses = new ClassFileImporter()

@@ -32,7 +32,9 @@ import org.hosh.spi.Record;
 import org.jline.terminal.Terminal;
 
 public class ConsoleChannel implements Channel {
+
 	private final PrintWriter printWriter;
+
 	private final Ansi.Style style;
 
 	public ConsoleChannel(Terminal terminal, Ansi.Style style) {

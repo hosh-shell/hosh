@@ -31,6 +31,7 @@ import java.util.Optional;
  * commands.
  */
 public class ExitStatus {
+
 	private final int value;
 
 	private ExitStatus(int value) {

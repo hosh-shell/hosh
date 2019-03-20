@@ -32,6 +32,7 @@ import org.junit.Test;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class ExitStatusTest {
+
 	@Test
 	public void equalsContract() {
 		EqualsVerifier.forClass(ExitStatus.class).verify();

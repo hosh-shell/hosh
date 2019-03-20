@@ -35,6 +35,7 @@ import org.junit.Test;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class RecordTest {
+
 	@Test
 	public void copy() {
 		Record a = Record.of(Keys.NAME, Values.ofText("a"));

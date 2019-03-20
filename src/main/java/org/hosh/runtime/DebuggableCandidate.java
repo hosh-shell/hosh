@@ -31,6 +31,7 @@ import org.jline.reader.Candidate;
  * {@link Candidate} as value object
  */
 public class DebuggableCandidate extends Candidate {
+
 	public static DebuggableCandidate incomplete(String value) {
 		return new DebuggableCandidate(value, false);
 	}

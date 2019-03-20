@@ -46,14 +46,19 @@ import org.mockito.junit.MockitoJUnitRunner;
 @Todo(description = "improve assertions (e.g. check arguments parsing and proper nesting of objects)")
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CompilerTest {
+
 	@Mock(stubOnly = true)
 	private Command command;
+
 	@Mock(stubOnly = true)
 	private Command anotherCommand;
+
 	@Mock(stubOnly = true)
 	private CommandWrapper<?> commandWrapper;
+
 	@Mock(stubOnly = true)
 	private CommandResolver commandResolver;
+
 	@InjectMocks
 	private Compiler sut;
 

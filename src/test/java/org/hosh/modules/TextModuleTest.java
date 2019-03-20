@@ -82,14 +82,19 @@ import org.mockito.junit.MockitoJUnitRunner;
 		TableTest.class,
 })
 public class TextModuleTest {
+
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SchemaTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Schema sut;
 
@@ -114,12 +119,16 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class CountTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Count sut;
 
@@ -168,12 +177,16 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class EnumerateTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Enumerate sut;
 
@@ -199,12 +212,16 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class DropTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Drop sut;
 
@@ -239,12 +256,16 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class TakeTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Take sut;
 
@@ -307,12 +328,16 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class FilterTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Filter sut;
 
@@ -355,14 +380,19 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SortTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Sort sut;
+
 		@Captor
 		private ArgumentCaptor<Record> records;
 
@@ -405,14 +435,19 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class DistinctTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Distinct sut;
+
 		@Captor
 		private ArgumentCaptor<Record> records;
 
@@ -470,14 +505,19 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class DuplicatedTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Duplicated sut;
+
 		@Captor
 		private ArgumentCaptor<Record> records;
 
@@ -535,14 +575,19 @@ public class TextModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class TableTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Table sut;
+
 		@Captor
 		private ArgumentCaptor<Record> records;
 

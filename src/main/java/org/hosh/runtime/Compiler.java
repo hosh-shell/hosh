@@ -42,6 +42,7 @@ import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 
 public class Compiler {
+
 	private final CommandResolver commandResolver;
 
 	public Compiler(CommandResolver commandResolver) {
@@ -165,6 +166,7 @@ public class Compiler {
 	}
 
 	public static class Program {
+
 		private List<Statement> statements;
 
 		public void setStatements(List<Statement> statements) {
@@ -182,7 +184,9 @@ public class Compiler {
 	}
 
 	public static class Statement {
+
 		private Command command;
+
 		private List<String> arguments;
 
 		public void setCommand(Command command) {
@@ -208,6 +212,7 @@ public class Compiler {
 	}
 
 	public static class CompileError extends RuntimeException {
+
 		private static final long serialVersionUID = 1L;
 
 		public CompileError(String message) {
@@ -216,6 +221,7 @@ public class Compiler {
 	}
 
 	public static class InternalBug extends RuntimeException {
+
 		private static final long serialVersionUID = 1L;
 	}
 }

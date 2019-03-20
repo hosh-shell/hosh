@@ -50,12 +50,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SupervisorTest {
+
 	@Rule
 	public final WithThread withThread = new WithThread();
+
 	@Mock
 	private Channel err;
+
 	@Mock(stubOnly = true)
 	private Statement statement;
+
 	@InjectMocks
 	private Supervisor sut;
 
@@ -165,6 +169,7 @@ public class SupervisorTest {
 
 	// cannot be a mock since we need a fixed name for testing purposes
 	private static class TestCommand implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			return ExitStatus.success();

@@ -35,8 +35,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NullChannelTest {
+
 	@Mock
 	private Record record;
+
 	@InjectMocks
 	private NullChannel sut;
 

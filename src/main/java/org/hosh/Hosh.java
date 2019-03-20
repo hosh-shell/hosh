@@ -74,6 +74,7 @@ import org.jline.terminal.TerminalBuilder;
 
 /** Main class */
 public class Hosh {
+
 	private Hosh() {
 	}
 

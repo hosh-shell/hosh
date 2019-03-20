@@ -28,5 +28,6 @@ import java.util.Optional;
 import org.hosh.spi.Command;
 
 public interface CommandResolver {
+
 	Optional<Command> tryResolve(String commandName);
 }

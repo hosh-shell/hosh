@@ -31,5 +31,6 @@ package org.hosh.runtime;
  * (spi or modules).
  */
 public interface InterpreterAware {
+
 	void setInterpreter(Interpreter interpreter);
 }

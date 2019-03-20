@@ -42,14 +42,19 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class VariableExpansionCompleterTest {
+
 	@Mock(stubOnly = true)
 	private LineReader lineReader;
+
 	@Mock(stubOnly = true)
 	private ParsedLine parsedLine;
+
 	@Spy
 	private State state = new State();
+
 	@Mock
 	private List<Candidate> candidates;
+
 	@InjectMocks
 	private VariableExpansionCompleter sut;
 

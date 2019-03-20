@@ -44,6 +44,7 @@ import org.hosh.doc.Todo;
  * NB: concrete types are not exposed by design
  */
 public class Values {
+
 	private Values() {
 	}
 
@@ -81,6 +82,7 @@ public class Values {
 	 * One kibibyte (1024 bytes), this is in contrast to the SI system (1000 bytes)
 	 */
 	public static final int KIB = 1024;
+
 	// log-indexed units table
 	private static final Unit[] UNITS = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
 
@@ -109,7 +111,9 @@ public class Values {
 	 * the current locale.
 	 */
 	static final class Text implements Value {
+
 		private final String value;
+
 		private final Ansi.Style[] styles;
 
 		public Text(String value, Ansi.Style... styles) {
@@ -181,7 +185,9 @@ public class Values {
 	 * Used to represent a size of a file, etc.
 	 */
 	static final class Size implements Value {
+
 		private final BigDecimal value;
+
 		private final Unit unit;
 
 		public Size(BigDecimal value, Unit unit) {
@@ -245,6 +251,7 @@ public class Values {
 	}
 
 	static final class Numeric implements Value {
+
 		private final long number;
 
 		public Numeric(long number) {
@@ -291,6 +298,7 @@ public class Values {
 	}
 
 	static final class None implements Value {
+
 		@Override
 		public void append(PrintWriter printWriter, Locale locale) {
 			printWriter.append("");
@@ -322,6 +330,7 @@ public class Values {
 	}
 
 	static final class DurationValue implements Value {
+
 		private final Duration duration;
 
 		public DurationValue(Duration duration) {
@@ -370,6 +379,7 @@ public class Values {
 	}
 
 	static final class InstantValue implements Value {
+
 		private final Instant instant;
 
 		public InstantValue(Instant instant) {
@@ -419,6 +429,7 @@ public class Values {
 	}
 
 	static final class LocalPath implements Value {
+
 		private final Path path;
 
 		public LocalPath(Path path) {
@@ -477,6 +488,7 @@ public class Values {
 	 * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
 	 */
 	static class AlphaNumericStringComparator implements Comparator<String> {
+
 		private static final Pattern CHUNK = Pattern.compile("(\\d+)|(\\D+)");
 
 		@Override

@@ -41,10 +41,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AnsiFormatterTest {
+
 	@Rule
 	public final WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("PST"));
+
 	@Mock(stubOnly = true)
 	private LogRecord logRecord;
+
 	@InjectMocks
 	private AnsiFormatter sut;
 
@@ -79,6 +82,7 @@ public class AnsiFormatterTest {
 
 	@SuppressWarnings("serial")
 	static class Stacktraceless extends RuntimeException {
+
 		@Override
 		public synchronized Throwable fillInStackTrace() {
 			return this;

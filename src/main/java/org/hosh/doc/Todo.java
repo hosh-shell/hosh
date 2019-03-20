@@ -36,6 +36,7 @@ import java.lang.annotation.Target;
 		ElementType.TYPE, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.PACKAGE, ElementType.FIELD
 })
 public @interface Todo {
+
 	String description();
 
 	String issue() default "";

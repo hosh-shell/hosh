@@ -42,10 +42,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class LineReaderIteratorTest {
+
 	@Mock(stubOnly = true)
 	private LineReader lineReader;
+
 	@Mock(stubOnly = true)
 	private State state;
+
 	@InjectMocks
 	private LineReaderIterator sut;
 

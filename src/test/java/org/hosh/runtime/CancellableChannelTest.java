@@ -38,10 +38,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CancellableChannelTest {
+
 	@Mock(stubOnly = true)
 	private Record record;
+
 	@Mock
 	private Channel channel;
+
 	@InjectMocks
 	private CancellableChannel sut;
 

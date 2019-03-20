@@ -40,6 +40,7 @@ import org.hosh.spi.State;
  * compiler unaware of how commands are resolved.
  */
 public class CommandResolvers {
+
 	private CommandResolvers() {
 	}
 
@@ -55,6 +56,7 @@ public class CommandResolvers {
 	}
 
 	public static class AggregateCommandResolver implements CommandResolver {
+
 		private final List<CommandResolver> resolvers;
 
 		public AggregateCommandResolver(List<CommandResolver> resolvers) {
@@ -74,7 +76,9 @@ public class CommandResolvers {
 	}
 
 	public static class ExternalCommandResolver implements CommandResolver {
+
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 		private final State state;
 
 		public ExternalCommandResolver(State state) {
@@ -121,7 +125,9 @@ public class CommandResolvers {
 	}
 
 	public static class BuiltinCommandResolver implements CommandResolver {
+
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 		private final State state;
 
 		public BuiltinCommandResolver(State state) {
@@ -151,7 +157,9 @@ public class CommandResolvers {
 	}
 
 	public static class WindowsCommandResolver implements CommandResolver {
+
 		private final State state;
+
 		private final ExternalCommandResolver resolver;
 
 		public WindowsCommandResolver(State state) {

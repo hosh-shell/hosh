@@ -41,6 +41,7 @@ import org.hosh.doc.Experimental;
  * a list of key-value pairs.
  */
 public interface Record {
+
 	/**
 	 * Yields a new Record with the specified mapping as last one.
 	 */
@@ -75,7 +76,9 @@ public interface Record {
 	}
 
 	class Entry {
+
 		private final Key key;
+
 		private final Value value;
 
 		public Entry(Key key, Value value) {
@@ -113,6 +116,7 @@ public interface Record {
 	}
 
 	class Empty implements Record {
+
 		@Override
 		public List<Key> keys() {
 			return Collections.emptyList();
@@ -165,7 +169,9 @@ public interface Record {
 	}
 
 	static class Singleton implements Record {
+
 		private final Key key;
+
 		private final Value value;
 
 		public Singleton(Key key, Value value) {
@@ -240,6 +246,7 @@ public interface Record {
 	}
 
 	static class Generic implements Record {
+
 		private final Map<Key, Value> data;
 
 		private Generic(Map<Key, Value> data) {
@@ -329,6 +336,7 @@ public interface Record {
 	 * Mutable builder of Record objects. Retains insertion order.
 	 */
 	class Builder {
+
 		private final LinkedHashMap<Key, Value> data = new LinkedHashMap<>(2);
 
 		private Builder() {

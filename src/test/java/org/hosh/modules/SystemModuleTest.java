@@ -90,16 +90,22 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.KillProcessTest.class,
 })
 public class SystemModuleTest {
+
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ExitTest {
+
 		@Mock
 		private State state;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Exit sut;
 
@@ -146,16 +152,22 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class EnvTest {
+
 		@Mock(stubOnly = true)
 		private State state;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@Captor
 		private ArgumentCaptor<Record> records;
+
 		@InjectMocks
 		private Env sut;
 
@@ -190,16 +202,22 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class HelpCommandTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@Mock
 		private State state;
+
 		@Captor
 		private ArgumentCaptor<Record> records;
+
 		@InjectMocks
 		private HelpCommand sut;
 
@@ -233,12 +251,16 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class EchoTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Echo sut;
 
@@ -269,14 +291,19 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SleepTest {
+
 		@Rule
 		public final WithThread withThread = new WithThread();
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Sleep sut;
 
@@ -325,12 +352,16 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ProcessListTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private ProcessList sut;
 
@@ -353,12 +384,16 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ErrTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Err sut;
 
@@ -372,12 +407,16 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SourceTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Source sut;
 
@@ -394,14 +433,19 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SinkTest {
+
 		@Mock(stubOnly = true)
 		private Record record;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Sink sut;
 
@@ -419,14 +463,19 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class BenchmarkTest {
+
 		@Mock
 		private State state;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Benchmark sut;
 
@@ -501,12 +550,16 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class WithTimeTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private WithTime sut;
 
@@ -534,14 +587,19 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SetVariableTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@Spy
 		private State state = new State();
+
 		@InjectMocks
 		private SetVariable sut;
 
@@ -587,14 +645,19 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class UnsetVariableTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@Spy
 		private State state = new State();
+
 		@InjectMocks
 		private UnsetVariable sut;
 
@@ -631,16 +694,22 @@ public class SystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class KillProcessTest {
+
 		@Mock(stubOnly = true)
 		private ProcessHandle processHandle;
+
 		@Mock(stubOnly = true)
 		private ProcessLookup processLookup;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private KillProcess sut;
 

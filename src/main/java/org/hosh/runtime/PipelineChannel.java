@@ -37,11 +37,17 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 
 public class PipelineChannel implements Channel {
+
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 	private static final int QUEUE_CAPACITY = 100;
+
 	private static final boolean QUEUE_FAIRNESS = false;
+
 	private final Record poisonPill = Record.of(Keys.of("poisonpill"), Values.none());
+
 	private final BlockingQueue<Record> queue;
+
 	private volatile boolean done;
 
 	public PipelineChannel() {
@@ -114,6 +120,7 @@ public class PipelineChannel implements Channel {
 	 * stop any downstream readers.
 	 */
 	public static class ProducerPoisonPill extends RuntimeException {
+
 		private static final long serialVersionUID = 1L;
 	}
 }

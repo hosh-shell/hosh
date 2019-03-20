@@ -54,16 +54,22 @@ import org.mockito.junit.MockitoJUnitRunner;
 		TerminalModuleTest.DumpTest.class,
 })
 public class TerminalModuleTest {
+
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ClearTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@Mock
 		private Terminal terminal;
+
 		@InjectMocks
 		private Clear sut;
 
@@ -91,14 +97,19 @@ public class TerminalModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class BellTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@Mock
 		private Terminal terminal;
+
 		@InjectMocks
 		private Bell sut;
 
@@ -126,14 +137,19 @@ public class TerminalModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class DumpTest {
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@Mock
 		private Terminal terminal;
+
 		@InjectMocks
 		private Dump sut;
 

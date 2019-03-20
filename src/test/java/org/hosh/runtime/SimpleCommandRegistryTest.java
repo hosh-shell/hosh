@@ -37,12 +37,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SimpleCommandRegistryTest {
+
 	@Mock
 	private Command command;
+
 	@Mock
 	private Command anotherCommand;
+
 	@Spy
 	private State state = new State();
+
 	@InjectMocks
 	private SimpleCommandRegistry sut;
 

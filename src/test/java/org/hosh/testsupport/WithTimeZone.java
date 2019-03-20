@@ -28,7 +28,9 @@ import java.util.TimeZone;
 import org.junit.rules.ExternalResource;
 
 public class WithTimeZone extends ExternalResource {
+
 	private final TimeZone wanted;
+
 	private TimeZone backup;
 
 	public WithTimeZone(TimeZone wanted) {

@@ -30,6 +30,7 @@ import java.io.IOException;
 import org.junit.Test;
 
 public class VersionLoaderTest {
+
 	@Test
 	public void readVersion() throws IOException {
 		String readVersion = VersionLoader.loadVersion();

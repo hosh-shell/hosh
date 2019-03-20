@@ -43,18 +43,25 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DefaultCommandWrapperTest {
+
 	@Mock(stubOnly = true)
 	private Channel in;
+
 	@Mock(stubOnly = true)
 	private Channel out;
+
 	@Mock(stubOnly = true)
 	private Channel err;
+
 	@Mock(stubOnly = true)
 	private Statement statement;
+
 	@Mock(stubOnly = true)
 	private Interpreter interpreter;
+
 	@Mock
 	private CommandWrapper<Object> commandWrapper;
+
 	private DefaultCommandWrapper<Object> sut;
 
 	@Before

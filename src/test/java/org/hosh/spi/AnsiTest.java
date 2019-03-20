@@ -30,6 +30,7 @@ import org.hosh.spi.Ansi.Style;
 import org.junit.Test;
 
 public class AnsiTest {
+
 	@Test
 	public void coloring() {
 		PrintWriter pw = new PrintWriter(System.out, true, StandardCharsets.UTF_8);

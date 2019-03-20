@@ -35,9 +35,13 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.LoggerFactory;
 
 public class PipelineCommand implements Command, InterpreterAware {
+
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 	private final Statement producer;
+
 	private final Statement consumer;
+
 	private Interpreter interpreter;
 
 	public PipelineCommand(Statement producer, Statement consumer) {
@@ -68,7 +72,9 @@ public class PipelineCommand implements Command, InterpreterAware {
 			FIRST(false, true),
 			MIDDLE(false, false),
 			LAST(true, false);
+
 		private final boolean redirectInput;
+
 		private final boolean redirectOutput;
 
 		private Position(boolean redirectInput, boolean redirectOutput) {

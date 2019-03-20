@@ -32,6 +32,7 @@ import org.hosh.doc.Experimental;
  * Command represents a built-in (i.e. ls) or system commands (i.e. vim).
  */
 public interface Command {
+
 	ExitStatus run(List<String> args, Channel in, Channel out, Channel err);
 
 	default <T> Optional<T> downCast(Class<T> requiredClass) {

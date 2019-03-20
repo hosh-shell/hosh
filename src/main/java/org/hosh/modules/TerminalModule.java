@@ -39,6 +39,7 @@ import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
 
 public class TerminalModule implements Module {
+
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("dump", Dump.class);
@@ -47,6 +48,7 @@ public class TerminalModule implements Module {
 	}
 
 	public static class Dump implements Command, TerminalAware {
+
 		private Terminal terminal;
 
 		@Override
@@ -70,6 +72,7 @@ public class TerminalModule implements Module {
 	}
 
 	public static class Clear implements Command, TerminalAware {
+
 		private Terminal terminal;
 
 		@Override
@@ -90,6 +93,7 @@ public class TerminalModule implements Module {
 	}
 
 	public static class Bell implements Command, TerminalAware {
+
 		private Terminal terminal;
 
 		@Override

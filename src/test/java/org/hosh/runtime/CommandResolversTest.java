@@ -63,16 +63,22 @@ import org.mockito.junit.MockitoJUnitRunner;
 		WindowsCommandResolverTest.class,
 })
 public class CommandResolversTest {
+
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class BuiltinsThenSystemTest {
+
 		@Rule
 		public final TemporaryFolder folder = new TemporaryFolder();
+
 		@Rule
 		public final IgnoreIf ignoreIf = new IgnoreIf();
+
 		@Mock(stubOnly = true)
 		private Command command;
+
 		@Mock(stubOnly = true)
 		private State state;
+
 		private CommandResolver sut;
 
 		@Before
@@ -196,6 +202,7 @@ public class CommandResolversTest {
 		}
 
 		private static class InvalidCommand implements Command {
+
 			@SuppressWarnings("unused")
 			public InvalidCommand(String arg) {
 			}
@@ -209,12 +216,16 @@ public class CommandResolversTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class WindowsCommandResolverTest {
+
 		@Rule
 		public final TemporaryFolder folder = new TemporaryFolder();
+
 		@Mock(stubOnly = true)
 		private Command command;
+
 		@Mock(stubOnly = true)
 		private State state;
+
 		private WindowsCommandResolver sut;
 
 		@Before

@@ -31,6 +31,7 @@ import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.State;
 
 public class SimpleCommandRegistry implements CommandRegistry {
+
 	private final State state;
 
 	public SimpleCommandRegistry(State state) {

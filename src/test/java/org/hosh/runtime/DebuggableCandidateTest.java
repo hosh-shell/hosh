@@ -31,6 +31,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 
 public class DebuggableCandidateTest {
+
 	@Test
 	public void equalsContract() {
 		EqualsVerifier.configure()

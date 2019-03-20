@@ -27,5 +27,6 @@ import org.hosh.doc.Experimental;
 
 @Experimental(description = "must be Comparable?")
 public interface Key {
+
 	String name();
 }

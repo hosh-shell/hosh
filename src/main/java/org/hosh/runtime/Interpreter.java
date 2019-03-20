@@ -38,9 +38,13 @@ import org.hosh.spi.TerminalAware;
 import org.jline.terminal.Terminal;
 
 public class Interpreter {
+
 	private final State state;
+
 	private final Terminal terminal;
+
 	private final Channel out;
+
 	private final Channel err;
 
 	public Interpreter(State state, Terminal terminal, Channel out, Channel err) {

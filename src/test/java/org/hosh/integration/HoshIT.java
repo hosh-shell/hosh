@@ -54,12 +54,16 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
 
 public class HoshIT {
+
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 	@Rule
 	public final IgnoreIf ignoreIf = new IgnoreIf();
+
 	@Rule
 	public final TestName testName = new TestName();
+
 	private long nanos;
 
 	@Before

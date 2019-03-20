@@ -68,18 +68,25 @@ import org.mockito.junit.MockitoJUnitRunner;
 		FileSystemModuleTest.FindTest.class
 })
 public class FileSystemModuleTest {
+
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ListTest {
+
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 		@Mock
 		private State state;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private ListFiles sut;
 
@@ -209,16 +216,22 @@ public class FileSystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ChangeDirectoryTest {
+
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 		@Mock
 		private State state;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private ChangeDirectory sut;
 
@@ -276,16 +289,22 @@ public class FileSystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class CurrentWorkingDirectoryTest {
+
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 		@Mock
 		private State state;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private CurrentWorkingDirectory sut;
 
@@ -311,16 +330,22 @@ public class FileSystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class LinesTest {
+
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 		@Mock
 		private State state;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Lines sut;
 
@@ -386,16 +411,22 @@ public class FileSystemModuleTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class FindTest {
+
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 		@Mock(stubOnly = true)
 		private State state;
+
 		@Mock
 		private Channel in;
+
 		@Mock
 		private Channel out;
+
 		@Mock
 		private Channel err;
+
 		@InjectMocks
 		private Find sut;
 

@@ -35,49 +35,60 @@ import java.util.Objects;
  * NB: these could be good candidates for constant pool (JEP 303)
  */
 public class Keys {
+
 	/**
 	 * Human readable name of something (e.g. name of an env variable).
 	 */
 	public static final Key NAME = Keys.of("name");
+
 	/**
 	 * Human readable value of something (e.g. value of env variable).
 	 */
 	public static final Key VALUE = Keys.of("value");
+
 	/**
 	 * A human readable error message.
 	 */
 	public static final Key ERROR = Keys.of("error");
+
 	/**
 	 * Denotes an unstructured text value. Usually text is the output of a native
 	 * command but also some built-it commands are using this standard key (e.g.
 	 * lines).
 	 */
 	public static final Key TEXT = Keys.of("text");
+
 	/**
 	 * Denotes a local path to system.
 	 */
 	public static final Key PATH = Keys.of("path");
+
 	/**
 	 * Denotes a value measured in bytes.
 	 */
 	public static final Key SIZE = Keys.of("size");
+
 	/**
 	 * A numeric value representing a count.
 	 */
 	public static final Key COUNT = Keys.of("count");
+
 	/**
 	 * A numeric value representing an index in a set of values
 	 * (e.g. 'cmd | enumerate').
 	 */
 	public static final Key INDEX = Keys.of("index");
+
 	/**
 	 * Denotes a random generated value.
 	 */
 	public static final Key RAND = Keys.of("rand");
+
 	/**
 	 * Denotes a duration value (i.e. java.time.Duration).
 	 */
 	public static final Key DURATION = Keys.of("duration");
+
 	/**
 	 * Denotes an instant value (i.e. java.time.Instant).
 	 */
@@ -91,6 +102,7 @@ public class Keys {
 	}
 
 	static final class SingleWordKey implements Key {
+
 		private final String name;
 
 		public SingleWordKey(String name) {
@@ -105,13 +117,13 @@ public class Keys {
 
 		@Override
 		public String name() {
-			return name;
+			return this.name;
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof SingleWordKey) {
-				SingleWordKey that = (SingleWordKey) obj;
+				final SingleWordKey that = (SingleWordKey) obj;
 				return Objects.equals(this.name, that.name);
 			} else {
 				return false;
@@ -120,12 +132,12 @@ public class Keys {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(name);
+			return Objects.hash(this.name);
 		}
 
 		@Override
 		public String toString() {
-			return String.format("Key[%s]", name);
+			return String.format("Key[%s]", this.name);
 		}
 	}
 }

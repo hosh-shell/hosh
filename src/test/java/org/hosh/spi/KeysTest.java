@@ -32,6 +32,7 @@ import org.junit.Test;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class KeysTest {
+
 	@Test
 	public void nullKey() {
 		assertThatThrownBy(() -> Keys.of(null))

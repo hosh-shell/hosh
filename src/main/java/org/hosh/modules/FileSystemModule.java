@@ -58,6 +58,7 @@ import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
 public class FileSystemModule implements Module {
+
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("cd", ChangeDirectory.class);
@@ -73,7 +74,9 @@ public class FileSystemModule implements Module {
 	@Example(description = "ls /tmp")
 	@Example(description = "ls directory")
 	public static class ListFiles implements Command, StateAware {
+
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 		private State state;
 
 		@Override
@@ -121,6 +124,7 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class CurrentWorkingDirectory implements Command, StateAware {
+
 		private State state;
 
 		@Override
@@ -140,6 +144,7 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class ChangeDirectory implements Command, StateAware {
+
 		private State state;
 
 		@Override
@@ -170,7 +175,9 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class Lines implements Command, StateAware {
+
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 		private State state;
 
 		@Override
@@ -204,7 +211,9 @@ public class FileSystemModule implements Module {
 	}
 
 	public static class Find implements Command, StateAware {
+
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 		private State state;
 
 		@Override
@@ -250,7 +259,9 @@ public class FileSystemModule implements Module {
 	// class com.sun.nio.file.ExtendedWatchEventModifier.FILE_TREE.
 	@Todo(description = "should be recursive? should be possible to specify which type of events to watch")
 	public static class Watch implements Command, StateAware {
+
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 		private State state;
 
 		@Override

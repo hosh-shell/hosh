@@ -66,8 +66,10 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 		SortingBetweenValuesTest.class
 })
 public class ValuesTest {
+
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class NoneValueTest {
+
 		@Mock
 		private PrintWriter printWriter;
 
@@ -95,6 +97,7 @@ public class ValuesTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class DurationValueTest {
+
 		@Mock
 		private PrintWriter printWriter;
 
@@ -131,6 +134,7 @@ public class ValuesTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class TextValueTest {
+
 		@Mock
 		private PrintWriter printWriter;
 
@@ -177,6 +181,7 @@ public class ValuesTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class NumericValueTest {
+
 		@Mock
 		private PrintWriter printWriter;
 
@@ -212,6 +217,7 @@ public class ValuesTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SizeValueTest {
+
 		@Mock
 		private PrintWriter printWriter;
 
@@ -270,6 +276,7 @@ public class ValuesTest {
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class LocalPathValueTest {
+
 		@Mock
 		private PrintWriter printWriter;
 
@@ -298,6 +305,7 @@ public class ValuesTest {
 	}
 
 	public static class AlphaNumericStringComparatorTest {
+
 		@Test
 		public void sortLetters() {
 			List<String> input = Arrays.asList("b", "c", "a", "ad", "a");
@@ -363,6 +371,7 @@ public class ValuesTest {
 	}
 
 	public static class SortingBetweenValuesTest {
+
 		@Test
 		public void numericWithNone() {
 			List<Value> sorted = Stream.of(

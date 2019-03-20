@@ -30,8 +30,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class ParserTest {
+
 	@Rule
 	public final ExpectedException expectedException = ExpectedException.none();
+
 	private Parser sut = new Parser();
 
 	@Test

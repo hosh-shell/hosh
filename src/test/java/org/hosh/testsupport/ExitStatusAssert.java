@@ -27,6 +27,7 @@ import org.assertj.core.api.AbstractAssert;
 import org.hosh.spi.ExitStatus;
 
 public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatus> {
+
 	public static ExitStatusAssert assertThat(ExitStatus actual) {
 		return new ExitStatusAssert(actual);
 	}

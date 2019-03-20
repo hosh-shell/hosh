@@ -37,8 +37,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class PipelineChannelTest {
+
 	@Rule
 	public final WithThread withThread = new WithThread();
+
 	@Mock(stubOnly = true)
 	private Record record;
 

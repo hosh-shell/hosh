@@ -30,6 +30,7 @@ import org.hosh.spi.Record;
  * This is a special-case channel used in the REPL.
  */
 public class NullChannel implements Channel {
+
 	@Override
 	public void send(Record record) {
 		// no-op

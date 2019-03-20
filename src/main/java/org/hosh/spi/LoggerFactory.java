@@ -27,6 +27,7 @@ import java.lang.StackWalker.Option;
 import java.util.logging.Logger;
 
 public class LoggerFactory {
+
 	public static Logger forEnclosingClass() {
 		Class<?> callerClass = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE).getCallerClass();
 		return Logger.getLogger(callerClass.getCanonicalName());

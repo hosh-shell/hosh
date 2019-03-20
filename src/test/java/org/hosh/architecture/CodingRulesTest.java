@@ -31,6 +31,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 
 public class CodingRulesTest {
+
 	private final JavaClasses classes = new ClassFileImporter().importPackages("org.hosh");
 
 	@Test

@@ -35,20 +35,26 @@ import org.hosh.doc.Todo;
  * The state of the shell: it has been modeled as explicit state,
  * in practice this is a global variable.
  *
- * This is not thread-safe by now.
+ * Not thread-safe.
  */
-@Todo(description = "must be thread-safe sooner or later; be aware that reads outnumber writes")
+@Todo(description = "must be thread-safe sooner or later")
 public class State {
+
 	// variables
 	private final Map<String, String> variables = new LinkedHashMap<>();
+
 	// registered commands
 	private final Map<String, Class<? extends Command>> commands = new LinkedHashMap<>();
+
 	// current working directory
 	private Path cwd;
+
 	// current command id: used by the REPL
 	private int id;
+
 	// PATH
 	private List<Path> path = new ArrayList<>();
+
 	// request exit shell before executing next command
 	private boolean exit = false;
 

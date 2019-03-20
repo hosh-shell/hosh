@@ -48,9 +48,13 @@ import org.hosh.spi.Values;
  * SIGINT is handled as well, if requested.
  */
 public class Supervisor implements AutoCloseable {
+
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 	private final ExecutorService executor = Executors.newCachedThreadPool();
+
 	private final List<Future<ExitStatus>> futures = new ArrayList<>();
+
 	private boolean handleSignals = true;
 
 	public void setHandleSignals(boolean handleSignals) {

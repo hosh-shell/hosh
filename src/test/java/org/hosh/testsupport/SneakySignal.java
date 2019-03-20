@@ -26,8 +26,9 @@ package org.hosh.testsupport;
 import org.hosh.doc.Bug;
 import org.hosh.doc.Todo;
 
-@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "allows some unit tests")
+@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "allows some unit tests for signals")
 public class SneakySignal {
+
 	private SneakySignal() {
 	}
 

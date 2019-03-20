@@ -55,6 +55,7 @@ import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
 public class TextModule implements Module {
+
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("schema", Schema.class);
@@ -72,6 +73,7 @@ public class TextModule implements Module {
 	}
 
 	public static class Schema implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
@@ -91,6 +93,7 @@ public class TextModule implements Module {
 	}
 
 	public static class Filter implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
@@ -114,6 +117,7 @@ public class TextModule implements Module {
 	}
 
 	public static class Enumerate implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
@@ -134,6 +138,7 @@ public class TextModule implements Module {
 
 	@Todo(description = "use local time?")
 	public static class Timestamp implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
@@ -153,6 +158,7 @@ public class TextModule implements Module {
 
 	@Experimental(description = "uniq")
 	public static class Distinct implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
@@ -180,6 +186,7 @@ public class TextModule implements Module {
 
 	@Experimental(description = "uniq -d")
 	public static class Duplicated implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
@@ -206,6 +213,7 @@ public class TextModule implements Module {
 	}
 
 	public static class Sort implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
@@ -246,6 +254,7 @@ public class TextModule implements Module {
 
 	@Todo(description = "error handling (e.g. non-integer and negative value)")
 	public static class Take implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
@@ -271,6 +280,7 @@ public class TextModule implements Module {
 
 	@Todo(description = "error handling (e.g. non-integer and negative value)")
 	public static class Drop implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
@@ -296,6 +306,7 @@ public class TextModule implements Module {
 
 	@Experimental(description = "extends with seed, bounds parameters; later add also 'doubles', 'booleans', etc")
 	public static class Rand implements Command {
+
 		@SuppressWarnings("squid:S2189")
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -313,6 +324,7 @@ public class TextModule implements Module {
 	}
 
 	public static class Count implements Command {
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
@@ -333,6 +345,7 @@ public class TextModule implements Module {
 	}
 
 	public static class Table implements Command {
+
 		private int i = 0;
 
 		@Override
