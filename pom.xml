@@ -153,21 +153,13 @@
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
-				<version>2.2.4</version>
+				<version>2.2.6</version>
 				<executions>
 					<execution>
-						<id>get-the-git-info</id>
+						<id>fetch-git-revision</id>
 						<goals>
 							<goal>revision</goal>
 						</goals>
-						<phase>generate-sources</phase>
-					</execution>
-					<execution>
-						<id>validate-the-git-info</id>
-						<goals>
-							<goal>validateRevision</goal>
-						</goals>
-						<phase>validate</phase>
 					</execution>
 				</executions>
 				<configuration>
