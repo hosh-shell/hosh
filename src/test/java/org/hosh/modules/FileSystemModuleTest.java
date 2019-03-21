@@ -112,7 +112,7 @@ public class FileSystemModuleTest {
 		@Test
 		public void zeroArgsWithOneDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
-			temporaryFolder.newFolder("dir").mkdirs();
+			temporaryFolder.newFolder("dir").mkdir();
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -431,7 +431,7 @@ public class FileSystemModuleTest {
 		private Find sut;
 
 		@Test
-		public void noArgs() throws Exception {
+		public void noArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();

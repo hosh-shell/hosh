@@ -53,7 +53,7 @@ public class LineReaderIteratorTest {
 	private LineReaderIterator sut;
 
 	@Test
-	public void oneLine() throws Exception {
+	public void oneLine() {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willReturn("1");
 		assertThat(sut.hasNext()).isTrue();
@@ -61,7 +61,7 @@ public class LineReaderIteratorTest {
 	}
 
 	@Test
-	public void twoLines() throws Exception {
+	public void twoLines() {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willReturn("1", "2");
 		assertThat(sut.hasNext()).isTrue();
@@ -71,7 +71,7 @@ public class LineReaderIteratorTest {
 	}
 
 	@Test
-	public void hasNextIsIdempotent() throws Exception {
+	public void hasNextIsIdempotent() {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willReturn("1");
 		assertThat(sut.hasNext()).isTrue();
@@ -80,7 +80,7 @@ public class LineReaderIteratorTest {
 	}
 
 	@Test
-	public void stopsAtEOF() throws Exception {
+	public void stopsAtEOF() {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
 		assertThat(sut.hasNext()).isFalse();
@@ -88,7 +88,7 @@ public class LineReaderIteratorTest {
 	}
 
 	@Test
-	public void killsCurrentLineAtINT() throws Exception {
+	public void killsCurrentLineAtINT() {
 		given(state.getId()).willReturn(0);
 		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated INT"));
 		assertThat(sut.hasNext()).isTrue();

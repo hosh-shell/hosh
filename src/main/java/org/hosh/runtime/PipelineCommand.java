@@ -77,7 +77,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 
 		private final boolean redirectOutput;
 
-		private Position(boolean redirectInput, boolean redirectOutput) {
+		Position(boolean redirectInput, boolean redirectOutput) {
 			this.redirectInput = redirectInput;
 			this.redirectOutput = redirectOutput;
 		}

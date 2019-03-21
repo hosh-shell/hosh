@@ -372,9 +372,7 @@ public class HoshIT {
 			}
 		});
 		cmd.addAll(Arrays.asList("-jar", "target/dist/hosh.jar"));
-		for (String arg : args) {
-			cmd.add(arg);
-		}
+		cmd.addAll(Arrays.asList(args));
 		ProcessBuilder pb = new ProcessBuilder()
 				.command(cmd)
 				.redirectErrorStream(true);

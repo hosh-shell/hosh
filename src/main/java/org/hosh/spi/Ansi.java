@@ -67,7 +67,7 @@ public class Ansi {
 
 		private final String endCode;
 
-		private Style(String startCode, String endCode) {
+		Style(String startCode, String endCode) {
 			this.startCode = startCode;
 			this.endCode = endCode;
 		}

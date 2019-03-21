@@ -86,9 +86,9 @@ public class InterpreterTest {
 	@Mock
 	private TerminalAwareCommand terminalAwareCommand;
 
-	private Map<String, String> variables = new HashMap<>();
+	private final Map<String, String> variables = new HashMap<>();
 
-	private List<String> args = new ArrayList<>();
+	private final List<String> args = new ArrayList<>();
 
 	private Interpreter sut;
 
@@ -98,7 +98,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void storeCommandExitStatus() throws Exception {
+	public void storeCommandExitStatus() {
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
@@ -110,7 +110,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void injectState() throws Exception {
+	public void injectState() {
 		given(state.getVariables()).willReturn(variables);
 		doReturn(Optional.of(stateAwareCommand)).when(stateAwareCommand).downCast(StateAware.class);
 		given(stateAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
@@ -122,7 +122,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void injectTerminal() throws Exception {
+	public void injectTerminal() {
 		doReturn(Optional.of(terminalAwareCommand)).when(terminalAwareCommand).downCast(TerminalAware.class);
 		given(terminalAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
@@ -133,7 +133,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleCancellations() throws Exception {
+	public void handleCancellations() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new CancellationException());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
@@ -144,7 +144,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleExceptionWithoutMessage() throws Exception {
+	public void handleExceptionWithoutMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new NullPointerException());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
@@ -156,7 +156,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleExceptionWithMessage() throws Exception {
+	public void handleExceptionWithMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new IllegalArgumentException("simulated error"));
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
@@ -168,7 +168,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void plainArguments() throws Exception {
+	public void plainArguments() {
 		args.add("file");
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
@@ -180,7 +180,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void presentVariable() throws Exception {
+	public void presentVariable() {
 		args.add("${VARIABLE}");
 		variables.put("VARIABLE", "1");
 		given(state.getVariables()).willReturn(variables);
@@ -193,7 +193,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void absentVariables() throws Exception {
+	public void absentVariables() {
 		args.add("${VARIABLE}");
 		given(state.getVariables()).willReturn(variables);
 		given(program.getStatements()).willReturn(Arrays.asList(statement));

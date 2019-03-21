@@ -33,7 +33,7 @@ public class WithThread extends ExternalResource {
 	private String backup;
 
 	@Override
-	protected void before() throws Throwable {
+	protected void before() {
 		backup = Thread.currentThread().getName();
 	}
 

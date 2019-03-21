@@ -168,7 +168,7 @@ public interface Record {
 		}
 	}
 
-	static class Singleton implements Record {
+	class Singleton implements Record {
 
 		private final Key key;
 
@@ -245,7 +245,7 @@ public interface Record {
 		}
 	}
 
-	static class Generic implements Record {
+	class Generic implements Record {
 
 		private final Map<Key, Value> data;
 

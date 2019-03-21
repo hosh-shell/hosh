@@ -34,7 +34,7 @@ public class ParserTest {
 	@Rule
 	public final ExpectedException expectedException = ExpectedException.none();
 
-	private Parser sut = new Parser();
+	private final Parser sut = new Parser();
 
 	@Test
 	public void empty() {

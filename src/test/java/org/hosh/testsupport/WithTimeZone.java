@@ -38,7 +38,7 @@ public class WithTimeZone extends ExternalResource {
 	}
 
 	@Override
-	protected void before() throws Throwable {
+	protected void before() {
 		backup = TimeZone.getDefault();
 		TimeZone.setDefault(wanted);
 	}

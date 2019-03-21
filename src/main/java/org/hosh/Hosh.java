@@ -161,7 +161,7 @@ public class Hosh {
 
 	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter,
 			Channel err, Logger logger) {
-		LineReader lineReader1 = LineReaderBuilder
+		LineReader lineReader = LineReaderBuilder
 				.builder()
 				.appName("hosh")
 				.history(new DefaultHistory())
@@ -170,7 +170,6 @@ public class Hosh {
 				.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state), new VariableExpansionCompleter(state)))
 				.terminal(terminal)
 				.build();
-		LineReader lineReader = lineReader1;
 		LineReaderIterator read = new LineReaderIterator(state, lineReader);
 		while (read.hasNext()) {
 			state.setId(state.getId() + 1);

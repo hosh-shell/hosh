@@ -49,7 +49,7 @@ public class RecordTest {
 	public void valueObject() {
 		Record a = Record.empty();
 		Record b = a;
-		Record c = a.append(Keys.NAME, Values.ofText("a"));
+		Record c = b.append(Keys.NAME, Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
 		assertThat(a).isNotEqualTo(c);
 		assertThat(b).isNotEqualTo(c);

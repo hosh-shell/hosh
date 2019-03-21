@@ -105,7 +105,7 @@ public class CommandResolversTest {
 		@Test
 		public void validAbsolutePath() throws IOException {
 			File file = folder.newFile("test");
-			file.setExecutable(true);
+			assert file.setExecutable(true);
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			Optional<Command> result = sut.tryResolve(file.getAbsolutePath());
 			assertThat(result).isPresent();
@@ -132,7 +132,7 @@ public class CommandResolversTest {
 		@Test
 		@IgnoredIf(description = "in Windows this file is marked as executable, why?", condition = OnWindows.class)
 		public void foundNonExecutableInPath() throws IOException {
-			folder.newFile("test").setExecutable(false);
+			assert folder.newFile("test").setExecutable(false);
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -142,7 +142,7 @@ public class CommandResolversTest {
 
 		@Test
 		public void foundExecutableInPath() throws IOException {
-			folder.newFile("test").setExecutable(true);
+			assert folder.newFile("test").setExecutable(true);
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -153,7 +153,7 @@ public class CommandResolversTest {
 		@Test
 		@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
 		public void notFoundInPathAsSpecifiedByPathExt() throws IOException {
-			folder.newFile("test.vbs").setExecutable(true); // VBS in not PATHEXT
+			assert folder.newFile("test.vbs").setExecutable(true); // VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -165,7 +165,7 @@ public class CommandResolversTest {
 		@Test
 		@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
 		public void foundInPathAsSpecifiedByPathExt() throws IOException {
-			folder.newFile("test.exe").setExecutable(true);
+			assert folder.newFile("test.exe").setExecutable(true);
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -176,7 +176,7 @@ public class CommandResolversTest {
 
 		@Test
 		public void foundInCwd() throws IOException {
-			folder.newFile("test").setExecutable(true);
+			assert folder.newFile("test").setExecutable(true);
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -243,7 +243,7 @@ public class CommandResolversTest {
 
 		@Test
 		public void findExecutableInPathext() throws IOException {
-			folder.newFile("TEST.EXE").setExecutable(true);
+			assert folder.newFile("TEST.EXE").setExecutable(true);
 			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE"));
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -253,7 +253,7 @@ public class CommandResolversTest {
 
 		@Test
 		public void findExecutableNotInPathext() throws IOException {
-			folder.newFile("TEST.CMD").setExecutable(true);
+			assert folder.newFile("TEST.CMD").setExecutable(true);
 			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE"));
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));

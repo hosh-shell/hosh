@@ -37,18 +37,12 @@ public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatu
 	}
 
 	public ExitStatusAssert isSuccess() {
-		isNotNull();
-		if (!actual.isSuccess()) {
-			failWithMessage("expected success");
-		}
-		return this;
+		return isNotNull()
+				.matches(ExitStatus::isSuccess, "isSuccess()");
 	}
 
 	public ExitStatusAssert isError() {
-		isNotNull();
-		if (!actual.isError()) {
-			failWithMessage("expected error");
-		}
-		return this;
+		return isNotNull()
+				.matches(ExitStatus::isError, "isError()");
 	}
 }
