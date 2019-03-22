@@ -47,8 +47,6 @@ import java.util.stream.Stream;
 import org.hosh.doc.Bug;
 import org.hosh.doc.Todo;
 import org.hosh.testsupport.IgnoreIf;
-import org.hosh.testsupport.IgnoreIf.IgnoredIf;
-import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -236,16 +234,14 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(0);
 	}
 
-	@IgnoredIf(description = "windows does not have 'wc'", condition = OnWindows.class)
 	@Test
 	public void pipelineWriteToExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"cwd | wc -l"// 'cwd' is a Java command that writes into 'wc -l' (native command)
-		);
+				"cwd | git cat-file --batch");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
 		String output = consumeOutput(hosh);
-		assertThat(output).isEqualToNormalizingWhitespace("1");
+		assertThat(output).containsOnlyOnce("missing");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
