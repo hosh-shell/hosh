@@ -60,6 +60,7 @@ public class ParserTest {
 		sut.parse("withLock /tmp/push.lock { git push }");
 		sut.parse("withLock /tmp/push.lock { git push\n git push --tags\n }");
 		sut.parse("withTime { withLock /tmp/push.lock { git push } }");
+		sut.parse("cd C:\\Users\\VSSADM~1\\AppData\\Local\\Temp\\junit16864313966026428034");
 	}
 
 	@Test

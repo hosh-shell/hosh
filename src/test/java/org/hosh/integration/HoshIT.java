@@ -26,6 +26,7 @@ package org.hosh.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -41,8 +42,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hosh.doc.Bug;
+import org.hosh.doc.Todo;
 import org.hosh.testsupport.IgnoreIf;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
 import org.hosh.testsupport.IgnoreIf.OnWindows;
@@ -200,12 +203,12 @@ public class HoshIT {
 	@Test
 	public void nonPipelineExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"java --version "//
+				"git --version"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
 		String output = consumeOutput(hosh);
-		assertThat(output).contains("Runtime Environment");
+		assertThat(output).startsWith("git version");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
@@ -222,9 +225,9 @@ public class HoshIT {
 	}
 
 	@Test
-	public void pipelineWithExternalCommand() throws Exception {
+	public void pipelineReadFromExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"java --version | take 1 | count"//
+				"git --version | take 1 | count"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
@@ -235,7 +238,7 @@ public class HoshIT {
 
 	@IgnoredIf(description = "windows does not have 'wc'", condition = OnWindows.class)
 	@Test
-	public void pipelineWriteExternalCommand() throws Exception {
+	public void pipelineWriteToExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
 				"cwd | wc -l"// 'cwd' is a Java command that writes into 'wc -l' (native command)
 		);
@@ -363,21 +366,34 @@ public class HoshIT {
 		return givenHoshProcess(Collections.emptyMap(), args);
 	}
 
-	private Process givenHoshProcess(Map<String, String> env, String... args) throws IOException {
+	private Process givenHoshProcess(Map<String, String> additionalEnv, String... args) throws IOException {
 		List<String> cmd = new ArrayList<>();
-		cmd.add("java");
-		ProcessHandle.current().info().arguments().ifPresent(jvmArgs -> {
-			if (jvmArgs[0].contains("jacoco")) {
-				cmd.add(jvmArgs[0]);
-			}
-		});
+		cmd.add(absoluteJavaFromJavaPath());
+		cmd.addAll(jacocoAgentIfPresent());
 		cmd.addAll(Arrays.asList("-jar", "target/dist/hosh.jar"));
 		cmd.addAll(Arrays.asList(args));
 		ProcessBuilder pb = new ProcessBuilder()
 				.command(cmd)
 				.redirectErrorStream(true);
-		pb.environment().putAll(env);
+		pb.environment().putAll(additionalEnv);
 		return pb.start();
+	}
+
+	private String absoluteJavaFromJavaPath() {
+		return System.getenv("JAVA_HOME") + File.separator + "bin" + File.separator + "java";
+	}
+
+	@Todo(description = "please feel free to improve this method :-)")
+	private List<String> jacocoAgentIfPresent() {
+		String[] arguments = ProcessHandle
+				.current()
+				.info()
+				.arguments()
+				.orElse(new String[0]);
+		return Stream.of(arguments)
+				.filter(s -> s.contains("jacoco"))
+				.limit(1)
+				.collect(Collectors.toList());
 	}
 
 	private String consumeOutput(Process hosh) throws IOException {
