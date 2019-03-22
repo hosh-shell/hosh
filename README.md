@@ -14,8 +14,10 @@
     - stderr always colored in red
     - sorting using http://davekoelle.com/alphanum.html
     - file sizes reported using KB, MB, etc
+    - by default history works like bash with HISTCONTROL=ignoredups
 - distributed as single-jar or docker image
 - MIT license
+
 
 ## Inspired by
 - https://michaelfeathers.silvrback.com/collection-pipelines-the-revenge-of-c
