@@ -376,7 +376,11 @@ public class HoshIT {
 	}
 
 	private String absoluteJavaFromJavaPath() {
-		return System.getenv("JAVA_HOME") + File.separator + "bin" + File.separator + "java";
+		String javaHome = System.getenv("JAVA_HOME");
+		if (javaHome == null) {
+			return "java";
+		}
+		return javaHome + File.separator + "bin" + File.separator + "java";
 	}
 
 	@Todo(description = "please feel free to improve this method :-)")
