@@ -55,7 +55,7 @@ public class FileSystemCompleterTest {
 	@Rule
 	public final IgnoreIf ignoreIf = new IgnoreIf();
 
-	@Mock
+	@Mock(stubOnly = true)
 	private State state;
 
 	@Mock(stubOnly = true)

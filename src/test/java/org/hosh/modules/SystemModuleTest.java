@@ -94,7 +94,7 @@ public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ExitTest {
 
-		@Mock
+		@Mock(stubOnly = true)
 		private State state;
 
 		@Mock
@@ -212,7 +212,7 @@ public class SystemModuleTest {
 		@Mock
 		private Channel err;
 
-		@Mock
+		@Mock(stubOnly = true)
 		private State state;
 
 		@Captor
@@ -464,7 +464,7 @@ public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class BenchmarkTest {
 
-		@Mock
+		@Mock(stubOnly = true)
 		private State state;
 
 		@Mock

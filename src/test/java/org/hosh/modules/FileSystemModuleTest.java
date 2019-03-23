@@ -76,7 +76,7 @@ public class FileSystemModuleTest {
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-		@Mock
+		@Mock(stubOnly = true)
 		private State state;
 
 		@Mock
@@ -296,6 +296,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(state).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a directory")));
 		}
@@ -307,7 +308,7 @@ public class FileSystemModuleTest {
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-		@Mock
+		@Mock(stubOnly = true)
 		private State state;
 
 		@Mock
@@ -348,7 +349,7 @@ public class FileSystemModuleTest {
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-		@Mock
+		@Mock(stubOnly = true)
 		private State state;
 
 		@Mock
