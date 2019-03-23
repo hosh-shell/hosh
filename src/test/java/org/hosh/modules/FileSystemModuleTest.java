@@ -49,6 +49,9 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.IgnoreIf;
+import org.hosh.testsupport.IgnoreIf.IgnoredIf;
+import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -75,6 +78,9 @@ public class FileSystemModuleTest {
 
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Rule
+		public final IgnoreIf ignoreIf = new IgnoreIf();
 
 		@Mock(stubOnly = true)
 		private State state;
@@ -214,10 +220,12 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
+		@IgnoredIf(description = "File.setReadable() fails on windows", condition = OnWindows.class)
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test
 		public void accessDenied() {
 			File cwd = temporaryFolder.getRoot();
+			assert cwd.exists();
 			assert cwd.setReadable(false, true);
 			assert cwd.setExecutable(false, true);
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());

@@ -29,6 +29,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Locale;
 
 import org.hosh.doc.Experimental;
 import org.junit.rules.MethodRule;
@@ -73,7 +74,7 @@ public class IgnoreIf implements MethodRule {
 
 		@Override
 		public boolean test() {
-			return System.getProperty("os.name").startsWith("Windows");
+			return normalizedOsName().contains("win");
 		}
 	}
 
@@ -81,7 +82,11 @@ public class IgnoreIf implements MethodRule {
 
 		@Override
 		public boolean test() {
-			return !System.getProperty("os.name").startsWith("Windows");
+			return !normalizedOsName().contains("win");
 		}
+	}
+
+	private static String normalizedOsName() {
+		return System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
 	}
 }
