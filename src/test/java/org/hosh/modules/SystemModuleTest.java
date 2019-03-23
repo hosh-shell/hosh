@@ -94,8 +94,8 @@ public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class ExitTest {
 
-		@Mock(stubOnly = true)
-		private State state;
+		@Spy
+		private State state = new State();
 
 		@Mock
 		private Channel in;
@@ -113,7 +113,7 @@ public class SystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus.value()).isEqualTo(0);
-			then(state).should().setExit(true);
+			assertThat(state.isExit()).isTrue();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
