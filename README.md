@@ -1,5 +1,7 @@
 # Human Oriented SHell
 
+[![Build Status](https://dev.azure.com/davideangelocola/hosh/_apis/build/status/dfa1.hosh?branchName=master)](https://dev.azure.com/davideangelocola/hosh/_build/latest?definitionId=1&branchName=master)
+
 ## Main features
 - written in Java 11
 - portable, works out-of-the-box in Windows, MacOS and Linux
