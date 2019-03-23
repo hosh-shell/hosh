@@ -216,15 +216,16 @@ public class FileSystemModuleTest {
 
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test
-		public void accessDenied() throws IOException {
-			File newFolder = temporaryFolder.newFolder();
-			newFolder.setReadable(false, false);
+		public void accessDenied() {
+			File cwd = temporaryFolder.getRoot();
+			assert cwd.setReadable(false, true);
+			assert cwd.setExecutable(false, true);
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
-			ExitStatus exitStatus = sut.run(Arrays.asList(newFolder.getAbsolutePath()), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("access denied: " + newFolder.toString())));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("access denied: " + cwd.toString())));
 		}
 	}
 
