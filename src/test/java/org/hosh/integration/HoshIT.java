@@ -237,7 +237,8 @@ public class HoshIT {
 	@Test
 	public void pipelineWriteToExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"cwd | git cat-file --batch");
+				"cwd | git cat-file --batch" //
+		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
 		String output = consumeOutput(hosh);

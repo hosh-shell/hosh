@@ -244,4 +244,24 @@ public class CompilerTest {
 		Program program = sut.compile("benchmark 50 { ls } | schema");
 		assertThat(program.getStatements()).hasSize(1);
 	}
+
+	@Bug(description = "this is a known bug", issue = "https://github.com/dfa1/hosh/issues/63")
+	@Test
+	public void variableExpansionInCommand() {
+		Program program = sut.compile("${JAVA_HOME}/bin/java");
+		assertThat(program.getStatements()).hasSize(0); // should be 1
+	}
+
+	@Bug(description = "this is a known bug", issue = "https://github.com/dfa1/hosh/issues/63")
+	@Test
+	public void variableExpansionInArgument() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
+		Program program = sut.compile("echo ${JAVA_HOME}/bin/${JAVA_CMD}");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first()
+				.satisfies(stmt -> {
+					assertThat(stmt.getArguments()).hasSize(3); // should be 1
+				});
+	}
 }
