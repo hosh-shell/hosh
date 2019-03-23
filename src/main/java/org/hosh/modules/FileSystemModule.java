@@ -26,6 +26,7 @@ package org.hosh.modules;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -114,6 +115,9 @@ public class FileSystemModule implements Module {
 				return ExitStatus.success();
 			} catch (NotDirectoryException e) {
 				err.send(Record.of(Keys.ERROR, Values.ofText("not a directory: " + e.getMessage())));
+				return ExitStatus.error();
+			} catch (AccessDeniedException e) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("access denied: " + e.getMessage())));
 				return ExitStatus.error();
 			} catch (IOException e) {
 				LOGGER.log(Level.WARNING, "caught I/O error", e);

@@ -37,6 +37,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hosh.doc.Bug;
 import org.hosh.modules.FileSystemModule.ChangeDirectory;
 import org.hosh.modules.FileSystemModule.CurrentWorkingDirectory;
 import org.hosh.modules.FileSystemModule.Find;
@@ -211,6 +212,19 @@ public class FileSystemModuleTest {
 							.entry(Keys.SIZE, Values.ofHumanizedSize(0))
 							.build());
 			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
+		@Test
+		public void accessDenied() throws IOException {
+			File newFolder = temporaryFolder.newFolder();
+			newFolder.setReadable(false, false);
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
+			ExitStatus exitStatus = sut.run(Arrays.asList(newFolder.getAbsolutePath()), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("access denied: " + newFolder.toString())));
 		}
 	}
 
