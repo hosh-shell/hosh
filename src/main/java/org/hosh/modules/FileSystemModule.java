@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.hosh.doc.Example;
+import org.hosh.doc.Examples;
 import org.hosh.doc.Help;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
@@ -71,9 +72,11 @@ public class FileSystemModule implements Module {
 	}
 
 	@Help(description = "list files")
-	@Example(description = "ls")
-	@Example(description = "ls /tmp")
-	@Example(description = "ls directory")
+	@Examples({
+			@Example(command = "ls", description = "list current directory"),
+			@Example(command = "ls /tmp", description = "list specified absolute directory"),
+			@Example(command = "ls directory", description = "list relative directory")
+	})
 	public static class ListFiles implements Command, StateAware {
 
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();

@@ -155,8 +155,10 @@ public class SystemModule implements Module {
 	}
 
 	@Help(description = "built-in help system")
-	@Example(description = "help")
-	@Example(description = "help command")
+	@Examples({
+			@Example(command = "help", description = "print all built-in commands"),
+			@Example(command = "help command", description = "print help for specified command")
+	})
 	public static class HelpCommand implements Command, StateAware {
 
 		private State state;
@@ -192,7 +194,7 @@ public class SystemModule implements Module {
 				if (examples != null) {
 					out.send(Record.of(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
 					for (Example example : examples.value()) {
-						out.send(Record.of(Keys.TEXT, Values.ofStyledText(example.description(), Style.ITALIC)));
+						out.send(Record.of(Keys.TEXT, Values.ofStyledText(example.command() + " - " + example.description(), Style.ITALIC)));
 					}
 				}
 				return ExitStatus.success();
