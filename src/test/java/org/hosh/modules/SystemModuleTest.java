@@ -464,9 +464,6 @@ public class SystemModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class BenchmarkTest {
 
-		@Mock(stubOnly = true)
-		private State state;
-
 		@Mock
 		private Channel in;
 
