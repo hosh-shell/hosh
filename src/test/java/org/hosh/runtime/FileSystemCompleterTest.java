@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.hosh.doc.Todo;
 import org.hosh.spi.State;
 import org.hosh.testsupport.IgnoreIf;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
@@ -41,7 +42,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -91,26 +91,34 @@ public class FileSystemCompleterTest {
 	public void emptyWordInNonEmptyDir() throws IOException {
 		temporaryFolder.newFile("a");
 		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
-		given(line.word()).willReturn("aaa");
+		given(line.word()).willReturn("");
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should().add(ArgumentMatchers.any());
+		then(candidates).should().add(DebuggableCandidate.complete("a"));
 	}
 
 	@Test
+	@Todo(description = "use Path.getRoot()?")
 	@IgnoredIf(description = "fails on windows, / should be C:/", condition = OnWindows.class)
 	public void slash() {
 		given(line.word()).willReturn("/");
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should(Mockito.atLeastOnce()).add(ArgumentMatchers.any());
+		then(candidates).should(Mockito.atLeastOnce()).add(Mockito.any());
 	}
 
 	@Test
-	public void absoluteDir() throws IOException {
-		String dir = temporaryFolder.getRoot().getAbsolutePath();
-		temporaryFolder.newFile();
-		given(line.word()).willReturn(dir);
+	public void absoluteDirWithoutEndingSeparator() throws IOException {
+		File newFile = temporaryFolder.newFile("aaa");
+		given(line.word()).willReturn(newFile.getParent());
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should(Mockito.atLeastOnce()).add(ArgumentMatchers.any());
+		then(candidates).should().add(DebuggableCandidate.incomplete(temporaryFolder.getRoot().getAbsolutePath() + File.separator));
+	}
+
+	@Test
+	public void absoluteDirWithEndingSeparator() throws IOException {
+		File newFile = temporaryFolder.newFile("aaa");
+		given(line.word()).willReturn(newFile.getParent() + File.separator);
+		sut.complete(lineReader, line, candidates);
+		then(candidates).should().add(DebuggableCandidate.complete(newFile.getAbsolutePath()));
 	}
 
 	@Test
