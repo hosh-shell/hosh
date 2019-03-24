@@ -33,7 +33,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.ServiceLoader;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -52,16 +51,13 @@ import org.hosh.runtime.ConsoleChannel;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.LineReaderIterator;
-import org.hosh.runtime.SimpleCommandRegistry;
 import org.hosh.runtime.VariableExpansionCompleter;
 import org.hosh.runtime.VersionLoader;
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
-import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
-import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
@@ -118,15 +114,12 @@ public class Hosh {
 		state.setCwd(Paths.get("."));
 		state.getVariables().putAll(System.getenv());
 		state.setPath(path);
-		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
-		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
-		for (Module module : modules) {
-			module.onStartup(commandRegistry);
-		}
-		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
-		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
+		BootstrapBuiltins bootstrap = new BootstrapBuiltins();
+		bootstrap.registerAllBuiltins(state);
 		CommandResolver commandResolver = CommandResolvers.builtinsThenSystem(state);
 		Compiler compiler = new Compiler(commandResolver);
+		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
+		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
 		Interpreter interpreter = new Interpreter(state, terminal, out, err);
 		ExitStatus exitStatus;
 		if (args.length == 0) {
