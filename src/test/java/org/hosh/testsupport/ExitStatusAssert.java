@@ -45,4 +45,9 @@ public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatu
 		return isNotNull()
 				.matches(ExitStatus::isError, "isError()");
 	}
+
+	public ExitStatusAssert hasExitCode(int expectedCode) {
+		return isNotNull()
+				.matches(exitStatus -> exitStatus.value() == expectedCode, "expecting exitCode " + expectedCode);
+	}
 }
