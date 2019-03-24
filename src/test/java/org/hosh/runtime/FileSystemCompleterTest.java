@@ -26,6 +26,7 @@ package org.hosh.runtime;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -110,5 +111,14 @@ public class FileSystemCompleterTest {
 		given(line.word()).willReturn(dir);
 		sut.complete(lineReader, line, candidates);
 		then(candidates).should(Mockito.atLeastOnce()).add(ArgumentMatchers.any());
+	}
+
+	@Test
+	public void partialMatchDirectory() throws IOException {
+		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+		temporaryFolder.newFolder("aaa", "bbb");
+		given(line.word()).willReturn("aaa" + File.separator + "b");
+		sut.complete(lineReader, line, candidates);
+		then(candidates).should(Mockito.atLeastOnce()).add(DebuggableCandidate.complete("aaa" + File.separator + "bbb"));
 	}
 }

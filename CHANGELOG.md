@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - new command 'regex', basically named groups regexp to record
+- improving autocomplete of partially specified directories
 
 ## [0.0.27] - 2019-03-17
 - new system commands:
