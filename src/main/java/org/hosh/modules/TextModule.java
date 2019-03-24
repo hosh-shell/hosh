@@ -41,7 +41,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.hosh.doc.Example;
 import org.hosh.doc.Experimental;
+import org.hosh.doc.Help;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Ansi.Style;
@@ -76,6 +78,9 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("table", Table.class);
 	}
 
+	@Help(description = "regex with named groups to record")
+	@Example(description = "parse format k=v", command = "git config -l | regex text '(?<key>.+)=(?<value>.+)' | schema")
+	@Experimental(description = "very hard to use")
 	public static class Regex implements Command {
 
 		@Override
@@ -98,8 +103,8 @@ public class TextModule implements Module {
 					PrintWriter pw = new PrintWriter(sw);
 					record.append(pw, Locale.getDefault());
 					Matcher matcher = pattern.matcher(sw.toString());
+					Builder builder = Record.builder();
 					if (matcher.find()) {
-						Builder builder = Record.builder();
 						for (String groupName : groupNames) {
 							builder.entry(Keys.of(groupName), Values.ofText(matcher.group(groupName)));
 						}
