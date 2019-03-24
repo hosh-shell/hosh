@@ -24,9 +24,11 @@
 package org.hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -66,20 +68,20 @@ public class ExternalCommandTest {
 	@Rule
 	public final TemporaryFolder folder = new TemporaryFolder();
 
-	@Mock(name = "in")
-	private Channel in;
-
-	@Mock(name = "out")
-	private Channel out;
-
-	@Mock(name = "err")
-	private Channel err;
-
 	@Mock(stubOnly = true)
 	private State state;
 
 	@Mock(stubOnly = true)
 	private Process process;
+
+	@Mock
+	private Channel in;
+
+	@Mock
+	private Channel out;
+
+	@Mock
+	private Channel err;
 
 	@Mock
 	private ProcessFactory processFactory;
@@ -105,12 +107,14 @@ public class ExternalCommandTest {
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.emptyList(), in, out, err);
+		ExitStatus exitStatus = sut.run(Collections.emptyList(), in, out, err);
+		assertThat(exitStatus).isSuccess();
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString()),
 				Paths.get("."),
 				Collections.emptyMap(),
 				Position.SOLE);
+		then(in).should().recv();
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
@@ -124,32 +128,37 @@ public class ExternalCommandTest {
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		assertThat(exitStatus).isSuccess();
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
 				Collections.emptyMap(),
 				Position.SOLE);
+		then(in).should().recv();
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void processExitsWithError() throws Exception {
-		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(1);
+		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
-		assertThat(exitStatus.isSuccess()).isFalse();
+		assertThat(exitStatus).isError();
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
 				Collections.emptyMap(),
 				Position.SOLE);
+		then(in).should(times(1)).recv();
+		then(out).shouldHaveZeroInteractions();
+		then(err).shouldHaveZeroInteractions();
 	}
 
 	@Test
@@ -161,13 +170,16 @@ public class ExternalCommandTest {
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		assertThat(exitStatus).isError();
 		then(processFactory).should().create(
 				Arrays.asList(executable.toString(), "file.hosh"),
 				Paths.get("."),
 				Collections.emptyMap(),
 				Position.SOLE);
-		then(err).should().send(any());
+		then(in).should(times(1)).recv();
+		then(out).shouldHaveZeroInteractions();
+		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("interrupted")));
 	}
 
 	@Test
@@ -179,7 +191,9 @@ public class ExternalCommandTest {
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		assertThat(exitStatus).isSuccess();
+		then(in).should(times(1)).recv();
 		then(out).should().send(Record.of(Keys.TEXT, Values.ofText("test")));
 		then(err).shouldHaveZeroInteractions();
 	}
@@ -193,7 +207,9 @@ public class ExternalCommandTest {
 		given(process.getErrorStream()).willReturn(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		assertThat(exitStatus).isSuccess();
+		then(in).should(times(1)).recv();
 		then(out).shouldHaveZeroInteractions();
 		then(err).should().send(Record.of(Keys.TEXT, Values.ofText("test")));
 	}
@@ -212,10 +228,12 @@ public class ExternalCommandTest {
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		assertThat(exitStatus).isSuccess();
+		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualToNormalizingNewlines("aaa 10\n");
+		then(in).should(times(2)).recv();
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
-		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualToNormalizingNewlines("aaa 10\n");
 	}
 
 	@Test
@@ -223,7 +241,9 @@ public class ExternalCommandTest {
 		given(processFactory.create(any(), any(), any(), any())).willThrow(new IOException("simulated error"));
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
-		sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		assertThat(exitStatus).isError();
+		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
 		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("simulated error")));
 	}
