@@ -37,6 +37,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Experimental;
@@ -51,6 +53,7 @@ import org.hosh.spi.Key;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
+import org.hosh.spi.Record.Builder;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
@@ -58,6 +61,7 @@ public class TextModule implements Module {
 
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
+		commandRegistry.registerCommand("regex", Regex.class);
 		commandRegistry.registerCommand("schema", Schema.class);
 		commandRegistry.registerCommand("filter", Filter.class);
 		commandRegistry.registerCommand("enumerate", Enumerate.class);
@@ -70,6 +74,50 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("rand", Rand.class);
 		commandRegistry.registerCommand("count", Count.class);
 		commandRegistry.registerCommand("table", Table.class);
+	}
+
+	public static class Regex implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 2) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters")));
+				return ExitStatus.error();
+			}
+			Key key = Keys.of(args.get(0));
+			Pattern pattern = Pattern.compile(args.get(1));
+			List<String> groupNames = extractNamedGroups(args.get(1));
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					return ExitStatus.success();
+				}
+				Record record = incoming.get();
+				record.value(key).ifPresent(v -> {
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					record.append(pw, Locale.getDefault());
+					Matcher matcher = pattern.matcher(sw.toString());
+					if (matcher.find()) {
+						Builder builder = Record.builder();
+						for (String groupName : groupNames) {
+							builder.entry(Keys.of(groupName), Values.ofText(matcher.group(groupName)));
+						}
+						out.send(builder.build());
+					}
+				});
+			}
+		}
+
+		private List<String> extractNamedGroups(String pattern) {
+			Pattern names = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>");
+			Matcher matcher = names.matcher(pattern);
+			List<String> result = new ArrayList<>();
+			while (matcher.find()) {
+				result.add(matcher.group(1));
+			}
+			return result;
+		}
 	}
 
 	public static class Schema implements Command {

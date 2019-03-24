@@ -38,6 +38,7 @@ import org.hosh.modules.TextModule.Drop;
 import org.hosh.modules.TextModule.Duplicated;
 import org.hosh.modules.TextModule.Enumerate;
 import org.hosh.modules.TextModule.Filter;
+import org.hosh.modules.TextModule.Regex;
 import org.hosh.modules.TextModule.Schema;
 import org.hosh.modules.TextModule.Sort;
 import org.hosh.modules.TextModule.Table;
@@ -48,6 +49,7 @@ import org.hosh.modules.TextModuleTest.DropTest;
 import org.hosh.modules.TextModuleTest.DuplicatedTest;
 import org.hosh.modules.TextModuleTest.EnumerateTest;
 import org.hosh.modules.TextModuleTest.FilterTest;
+import org.hosh.modules.TextModuleTest.RegexTest;
 import org.hosh.modules.TextModuleTest.SchemaTest;
 import org.hosh.modules.TextModuleTest.SortTest;
 import org.hosh.modules.TextModuleTest.TableTest;
@@ -70,6 +72,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+		RegexTest.class,
 		SchemaTest.class,
 		CountTest.class,
 		EnumerateTest.class,
@@ -82,6 +85,86 @@ import org.mockito.junit.MockitoJUnitRunner;
 		TableTest.class,
 })
 public class TextModuleTest {
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class RegexTest {
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Regex sut;
+
+		@Test
+		public void zeroArg() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters")));
+		}
+
+		@Test
+		public void oneArg() {
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters")));
+		}
+
+		@Test
+		public void twoArgsNoInput() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void twoArgsNonMatching() {
+			Record record = Record.of(Keys.TEXT, Values.ofText(""));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void twoArgsMatching() {
+			Record record = Record.of(Keys.TEXT, Values.ofText("1"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), "(?<id>\\d+)"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Record.builder().entry(Keys.of("id"), Values.ofText("1")).build());
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void twoArgsMissingKey() {
+			Record record = Record.of(Keys.TEXT, Values.ofText("1"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.COUNT.name(), "(?<id>\\d+)"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class SchemaTest {
@@ -103,14 +186,18 @@ public class TextModuleTest {
 		public void zeroArg() {
 			Record record = Record.of(Keys.COUNT, null).append(Keys.INDEX, null);
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
-			sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Record.of(Keys.of("schema"), Values.ofText("count index")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();

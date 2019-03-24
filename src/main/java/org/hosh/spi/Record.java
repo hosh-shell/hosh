@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Experimental;
+import org.hosh.doc.Todo;
 
 /**
  * An immutable, persistent value object representing
@@ -224,6 +225,7 @@ public interface Record {
 			return Objects.hash(key, value);
 		}
 
+		@Todo(description = "equals is broken when comparing to a Generic with same key/value")
 		@Override
 		public final boolean equals(Object obj) {
 			if (obj instanceof Singleton) {
@@ -304,6 +306,7 @@ public interface Record {
 			return Objects.hash(data);
 		}
 
+		@Todo(description = "equals is broken when comparing to a Singleton with same key/value")
 		@Override
 		public final boolean equals(Object obj) {
 			if (obj instanceof Generic) {
