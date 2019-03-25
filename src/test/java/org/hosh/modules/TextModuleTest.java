@@ -149,7 +149,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), "(?<id>\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Record.builder().entry(Keys.of("id"), Values.ofText("1")).build());
+			then(out).should().send(Record.of(Keys.of("id"), Values.ofText("1")));
 			then(err).shouldHaveZeroInteractions();
 		}
 

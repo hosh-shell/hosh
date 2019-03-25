@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Experimental;
-import org.hosh.doc.Todo;
 
 /**
  * An immutable, persistent value object representing
@@ -60,6 +59,8 @@ public interface Record {
 	List<Entry> entries();
 
 	Optional<Value> value(Key key);
+
+	int size();
 
 	@Experimental(description = "should have record_separator (hardcoded to ' ') and boolean newline, perhaps in a nice fluent interface")
 	void append(PrintWriter printWriter, Locale locale);
@@ -149,6 +150,11 @@ public interface Record {
 		}
 
 		@Override
+		public int size() {
+			return 0;
+		}
+
+		@Override
 		public final int hashCode() {
 			return 17;
 		}
@@ -221,16 +227,20 @@ public interface Record {
 		}
 
 		@Override
+		public int size() {
+			return 1;
+		}
+
+		@Override
 		public final int hashCode() {
 			return Objects.hash(key, value);
 		}
 
-		@Todo(description = "equals is broken when comparing to a Generic with same key/value")
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof Singleton) {
-				Singleton that = (Singleton) obj;
-				return Objects.equals(this.key, that.key) && Objects.equals(this.value, that.value);
+			if (obj instanceof Record) {
+				Record that = (Record) obj;
+				return this.size() == that.size() && this.entries().equals(that.entries());
 			} else {
 				return false;
 			}
@@ -252,6 +262,9 @@ public interface Record {
 		private final Map<Key, Value> data;
 
 		private Generic(Map<Key, Value> data) {
+			if (data == null) {
+				throw new IllegalArgumentException("data cannot be null");
+			}
 			this.data = data;
 		}
 
@@ -302,16 +315,20 @@ public interface Record {
 		}
 
 		@Override
+		public int size() {
+			return data.size();
+		}
+
+		@Override
 		public final int hashCode() {
 			return Objects.hash(data);
 		}
 
-		@Todo(description = "equals is broken when comparing to a Singleton with same key/value")
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof Generic) {
-				Generic that = (Generic) obj;
-				return Objects.equals(this.data, that.data);
+			if (obj instanceof Record) {
+				Record that = (Record) obj;
+				return this.size() == that.size() && this.entries().equals(that.entries());
 			} else {
 				return false;
 			}

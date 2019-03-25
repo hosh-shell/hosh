@@ -91,8 +91,16 @@ public class RecordTest {
 	public void equalsContract() {
 		EqualsVerifier.forClass(Empty.class).verify();
 		EqualsVerifier.forClass(Singleton.class).verify();
-		EqualsVerifier.forClass(Generic.class).verify();
+		EqualsVerifier.forClass(Generic.class).withNonnullFields("data").verify();
 		EqualsVerifier.forClass(Entry.class).verify();
+	}
+
+	@Test
+	public void singletonEqualsGenericAndViceversa() {
+		Record singleton = Record.of(Keys.COUNT, Values.ofNumeric(1));
+		Record generic = Record.builder().entry(Keys.COUNT, Values.ofNumeric(1)).build();
+		assertThat(singleton).isEqualTo(generic);
+		assertThat(generic).isEqualTo(singleton);
 	}
 
 	@Test
