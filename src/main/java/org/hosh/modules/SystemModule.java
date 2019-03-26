@@ -95,6 +95,8 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "display all variables")
+	@Example(command = "env", description = "display all variables")
 	public static class Env implements Command, StateAware {
 
 		private State state;
@@ -122,6 +124,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "exit current interactive session or script")
+	@Example(command = "exit", description = "exit with status 0 (success)")
+	@Example(command = "exit 1", description = "exit with status 1 (error)")
+	@Example(command = "exit 0", description = "exit with status 0 (success)")
 	public static class Exit implements Command, StateAware {
 
 		private State state;
@@ -398,6 +404,8 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "consume any record (e.g. like /dev/null)")
+	@Example(command = "ls | sink", description = "consume any record produced by ls")
 	public static class Sink implements Command {
 
 		@Override

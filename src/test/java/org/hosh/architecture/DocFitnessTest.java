@@ -25,10 +25,14 @@ package org.hosh.architecture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.hosh.BootstrapBuiltins;
+import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
+import org.hosh.doc.Help;
+import org.hosh.doc.Todo;
 import org.hosh.runtime.CommandResolvers;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.Program;
@@ -39,7 +43,7 @@ import org.junit.Test;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 
-public class CheckExamplesSyntaxTest {
+public class DocFitnessTest {
 
 	@Test
 	public void checkExamplesSytanx() {
@@ -60,6 +64,21 @@ public class CheckExamplesSyntaxTest {
 						Program program = compiler.compile(example.command());
 						assertThat(program).isNotNull();
 					});
+		}
+	}
+
+	@Todo(description = "enforce this fitness test after 100% coverage is reached")
+	@Test
+	public void displayHelpAndExamplesCoverage() {
+		try (ScanResult scanResult = new ClassGraph().whitelistPackages("org.hosh").scan()) {
+			List<Class<?>> commands = scanResult
+					.getClassesImplementing(Command.class.getCanonicalName())
+					.loadClasses();
+			long totalCommands = commands.size();
+			long withHelp = commands.stream().filter(c -> c.isAnnotationPresent(Help.class)).count();
+			long withExamples = commands.stream().filter(c -> c.isAnnotationPresent(Examples.class) || c.isAnnotationPresent(Example.class)).count();
+			System.out.printf("@Examples %s/%s%n", withExamples, totalCommands);
+			System.out.printf("@Help     %s/%s%n", withHelp, totalCommands);
 		}
 	}
 }
