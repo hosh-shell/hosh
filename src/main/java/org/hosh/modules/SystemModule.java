@@ -112,8 +112,8 @@ public class SystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
 				return ExitStatus.error();
 			}
-			Map<String, String> env = state.getVariables();
-			for (Map.Entry<String, String> entry : env.entrySet()) {
+			Map<String, String> variables = state.getVariables();
+			for (var entry : variables.entrySet()) {
 				Record record = Record.builder()
 						.entry(Keys.NAME, Values.ofText(entry.getKey()))
 						.entry(Keys.VALUE, Values.ofText(entry.getValue()))
