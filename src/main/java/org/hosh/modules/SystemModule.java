@@ -197,11 +197,16 @@ public class SystemModule implements Module {
 				}
 				out.send(Record.of(Keys.TEXT, Values.ofStyledText(commandName + " - " + help.description(), Style.BOLD)));
 				Examples examples = commandClass.getAnnotation(Examples.class);
+				Example example = commandClass.getAnnotation(Example.class);
+				out.send(Record.of(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
 				if (examples != null) {
-					out.send(Record.of(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
-					for (Example example : examples.value()) {
-						out.send(Record.of(Keys.TEXT, Values.ofStyledText(example.command() + " - " + example.description(), Style.ITALIC)));
+					for (Example ex : examples.value()) {
+						out.send(Record.of(Keys.TEXT, Values.ofStyledText(ex.command() + " - " + ex.description(), Style.ITALIC)));
 					}
+				} else if (example != null) {
+					out.send(Record.of(Keys.TEXT, Values.ofStyledText(example.command() + " - " + example.description(), Style.ITALIC)));
+				} else {
+					out.send(Record.of(Keys.TEXT, Values.ofStyledText("N/A", Style.FG_RED)));
 				}
 				return ExitStatus.success();
 			}
