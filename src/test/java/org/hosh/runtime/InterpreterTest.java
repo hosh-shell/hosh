@@ -135,7 +135,7 @@ public class InterpreterTest {
 	@Test
 	public void handleCancellations() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-				.willThrow(new CancellationException());
+				.willThrow(new CancellationException("simulated cancellation"));
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
@@ -146,7 +146,7 @@ public class InterpreterTest {
 	@Test
 	public void handleExceptionWithoutMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-				.willThrow(new NullPointerException());
+				.willThrow(new NullPointerException("simulated error"));
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);

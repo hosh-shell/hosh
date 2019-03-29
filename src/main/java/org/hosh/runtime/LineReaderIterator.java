@@ -67,7 +67,7 @@ public class LineReaderIterator implements Iterator<String> {
 	@Override
 	public String next() {
 		if (nextLine == null) {
-			throw new NoSuchElementException();
+			throw new NoSuchElementException("end of file reached");
 		} else {
 			String line = nextLine;
 			nextLine = null;
