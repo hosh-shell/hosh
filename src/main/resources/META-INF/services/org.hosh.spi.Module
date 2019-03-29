@@ -2,3 +2,4 @@ org.hosh.modules.FileSystemModule
 org.hosh.modules.TerminalModule
 org.hosh.modules.SystemModule
 org.hosh.modules.TextModule
+org.hosh.modules.NetworkModule
