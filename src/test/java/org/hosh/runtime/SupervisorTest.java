@@ -136,7 +136,7 @@ public class SupervisorTest {
 		given(statement.getCommand()).willReturn(new TestCommand());
 		given(statement.getArguments()).willReturn(Collections.emptyList());
 		sut.submit(statement, () -> {
-			throw new NullPointerException("simulated error");
+			throw new NullPointerException();
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus.value()).isEqualTo(1);
