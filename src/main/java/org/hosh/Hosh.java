@@ -51,6 +51,7 @@ import org.hosh.runtime.ConsoleChannel;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.LineReaderIterator;
+import org.hosh.runtime.Prompt;
 import org.hosh.runtime.VariableExpansionCompleter;
 import org.hosh.runtime.VersionLoader;
 import org.hosh.spi.Ansi;
@@ -163,7 +164,7 @@ public class Hosh {
 				.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state), new VariableExpansionCompleter(state)))
 				.terminal(terminal)
 				.build();
-		LineReaderIterator read = new LineReaderIterator(state, lineReader);
+		LineReaderIterator read = new LineReaderIterator(new Prompt(state), lineReader);
 		while (read.hasNext()) {
 			state.setId(state.getId() + 1);
 			String line = read.next();

@@ -30,13 +30,12 @@ import static org.mockito.BDDMockito.given;
 
 import java.util.NoSuchElementException;
 
-import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -47,14 +46,18 @@ public class LineReaderIteratorTest {
 	private LineReader lineReader;
 
 	@Mock(stubOnly = true)
-	private State state;
+	private Prompt prompt;
 
-	@InjectMocks
 	private LineReaderIterator sut;
+
+	@Before
+	public void setup() {
+		sut = new LineReaderIterator(prompt, lineReader);
+	}
 
 	@Test
 	public void oneLine() {
-		given(state.getId()).willReturn(0);
+		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willReturn("1");
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("1");
@@ -62,7 +65,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void twoLines() {
-		given(state.getId()).willReturn(0);
+		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willReturn("1", "2");
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("1");
@@ -72,7 +75,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void hasNextIsIdempotent() {
-		given(state.getId()).willReturn(0);
+		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willReturn("1");
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.hasNext()).isTrue(); // second call
@@ -81,7 +84,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void stopsAtEOF() {
-		given(state.getId()).willReturn(0);
+		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
 		assertThat(sut.hasNext()).isFalse();
 		assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> sut.next());
@@ -89,7 +92,7 @@ public class LineReaderIteratorTest {
 
 	@Test
 	public void killsCurrentLineAtINT() {
-		given(state.getId()).willReturn(0);
+		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated INT"));
 		assertThat(sut.hasNext()).isTrue();
 		assertThat(sut.next()).isEqualTo("");

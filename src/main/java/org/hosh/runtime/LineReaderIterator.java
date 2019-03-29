@@ -23,28 +23,23 @@
  */
 package org.hosh.runtime;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.hosh.doc.Todo;
-import org.hosh.spi.Ansi;
-import org.hosh.spi.State;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
 
 public class LineReaderIterator implements Iterator<String> {
 
-	private final State state;
+	private final Prompt prompt;
 
 	private final LineReader lineReader;
 
 	private String nextLine;
 
-	public LineReaderIterator(State state, LineReader lineReader) {
-		this.state = state;
+	public LineReaderIterator(Prompt prompt, LineReader lineReader) {
+		this.prompt = prompt;
 		this.lineReader = lineReader;
 	}
 
@@ -52,7 +47,7 @@ public class LineReaderIterator implements Iterator<String> {
 	public boolean hasNext() {
 		if (nextLine == null) {
 			try {
-				nextLine = lineReader.readLine(computePrompt());
+				nextLine = lineReader.readLine(prompt.compute());
 			} catch (EndOfFileException e) {
 				nextLine = null;
 				return false;
@@ -73,19 +68,5 @@ public class LineReaderIterator implements Iterator<String> {
 			nextLine = null;
 			return line;
 		}
-	}
-
-	@Todo(description = "this should be user-configurable")
-	private String computePrompt() {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		Ansi.Style.FG_BLUE.enable(pw);
-		pw.append("hosh:");
-		Ansi.Style.FG_CYAN.enable(pw);
-		pw.append(String.valueOf(state.getId()));
-		Ansi.Style.FG_BLUE.enable(pw);
-		pw.append("> ");
-		Ansi.Style.RESET.enable(pw);
-		return sw.toString();
 	}
 }
