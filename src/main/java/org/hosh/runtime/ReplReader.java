@@ -23,50 +23,31 @@
  */
 package org.hosh.runtime;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
 
-public class LineReaderIterator implements Iterator<String> {
+public class ReplReader {
 
 	private final Prompt prompt;
 
 	private final LineReader lineReader;
 
-	private String nextLine;
-
-	public LineReaderIterator(Prompt prompt, LineReader lineReader) {
+	public ReplReader(Prompt prompt, LineReader lineReader) {
 		this.prompt = prompt;
 		this.lineReader = lineReader;
 	}
 
-	@Override
-	public boolean hasNext() {
-		if (nextLine == null) {
-			try {
-				nextLine = lineReader.readLine(prompt.compute());
-			} catch (EndOfFileException e) {
-				nextLine = null;
-				return false;
-			} catch (UserInterruptException e) {
-				nextLine = "";
-				return true;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public String next() {
-		if (nextLine == null) {
-			throw new NoSuchElementException("end of file reached");
-		} else {
-			String line = nextLine;
-			nextLine = null;
-			return line;
+	public Optional<String> read() {
+		try {
+			String line = lineReader.readLine(prompt.compute());
+			return Optional.of(line);
+		} catch (UserInterruptException e) {
+			return Optional.of("");
+		} catch (EndOfFileException e) {
+			return Optional.empty();
 		}
 	}
 }

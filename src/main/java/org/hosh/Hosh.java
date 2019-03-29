@@ -33,6 +33,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -50,8 +51,8 @@ import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
-import org.hosh.runtime.LineReaderIterator;
 import org.hosh.runtime.Prompt;
+import org.hosh.runtime.ReplReader;
 import org.hosh.runtime.VariableExpansionCompleter;
 import org.hosh.runtime.VersionLoader;
 import org.hosh.spi.Ansi;
@@ -164,16 +165,20 @@ public class Hosh {
 				.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state), new VariableExpansionCompleter(state)))
 				.terminal(terminal)
 				.build();
-		LineReaderIterator read = new LineReaderIterator(new Prompt(state), lineReader);
-		while (read.hasNext()) {
-			state.setId(state.getId() + 1);
-			String line = read.next();
+		Prompt prompt = new Prompt(state);
+		ReplReader reader = new ReplReader(prompt, lineReader);
+		while (true) {
+			Optional<String> line = reader.read();
+			if (line.isEmpty()) {
+				break;
+			}
 			try {
-				Program program = compiler.compile(line);
+				Program program = compiler.compile(line.get());
 				ExitStatus exitStatus = interpreter.eval(program);
 				if (state.isExit()) {
 					return exitStatus;
 				}
+				state.setId(state.getId() + 1);
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line), e);
 				err.send(Record.of(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));

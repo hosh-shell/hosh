@@ -146,7 +146,7 @@ public class InterpreterTest {
 	@Test
 	public void handleExceptionWithoutMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-				.willThrow(new NullPointerException("simulated error"));
+				.willThrow(new NullPointerException());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
