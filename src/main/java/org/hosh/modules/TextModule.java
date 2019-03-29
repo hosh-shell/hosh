@@ -457,6 +457,7 @@ public class TextModule implements Module {
 			out.send(Record.of(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.BOLD, Ansi.Style.FG_CYAN)));
 		}
 
+		@Todo(description = "be aware of width of unicode char, see https://github.com/joshuarubin/wcwidth9")
 		private final Map<Key, Integer> paddings = Map.of(
 				Keys.NAME, 30,
 				Keys.PATH, 30,
