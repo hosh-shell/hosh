@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.hosh.doc.Example;
+import org.hosh.doc.Examples;
 import org.hosh.doc.Help;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -48,8 +49,10 @@ public class NetworkModule implements Module {
 		commandRegistry.registerCommand("network", Network.class);
 	}
 
-	@Help(description = "network interfaces")
-	@Example(command = "network", description = "list all network interfaces")
+	@Help(description = "list network interfaces")
+	@Examples({
+			@Example(command = "network", description = "list all network interfaces")
+	})
 	public static class Network implements Command {
 
 		@Override
