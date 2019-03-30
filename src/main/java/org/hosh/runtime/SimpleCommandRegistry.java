@@ -46,6 +46,6 @@ public class SimpleCommandRegistry implements CommandRegistry {
 		if (commands.containsKey(name)) {
 			throw new IllegalArgumentException("command with same name already registered: " + name);
 		}
-		commands.putIfAbsent(name, command);
+		commands.put(name, command);
 	}
 }

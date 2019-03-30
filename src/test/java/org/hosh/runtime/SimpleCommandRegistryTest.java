@@ -38,10 +38,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SimpleCommandRegistryTest {
 
-	@Mock
+	@Mock(stubOnly = true)
 	private Command command;
 
-	@Mock
+	@Mock(stubOnly = true)
 	private Command anotherCommand;
 
 	@Spy
@@ -79,8 +79,10 @@ public class SimpleCommandRegistryTest {
 	public void twoTimesSameCommand() {
 		assertThatThrownBy(() -> {
 			sut.registerCommand("foo", command.getClass());
-			sut.registerCommand("foo", command.getClass());
+			sut.registerCommand("foo", anotherCommand.getClass());
 		}).hasMessage("command with same name already registered: foo")
 				.isInstanceOf(IllegalArgumentException.class);
+		// make sure first mapping is still in place
+		assertThat(state.getCommands()).containsEntry("foo", command.getClass());
 	}
 }
