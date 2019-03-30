@@ -107,7 +107,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 arguments")));
 		}
 
 		@Test
@@ -116,7 +116,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 arguments")));
 		}
 
 		@Test
@@ -199,7 +199,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -259,7 +259,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -298,7 +298,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -489,7 +489,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters: key regex")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -499,7 +499,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters: key regex")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -752,7 +752,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("a"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

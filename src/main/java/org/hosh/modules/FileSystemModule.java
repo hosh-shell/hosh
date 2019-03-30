@@ -142,7 +142,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
 			}
 			out.send(Record.of(Keys.PATH, Values.ofLocalPath(state.getCwd())));

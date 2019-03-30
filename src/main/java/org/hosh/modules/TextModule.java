@@ -87,7 +87,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 2 arguments")));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -131,7 +131,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -151,7 +151,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters: key regex")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -175,7 +175,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			long i = 1;
@@ -197,7 +197,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -384,14 +384,14 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Experimental(description = "extends with seed, bounds parameters; later add also 'doubles', 'booleans', etc")
+	@Experimental(description = "extends with seed, min-max interval; add also 'doubles', 'booleans', etc")
 	public static class Rand implements Command {
 
 		@SuppressWarnings("squid:S2189")
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			Random random = ThreadLocalRandom.current();
@@ -408,7 +408,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			long count = 0;
@@ -431,7 +431,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			boolean headerSent = false;

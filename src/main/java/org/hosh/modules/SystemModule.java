@@ -109,7 +109,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
 			}
 			Map<String, String> variables = state.getVariables();
@@ -154,7 +154,7 @@ public class SystemModule implements Module {
 						return ExitStatus.error();
 					}
 				default:
-					err.send(Record.of(Keys.ERROR, Values.ofText("too many parameters")));
+					err.send(Record.of(Keys.ERROR, Values.ofText("too many arguments")));
 					return ExitStatus.error();
 			}
 		}
@@ -210,7 +210,7 @@ public class SystemModule implements Module {
 				}
 				return ExitStatus.success();
 			}
-			err.send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
+			err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
 			return ExitStatus.error();
 		}
 	}

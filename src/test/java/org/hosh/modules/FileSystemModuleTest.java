@@ -347,7 +347,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
 			then(out).shouldHaveZeroInteractions();
 		}
 	}

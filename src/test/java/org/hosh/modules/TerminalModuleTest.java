@@ -82,9 +82,9 @@ public class TerminalModuleTest {
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
 		}
 
 		@Test
@@ -94,7 +94,7 @@ public class TerminalModuleTest {
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no arguments expected")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -136,7 +136,7 @@ public class TerminalModuleTest {
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no arguments expected")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

@@ -145,7 +145,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).hasExitCode(1);
 			then(state).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("too many parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("too many arguments")));
 			then(out).shouldHaveZeroInteractions();
 		}
 	}
@@ -199,7 +199,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no parameters")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
 		}
 	}
 

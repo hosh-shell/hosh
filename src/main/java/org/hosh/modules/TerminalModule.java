@@ -83,7 +83,7 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();
 			}
 			terminal.puts(InfoCmp.Capability.clear_screen);
@@ -104,7 +104,7 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();
 			}
 			terminal.puts(InfoCmp.Capability.bell);

@@ -58,7 +58,7 @@ public class NetworkModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
+				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			try {
