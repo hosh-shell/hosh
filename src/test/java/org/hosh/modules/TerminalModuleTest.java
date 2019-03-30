@@ -23,6 +23,7 @@
  */
 package org.hosh.modules;
 
+import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -32,6 +33,7 @@ import org.hosh.modules.TerminalModule.Bell;
 import org.hosh.modules.TerminalModule.Clear;
 import org.hosh.modules.TerminalModule.Dump;
 import org.hosh.spi.Channel;
+import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
@@ -75,7 +77,8 @@ public class TerminalModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
@@ -86,12 +89,13 @@ public class TerminalModuleTest {
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
 			then(err).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
 		}
 	}
 
@@ -115,23 +119,25 @@ public class TerminalModuleTest {
 
 		@Test
 		public void noArgs() {
-			sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no parameters expected")));
 			then(err).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
 		}
 	}
 
@@ -147,7 +153,7 @@ public class TerminalModuleTest {
 		@Mock
 		private Channel err;
 
-		@Mock
+		@Mock(stubOnly = true)
 		private Terminal terminal;
 
 		@InjectMocks
@@ -157,10 +163,11 @@ public class TerminalModuleTest {
 		public void noArgs() {
 			given(terminal.getType()).willReturn("xterm");
 			given(terminal.getAttributes()).willReturn(new Attributes());
-			sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Mockito.any());
 			then(err).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
 		}
 	}
 }
