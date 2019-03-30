@@ -255,7 +255,9 @@ public class TextModuleTest {
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -282,7 +284,9 @@ public class TextModuleTest {
 		public void zeroArg() {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Record.empty()), Optional.empty());
-			sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(Mockito.times(3)).recv();
 			then(out).should().send(Record.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.TEXT, Values.ofText("some data")).build());
 			then(out).should().send(Record.of(Keys.INDEX, Values.ofNumeric(2)));
 			then(err).shouldHaveNoMoreInteractions();
@@ -290,7 +294,9 @@ public class TextModuleTest {
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("asd"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 0 parameters")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -317,7 +323,9 @@ public class TextModuleTest {
 		public void dropZero() {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
-			sut.run(Arrays.asList("0"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("0"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(Mockito.times(2)).recv();
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -327,17 +335,30 @@ public class TextModuleTest {
 		public void dropOne() {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
-			sut.run(Arrays.asList("1"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(Mockito.times(2)).recv();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
-		public void zeroArgs() {
-			sut.run(Arrays.asList(), in, out, err);
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
 			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void negativeArg() {
+			ExitStatus exitStatus = sut.run(Arrays.asList("-1"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 		}
 	}
 
@@ -400,14 +421,24 @@ public class TextModuleTest {
 			then(in).should(Mockito.times(3)).recv();
 			then(out).should().send(record);
 			then(out).should().send(record2);
-			then(err).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveZeroInteractions();
 		}
 
 		@Test
-		public void zeroArgs() {
+		public void negativeArg() {
+			ExitStatus exitStatus = sut.run(Arrays.asList("-1"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+		}
+
+		@Test
+		public void noArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(out).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -433,7 +464,9 @@ public class TextModuleTest {
 		public void printMatchingLines() {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
-			sut.run(Arrays.asList(Keys.TEXT.name(), ".*string.*"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), ".*string.*"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(Mockito.times(2)).recv();
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -443,22 +476,28 @@ public class TextModuleTest {
 		public void ignoreNonMatchingLines() {
 			Record record = Record.of(Keys.TEXT, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
-			sut.run(Arrays.asList("key", ".*number.*"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("key", ".*number.*"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(Mockito.times(2)).recv();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void zeroArgs() {
-			sut.run(Arrays.asList(), in, out, err);
-			then(out).shouldHaveNoMoreInteractions();
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters: key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			sut.run(Arrays.asList("key"), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList("key"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expected 2 parameters: key regex")));
 			then(err).shouldHaveNoMoreInteractions();

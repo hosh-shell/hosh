@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.hosh.doc.Example;
+import org.hosh.doc.Examples;
 import org.hosh.doc.Experimental;
 import org.hosh.doc.Help;
 import org.hosh.doc.Todo;
@@ -181,11 +182,12 @@ public class TextModule implements Module {
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					return ExitStatus.success();
+					break;
 				}
 				Record record = incoming.get();
 				out.send(record.prepend(Keys.INDEX, Values.ofNumeric(i++)));
 			}
+			return ExitStatus.success();
 		}
 	}
 
@@ -201,15 +203,19 @@ public class TextModule implements Module {
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					return ExitStatus.success();
+					break;
 				}
 				Record record = incoming.get();
 				out.send(record.prepend(Keys.TIMESTAMP, Values.ofInstant(Instant.now())));
 			}
+			return ExitStatus.success();
 		}
 	}
 
-	@Experimental(description = "uniq")
+	@Help(description = "only output records that are not repeated in the input according to the specified key")
+	@Examples({
+			@Example(command = "lines file.txt | distinct text", description = "output all unique lines in 'file.txt'")
+	})
 	public static class Distinct implements Command {
 
 		@Override
@@ -237,7 +243,10 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Experimental(description = "uniq -d")
+	@Help(description = "only output records that are repeated in the input, according to the specified key")
+	@Examples({
+			@Example(command = "lines file.txt | duplicated text", description = "output all non-unique lines in 'file.txt'")
+	})
 	public static class Duplicated implements Command {
 
 		@Override
@@ -265,6 +274,10 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Help(description = "sort records according to the specified key")
+	@Examples({
+			@Example(command = "lines file.txt | sort text", description = "sort lines in 'file.txt'")
+	})
 	public static class Sort implements Command {
 
 		@Override
@@ -305,7 +318,10 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Todo(description = "error handling (e.g. non-integer and negative value)")
+	@Help(description = "take first n records, discarding everything else")
+	@Examples({
+			@Example(command = "lines file.txt | take 1", description = "output first line of 'file.txt'")
+	})
 	public static class Take implements Command {
 
 		@Override
@@ -315,6 +331,10 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			int take = Integer.parseInt(args.get(0));
+			if (take < 0) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+				return ExitStatus.error();
+			}
 			while (true) {
 				if (take == 0) {
 					break;
@@ -331,7 +351,10 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Todo(description = "error handling (e.g. non-integer and negative value)")
+	@Help(description = "drop first n records, then keep everything else")
+	@Examples({
+			@Example(command = "lines file.txt | drop 1", description = "output 'file.txt', except the first line")
+	})
 	public static class Drop implements Command {
 
 		@Override
@@ -341,6 +364,10 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			int drop = Integer.parseInt(args.get(0));
+			if (drop < 0) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+				return ExitStatus.error();
+			}
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
