@@ -42,11 +42,11 @@ public class Prompt {
 	public String compute() {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
-		Ansi.Style.FG_BLUE.enable(pw);
+		Ansi.Style.FG_GREEN.enable(pw);
 		pw.append("hosh:");
 		Ansi.Style.FG_CYAN.enable(pw);
 		pw.append(String.valueOf(state.getId()));
-		Ansi.Style.FG_BLUE.enable(pw);
+		Ansi.Style.FG_GREEN.enable(pw);
 		pw.append("> ");
 		Ansi.Style.RESET.enable(pw);
 		return sw.toString();
