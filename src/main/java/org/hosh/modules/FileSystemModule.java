@@ -110,7 +110,7 @@ public class FileSystemModule implements Module {
 				for (Path path : stream) {
 					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
 					Record entry = Record.builder()
-							.entry(Keys.PATH, Values.ofLocalPath(path.getFileName()))
+							.entry(Keys.PATH, Values.ofPath(path.getFileName()))
 							.entry(Keys.SIZE, size)
 							.build();
 					out.send(entry);
@@ -145,7 +145,7 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
 			}
-			out.send(Record.of(Keys.PATH, Values.ofLocalPath(state.getCwd())));
+			out.send(Record.of(Keys.PATH, Values.ofPath(state.getCwd())));
 			return ExitStatus.success();
 		}
 	}
@@ -243,7 +243,7 @@ public class FileSystemModule implements Module {
 			}
 			try (Stream<Path> stream = Files.walk(followSymlinksRecursively(start))) {
 				stream.forEach(path -> {
-					Record result = Record.of(Keys.PATH, Values.ofLocalPath(path.toAbsolutePath()));
+					Record result = Record.of(Keys.PATH, Values.ofPath(path.toAbsolutePath()));
 					out.send(result);
 				});
 				return ExitStatus.success();
@@ -313,7 +313,7 @@ public class FileSystemModule implements Module {
 					WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
 					out.send(Record.builder()
 							.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
-							.entry(Keys.PATH, Values.ofLocalPath(pathEvent.context()))
+							.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
 							.build());
 				}
 				if (!key.reset()) {

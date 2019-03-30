@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 import org.hosh.spi.Values.AlphaNumericStringComparator;
 import org.hosh.spi.ValuesTest.AlphaNumericStringComparatorTest;
 import org.hosh.spi.ValuesTest.DurationValueTest;
-import org.hosh.spi.ValuesTest.LocalPathValueTest;
+import org.hosh.spi.ValuesTest.PathValueTest;
 import org.hosh.spi.ValuesTest.NoneValueTest;
 import org.hosh.spi.ValuesTest.NumericValueTest;
 import org.hosh.spi.ValuesTest.SizeValueTest;
@@ -61,7 +61,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 		TextValueTest.class,
 		NumericValueTest.class,
 		SizeValueTest.class,
-		LocalPathValueTest.class,
+		PathValueTest.class,
 		AlphaNumericStringComparatorTest.class,
 		SortingBetweenValuesTest.class
 })
@@ -153,7 +153,7 @@ public class ValuesTest {
 
 		@Test
 		public void equalsContract() {
-			EqualsVerifier.forClass(Values.Text.class)
+			EqualsVerifier.forClass(Values.TextValue.class)
 					.withIgnoredFields("styles")
 					.verify();
 		}
@@ -199,7 +199,7 @@ public class ValuesTest {
 
 		@Test
 		public void equalsContract() {
-			EqualsVerifier.forClass(Values.Numeric.class).verify();
+			EqualsVerifier.forClass(Values.NumericValue.class).verify();
 		}
 
 		@Test
@@ -263,7 +263,7 @@ public class ValuesTest {
 
 		@Test
 		public void equalsContract() {
-			EqualsVerifier.forClass(Values.Size.class).verify();
+			EqualsVerifier.forClass(Values.SizeValue.class).verify();
 		}
 
 		@Test
@@ -275,32 +275,32 @@ public class ValuesTest {
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class LocalPathValueTest {
+	public static class PathValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
 
 		@Test
 		public void appendOk() {
-			Values.ofLocalPath(Paths.get(".")).append(printWriter, Locale.getDefault());
+			Values.ofPath(Paths.get(".")).append(printWriter, Locale.getDefault());
 			then(printWriter).should().append(".");
 		}
 
 		@Test
 		public void equalsContract() {
-			EqualsVerifier.forClass(Values.LocalPath.class).verify();
+			EqualsVerifier.forClass(Values.PathValue.class).verify();
 		}
 
 		@Test
 		public void asString() {
-			assertThat(Values.ofLocalPath(Paths.get("file"))).hasToString("LocalPath[file]");
+			assertThat(Values.ofPath(Paths.get("file"))).hasToString("Path[file]");
 		}
 
 		@Test
 		public void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.ofLocalPath(Paths.get("file")).compareTo(Values.ofText("2")))
+			assertThatThrownBy(() -> Values.ofPath(Paths.get("file")).compareTo(Values.ofText("2")))
 					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("cannot compare LocalPath[file] to Text[2]");
+					.hasMessage("cannot compare Path[file] to Text[2]");
 		}
 	}
 
@@ -429,19 +429,19 @@ public class ValuesTest {
 		@Test
 		public void localPathWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.ofLocalPath(Paths.get("bbb")),
+					Values.ofPath(Paths.get("bbb")),
 					Values.none(),
 					Values.none(),
-					Values.ofLocalPath(Paths.get("aaa")),
-					Values.ofLocalPath(Paths.get("ccc")))
+					Values.ofPath(Paths.get("aaa")),
+					Values.ofPath(Paths.get("ccc")))
 					.sorted()
 					.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 					Values.none(),
 					Values.none(),
-					Values.ofLocalPath(Paths.get("aaa")),
-					Values.ofLocalPath(Paths.get("bbb")),
-					Values.ofLocalPath(Paths.get("ccc")));
+					Values.ofPath(Paths.get("aaa")),
+					Values.ofPath(Paths.get("bbb")),
+					Values.ofPath(Paths.get("ccc")));
 		}
 
 		@Test

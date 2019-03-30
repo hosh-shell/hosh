@@ -39,9 +39,9 @@ import java.util.regex.Pattern;
 import org.hosh.doc.Todo;
 
 /**
- * Built-in values to be used in Records.
+ * Built-in value objects to be used in @{see Record}.
  *
- * NB: concrete types are not exposed by design
+ * NB: concrete types are not exposed by design.
  */
 public class Values {
 
@@ -63,15 +63,15 @@ public class Values {
 	}
 
 	public static Value ofNumeric(long number) {
-		return new Numeric(number);
+		return new NumericValue(number);
 	}
 
 	public static Value ofText(String text) {
-		return new Text(text);
+		return new TextValue(text);
 	}
 
 	public static Value ofStyledText(String text, Ansi.Style... styles) {
-		return new Text(text, styles);
+		return new TextValue(text, styles);
 	}
 
 	public enum Unit {
@@ -91,32 +91,32 @@ public class Values {
 	 */
 	public static Value ofHumanizedSize(long bytes) {
 		if (bytes < KIB) {
-			return new Size(BigDecimal.valueOf(bytes), Unit.B);
+			return new SizeValue(BigDecimal.valueOf(bytes), Unit.B);
 		}
 		int exp = (int) (Math.log(bytes) / Math.log(KIB));
 		Unit unit = UNITS[exp - 1];
 		BigDecimal value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(KIB, exp)), 1, RoundingMode.HALF_UP);
-		return new Size(value, unit);
+		return new SizeValue(value, unit);
 	}
 
 	/**
 	 * Paths, without any special attributes.
 	 */
-	public static Value ofLocalPath(Path path) {
-		return new LocalPath(path);
+	public static Value ofPath(Path path) {
+		return new PathValue(path);
 	}
 
 	/**
 	 * Generic text, make sure that text hasn't any number or date formatted without
 	 * the current locale.
 	 */
-	static final class Text implements Value {
+	static final class TextValue implements Value {
 
 		private final String value;
 
 		private final Ansi.Style[] styles;
 
-		public Text(String value, Ansi.Style... styles) {
+		public TextValue(String value, Ansi.Style... styles) {
 			if (styles == null) {
 				throw new IllegalArgumentException("styles cannot be null");
 			}
@@ -146,8 +146,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof Text) {
-				Text that = (Text) obj;
+			if (obj instanceof TextValue) {
+				TextValue that = (TextValue) obj;
 				return Objects.equals(this.value, that.value);
 			} else {
 				return false;
@@ -161,8 +161,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof Text) {
-				Text that = (Text) obj;
+			if (obj instanceof TextValue) {
+				TextValue that = (TextValue) obj;
 				return this.value.compareTo(that.value);
 			} else if (obj instanceof None) {
 				return 1;
@@ -173,8 +173,8 @@ public class Values {
 
 		@Override
 		public boolean matches(Value that) {
-			if (that instanceof Text) {
-				return value.matches(((Text) that).value);
+			if (that instanceof TextValue) {
+				return value.matches(((TextValue) that).value);
 			} else {
 				return false;
 			}
@@ -184,13 +184,13 @@ public class Values {
 	/**
 	 * Used to represent a size of a file, etc.
 	 */
-	static final class Size implements Value {
+	static final class SizeValue implements Value {
 
 		private final BigDecimal value;
 
 		private final Unit unit;
 
-		public Size(BigDecimal value, Unit unit) {
+		public SizeValue(BigDecimal value, Unit unit) {
 			if (value.compareTo(BigDecimal.ZERO) < 0) {
 				throw new IllegalArgumentException("negative size");
 			}
@@ -212,8 +212,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof Size) {
-				Size that = (Size) obj;
+			if (obj instanceof SizeValue) {
+				SizeValue that = (SizeValue) obj;
 				return Objects.equals(this.value, that.value) && Objects.equals(this.unit, that.unit);
 			} else {
 				return false;
@@ -225,9 +225,9 @@ public class Values {
 			return Objects.hash(value, unit);
 		}
 
-		private static final Comparator<Size> SIZE_COMPARATOR = Comparator
-				.comparing(Size::getUnit)
-				.thenComparing(Size::getValue);
+		private static final Comparator<SizeValue> SIZE_COMPARATOR = Comparator
+				.comparing(SizeValue::getUnit)
+				.thenComparing(SizeValue::getValue);
 
 		public BigDecimal getValue() {
 			return value;
@@ -239,8 +239,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof Size) {
-				Size that = (Size) obj;
+			if (obj instanceof SizeValue) {
+				SizeValue that = (SizeValue) obj;
 				return SIZE_COMPARATOR.compare(this, that);
 			} else if (obj instanceof None) {
 				return 1;
@@ -250,11 +250,11 @@ public class Values {
 		}
 	}
 
-	static final class Numeric implements Value {
+	static final class NumericValue implements Value {
 
 		private final long number;
 
-		public Numeric(long number) {
+		public NumericValue(long number) {
 			this.number = number;
 		}
 
@@ -276,8 +276,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof Numeric) {
-				Numeric that = (Numeric) obj;
+			if (obj instanceof NumericValue) {
+				NumericValue that = (NumericValue) obj;
 				return this.number == that.number;
 			} else {
 				return false;
@@ -286,8 +286,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof Numeric) {
-				Numeric that = (Numeric) obj;
+			if (obj instanceof NumericValue) {
+				NumericValue that = (NumericValue) obj;
 				return Long.compare(this.number, that.number);
 			} else if (obj instanceof None) {
 				return 1;
@@ -428,11 +428,11 @@ public class Values {
 		}
 	}
 
-	static final class LocalPath implements Value {
+	static final class PathValue implements Value {
 
 		private final Path path;
 
-		public LocalPath(Path path) {
+		public PathValue(Path path) {
 			if (path == null) {
 				throw new IllegalArgumentException("path cannot be null");
 			}
@@ -446,13 +446,13 @@ public class Values {
 
 		@Override
 		public String toString() {
-			return String.format("LocalPath[%s]", path);
+			return String.format("Path[%s]", path);
 		}
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof LocalPath) {
-				LocalPath that = (LocalPath) obj;
+			if (obj instanceof PathValue) {
+				PathValue that = (PathValue) obj;
 				return Objects.equals(this.path, that.path);
 			} else {
 				return false;
@@ -469,8 +469,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof LocalPath) {
-				LocalPath that = (LocalPath) obj;
+			if (obj instanceof PathValue) {
+				PathValue that = (PathValue) obj;
 				return PATH_COMPARATOR.compare(this.path, that.path);
 			} else if (obj instanceof None) {
 				return 1;

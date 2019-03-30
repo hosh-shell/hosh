@@ -125,7 +125,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(
 					Record.builder()
-							.entry(Keys.PATH, Values.ofLocalPath(Paths.get("dir")))
+							.entry(Keys.PATH, Values.ofPath(Paths.get("dir")))
 							.entry(Keys.SIZE, Values.none())
 							.build());
 			then(err).shouldHaveZeroInteractions();
@@ -138,9 +138,8 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should()
-					.send(Record.builder().entry(Keys.PATH, Values.ofLocalPath(Paths.get("file"))).entry(Keys.SIZE, Values.ofHumanizedSize(0))
-							.build());
+			then(out).should().send(Record.builder().entry(Keys.PATH, Values.ofPath(Paths.get("file"))).entry(Keys.SIZE, Values.ofHumanizedSize(0))
+					.build());
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -187,7 +186,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should().send(Record.builder()
-					.entry(Keys.PATH, Values.ofLocalPath(Paths.get("aaa")))
+					.entry(Keys.PATH, Values.ofPath(Paths.get("aaa")))
 					.entry(Keys.SIZE, Values.ofHumanizedSize(0))
 					.build());
 		}
@@ -214,7 +213,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(
 					Record.builder()
-							.entry(Keys.PATH, Values.ofLocalPath(Paths.get("aaa")))
+							.entry(Keys.PATH, Values.ofPath(Paths.get("aaa")))
 							.entry(Keys.SIZE, Values.ofHumanizedSize(0))
 							.build());
 			then(err).shouldHaveNoMoreInteractions();
@@ -338,7 +337,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Record.of(Keys.PATH, Values.ofLocalPath(temporaryFolder.getRoot().toPath())));
+			then(out).should().send(Record.of(Keys.PATH, Values.ofPath(temporaryFolder.getRoot().toPath())));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -469,7 +468,7 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(Arrays.asList("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(out).should().send(Record.of(Keys.PATH, Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
+			then(out).should().send(Record.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
 			then(err).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}
@@ -491,7 +490,7 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(Arrays.asList(temporaryFolder.getRoot().getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(out).should().send(Record.of(Keys.PATH, Values.ofLocalPath(newFile.toPath().toAbsolutePath())));
+			then(out).should().send(Record.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
 			then(err).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
 		}
@@ -516,7 +515,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("symlink"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(err).shouldHaveZeroInteractions();
-			then(out).should().send(Record.of(Keys.PATH, Values.ofLocalPath(newFolder.toPath())));
+			then(out).should().send(Record.of(Keys.PATH, Values.ofPath(newFolder.toPath())));
 			then(in).shouldHaveZeroInteractions();
 		}
 	}
