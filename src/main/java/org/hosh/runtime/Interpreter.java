@@ -24,6 +24,7 @@
 package org.hosh.runtime;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -119,8 +120,10 @@ public class Interpreter {
 	private String resolveVariable(String argument) {
 		if (argument.startsWith("${") && argument.endsWith("}")) {
 			String variableName = variableName(argument);
-			if (state.getVariables().containsKey(variableName)) {
-				return state.getVariables().get(variableName);
+			Map<String, String> variables = state.getVariables();
+			String variableValue = variables.get(variableName);
+			if (variableValue != null) {
+				return variableValue;
 			} else {
 				throw new IllegalStateException("unknown variable: " + variableName);
 			}
