@@ -32,7 +32,5 @@ public interface Channel {
 
 	void send(Record record);
 
-	default Optional<Record> recv() {
-		return Optional.empty();
-	}
+	Optional<Record> recv();
 }

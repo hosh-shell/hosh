@@ -33,7 +33,5 @@ public interface Value extends Comparable<Value> {
 
 	void append(PrintWriter printWriter, Locale locale);
 
-	default boolean matches(@SuppressWarnings("unused") Value that) {
-		return false;
-	}
+	boolean matches(Value that);
 }

@@ -23,6 +23,8 @@
  */
 package org.hosh.runtime;
 
+import java.util.Optional;
+
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 
@@ -34,6 +36,11 @@ public class NullChannel implements Channel {
 	@Override
 	public void send(Record record) {
 		// no-op
+	}
+
+	@Override
+	public Optional<Record> recv() {
+		return Optional.empty();
 	}
 
 	@Override

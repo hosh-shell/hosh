@@ -23,7 +23,9 @@
  */
 package org.hosh.spi;
 
-/** Marker interface to inject State in Commands */
+/**
+ * Marker interface to inject @{see State} in commands.
+ */
 public interface StateAware {
 
 	void setState(State state);

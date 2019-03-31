@@ -25,6 +25,7 @@ package org.hosh.runtime;
 
 import java.io.PrintWriter;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
@@ -50,6 +51,11 @@ public class ConsoleChannel implements Channel {
 		style.disable(printWriter);
 		printWriter.append(System.lineSeparator());
 		printWriter.flush();
+	}
+
+	@Override
+	public Optional<Record> recv() {
+		return Optional.empty();
 	}
 
 	@Override

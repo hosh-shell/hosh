@@ -25,7 +25,9 @@ package org.hosh.spi;
 
 import org.jline.terminal.Terminal;
 
-/** Marker interface to inject Terminal in Commands */
+/**
+ * Marker interface to inject @{see Terminal} in commands.
+ */
 public interface TerminalAware {
 
 	void setTerminal(Terminal terminal);
