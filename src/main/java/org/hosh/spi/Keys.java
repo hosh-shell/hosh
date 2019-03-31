@@ -31,8 +31,6 @@ import java.util.Objects;
  * and some defaults regarding textual representation in terminal.
  *
  * Built-in commands can use "private" keys when appropriate.
- *
- * NB: these could be good candidates for constant pool (JEP 303)
  */
 public class Keys {
 
@@ -138,6 +136,11 @@ public class Keys {
 		@Override
 		public String toString() {
 			return String.format("Key[%s]", this.name);
+		}
+
+		@Override
+		public int compareTo(Key o) {
+			return this.name().compareTo(o.name());
 		}
 	}
 }

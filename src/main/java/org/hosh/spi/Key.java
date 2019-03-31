@@ -23,10 +23,10 @@
  */
 package org.hosh.spi;
 
-import org.hosh.doc.Experimental;
-
-@Experimental(description = "must be Comparable?")
-public interface Key {
+/**
+ * The key in a @{see Record}.
+ */
+public interface Key extends Comparable<Key> {
 
 	String name();
 }

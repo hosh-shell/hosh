@@ -27,7 +27,7 @@ import java.io.PrintWriter;
 import java.util.Locale;
 
 /**
- * Any value produced by commands such as text, size or path.
+ * The value in @{see Record}.
  */
 public interface Value extends Comparable<Value> {
 
@@ -35,29 +35,5 @@ public interface Value extends Comparable<Value> {
 
 	default boolean matches(@SuppressWarnings("unused") Value that) {
 		return false;
-	}
-
-	default boolean eq(Value value) {
-		return this.compareTo(value) == 0;
-	}
-
-	default boolean ne(Value value) {
-		return this.compareTo(value) != 0;
-	}
-
-	default boolean gt(Value value) {
-		return this.compareTo(value) > 0;
-	}
-
-	default boolean lt(Value value) {
-		return this.compareTo(value) < 0;
-	}
-
-	default boolean ge(Value value) {
-		return this.compareTo(value) >= 0;
-	}
-
-	default boolean le(Value value) {
-		return this.compareTo(value) <= 0;
 	}
 }
