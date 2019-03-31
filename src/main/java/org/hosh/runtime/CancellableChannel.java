@@ -29,7 +29,9 @@ import java.util.concurrent.CancellationException;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 
-/** A decorator that makes any channel implementation cancellable on send() */
+/**
+ * A decorator that makes any channel implementation cancellable on send().
+ */
 public class CancellableChannel implements Channel {
 
 	private final Channel channel;

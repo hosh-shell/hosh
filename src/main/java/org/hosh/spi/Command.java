@@ -26,10 +26,8 @@ package org.hosh.spi;
 import java.util.List;
 import java.util.Optional;
 
-import org.hosh.doc.Experimental;
-
 /**
- * Command represents a built-in (i.e. ls) or system commands (i.e. vim).
+ * Command represents a built-in (i.e. ls) or external commands (i.e. vim).
  */
 public interface Command {
 
@@ -50,7 +48,6 @@ public interface Command {
 	 * @return a human readable description of the command
 	 *         (e.g. 'ls' or '/usr/bin/cat')
 	 */
-	@Experimental(description = "mandatory marking as experimental")
 	default String describe() {
 		return this.getClass().getSimpleName();
 	}

@@ -35,10 +35,6 @@ import org.hosh.spi.Command;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.State;
 
-/**
- * Search a command using various strategies. This has been done to keep the
- * compiler unaware of how commands are resolved.
- */
 public class CommandResolvers {
 
 	private CommandResolvers() {

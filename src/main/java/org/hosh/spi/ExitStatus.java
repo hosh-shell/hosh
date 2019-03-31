@@ -27,8 +27,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Value object for describing exit status from external as well as internal
- * commands.
+ * Value object for describing exit status.
+ *
+ * It can be used for both from external as well as internal commands.
  */
 public class ExitStatus {
 
