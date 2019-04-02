@@ -118,7 +118,7 @@ public class Hosh {
 		state.setPath(path);
 		BootstrapBuiltins bootstrap = new BootstrapBuiltins();
 		bootstrap.registerAllBuiltins(state);
-		CommandResolver commandResolver = CommandResolvers.builtinsThenSystem(state);
+		CommandResolver commandResolver = CommandResolvers.builtinsThenExternal(state);
 		Compiler compiler = new Compiler(commandResolver);
 		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
 		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));

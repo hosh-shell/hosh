@@ -83,7 +83,7 @@ public class CommandResolversTest {
 
 		@Before
 		public void setup() {
-			sut = CommandResolvers.builtinsThenSystem(state);
+			sut = CommandResolvers.builtinsThenExternal(state);
 		}
 
 		@Test

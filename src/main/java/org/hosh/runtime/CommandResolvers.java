@@ -40,7 +40,7 @@ public class CommandResolvers {
 	private CommandResolvers() {
 	}
 
-	public static CommandResolver builtinsThenSystem(State state) {
+	public static CommandResolver builtinsThenExternal(State state) {
 		boolean isWindows = System.getProperty("os.name").startsWith("Windows");
 		List<CommandResolver> order = new ArrayList<>();
 		order.add(new BuiltinCommandResolver(state));
@@ -83,7 +83,7 @@ public class CommandResolvers {
 
 		@Override
 		public Optional<Command> tryResolve(String commandName) {
-			LOGGER.info(() -> String.format("resolving commandName '%s' as system command", commandName));
+			LOGGER.info(() -> String.format("resolving commandName '%s' as external command", commandName));
 			final Path absoluteCandidate = Paths.get(commandName).normalize();
 			if (absoluteCandidate.isAbsolute()) {
 				Optional<Command> command = attemptResolution(absoluteCandidate);
