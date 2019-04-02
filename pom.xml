@@ -223,6 +223,7 @@
 				<version>2.22.1</version>
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -237,6 +238,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<trimStackTrace>false</trimStackTrace>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

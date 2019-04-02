@@ -35,10 +35,6 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
-import org.hosh.testsupport.IgnoreIf;
-import org.hosh.testsupport.IgnoreIf.IgnoredIf;
-import org.hosh.testsupport.IgnoreIf.OnWindows;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -57,9 +53,6 @@ public class NetworkModuleTest {
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class NetworkTest {
 
-		@Rule
-		public final IgnoreIf ignoreIf = new IgnoreIf();
-
 		@Mock
 		private Channel in;
 
@@ -72,7 +65,6 @@ public class NetworkModuleTest {
 		@InjectMocks
 		private Network sut;
 
-		@IgnoredIf(description = "on azul jdk 11 on windows this is failing in Arrays.asList()!?", condition = OnWindows.class)
 		@Todo(description = "this is a very bland test: let's try to consolidate this command before investing more")
 		@Test
 		public void noArgs() {
