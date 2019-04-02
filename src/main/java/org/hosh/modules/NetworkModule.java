@@ -72,7 +72,7 @@ public class NetworkModule implements Module {
 							.entry(Keys.of("virtual"), Values.ofText(ni.isVirtual() ? "yes" : "no"))
 							.entry(Keys.of("mtu"), Values.ofNumeric(ni.getMTU()))
 							.entry(Keys.of("hwaddress"), Values.ofText(formatHex(ni.getHardwareAddress())))
-							.entry(Keys.of("address"), Values.ofText(ni.getInterfaceAddresses().get(0).getAddress().getHostAddress()))
+							.entry(Keys.of("address"), Values.ofText(formatInterfaceAddress(ni)))
 							.build();
 					out.send(record);
 				}
@@ -80,6 +80,14 @@ public class NetworkModule implements Module {
 			} catch (SocketException e) {
 				throw new UncheckedIOException(e);
 			}
+		}
+
+		private String formatInterfaceAddress(NetworkInterface ni) {
+			var interfaceAddresses = ni.getInterfaceAddresses();
+			if (interfaceAddresses.isEmpty()) {
+				return "";
+			}
+			return interfaceAddresses.get(0).getAddress().getHostAddress();
 		}
 
 		private String formatHex(byte[] bytes) {
