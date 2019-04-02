@@ -73,4 +73,12 @@ public class KeysTest {
 				.forClass(SingleWordKey.class)
 				.verify();
 	}
+
+	@Test
+	public void compareTo() {
+		Key a = Keys.of("name");
+		Key b = Keys.of("b");
+		assertThat(a).isEqualByComparingTo(a);
+		assertThat(a).isNotEqualByComparingTo(b);
+	}
 }

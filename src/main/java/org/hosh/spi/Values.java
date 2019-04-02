@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
@@ -117,11 +118,14 @@ public class Values {
 		private final Ansi.Style[] styles;
 
 		public TextValue(String value, Ansi.Style... styles) {
+			if (value == null) {
+				throw new IllegalArgumentException("text cannot be null");
+			}
 			if (styles == null) {
 				throw new IllegalArgumentException("styles cannot be null");
 			}
-			if (value == null) {
-				throw new IllegalArgumentException("text cannot be null");
+			if (Arrays.stream(styles).anyMatch(style -> style == null)) {
+				throw new IllegalArgumentException("style cannot be null");
 			}
 			this.styles = styles;
 			this.value = value;

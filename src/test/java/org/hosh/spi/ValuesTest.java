@@ -30,6 +30,7 @@ import static org.mockito.BDDMockito.then;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -39,9 +40,10 @@ import java.util.stream.Stream;
 import org.hosh.spi.Values.AlphaNumericStringComparator;
 import org.hosh.spi.ValuesTest.AlphaNumericStringComparatorTest;
 import org.hosh.spi.ValuesTest.DurationValueTest;
-import org.hosh.spi.ValuesTest.PathValueTest;
+import org.hosh.spi.ValuesTest.InstantValueTest;
 import org.hosh.spi.ValuesTest.NoneValueTest;
 import org.hosh.spi.ValuesTest.NumericValueTest;
+import org.hosh.spi.ValuesTest.PathValueTest;
 import org.hosh.spi.ValuesTest.SizeValueTest;
 import org.hosh.spi.ValuesTest.SortingBetweenValuesTest;
 import org.hosh.spi.ValuesTest.TextValueTest;
@@ -57,6 +59,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 @RunWith(Suite.class)
 @SuiteClasses({
 		NoneValueTest.class,
+		InstantValueTest.class,
 		DurationValueTest.class,
 		TextValueTest.class,
 		NumericValueTest.class,
@@ -133,6 +136,43 @@ public class ValuesTest {
 	}
 
 	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class InstantValueTest {
+
+		@Mock
+		private PrintWriter printWriter;
+
+		@Test
+		public void append() {
+			Values.ofInstant(Instant.EPOCH).append(printWriter, Locale.ENGLISH);
+			then(printWriter).should().append("1970-01-01T00:00:00Z");
+		}
+
+		@Test
+		public void equalsContract() {
+			EqualsVerifier.forClass(Values.InstantValue.class).verify();
+		}
+
+		@Test
+		public void asString() {
+			assertThat(Values.ofInstant(Instant.EPOCH)).hasToString("Instant[1970-01-01T00:00:00Z]");
+		}
+
+		@Test
+		public void nullDuration() {
+			assertThatThrownBy(() -> Values.ofInstant(null))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("instant cannot be null");
+		}
+
+		@Test
+		public void compareToAnotherValueType() {
+			assertThatThrownBy(() -> Values.ofInstant(Instant.EPOCH).compareTo(Values.ofText("2")))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Instant[1970-01-01T00:00:00Z] to Text[2]");
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
 	public static class TextValueTest {
 
 		@Mock
@@ -176,6 +216,27 @@ public class ValuesTest {
 			assertThatThrownBy(() -> Values.ofText("2").compareTo(Values.ofDuration(Duration.ofHours(1))))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Text[2] to Duration[PT1H]");
+		}
+
+		@Test
+		public void nullText() {
+			assertThatThrownBy(() -> Values.ofText(null))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("text cannot be null");
+		}
+
+		@Test
+		public void nullStyles() {
+			assertThatThrownBy(() -> Values.ofStyledText("asd", (Ansi.Style[]) null))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("styles cannot be null");
+		}
+
+		@Test
+		public void nullStyle() {
+			assertThatThrownBy(() -> Values.ofStyledText("asd", new Ansi.Style[] { null }))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("style cannot be null");
 		}
 	}
 
@@ -373,6 +434,24 @@ public class ValuesTest {
 	public static class SortingBetweenValuesTest {
 
 		@Test
+		public void instantWithNone() {
+			List<Value> sorted = Stream.of(
+					Values.ofInstant(Instant.ofEpochMilli(100)),
+					Values.none(),
+					Values.none(),
+					Values.ofInstant(Instant.ofEpochMilli(-100)),
+					Values.ofInstant(Instant.ofEpochMilli(0)))
+					.sorted()
+					.collect(Collectors.toList());
+			assertThat(sorted).containsExactly(
+					Values.none(),
+					Values.none(),
+					Values.ofInstant(Instant.ofEpochMilli(-100)),
+					Values.ofInstant(Instant.ofEpochMilli(0)),
+					Values.ofInstant(Instant.ofEpochMilli(100)));
+		}
+
+		@Test
 		public void numericWithNone() {
 			List<Value> sorted = Stream.of(
 					Values.ofNumeric(1),
@@ -427,7 +506,7 @@ public class ValuesTest {
 		}
 
 		@Test
-		public void localPathWithNone() {
+		public void pathWithNone() {
 			List<Value> sorted = Stream.of(
 					Values.ofPath(Paths.get("bbb")),
 					Values.none(),
