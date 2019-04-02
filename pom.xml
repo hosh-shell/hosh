@@ -259,6 +259,12 @@
 					<targetTests>
 						<param>org.hosh.*</param>
 					</targetTests>
+					<excludedTestClasses>
+						<param>org.hosh.integration.*</param>
+						<param>org.hosh.runtime.CommandResolversTest*</param>
+						<param>org.hosh.modules.FileSystemModuleTest*</param>
+						<param>org.hosh.antlr4.*</param>
+					</excludedTestClasses>
 				</configuration>
 			</plugin>
 			<plugin>
