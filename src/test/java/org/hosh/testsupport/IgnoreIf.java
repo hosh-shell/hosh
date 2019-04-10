@@ -25,10 +25,16 @@ package org.hosh.testsupport;
 
 import static org.junit.Assume.assumeFalse;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 
 import org.hosh.doc.Experimental;
@@ -83,6 +89,34 @@ public class IgnoreIf implements MethodRule {
 		@Override
 		public boolean test() {
 			return !normalizedOsName().contains("win");
+		}
+	}
+
+	public static class CannotCreateSymbolicLinks implements Condition {
+
+		@Override
+		public boolean test() {
+			try {
+				return cannotCreateSymlink();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+
+		private boolean cannotCreateSymlink() throws IOException {
+			Path target = Paths.get("test");
+			Path symlink = Path.of("symlink");
+			try {
+				Files.createSymbolicLink(target, symlink);
+				return false;
+			} catch (FileSystemException e) {
+				String expectedReason = "A required privilege is not held by the client." + System.lineSeparator();
+				String actualReason = e.getReason();
+				return expectedReason.equals(actualReason);
+			} finally {
+				Files.deleteIfExists(target);
+				Files.deleteIfExists(symlink);
+			}
 		}
 	}
 

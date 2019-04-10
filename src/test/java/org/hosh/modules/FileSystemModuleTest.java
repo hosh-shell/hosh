@@ -50,6 +50,7 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.IgnoreIf;
+import org.hosh.testsupport.IgnoreIf.CannotCreateSymbolicLinks;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
 import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.junit.Rule;
@@ -436,6 +437,9 @@ public class FileSystemModuleTest {
 	public static class FindTest {
 
 		@Rule
+		public final IgnoreIf ignoreIf = new IgnoreIf();
+
+		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -506,6 +510,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 		}
 
+		@IgnoredIf(description = "on Windows 7 a special permission is needed to create symlinks (see https://stackoverflow.com/a/24353758)", condition = CannotCreateSymbolicLinks.class)
 		@Test
 		public void resolveSymlinks() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
