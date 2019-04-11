@@ -77,7 +77,6 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("kill", KillProcess.class);
 		commandRegistry.registerCommand("err", Err.class);
 		commandRegistry.registerCommand("benchmark", Benchmark.class);
-		commandRegistry.registerCommand("source", Source.class);
 		commandRegistry.registerCommand("sink", Sink.class);
 		commandRegistry.registerCommand("set", SetVariable.class);
 		commandRegistry.registerCommand("unset", UnsetVariable.class);
@@ -394,17 +393,6 @@ public class SystemModule implements Module {
 
 			public List<Duration> getResults() {
 				return results;
-			}
-		}
-	}
-
-	public static class Source implements Command {
-
-		@SuppressWarnings("squid:S2189")
-		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			while (true) {
-				out.send(Record.of(Keys.VALUE, Values.ofText("test value")));
 			}
 		}
 	}

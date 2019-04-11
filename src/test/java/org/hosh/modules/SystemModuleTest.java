@@ -48,7 +48,6 @@ import org.hosh.modules.SystemModule.ProcessList;
 import org.hosh.modules.SystemModule.SetVariable;
 import org.hosh.modules.SystemModule.Sink;
 import org.hosh.modules.SystemModule.Sleep;
-import org.hosh.modules.SystemModule.Source;
 import org.hosh.modules.SystemModule.UnsetVariable;
 import org.hosh.modules.SystemModule.WithTime;
 import org.hosh.spi.Channel;
@@ -58,7 +57,6 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -83,7 +81,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 		SystemModuleTest.ErrTest.class,
 		SystemModuleTest.BenchmarkTest.class,
 		SystemModuleTest.WithTimeTest.class,
-		SystemModuleTest.SourceTest.class,
 		SystemModuleTest.SinkTest.class,
 		SystemModuleTest.SetVariableTest.class,
 		SystemModuleTest.UnsetVariableTest.class,
@@ -417,32 +414,6 @@ public class SystemModuleTest {
 			assertThatThrownBy(() -> sut.run(Arrays.asList(), in, out, err))
 					.hasMessage("injected error: please do not report")
 					.isInstanceOf(NullPointerException.class);
-		}
-	}
-
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class SourceTest {
-
-		@Mock
-		private Channel in;
-
-		@Mock
-		private Channel out;
-
-		@Mock
-		private Channel err;
-
-		@InjectMocks
-		private Source sut;
-
-		@Ignore("WIP")
-		@Test
-		public void canBeInterrupted() {
-			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
-			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
 		}
 	}
 

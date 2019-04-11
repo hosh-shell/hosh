@@ -213,7 +213,7 @@ public class HoshIT {
 	@Test
 	public void pipelineWithInternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"source | take 1 | count"//
+				"rand | take 1 | count"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
