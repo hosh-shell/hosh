@@ -26,7 +26,6 @@ package org.hosh.testsupport;
 import static org.junit.Assume.assumeFalse;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -47,7 +46,7 @@ public class IgnoreIf implements MethodRule {
 
 	interface Condition {
 
-		boolean test();
+		boolean test() throws Throwable;
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
@@ -95,15 +94,7 @@ public class IgnoreIf implements MethodRule {
 	public static class CannotCreateSymbolicLinks implements Condition {
 
 		@Override
-		public boolean test() {
-			try {
-				return cannotCreateSymlink();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		}
-
-		private boolean cannotCreateSymlink() throws IOException {
+		public boolean test() throws IOException {
 			Path target = Paths.get("test");
 			Path symlink = Path.of("symlink");
 			try {
