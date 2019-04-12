@@ -396,6 +396,11 @@ public class TextModule implements Module {
 			}
 			Random random = ThreadLocalRandom.current();
 			while (true) {
+
+
+
+
+
 				long next = random.nextLong();
 				Record of = Record.of(Keys.RAND, Values.ofNumeric(next));
 				out.send(of);

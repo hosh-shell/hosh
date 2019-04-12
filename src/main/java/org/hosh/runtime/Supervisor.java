@@ -34,6 +34,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -43,7 +44,7 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 
 /**
- * Manages runtime execution of built-in commands as well as external commands.
+ * Manages execution of built-in commands as well as external commands.
  *
  * SIGINT is handled as well, if requested.
  */
@@ -66,6 +67,7 @@ public class Supervisor implements AutoCloseable {
 		executor.shutdownNow();
 	}
 
+	@Todo(description = "use java.lang.Fiber instead of java.lang.Thread", issue = "https://github.com/dfa1/hosh/issues/85")
 	public void submit(Statement statement, Callable<ExitStatus> task) {
 		Future<ExitStatus> future = executor.submit(() -> {
 			setThreadName(statement);
