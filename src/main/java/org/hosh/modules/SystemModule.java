@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.lang.ProcessHandle.Info;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -521,8 +522,7 @@ public class SystemModule implements Module {
 				}
 				return ExitStatus.success();
 			} catch (IOException e) {
-				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
-				return ExitStatus.error();
+				throw new UncheckedIOException(e);
 			}
 		}
 

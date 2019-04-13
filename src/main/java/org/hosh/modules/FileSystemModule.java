@@ -38,7 +38,6 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -78,8 +77,6 @@ public class FileSystemModule implements Module {
 			@Example(command = "ls directory", description = "list relative directory")
 	})
 	public static class ListFiles implements Command, StateAware {
-
-		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 		private State state;
 
@@ -123,9 +120,7 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("access denied: " + e.getMessage())));
 				return ExitStatus.error();
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING, "caught I/O error", e);
-				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
-				return ExitStatus.error();
+				throw new UncheckedIOException(e);
 			}
 		}
 	}
@@ -183,8 +178,6 @@ public class FileSystemModule implements Module {
 
 	public static class Lines implements Command, StateAware {
 
-		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
-
 		private State state;
 
 		@Override
@@ -209,17 +202,13 @@ public class FileSystemModule implements Module {
 			try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
 				lines.forEach(line -> out.send(Record.of(Keys.TEXT, Values.ofText(line))));
 				return ExitStatus.success();
-			} catch (IOException | UncheckedIOException e) {
-				LOGGER.log(Level.WARNING, "caught I/O error", e);
-				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
-				return ExitStatus.error();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
 			}
 		}
 	}
 
 	public static class Find implements Command, StateAware {
-
-		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 		private State state;
 
@@ -251,9 +240,7 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("path does not exist: " + e.getFile())));
 				return ExitStatus.error();
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING, "caught I/O error", e);
-				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
-				return ExitStatus.error();
+				throw new UncheckedIOException(e);
 			}
 		}
 	}
@@ -294,9 +281,7 @@ public class FileSystemModule implements Module {
 				Thread.currentThread().interrupt();
 				return ExitStatus.error();
 			} catch (IOException e) {
-				LOGGER.log(Level.WARNING, "caught I/O error", e);
-				err.send(Record.of(Keys.ERROR, Values.ofText(e.getMessage())));
-				return ExitStatus.error();
+				throw new UncheckedIOException(e);
 			}
 		}
 
