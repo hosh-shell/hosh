@@ -63,11 +63,24 @@ public class Compiler {
 	}
 
 	private Statement compileStatement(StmtContext ctx) {
-		if (ctx.command() != null) {
+		return compilePipeline(ctx.pipeline());
+	}
+
+	private Statement compilePipeline(PipelineContext ctx) {
+		if (ctx.getChildCount() == 1) {
 			return compileCommand(ctx.command());
 		}
-		if (ctx.pipeline() != null) {
-			return compilePipeline(ctx.pipeline());
+		if (ctx.getChildCount() == 2) { // unfinished pipeline such as "command | "
+			throw new CompileError(String.format("line %d:%d: incomplete pipeline near '%s'", ctx.getStart().getLine(),
+					ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
+		}
+		if (ctx.getChildCount() == 3) {
+			Statement producer = compileCommand(ctx.command());
+			Statement consumer = compileStatement(ctx.stmt());
+			Statement pipeline = new Statement();
+			pipeline.setCommand(new PipelineCommand(producer, consumer));
+			pipeline.setArguments(Collections.emptyList());
+			return pipeline;
 		}
 		throw new InternalBug();
 	}
@@ -80,19 +93,6 @@ public class Compiler {
 			return compileWrappedCommand(ctx.wrapped());
 		}
 		throw new InternalBug();
-	}
-
-	private Statement compilePipeline(PipelineContext ctx) {
-		if (ctx.stmt() == null) {
-			throw new CompileError(String.format("line %d:%d: incomplete pipeline near '%s'", ctx.getStart().getLine(),
-					ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
-		}
-		Statement producer = compileCommand(ctx.command());
-		Statement consumer = compileStatement(ctx.stmt());
-		Statement pipeline = new Statement();
-		pipeline.setCommand(new PipelineCommand(producer, consumer));
-		pipeline.setArguments(Collections.emptyList());
-		return pipeline;
 	}
 
 	private Statement compileSimple(SimpleContext ctx) {

@@ -6,12 +6,12 @@ program
 
 stmt
     : pipeline NEWLINE?
-    | command NEWLINE?
     ;
 
 pipeline
     : command '|' stmt
     | command '|' // will be rejected by compiler
+    | command
     ;
 
 command

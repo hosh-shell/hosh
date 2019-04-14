@@ -80,7 +80,10 @@ public class ParserTest {
 		sut.parse("#\r\n");
 		sut.parse("# comment\n");
 		sut.parse("# comment\r\n");
+		sut.parse("ls # comment\n");
 		sut.parse("ls # comment\r\n");
+		sut.parse("ls # comment");
+		sut.parse("ls # comment");
 	}
 
 	@Test
