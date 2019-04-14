@@ -220,6 +220,38 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
+		@Test
+		public void listDot() throws IOException {
+			temporaryFolder.newFile("aaa");
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
+			ExitStatus exitStatus = sut.run(Arrays.asList("."), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(
+					Record.builder()
+							.entry(Keys.PATH, Values.ofPath(Paths.get("aaa")))
+							.entry(Keys.SIZE, Values.ofHumanizedSize(0))
+							.build());
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void listDotDot() throws IOException {
+			File cwd = temporaryFolder.newFolder("aaa");
+			given(state.getCwd()).willReturn(cwd.toPath().toAbsolutePath());
+			ExitStatus exitStatus = sut.run(Arrays.asList(".."), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(
+					Record.builder()
+							.entry(Keys.PATH, Values.ofPath(Path.of("aaa")))
+							.entry(Keys.SIZE, Values.none())
+							.build());
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
 		@IgnoredIf(description = "File.setReadable() fails on windows", condition = OnWindows.class)
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test

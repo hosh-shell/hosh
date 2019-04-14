@@ -98,7 +98,7 @@ public class FileSystemModule implements Module {
 				if (arg.isAbsolute()) {
 					dir = arg;
 				} else {
-					dir = cwd.resolve(arg).toAbsolutePath();
+					dir = cwd.resolve(arg).toAbsolutePath().normalize();
 				}
 			} else {
 				dir = cwd;
