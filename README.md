@@ -5,29 +5,30 @@
 ## Main features
 - written in Java 11
 - portable, works out-of-the-box in Windows, MacOS and Linux
+    - it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
 - pipelines built around schemaless records
-    - built-in commands produce strongly typed records with well defined keys
+    - built-in commands produce records with well defined keys
     - interoperability is achieved by using single-key records with "line" as value
     - `lines pom.xml | enumerate | take 10`
 - wrappers
+    - grouping commands, with before/after behaviour
     - `withTime { lines pom.xml | sink }`
 - usability features (although much more work is needed in this area)
     - ANSI colors
     - stderr always colored in red
     - sorting using http://davekoelle.com/alphanum.html
-    - file sizes reported using KB, MB, etc
+    - file sizes reported by default using KB, MB, etc
     - by default history works like bash with HISTCONTROL=ignoredups
 - distributed as uber-jar or docker image
 - MIT license
 
 
 ## Inspired by
+- https://zsh.org
+- https://fishshell.com
 - https://mywiki.wooledge.org/BashPitfalls
 - https://michaelfeathers.silvrback.com/collection-pipelines-the-revenge-of-c
 - https://www.martinfowler.com/articles/collection-pipeline/
-- https://zsh.org
-- https://fishshell.com 
-- http://minifesto.org/
 
 ## Requirements
 
