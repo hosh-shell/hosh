@@ -23,6 +23,7 @@
  */
 package org.hosh.modules;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -31,9 +32,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SecureDirectoryStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -97,6 +100,13 @@ public class FileSystemModuleTest {
 
 		@InjectMocks
 		private ListFiles sut;
+
+		@Test
+		public void hasSecureDirectoryStream() throws IOException {
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(temporaryFolder.getRoot().toPath())) {
+				assertThat(stream).isInstanceOf(SecureDirectoryStream.class);
+			}
+		}
 
 		@Test
 		public void errorTwoOrMoreArgs() {
