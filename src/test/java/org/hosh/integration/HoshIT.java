@@ -352,6 +352,19 @@ public class HoshIT {
 		assertThat(output).contains("'FOOBAR' unknown command");
 	}
 
+	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/71")
+	@Test
+	public void commandWrapperCapturesOutput() throws Exception {
+		Path scriptPath = givenScript(
+				"benchmark 1 { cwd } | schema"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).contains("path", "count best worst average");
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();

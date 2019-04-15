@@ -57,9 +57,6 @@ public class PipelineChannel implements Channel {
 
 	@Override
 	public Optional<Record> recv() {
-		if (done) {
-			return Optional.empty();
-		}
 		try {
 			LOGGER.finer("waiting for record... ");
 			Record record = queue.take();

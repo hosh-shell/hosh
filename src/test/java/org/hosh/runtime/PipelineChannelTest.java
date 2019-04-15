@@ -81,14 +81,6 @@ public class PipelineChannelTest {
 	}
 
 	@Test
-	public void recvDone() {
-		PipelineChannel sut = new PipelineChannel();
-		sut.stopProducer();
-		Optional<Record> recv = sut.recv();
-		assertThat(recv).isEmpty();
-	}
-
-	@Test
 	public void stringRepr() { // this is quite important while debugging
 		PipelineChannel sut = new PipelineChannel();
 		assertThat(sut).hasToString("PipelineChannel[done=false,queue=[]]");
