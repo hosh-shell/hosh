@@ -21,39 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.architecture;
+package org.hosh.fitness;
 
-import static org.junit.Assert.fail;
+import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS;
 
-import java.lang.reflect.Modifier;
-import java.util.stream.Stream;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
 
-public class ProperJUnitUsageTest {
+public class ExceptionFitnessTest {
+
+	private final JavaClasses classes = new ClassFileImporter().importPackages("org.hosh");
 
 	@Test
-	public void enforcePresenceOfTestAnnotation() {
-		try (ScanResult scanResult = new ClassGraph().whitelistPackages("org.hosh").scan()) {
-			scanResult
-					.getAllClasses()
-					.loadClasses()
-					.stream()
-					.filter(c -> c.getName().endsWith("Test") || c.getName().endsWith("IT"))
-					.flatMap(c -> Stream.of(c.getDeclaredMethods()))
-					.filter(m -> Modifier.isPublic(m.getModifiers()))
-					.filter(m -> !Modifier.isStatic(m.getModifiers()))
-					.filter(m -> !m.isAnnotationPresent(Before.class))
-					.filter(m -> !m.isAnnotationPresent(After.class))
-					.filter(m -> !m.isAnnotationPresent(Test.class))
-					.forEach(m -> {
-						fail("method should be annotated with @Test: " + m);
-					});
-		}
+	public void classesShouldNotThrowGenericExceptions() {
+		NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS.check(classes);
 	}
 }

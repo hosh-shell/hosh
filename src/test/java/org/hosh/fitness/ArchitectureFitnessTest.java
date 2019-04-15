@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.architecture;
+package org.hosh.fitness;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -39,9 +39,9 @@ import com.tngtech.archunit.core.importer.ImportOption;
  * <li>modules can see only spi</li>
  * <li>runtime can see spi but spi cannot see runtime</li>
  * </ul>
- * The short term goal is to prepare ground for modules.
+ * The long term goal is to prepare ground for modules.
  */
-public class ArchitectureTest {
+public class ArchitectureFitnessTest {
 
 	@Test
 	public void enforceProperDependenciesBetweenPackages() {

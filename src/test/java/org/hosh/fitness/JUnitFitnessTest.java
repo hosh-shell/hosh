@@ -21,9 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/**
- * Architecture tests.
- *
- * Fitness functions (see Evolutionary Architecture ISBN-13: 978-1491986363).
- */
-package org.hosh.architecture;
+package org.hosh.fitness;
+
+import static org.junit.Assert.fail;
+
+import java.lang.reflect.Modifier;
+import java.util.stream.Stream;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
+
+public class JUnitFitnessTest {
+
+	@Test
+	public void enforcePresenceOfTestAnnotation() {
+		try (ScanResult scanResult = new ClassGraph().whitelistPackages("org.hosh").scan()) {
+			scanResult
+					.getAllClasses()
+					.loadClasses()
+					.stream()
+					.filter(c -> c.getName().endsWith("Test") || c.getName().endsWith("IT"))
+					.flatMap(c -> Stream.of(c.getDeclaredMethods()))
+					.filter(m -> Modifier.isPublic(m.getModifiers()))
+					.filter(m -> !Modifier.isStatic(m.getModifiers()))
+					.filter(m -> !m.isAnnotationPresent(Before.class))
+					.filter(m -> !m.isAnnotationPresent(After.class))
+					.filter(m -> !m.isAnnotationPresent(Test.class))
+					.forEach(m -> {
+						fail("method should be annotated with @Test: " + m);
+					});
+		}
+	}
+}

@@ -21,21 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.architecture;
-
-import static com.tngtech.archunit.library.GeneralCodingRules.NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS;
-
-import org.junit.Test;
-
-import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
-
-public class CodingRulesTest {
-
-	private final JavaClasses classes = new ClassFileImporter().importPackages("org.hosh");
-
-	@Test
-	public void classes_should_not_throw_generic_exceptions() {
-		NO_CLASSES_SHOULD_THROW_GENERIC_EXCEPTIONS.check(classes);
-	}
-}
+/**
+ * Architecture tests.
+ *
+ * Fitness functions (see Evolutionary Architecture ISBN-13: 978-1491986363).
+ */
+package org.hosh.fitness;
