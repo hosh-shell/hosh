@@ -30,9 +30,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is used to produce user-facing documentation.
+ * Used to produce user-facing documentation with 'help' built-in command.
  */
-@Experimental(description = "still not 100% about this approach")
 @Repeatable(Examples.class)
 @Retention(RetentionPolicy.SOURCE)
 @Target({ ElementType.TYPE })

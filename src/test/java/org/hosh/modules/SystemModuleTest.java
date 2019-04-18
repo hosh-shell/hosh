@@ -35,6 +35,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.hosh.doc.Example;
+import org.hosh.doc.Examples;
+import org.hosh.doc.Help;
 import org.hosh.modules.SystemModule.Benchmark;
 import org.hosh.modules.SystemModule.Benchmark.Accumulator;
 import org.hosh.modules.SystemModule.Echo;
@@ -51,6 +54,7 @@ import org.hosh.modules.SystemModule.Sleep;
 import org.hosh.modules.SystemModule.UnsetVariable;
 import org.hosh.modules.SystemModule.WithTime;
 import org.hosh.spi.Channel;
+import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
@@ -222,18 +226,69 @@ public class SystemModuleTest {
 		private HelpCommand sut;
 
 		@Test
-		public void oneCommand() {
-			given(state.getCommands()).willReturn(Collections.singletonMap("name", null));
+		public void specificCommandWithExamples() {
+			given(state.getCommands()).willReturn(Collections.singletonMap("true", True.class));
+			ExitStatus exitStatus = sut.run(Arrays.asList("true"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should(Mockito.atLeastOnce()).send(records.capture());
+			then(err).shouldHaveZeroInteractions();
+			assertThat(records.getAllValues())
+					.containsExactly(
+							Record.of(Keys.TEXT, Values.ofText("true - /bin/true replacement")),
+							Record.of(Keys.TEXT, Values.ofText("Examples")),
+							Record.of(Keys.TEXT, Values.ofText("true - returns exit success")));
+		}
+
+		@Test
+		public void specificCommandWithoutExamples() {
+			given(state.getCommands()).willReturn(Collections.singletonMap("false", False.class));
+			ExitStatus exitStatus = sut.run(Arrays.asList("false"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should(Mockito.atLeastOnce()).send(records.capture());
+			then(err).shouldHaveZeroInteractions();
+			assertThat(records.getAllValues())
+					.containsExactly(
+							Record.of(Keys.TEXT, Values.ofText("false - /bin/false replacement")),
+							Record.of(Keys.TEXT, Values.ofText("Examples")),
+							Record.of(Keys.TEXT, Values.ofText("N/A")));
+		}
+
+		@Test
+		public void commandNotFound() {
+			ExitStatus exitStatus = sut.run(Arrays.asList("test"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("command not found: test")));
+		}
+
+		@Test
+		public void commandWithoutHelpAnnotation() {
+			given(state.getCommands()).willReturn(Collections.singletonMap("*", Star.class));
+			ExitStatus exitStatus = sut.run(Arrays.asList("*"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no help for command: *")));
+		}
+
+		@Test
+		public void listAllCommands() {
+			given(state.getCommands()).willReturn(Collections.singletonMap("true", True.class));
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
-			assertThat(records.getAllValues()).contains(Record.of(Keys.of("command"), Values.ofText("name")));
+			assertThat(records.getAllValues())
+					.containsExactly(
+							Record.of(Keys.TEXT, Values.ofText("true")));
 		}
 
 		@Test
-		public void noCommands() {
+		public void listNoCommands() {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -243,12 +298,42 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("test"), in, out, err);
+		public void twoArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList("test", "aaa"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("command not found: test")));
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("too many arguments")));
+		}
+
+		@Help(description = "/bin/true replacement")
+		@Examples({
+				@Example(command = "true", description = "returns exit success")
+		})
+		private static class True implements Command {
+
+			@Override
+			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+				return ExitStatus.success();
+			}
+		}
+
+		@Help(description = "/bin/false replacement")
+		private static class False implements Command {
+
+			@Override
+			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+				return ExitStatus.error();
+			}
+		}
+
+		// no help and no examples
+		private static class Star implements Command {
+
+			@Override
+			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+				return ExitStatus.of(42);
+			}
 		}
 	}
 

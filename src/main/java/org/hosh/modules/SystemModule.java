@@ -176,14 +176,13 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			if (args.isEmpty()) {
+			if (args.size() == 0) {
 				Set<String> commands = state.getCommands().keySet();
 				for (String command : commands) {
-					out.send(Record.of(Keys.of("command"), Values.ofText(command)));
+					out.send(Record.of(Keys.TEXT, Values.ofText(command)));
 				}
 				return ExitStatus.success();
-			}
-			if (args.size() == 1) {
+			} else if (args.size() == 1) {
 				String commandName = args.get(0);
 				Class<? extends Command> commandClass = state.getCommands().get(commandName);
 				if (commandClass == null) {
@@ -209,9 +208,10 @@ public class SystemModule implements Module {
 					out.send(Record.of(Keys.TEXT, Values.ofStyledText("N/A", Style.FG_RED)));
 				}
 				return ExitStatus.success();
+			} else {
+				err.send(Record.of(Keys.ERROR, Values.ofText("too many arguments")));
+				return ExitStatus.error();
 			}
-			err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
-			return ExitStatus.error();
 		}
 	}
 
