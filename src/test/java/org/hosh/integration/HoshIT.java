@@ -365,6 +365,19 @@ public class HoshIT {
 		assertThat(output).contains("path", "count best worst average");
 	}
 
+	@Test
+	public void redirectOutputToVariable() throws Exception {
+		Path scriptPath = givenScript(
+				"echo 'world' | capture WHO", // this is WHO=$(echo 'world')
+				"echo hello ${WHO}"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).contains("hello world");
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
