@@ -25,6 +25,9 @@ package org.hosh.modules;
 
 import java.util.List;
 
+import org.hosh.doc.Example;
+import org.hosh.doc.Examples;
+import org.hosh.doc.Help;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -47,6 +50,10 @@ public class TerminalModule implements Module {
 		commandRegistry.registerCommand("bell", Bell.class);
 	}
 
+	@Help(description = "dump terminal info")
+	@Examples({
+			@Example(command = "dump", description = "output current terminal information (similar to stty -a)"),
+	})
 	public static class Dump implements Command, TerminalAware {
 
 		private Terminal terminal;
@@ -71,6 +78,10 @@ public class TerminalModule implements Module {
 		}
 	}
 
+	@Help(description = "clear the terminal screen")
+	@Examples({
+			@Example(command = "clear", description = "clear terminal screen"),
+	})
 	public static class Clear implements Command, TerminalAware {
 
 		private Terminal terminal;
@@ -92,6 +103,10 @@ public class TerminalModule implements Module {
 		}
 	}
 
+	@Help(description = "ring/bell the terminal screen")
+	@Examples({
+			@Example(command = "bell", description = "send 'bell' command to the terminal"),
+	})
 	public static class Bell implements Command, TerminalAware {
 
 		private Terminal terminal;

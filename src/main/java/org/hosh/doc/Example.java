@@ -24,7 +24,6 @@
 package org.hosh.doc;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -32,8 +31,7 @@ import java.lang.annotation.Target;
 /**
  * Used to produce user-facing documentation with 'help' built-in command.
  */
-@Repeatable(Examples.class)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface Example {
 

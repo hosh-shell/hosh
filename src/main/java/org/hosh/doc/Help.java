@@ -31,7 +31,6 @@ import java.lang.annotation.Target;
 /**
  * This is used to produce user-facing documentation.
  */
-@Experimental(description = "still not 100% about this approach")
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
 public @interface Help {

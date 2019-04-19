@@ -80,7 +80,9 @@ public class TextModule implements Module {
 	}
 
 	@Help(description = "regex with named groups to record")
-	@Example(description = "parse format k=v", command = "git config -l | regex text '(?<key>.+)=(?<value>.+)' | schema")
+	@Examples({
+			@Example(description = "parse format k=v", command = "git config -l | regex text '(?<key>.+)=(?<value>.+)' | schema"),
+	})
 	@Experimental(description = "very hard to use")
 	public static class Regex implements Command {
 
@@ -126,6 +128,11 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Help(description = "output keys of incoming records")
+	@Examples({
+			@Example(command = "ls | schema", description = "output 'path size'"),
+			@Example(command = "ls | count | schema", description = "output 'count'"),
+	})
 	public static class Schema implements Command {
 
 		@Override
@@ -146,6 +153,10 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Help(description = "copy incoming records to the output only if they match a regex")
+	@Examples({
+			@Example(command = "lines file.txt | filter text '.*The.*' ", description = "output only lines containing 'The' somewhere"),
+	})
 	public static class Filter implements Command {
 
 		@Override
@@ -170,6 +181,10 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Help(description = "prepend 'index' key to all incoming records")
+	@Examples({
+			@Example(command = "lines file.txt | enumerate", description = "similar to 'cat -n'"),
+	})
 	public static class Enumerate implements Command {
 
 		@Override
@@ -191,6 +206,10 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Help(description = "prepend 'timestamp' key to all incoming records")
+	@Examples({
+			@Example(command = "watch | timestamp", description = "tag each event with current timestamp"),
+	})
 	@Todo(description = "use local time?")
 	public static class Timestamp implements Command {
 
@@ -384,7 +403,11 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Experimental(description = "extends with seed, min-max interval; add also 'doubles', 'booleans', etc")
+	@Help(description = "create an infinite sequence of random numbers, remember to always limit it with '| take n'")
+	@Examples({
+			@Example(command = "rand | enumerate | take 3", description = "create 3 random records")
+	})
+	@Todo(description = "extends with seed, min-max interval; add also 'doubles', 'booleans', etc")
 	public static class Rand implements Command {
 
 		@SuppressWarnings("squid:S2189")
@@ -403,6 +426,10 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Help(description = "count incoming records")
+	@Examples({
+			@Example(command = "rand | take 3 | count", description = "output 3")
+	})
 	public static class Count implements Command {
 
 		@Override
@@ -424,6 +451,10 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Help(description = "create a nicely formatted table with keys a columns")
+	@Examples({
+			@Example(command = "rand | enumerate |take 3 | table", description = "output a nicely formatted table")
+	})
 	public static class Table implements Command {
 
 		private int i = 0;

@@ -85,6 +85,12 @@ public class SystemModule implements Module {
 		commandRegistry.registerCommand("open", Open.class);
 	}
 
+	@Help(description = "write arguments to output")
+	@Examples({
+			@Example(command = "echo", description = "write empty line"),
+			@Example(command = "echo hello", description = "write 'hello'"),
+			@Example(command = "echo hello ${USER}", description = "write 'hello dfa', if USER=dfa"),
+	})
 	public static class Echo implements Command {
 
 		@Override
@@ -96,7 +102,9 @@ public class SystemModule implements Module {
 	}
 
 	@Help(description = "display all variables")
-	@Example(command = "env", description = "display all variables")
+	@Examples({
+			@Example(command = "env", description = "display all environment variables"),
+	})
 	public static class Env implements Command, StateAware {
 
 		private State state;
@@ -125,9 +133,11 @@ public class SystemModule implements Module {
 	}
 
 	@Help(description = "exit current interactive session or script")
-	@Example(command = "exit", description = "exit with status 0 (success)")
-	@Example(command = "exit 1", description = "exit with status 1 (error)")
-	@Example(command = "exit 0", description = "exit with status 0 (success)")
+	@Examples({
+			@Example(command = "exit", description = "exit with status 0 (success)"),
+			@Example(command = "exit 1", description = "exit with status 1 (error)"),
+			@Example(command = "exit 0", description = "exit with status 0 (success)"),
+	})
 	public static class Exit implements Command, StateAware {
 
 		private State state;
@@ -196,14 +206,11 @@ public class SystemModule implements Module {
 				}
 				out.send(Record.of(Keys.TEXT, Values.ofStyledText(commandName + " - " + help.description(), Style.BOLD)));
 				Examples examples = commandClass.getAnnotation(Examples.class);
-				Example example = commandClass.getAnnotation(Example.class);
 				out.send(Record.of(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
 				if (examples != null) {
 					for (Example ex : examples.value()) {
 						out.send(Record.of(Keys.TEXT, Values.ofStyledText(ex.command() + " - " + ex.description(), Style.ITALIC)));
 					}
-				} else if (example != null) {
-					out.send(Record.of(Keys.TEXT, Values.ofStyledText(example.command() + " - " + example.description(), Style.ITALIC)));
 				} else {
 					out.send(Record.of(Keys.TEXT, Values.ofStyledText("N/A", Style.FG_RED)));
 				}
@@ -215,6 +222,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "suspend execution for given duration, measured in millis")
+	@Examples({
+			@Example(command = "sleep 1000", description = "suspend execution for 1000 millis (1s)"),
+	})
 	public static class Sleep implements Command {
 
 		@Override
@@ -238,6 +249,11 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "measure execution time of command or pipeline")
+	@Examples({
+			@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
+			@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
+	})
 	public static class WithTime implements CommandWrapper<Long> {
 
 		@Override
@@ -253,6 +269,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "process status")
+	@Examples({
+			@Example(command = "ps", description = "list all running process in the system as the current user"),
+	})
 	public static class ProcessList implements Command {
 
 		@Override
@@ -276,6 +296,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "kill process")
+	@Examples({
+			@Example(command = "kill 38878", description = "kill process with PID 38878"),
+	})
 	public static class KillProcess implements Command {
 
 		/**
@@ -317,6 +341,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "create a runtime error, mostly for testing purposes")
+	@Examples({
+			@Example(command = "lines file.txt | err", description = "inject an error in this pipeline")
+	})
 	public static class Err implements Command {
 
 		@Override
@@ -325,6 +353,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "measure execution time (best, worst, average) of inner command")
+	@Examples({
+			@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
+	})
 	public static class Benchmark implements CommandWrapper<SystemModule.Benchmark.Accumulator> {
 
 		public static final Key BEST = Keys.of("best");
@@ -399,7 +431,9 @@ public class SystemModule implements Module {
 	}
 
 	@Help(description = "consume any record (e.g. like /dev/null)")
-	@Example(command = "ls | sink", description = "consume any record produced by ls")
+	@Examples({
+			@Example(command = "ls | sink", description = "consume any record produced by ls")
+	})
 	public static class Sink implements Command {
 
 		@Override
@@ -414,6 +448,11 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "create or update a variable binding)")
+	@Examples({
+			@Example(command = "set FILE file.txt", description = "create variable FILE"),
+			@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
+	})
 	public static class SetVariable implements Command, StateAware {
 
 		private State state;
@@ -436,6 +475,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "delete a variable binding)")
+	@Examples({
+			@Example(command = "unset FILE", description = "delete variable FILE, cannot be reference anymore after this command"),
+	})
 	public static class UnsetVariable implements Command, StateAware {
 
 		private State state;
@@ -457,6 +500,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "capture output of a command into a variable")
+	@Examples({
+			@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
+	})
 	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
 	@Experimental(description = "too low level compared to simply VARNAME=$(ls)")
 	public static class CaptureVariable implements Command, StateAware {
@@ -491,6 +538,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Help(description = "send output of a command into a file")
+	@Examples({
+			@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
+	})
 	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
 	@Experimental(description = "too low level compared to simply > file.txt or >> file.txt? too much power for end user (e.g. they could use DSYNC or READ)?")
 	public static class Open implements Command, StateAware {

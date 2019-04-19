@@ -125,6 +125,10 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@Help(description = "output current working directory")
+	@Examples({
+			@Example(command = "cwd", description = "current working directory"),
+	})
 	public static class CurrentWorkingDirectory implements Command, StateAware {
 
 		private State state;
@@ -145,6 +149,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@Help(description = "set new current working directory")
+	@Examples({
+			@Example(command = "cd local_dir", description = "change current working directory to 'local_dir'"),
+			@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
+	})
 	public static class ChangeDirectory implements Command, StateAware {
 
 		private State state;
@@ -176,6 +185,10 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@Help(description = "output file line by line")
+	@Examples({
+			@Example(command = "lines file.txt", description = "output all lines of 'file.txt'"),
+	})
 	public static class Lines implements Command, StateAware {
 
 		private State state;
@@ -208,6 +221,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@Help(description = "walk directory recursively")
+	@Examples({
+			@Example(command = "find .", description = "recursively output all paths in '.'"),
+			@Example(command = "find /tmp", description = "recursively output all paths in '/tmp'"),
+	})
 	public static class Find implements Command, StateAware {
 
 		private State state;
@@ -251,6 +269,10 @@ public class FileSystemModule implements Module {
 	//
 	// Would be also possible to register recursively by using another internal
 	// class com.sun.nio.file.ExtendedWatchEventModifier.FILE_TREE.
+	@Help(description = "watch for filesystem change in the given path")
+	@Examples({
+			@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
+	})
 	@Todo(description = "should be recursive? should be possible to specify which type of events to watch")
 	public static class Watch implements Command, StateAware {
 
