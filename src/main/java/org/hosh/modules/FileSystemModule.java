@@ -41,10 +41,10 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import org.hosh.doc.Bug;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Help;
-import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -263,17 +263,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	// JVM on MacOS uses sun.nio.fs.PollingWatchService with poll interval of 10
-	// seconds. This could be lowered to 2 seconds by using an internal JDK class
-	// (com.sun.nio.file.SensitivityWatchEventModifier.HIGH).
-	//
-	// Would be also possible to register recursively by using another internal
-	// class com.sun.nio.file.ExtendedWatchEventModifier.FILE_TREE.
 	@Help(description = "watch for filesystem change in the given path")
 	@Examples({
 			@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
 	})
-	@Todo(description = "should be recursive? should be possible to specify which type of events to watch")
+	@Bug(description = "should be recursive by default", issue = "https://github.com/dfa1/hosh/issues/94")
 	public static class Watch implements Command, StateAware {
 
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
@@ -292,11 +286,13 @@ public class FileSystemModule implements Module {
 				return ExitStatus.error();
 			}
 			Path dir = state.getCwd();
+			WatchEvent.Kind<?>[] events = {
+					StandardWatchEventKinds.ENTRY_CREATE,
+					StandardWatchEventKinds.ENTRY_DELETE,
+					StandardWatchEventKinds.ENTRY_MODIFY
+			};
 			try (WatchService watchService = dir.getFileSystem().newWatchService()) {
-				dir.register(watchService,
-						StandardWatchEventKinds.ENTRY_CREATE,
-						StandardWatchEventKinds.ENTRY_DELETE,
-						StandardWatchEventKinds.ENTRY_MODIFY);
+				dir.register(watchService, events);
 				withService(watchService, out);
 				return ExitStatus.success();
 			} catch (InterruptedException ex) {
