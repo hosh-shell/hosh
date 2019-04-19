@@ -54,11 +54,9 @@ Java 11
 
 Preliminary docker support (openjdk:11-jre-slim-stretch):
 
-`$ ./mvnw -Pdocker clean package`
+`$ ./mvnw -Pdocker clean verify`
 
-`$ docker image ls hosh`
-
-`$ docker run -it  docker run -it $IMAGE`
+`$ docker run -it $(docker image ls hosh --quiet  | head -n 1)`
 
 ## Eclipse support
 
