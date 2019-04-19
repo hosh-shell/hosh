@@ -44,7 +44,6 @@ import org.hosh.doc.Bug;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Help;
-import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -149,7 +148,7 @@ public class FileSystemModule implements Module {
 
 	@Help(description = "set new current working directory")
 	@Examples({
-			@Example(command = "cd local_dir", description = "change current working directory to 'local_dir'"),
+			@Example(command = "cd dir", description = "change current working directory to 'dir'"),
 			@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
 	})
 	public static class ChangeDirectory implements Command, StateAware {
@@ -246,11 +245,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "make use of Files.copy() return value?")
 	@Help(description = "copy file")
 	@Examples({
 			@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
-			@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"), })
+			@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"),
+	})
 	public static class Copy implements Command, StateAware {
 
 		private State state;
@@ -277,11 +276,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "make use of Files.move() return value?")
 	@Help(description = "move file")
 	@Examples({
 			@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
-			@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"), })
+			@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"),
+	})
 	public static class Move implements Command, StateAware {
 
 		private State state;
@@ -308,11 +307,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "make use of Files.move() return value?")
 	@Help(description = "remove file")
 	@Examples({
 			@Example(command = "rm target.txt", description = "remove file using current working directory"),
-			@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"), })
+			@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"),
+	})
 	public static class Remove implements Command, StateAware {
 
 		private State state;
