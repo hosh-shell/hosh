@@ -23,6 +23,7 @@
  */
 package org.hosh.modules;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -39,10 +40,13 @@ import java.util.List;
 
 import org.hosh.doc.Bug;
 import org.hosh.modules.FileSystemModule.ChangeDirectory;
+import org.hosh.modules.FileSystemModule.Copy;
 import org.hosh.modules.FileSystemModule.CurrentWorkingDirectory;
 import org.hosh.modules.FileSystemModule.Find;
 import org.hosh.modules.FileSystemModule.Lines;
 import org.hosh.modules.FileSystemModule.ListFiles;
+import org.hosh.modules.FileSystemModule.Move;
+import org.hosh.modules.FileSystemModule.Remove;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
@@ -70,7 +74,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 		FileSystemModuleTest.ChangeDirectoryTest.class,
 		FileSystemModuleTest.CurrentWorkingDirectoryTest.class,
 		FileSystemModuleTest.LinesTest.class,
-		FileSystemModuleTest.FindTest.class
+		FileSystemModuleTest.FindTest.class,
+		FileSystemModuleTest.CopyTest.class,
+		FileSystemModuleTest.MoveTest.class,
+		FileSystemModuleTest.RemoveTest.class,
 })
 public class FileSystemModuleTest {
 
@@ -462,6 +469,198 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
 			then(out).shouldHaveZeroInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class CopyTest {
+
+		@Rule
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Copy sut;
+
+		@Test
+		public void zeroArgs() throws IOException {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
+		}
+
+		@Test
+		public void oneArg() throws IOException {
+			ExitStatus exitStatus = sut.run(Arrays.asList("source.txt"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
+		}
+
+		@Test
+		public void copyRelativeToRelative() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			File source = temporaryFolder.newFile("source.txt");
+			File target = temporaryFolder.newFile("target.txt");
+			assert target.delete();
+			ExitStatus exitStatus = sut.run(Arrays.asList(source.getName(), target.getName()), in, out, err);
+			assertThat(source.exists()).isTrue();
+			assertThat(target.exists()).isTrue();
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void copyAbsoluteToAbsolute() throws IOException {
+			File source = temporaryFolder.newFile("source.txt").getAbsoluteFile();
+			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
+			assert target.delete();
+			ExitStatus exitStatus = sut.run(Arrays.asList(source.getAbsolutePath(), target.getAbsolutePath()), in, out, err);
+			assertThat(source.exists()).isTrue();
+			assertThat(target.exists()).isTrue();
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class MoveTest {
+
+		@Rule
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Move sut;
+
+		@Test
+		public void zeroArgs() throws IOException {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
+		}
+
+		@Test
+		public void oneArg() throws IOException {
+			ExitStatus exitStatus = sut.run(Arrays.asList("source.txt"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
+		}
+
+		@Test
+		public void moveRelativeToRelative() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			File source = temporaryFolder.newFile("source.txt");
+			File target = temporaryFolder.newFile("target.txt");
+			assert target.delete();
+			ExitStatus exitStatus = sut.run(Arrays.asList(source.getName(), target.getName()), in, out, err);
+			assertThat(source.exists()).isFalse();
+			assertThat(target.exists()).isTrue();
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void moveAbsoluteToAbsolute() throws IOException {
+			File source = temporaryFolder.newFile("source.txt").getAbsoluteFile();
+			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
+			assert target.delete();
+			ExitStatus exitStatus = sut.run(Arrays.asList(source.getAbsolutePath(), target.getAbsolutePath()), in, out, err);
+			assertThat(source.exists()).isFalse();
+			assertThat(target.exists()).isTrue();
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	public static class RemoveTest {
+
+		@Rule
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Remove sut;
+
+		@Test
+		public void zeroArgs() throws IOException {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("usage: rm target")));
+		}
+
+		@Test
+		public void removeRelative() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
+			ExitStatus exitStatus = sut.run(Arrays.asList(target.getName()), in, out, err);
+			assertThat(target.exists()).isFalse();
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void removeAbsolute() throws IOException {
+			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
+			ExitStatus exitStatus = sut.run(Arrays.asList(target.getAbsolutePath()), in, out, err);
+			assertThat(target.exists()).isFalse();
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
 		}
 	}
 

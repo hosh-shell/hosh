@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- new commands: 'cp', 'mv', 'rm'
+   - no recursion yet
+   - no directory operation yet, only files
+   - no overwrites
 
 ## [0.0.29] - 2019-04-19
 - removed comand 'source'

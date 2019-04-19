@@ -45,6 +45,7 @@ import org.hosh.doc.Bug;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Help;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -68,6 +69,9 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("lines", Lines.class);
 		commandRegistry.registerCommand("find", Find.class);
 		commandRegistry.registerCommand("watch", Watch.class);
+		commandRegistry.registerCommand("cp", Copy.class);
+		commandRegistry.registerCommand("mv", Move.class);
+		commandRegistry.registerCommand("rm", Remove.class);
 	}
 
 	@Help(description = "list files")
@@ -257,6 +261,113 @@ public class FileSystemModule implements Module {
 			} catch (NoSuchFileException e) {
 				err.send(Record.of(Keys.ERROR, Values.ofText("path does not exist: " + e.getFile())));
 				return ExitStatus.error();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+
+	@Todo(description = "make use of Files.copy() return value?")
+	@Help(description = "copy file")
+	@Examples({
+			@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
+			@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"), })
+	public static class Copy implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 2) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
+				return ExitStatus.error();
+			}
+			Path source = Path.of(args.get(0));
+			if (!source.isAbsolute()) {
+				source = state.getCwd().resolve(source).normalize().toAbsolutePath();
+			}
+			Path target = Path.of(args.get(1));
+			if (!target.isAbsolute()) {
+				target = state.getCwd().resolve(target).normalize().toAbsolutePath();
+			}
+			try {
+				Files.copy(source, target);
+				return ExitStatus.success();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+
+	@Todo(description = "make use of Files.move() return value?")
+	@Help(description = "move file")
+	@Examples({
+			@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
+			@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"), })
+	public static class Move implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 2) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
+				return ExitStatus.error();
+			}
+			Path source = Path.of(args.get(0));
+			if (!source.isAbsolute()) {
+				source = state.getCwd().resolve(source).normalize().toAbsolutePath();
+			}
+			Path target = Path.of(args.get(1));
+			if (!target.isAbsolute()) {
+				target = state.getCwd().resolve(target).normalize().toAbsolutePath();
+			}
+			try {
+				Files.move(source, target);
+				return ExitStatus.success();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+
+	@Todo(description = "make use of Files.move() return value?")
+	@Help(description = "remove file")
+	@Examples({
+			@Example(command = "rm target.txt", description = "remove file using current working directory"),
+			@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"), })
+	public static class Remove implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Record.of(Keys.ERROR, Values.ofText("usage: rm target")));
+				return ExitStatus.error();
+			}
+			Path target = Path.of(args.get(0));
+			if (!target.isAbsolute()) {
+				target = state.getCwd().resolve(target).normalize().toAbsolutePath();
+			}
+			try {
+				Files.delete(target);
+				return ExitStatus.success();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
