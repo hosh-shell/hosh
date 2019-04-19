@@ -32,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -98,12 +97,7 @@ public class FileSystemModule implements Module {
 			final Path cwd = state.getCwd();
 			final Path dir;
 			if (args.size() == 1) {
-				Path arg = Paths.get(args.get(0));
-				if (arg.isAbsolute()) {
-					dir = arg;
-				} else {
-					dir = cwd.resolve(arg).toAbsolutePath().normalize();
-				}
+				dir = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			} else {
 				dir = cwd;
 			}
@@ -173,13 +167,7 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 				return ExitStatus.error();
 			}
-			Path arg = Paths.get(args.get(0));
-			final Path newCwd;
-			if (arg.isAbsolute()) {
-				newCwd = arg;
-			} else {
-				newCwd = Paths.get(state.getCwd().toString(), args.get(0));
-			}
+			Path newCwd = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			if (!Files.isDirectory(newCwd)) {
 				err.send(Record.of(Keys.ERROR, Values.ofText("not a directory")));
 				return ExitStatus.error();
@@ -208,15 +196,12 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
 				return ExitStatus.error();
 			}
-			Path path = Paths.get(args.get(0));
-			if (!path.isAbsolute()) {
-				path = Paths.get(state.getCwd().toString(), args.get(0));
-			}
-			if (!Files.isRegularFile(path)) {
+			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+			if (!Files.isRegularFile(source)) {
 				err.send(Record.of(Keys.ERROR, Values.ofText("not readable file")));
 				return ExitStatus.error();
 			}
-			try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
+			try (Stream<String> lines = Files.lines(source, StandardCharsets.UTF_8)) {
 				lines.forEach(line -> out.send(Record.of(Keys.TEXT, Values.ofText(line))));
 				return ExitStatus.success();
 			} catch (IOException e) {
@@ -245,14 +230,8 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
-			final Path arg = Path.of(args.get(0));
-			final Path start;
-			if (arg.isAbsolute()) {
-				start = arg;
-			} else {
-				start = state.getCwd().resolve(arg).normalize().toAbsolutePath();
-			}
-			try (Stream<Path> stream = Files.walk(followSymlinksRecursively(start))) {
+			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+			try (Stream<Path> stream = Files.walk(followSymlinksRecursively(target))) {
 				stream.forEach(path -> {
 					Record result = Record.of(Keys.PATH, Values.ofPath(path.toAbsolutePath()));
 					out.send(result);
@@ -287,14 +266,8 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
 				return ExitStatus.error();
 			}
-			Path source = Path.of(args.get(0));
-			if (!source.isAbsolute()) {
-				source = state.getCwd().resolve(source).normalize().toAbsolutePath();
-			}
-			Path target = Path.of(args.get(1));
-			if (!target.isAbsolute()) {
-				target = state.getCwd().resolve(target).normalize().toAbsolutePath();
-			}
+			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
 			try {
 				Files.copy(source, target);
 				return ExitStatus.success();
@@ -324,14 +297,8 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
 				return ExitStatus.error();
 			}
-			Path source = Path.of(args.get(0));
-			if (!source.isAbsolute()) {
-				source = state.getCwd().resolve(source).normalize().toAbsolutePath();
-			}
-			Path target = Path.of(args.get(1));
-			if (!target.isAbsolute()) {
-				target = state.getCwd().resolve(target).normalize().toAbsolutePath();
-			}
+			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
 			try {
 				Files.move(source, target);
 				return ExitStatus.success();
@@ -361,10 +328,7 @@ public class FileSystemModule implements Module {
 				err.send(Record.of(Keys.ERROR, Values.ofText("usage: rm target")));
 				return ExitStatus.error();
 			}
-			Path target = Path.of(args.get(0));
-			if (!target.isAbsolute()) {
-				target = state.getCwd().resolve(target).normalize().toAbsolutePath();
-			}
+			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			try {
 				Files.delete(target);
 				return ExitStatus.success();
@@ -448,5 +412,16 @@ public class FileSystemModule implements Module {
 		} else {
 			return path;
 		}
+	}
+
+	private static Path resolveAsAbsolutePath(Path cwd, Path file) {
+		Path resolved;
+		if (file.isAbsolute()) {
+			resolved = file;
+		} else {
+			resolved = cwd.resolve(file).normalize().toAbsolutePath();
+		}
+		assert resolved.isAbsolute();
+		return resolved;
 	}
 }
