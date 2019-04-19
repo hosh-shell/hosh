@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.0.29] - 2019-04-19
+- removed comand 'source'
+- 100% built-in commands documented with help and examples
+- improved test coverage (thanks @pitest)
+
 ## [0.0.28] - 2019-03-29
 - new command 'regex', basically named groups regexp to record
 - new command 'network', to disply all network interfaces in this system
