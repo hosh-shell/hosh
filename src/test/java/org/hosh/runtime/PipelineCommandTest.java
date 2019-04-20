@@ -70,7 +70,7 @@ public class PipelineCommandTest {
 	@Mock(stubOnly = true)
 	private Command command;
 
-	@Mock(stubOnly = true)
+	@Mock(stubOnly = true, lenient = true)
 	private Interpreter interpreter;
 
 	private PipelineCommand sut;
