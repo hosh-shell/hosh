@@ -33,7 +33,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.hosh.runtime.CommandResolvers.WindowsCommandResolver;
@@ -45,9 +44,6 @@ import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
@@ -119,9 +115,8 @@ public class CommandResolversTest {
 		}
 
 		@Test
-		@DisabledOnOs(OS.WINDOWS) // in Windows this file is marked as executable!?
 		public void foundNonExecutableInPath() throws IOException {
-			assert folder.newFile("test").setExecutable(false);
+			folder.newFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -135,30 +130,6 @@ public class CommandResolversTest {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
-			Optional<Command> result = sut.tryResolve("test");
-			assertThat(result).isPresent();
-		}
-
-		@Test
-		@EnabledOnOs(OS.WINDOWS)
-		public void notFoundInPathAsSpecifiedByPathExt() throws IOException {
-			assert folder.newFile("test.vbs").setExecutable(true); // VBS in not PATHEXT
-			given(state.getCommands()).willReturn(Collections.emptyMap());
-			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
-			given(state.getCwd()).willReturn(Paths.get("."));
-			given(state.getVariables()).willReturn(Collections.singletonMap("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
-			Optional<Command> result = sut.tryResolve("test");
-			assertThat(result).isNotPresent();
-		}
-
-		@Test
-		@EnabledOnOs(OS.WINDOWS)
-		public void foundInPathAsSpecifiedByPathExt() throws IOException {
-			assert folder.newFile("test.exe").setExecutable(true);
-			given(state.getCommands()).willReturn(Collections.emptyMap());
-			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
-			given(state.getCwd()).willReturn(Paths.get("."));
-			given(state.getVariables()).willReturn(Collections.singletonMap("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent();
 		}
@@ -232,23 +203,23 @@ public class CommandResolversTest {
 		}
 
 		@Test
-		public void findExecutableInPathext() throws IOException {
-			assert folder.newFile("TEST.EXE").setExecutable(true);
-			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE"));
+		public void notFoundInPathAsSpecifiedByPathExt() throws IOException {
+			assert folder.newFile("test.vbs").setExecutable(true); // VBS in not PATHEXT
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
-			Optional<Command> result = sut.tryResolve("TEST");
-			assertThat(result).isNotEmpty();
+			given(state.getVariables()).willReturn(Collections.singletonMap("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
+			Optional<Command> result = sut.tryResolve("test");
+			assertThat(result).isNotPresent();
 		}
 
 		@Test
-		public void findExecutableNotInPathext() throws IOException {
-			assert folder.newFile("TEST.CMD").setExecutable(true);
-			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE"));
+		public void foundInPathAsSpecifiedByPathExt() throws IOException {
+			assert folder.newFile("test.exe").setExecutable(true);
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
-			Optional<Command> result = sut.tryResolve("TEST");
-			assertThat(result).isEmpty();
+			given(state.getVariables()).willReturn(Collections.singletonMap("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
+			Optional<Command> result = sut.tryResolve("test");
+			assertThat(result).isPresent();
 		}
 	}
 }
