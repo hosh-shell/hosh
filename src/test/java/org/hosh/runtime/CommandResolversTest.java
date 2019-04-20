@@ -57,7 +57,7 @@ public class CommandResolversTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class BuiltinsThenSystemTest {
+	public class BuiltinsThenSystemTest {
 
 		@RegisterExtension
 		public final TemporaryFolder folder = new TemporaryFolder();
@@ -190,7 +190,7 @@ public class CommandResolversTest {
 					.isInstanceOf(IllegalArgumentException.class);
 		}
 
-		private static class InvalidCommand implements Command {
+		private class InvalidCommand implements Command {
 
 			@SuppressWarnings("unused")
 			public InvalidCommand(String arg) {
@@ -205,7 +205,7 @@ public class CommandResolversTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class WindowsCommandResolverTest {
+	public class WindowsCommandResolverTest {
 
 		@RegisterExtension
 		public final TemporaryFolder folder = new TemporaryFolder();

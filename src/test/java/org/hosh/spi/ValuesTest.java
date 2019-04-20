@@ -50,7 +50,7 @@ public class ValuesTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class NoneValueTest {
+	public class NoneValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -79,7 +79,7 @@ public class ValuesTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class DurationValueTest {
+	public class DurationValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -117,7 +117,7 @@ public class ValuesTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class InstantValueTest {
+	public class InstantValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -155,7 +155,7 @@ public class ValuesTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class TextValueTest {
+	public class TextValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -224,7 +224,7 @@ public class ValuesTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class NumericValueTest {
+	public class NumericValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -261,7 +261,7 @@ public class ValuesTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class SizeValueTest {
+	public class SizeValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -321,7 +321,7 @@ public class ValuesTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class PathValueTest {
+	public class PathValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -351,7 +351,7 @@ public class ValuesTest {
 	}
 
 	@Nested
-	public static class AlphaNumericStringComparatorTest {
+	public class AlphaNumericStringComparatorTest {
 
 		@Test
 		public void sortLetters() {
@@ -418,7 +418,7 @@ public class ValuesTest {
 	}
 
 	@Nested
-	public static class SortingBetweenValuesTest {
+	public class SortingBetweenValuesTest {
 
 		@Test
 		public void instantWithNone() {

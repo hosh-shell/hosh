@@ -52,7 +52,7 @@ public class TerminalModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class ClearTest {
+	public class ClearTest {
 
 		@Mock
 		private Channel in;
@@ -95,7 +95,7 @@ public class TerminalModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class BellTest {
+	public class BellTest {
 
 		@Mock
 		private Channel in;
@@ -138,7 +138,7 @@ public class TerminalModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class DumpTest {
+	public class DumpTest {
 
 		@Mock
 		private Channel in;

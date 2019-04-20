@@ -69,7 +69,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class ListTest {
+	public class ListTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -262,7 +262,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class ChangeDirectoryTest {
+	public class ChangeDirectoryTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -337,7 +337,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class CurrentWorkingDirectoryTest {
+	public class CurrentWorkingDirectoryTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -379,7 +379,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class LinesTest {
+	public class LinesTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -461,7 +461,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class CopyTest {
+	public class CopyTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -531,7 +531,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class MoveTest {
+	public class MoveTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -601,7 +601,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class RemoveTest {
+	public class RemoveTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -656,7 +656,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class FindTest {
+	public class FindTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();

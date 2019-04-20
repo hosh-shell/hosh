@@ -62,7 +62,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class RegexTest {
+	public class RegexTest {
 
 		@Mock
 		private Channel in;
@@ -143,7 +143,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class SchemaTest {
+	public class SchemaTest {
 
 		@Mock
 		private Channel in;
@@ -182,7 +182,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class CountTest {
+	public class CountTest {
 
 		@Mock
 		private Channel in;
@@ -243,7 +243,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class EnumerateTest {
+	public class EnumerateTest {
 
 		@Mock
 		private Channel in;
@@ -283,7 +283,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class DropTest {
+	public class DropTest {
 
 		@Mock
 		private Channel in;
@@ -343,7 +343,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class TakeTest {
+	public class TakeTest {
 
 		@Mock
 		private Channel in;
@@ -426,7 +426,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class FilterTest {
+	public class FilterTest {
 
 		@Mock
 		private Channel in;
@@ -487,7 +487,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class SortTest {
+	public class SortTest {
 
 		@Mock
 		private Channel in;
@@ -543,7 +543,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class DistinctTest {
+	public class DistinctTest {
 
 		@Mock
 		private Channel in;
@@ -614,7 +614,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class DuplicatedTest {
+	public class DuplicatedTest {
 
 		@Mock
 		private Channel in;
@@ -685,7 +685,7 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class TableTest {
+	public class TableTest {
 
 		@Mock
 		private Channel in;

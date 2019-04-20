@@ -47,7 +47,7 @@ public class NetworkModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class NetworkTest {
+	public class NetworkTest {
 
 		@Mock
 		private Channel in;

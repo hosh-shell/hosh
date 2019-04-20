@@ -77,7 +77,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class ExitTest {
+	public class ExitTest {
 
 		@Spy
 		private State state = new State();
@@ -137,7 +137,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class EnvTest {
+	public class EnvTest {
 
 		@Mock(stubOnly = true)
 		private State state;
@@ -191,7 +191,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class HelpCommandTest {
+	public class HelpCommandTest {
 
 		@Mock
 		private Channel in;
@@ -296,7 +296,7 @@ public class SystemModuleTest {
 		@Examples({
 				@Example(command = "true", description = "returns exit success")
 		})
-		private static class True implements Command {
+		private class True implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -305,7 +305,7 @@ public class SystemModuleTest {
 		}
 
 		@Help(description = "/bin/false replacement")
-		private static class False implements Command {
+		private class False implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -314,7 +314,7 @@ public class SystemModuleTest {
 		}
 
 		// no help and no examples
-		private static class Star implements Command {
+		private class Star implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -325,7 +325,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class EchoTest {
+	public class EchoTest {
 
 		@Mock
 		private Channel in;
@@ -369,7 +369,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class SleepTest {
+	public class SleepTest {
 
 		@RegisterExtension
 		public final WithThread withThread = new WithThread();
@@ -435,7 +435,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class ProcessListTest {
+	public class ProcessListTest {
 
 		@Mock
 		private Channel in;
@@ -470,7 +470,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class ErrTest {
+	public class ErrTest {
 
 		@Mock
 		private Channel in;
@@ -494,7 +494,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class SinkTest {
+	public class SinkTest {
 
 		@Mock(stubOnly = true)
 		private Record record;
@@ -525,7 +525,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class BenchmarkTest {
+	public class BenchmarkTest {
 
 		@Mock
 		private Channel in;
@@ -610,7 +610,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class WithTimeTest {
+	public class WithTimeTest {
 
 		@Mock
 		private Channel in;
@@ -628,8 +628,8 @@ public class SystemModuleTest {
 		public void usage() {
 			Long resource = sut.before(Collections.emptyList(), in, out, err);
 			sut.after(resource, in, out, err);
-			then(out).should().send(Mockito.any());
 			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Mockito.any());
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -648,7 +648,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class SetVariableTest {
+	public class SetVariableTest {
 
 		@Mock
 		private Channel in;
@@ -707,7 +707,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class UnsetVariableTest {
+	public class UnsetVariableTest {
 
 		@Mock
 		private Channel in;
@@ -757,7 +757,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public static class KillProcessTest {
+	public class KillProcessTest {
 
 		@Mock(stubOnly = true)
 		private ProcessHandle processHandle;
