@@ -3,8 +3,8 @@ package org.hosh.testsupport;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  * JUnit 4.12 org.junit.rules.TemporaryFolder rule re-arranged as JUnit 5
  * extension
  */
-public class TemporaryFolder implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEachCallback {
 
 	private final File parentFolder;
 
@@ -27,12 +27,12 @@ public class TemporaryFolder implements Extension, BeforeTestExecutionCallback, 
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) throws Exception {
+	public void beforeEach(ExtensionContext context) throws Exception {
 		create();
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) throws Exception {
+	public void afterEach(ExtensionContext context) throws Exception {
 		delete();
 	}
 
