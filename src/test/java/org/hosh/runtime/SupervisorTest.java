@@ -90,8 +90,6 @@ public class SupervisorTest {
 
 	@Test
 	public void handleInterruptions() {
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Collections.emptyList());
 		sut.submit(statement, () -> {
 			Thread.sleep(10_000);
 			return ExitStatus.success();
