@@ -41,13 +41,12 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.State;
-import org.hosh.testsupport.IgnoreIf;
-import org.hosh.testsupport.IgnoreIf.IgnoredIf;
-import org.hosh.testsupport.IgnoreIf.NotOnWindows;
-import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
@@ -60,9 +59,6 @@ public class CommandResolversTest {
 
 		@Rule
 		public final TemporaryFolder folder = new TemporaryFolder();
-
-		@Rule
-		public final IgnoreIf ignoreIf = new IgnoreIf();
 
 		@Mock(stubOnly = true)
 		private Command command;
@@ -121,7 +117,7 @@ public class CommandResolversTest {
 		}
 
 		@Test
-		@IgnoredIf(description = "in Windows this file is marked as executable, why?", condition = OnWindows.class)
+		@DisabledOnOs(OS.WINDOWS) // in Windows this file is marked as executable!?
 		public void foundNonExecutableInPath() throws IOException {
 			assert folder.newFile("test").setExecutable(false);
 			given(state.getCommands()).willReturn(Collections.emptyMap());
@@ -142,7 +138,7 @@ public class CommandResolversTest {
 		}
 
 		@Test
-		@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
+		@EnabledOnOs(OS.WINDOWS)
 		public void notFoundInPathAsSpecifiedByPathExt() throws IOException {
 			assert folder.newFile("test.vbs").setExecutable(true); // VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
@@ -154,7 +150,7 @@ public class CommandResolversTest {
 		}
 
 		@Test
-		@IgnoredIf(description = "valid only in Windows", condition = NotOnWindows.class)
+		@EnabledOnOs(OS.WINDOWS)
 		public void foundInPathAsSpecifiedByPathExt() throws IOException {
 			assert folder.newFile("test.exe").setExecutable(true);
 			given(state.getCommands()).willReturn(Collections.emptyMap());
