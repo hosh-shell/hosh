@@ -116,7 +116,10 @@ public class CommandResolversTest {
 
 		@Test
 		public void foundNonExecutableInPath() throws IOException {
-			folder.newFile("test");
+			File newFile = folder.newFile("test");
+			newFile.setExecutable(true);
+			newFile.setExecutable(false);
+			assert !newFile.canExecute();
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Arrays.asList(folder.getRoot().toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));

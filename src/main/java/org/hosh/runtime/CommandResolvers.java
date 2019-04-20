@@ -169,7 +169,7 @@ public class CommandResolvers {
 		public Optional<Command> tryResolve(String commandName) {
 			String[] exts = state.getVariables().getOrDefault("PATHEXT", "").split(";");
 			for (String ext : exts) {
-				Optional<Command> resolved = resolver.tryResolve(commandName + ext.strip());
+				Optional<Command> resolved = resolver.tryResolve(commandName + ext.strip().toLowerCase());
 				if (resolved.isPresent()) {
 					return resolved;
 				}
