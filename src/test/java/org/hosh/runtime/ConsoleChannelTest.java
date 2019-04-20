@@ -34,8 +34,8 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -51,7 +51,7 @@ public class ConsoleChannelTest {
 
 	private ConsoleChannel sut;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		given(terminal.writer()).willReturn(printWriter);
 		sut = new ConsoleChannel(terminal, Ansi.Style.NONE);

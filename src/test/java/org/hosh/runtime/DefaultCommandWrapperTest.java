@@ -35,8 +35,8 @@ import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -64,7 +64,7 @@ public class DefaultCommandWrapperTest {
 
 	private DefaultCommandWrapper<Object> sut;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		sut = new DefaultCommandWrapper<>(statement, commandWrapper);
 		sut.setInterpreter(interpreter);

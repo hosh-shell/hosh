@@ -47,7 +47,7 @@ import org.hosh.spi.ValuesTest.PathValueTest;
 import org.hosh.spi.ValuesTest.SizeValueTest;
 import org.hosh.spi.ValuesTest.SortingBetweenValuesTest;
 import org.hosh.spi.ValuesTest.TextValueTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;

@@ -23,14 +23,10 @@
  */
 package org.hosh.fitness;
 
-import static org.junit.Assert.fail;
-
 import java.lang.reflect.Modifier;
 import java.util.stream.Stream;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
@@ -48,11 +44,8 @@ public class JUnitFitnessTest {
 					.flatMap(c -> Stream.of(c.getDeclaredMethods()))
 					.filter(m -> Modifier.isPublic(m.getModifiers()))
 					.filter(m -> !Modifier.isStatic(m.getModifiers()))
-					.filter(m -> !m.isAnnotationPresent(Before.class))
-					.filter(m -> !m.isAnnotationPresent(After.class))
-					.filter(m -> !m.isAnnotationPresent(Test.class))
 					.forEach(m -> {
-						fail("method should be annotated with @Test: " + m);
+						throw new IllegalStateException("method should be annotated with @Test: " + m);
 					});
 		}
 	}

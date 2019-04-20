@@ -51,9 +51,9 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -90,7 +90,7 @@ public class ExternalCommandTest {
 
 	private ExternalCommand sut;
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		executable = folder.newFile().toPath();
 		sut = new ExternalCommand(executable);

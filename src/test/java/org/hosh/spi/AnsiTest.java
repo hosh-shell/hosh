@@ -27,7 +27,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 import org.hosh.spi.Ansi.Style;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AnsiTest {
 

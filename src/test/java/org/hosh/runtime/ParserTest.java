@@ -26,7 +26,7 @@ package org.hosh.runtime;
 import org.hosh.doc.Bug;
 import org.hosh.runtime.Parser.ParseError;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.ExpectedException;
 
 public class ParserTest {

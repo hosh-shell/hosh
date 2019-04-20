@@ -33,7 +33,7 @@ import java.util.logging.LogRecord;
 
 import org.hosh.testsupport.WithTimeZone;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

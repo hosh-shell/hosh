@@ -62,7 +62,7 @@ import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;

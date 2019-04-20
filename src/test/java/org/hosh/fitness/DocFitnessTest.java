@@ -40,7 +40,7 @@ import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Parser.ParseError;
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;

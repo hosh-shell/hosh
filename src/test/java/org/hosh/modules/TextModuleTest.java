@@ -59,7 +59,7 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;

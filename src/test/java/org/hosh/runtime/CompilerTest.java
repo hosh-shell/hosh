@@ -37,7 +37,7 @@ import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

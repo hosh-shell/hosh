@@ -58,7 +58,7 @@ import org.hosh.testsupport.IgnoreIf.CannotCreateSymbolicLinks;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
 import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

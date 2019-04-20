@@ -30,7 +30,7 @@ import java.util.Optional;
 import org.hosh.spi.Record;
 import org.hosh.testsupport.WithThread;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;

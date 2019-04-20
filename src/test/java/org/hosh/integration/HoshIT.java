@@ -47,10 +47,10 @@ import java.util.stream.Stream;
 import org.hosh.doc.Bug;
 import org.hosh.doc.Todo;
 import org.hosh.testsupport.IgnoreIf;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestName;
 
@@ -67,13 +67,13 @@ public class HoshIT {
 
 	private long nanos;
 
-	@Before
+	@BeforeEach
 	public void startTest() {
 		System.out.print("  " + testName.getMethodName());
 		nanos = System.nanoTime();
 	}
 
-	@After
+	@AfterEach
 	public void stopTest() {
 		System.out.printf("...  %sms%n", Duration.ofNanos(System.nanoTime() - nanos).toMillis());
 	}
