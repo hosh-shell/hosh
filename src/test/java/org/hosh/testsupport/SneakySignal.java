@@ -39,6 +39,6 @@ public class SneakySignal {
 		signalClass.getMethod("raise", signalClass).invoke(null, signal);
 		// this is inherently unstable and ugly but it is needed
 		// to make sure the signal is delivered to this process
-		Thread.sleep(100);
+		Thread.sleep(500);
 	}
 }
