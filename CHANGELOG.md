@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
    - no recursion yet
    - no directory operation yet, only files
    - no overwrites
+- autocomplete of any executable in PATH
 
 ## [0.0.29] - 2019-04-19
 - removed comand 'source'

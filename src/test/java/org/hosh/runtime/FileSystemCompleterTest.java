@@ -62,7 +62,7 @@ public class FileSystemCompleterTest {
 	@Mock(stubOnly = true)
 	private LineReader lineReader;
 
-	@Mock
+	@Mock(stubOnly = true)
 	private ParsedLine line;
 
 	@Mock

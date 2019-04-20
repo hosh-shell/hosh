@@ -49,6 +49,7 @@ import org.hosh.runtime.CommandResolvers;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
+import org.hosh.runtime.ExecutableInPathCompleter;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.Prompt;
@@ -162,7 +163,11 @@ public class Hosh {
 				.history(new DefaultHistory())
 				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
 				.variable(LineReader.HISTORY_FILE_SIZE, "1000")
-				.completer(new AggregateCompleter(new CommandCompleter(state), new FileSystemCompleter(state), new VariableExpansionCompleter(state)))
+				.completer(new AggregateCompleter(
+						new CommandCompleter(state),
+						new FileSystemCompleter(state),
+						new VariableExpansionCompleter(state),
+						new ExecutableInPathCompleter(state)))
 				.terminal(terminal)
 				.build();
 		Prompt prompt = new Prompt(state);
