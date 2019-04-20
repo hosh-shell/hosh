@@ -145,11 +145,11 @@ public class SupervisorTest {
 
 	@Test
 	public void setThreadNameWithArgs() {
-		given(command.describe()).willReturn("TestCommand");
+		given(command.describe()).willReturn("java");
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Arrays.asList("-a", "-b"));
+		given(statement.getArguments()).willReturn(Arrays.asList("-jar", "hosh.jar"));
 		sut.submit(statement, () -> {
-			assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand -a -b'");
+			assertThat(Thread.currentThread().getName()).isEqualTo("command='java -jar hosh.jar'");
 			return ExitStatus.success();
 		});
 		sut.waitForAll(err);
@@ -158,11 +158,11 @@ public class SupervisorTest {
 
 	@Test
 	public void setThreadNameWithoutArgs() {
-		given(command.describe()).willReturn("TestCommand");
+		given(command.describe()).willReturn("java");
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(Arrays.asList());
 		sut.submit(statement, () -> {
-			assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand'");
+			assertThat(Thread.currentThread().getName()).isEqualTo("command='java'");
 			return ExitStatus.success();
 		});
 		sut.waitForAll(err);
