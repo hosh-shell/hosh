@@ -32,29 +32,25 @@ import java.util.List;
 
 import org.hosh.doc.Todo;
 import org.hosh.spi.State;
-import org.hosh.testsupport.IgnoreIf;
-import org.hosh.testsupport.IgnoreIf.IgnoredIf;
-import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class FileSystemCompleterTest {
 
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-	@Rule
-	public final IgnoreIf ignoreIf = new IgnoreIf();
 
 	@Mock(stubOnly = true)
 	private State state;
@@ -97,8 +93,8 @@ public class FileSystemCompleterTest {
 	}
 
 	@Test
-	@Todo(description = "use Path.getRoot()?")
-	@IgnoredIf(description = "fails on windows, / should be C:/", condition = OnWindows.class)
+	@Todo(description = "fails on windows, / should be C:/, use Path.getRoot?")
+	@DisabledOnOs(OS.WINDOWS)
 	public void slash() {
 		given(line.word()).willReturn("/");
 		sut.complete(lineReader, line, candidates);

@@ -30,13 +30,14 @@ import static org.mockito.BDDMockito.given;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
+
 public class ReplReaderTest {
 
 	@Mock(stubOnly = true)
@@ -47,7 +48,7 @@ public class ReplReaderTest {
 
 	private ReplReader sut;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		sut = new ReplReader(prompt, lineReader);
 	}

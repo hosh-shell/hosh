@@ -38,39 +38,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.spi.Values.AlphaNumericStringComparator;
-import org.hosh.spi.ValuesTest.AlphaNumericStringComparatorTest;
-import org.hosh.spi.ValuesTest.DurationValueTest;
-import org.hosh.spi.ValuesTest.InstantValueTest;
-import org.hosh.spi.ValuesTest.NoneValueTest;
-import org.hosh.spi.ValuesTest.NumericValueTest;
-import org.hosh.spi.ValuesTest.PathValueTest;
-import org.hosh.spi.ValuesTest.SizeValueTest;
-import org.hosh.spi.ValuesTest.SortingBetweenValuesTest;
-import org.hosh.spi.ValuesTest.TextValueTest;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		NoneValueTest.class,
-		InstantValueTest.class,
-		DurationValueTest.class,
-		TextValueTest.class,
-		NumericValueTest.class,
-		SizeValueTest.class,
-		PathValueTest.class,
-		AlphaNumericStringComparatorTest.class,
-		SortingBetweenValuesTest.class
-})
 public class ValuesTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class NoneValueTest {
 
 		@Mock
@@ -98,7 +75,7 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class DurationValueTest {
 
 		@Mock
@@ -135,7 +112,7 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class InstantValueTest {
 
 		@Mock
@@ -172,7 +149,7 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class TextValueTest {
 
 		@Mock
@@ -240,7 +217,7 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class NumericValueTest {
 
 		@Mock
@@ -276,7 +253,7 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class SizeValueTest {
 
 		@Mock
@@ -335,7 +312,7 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class PathValueTest {
 
 		@Mock

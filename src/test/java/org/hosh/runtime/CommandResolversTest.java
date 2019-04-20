@@ -37,8 +37,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hosh.runtime.CommandResolvers.WindowsCommandResolver;
-import org.hosh.runtime.CommandResolversTest.BuiltinsThenSystemTest;
-import org.hosh.runtime.CommandResolversTest.WindowsCommandResolverTest;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
@@ -47,24 +45,17 @@ import org.hosh.testsupport.IgnoreIf;
 import org.hosh.testsupport.IgnoreIf.IgnoredIf;
 import org.hosh.testsupport.IgnoreIf.NotOnWindows;
 import org.hosh.testsupport.IgnoreIf.OnWindows;
-import org.junit.Before;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		BuiltinsThenSystemTest.class,
-		WindowsCommandResolverTest.class,
-})
 public class CommandResolversTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class BuiltinsThenSystemTest {
 
 		@Rule
@@ -81,7 +72,7 @@ public class CommandResolversTest {
 
 		private CommandResolver sut;
 
-		@Before
+		@BeforeEach
 		public void setup() {
 			sut = CommandResolvers.builtinsThenExternal(state);
 		}
@@ -214,7 +205,7 @@ public class CommandResolversTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class WindowsCommandResolverTest {
 
 		@Rule
@@ -228,7 +219,7 @@ public class CommandResolversTest {
 
 		private WindowsCommandResolver sut;
 
-		@Before
+		@BeforeEach
 		public void setup() {
 			sut = new WindowsCommandResolver(state);
 		}

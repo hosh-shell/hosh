@@ -53,42 +53,24 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
-import org.hosh.testsupport.IgnoreIf;
-import org.hosh.testsupport.IgnoreIf.CannotCreateSymbolicLinks;
-import org.hosh.testsupport.IgnoreIf.IgnoredIf;
-import org.hosh.testsupport.IgnoreIf.OnWindows;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		FileSystemModuleTest.ListTest.class,
-		FileSystemModuleTest.ChangeDirectoryTest.class,
-		FileSystemModuleTest.CurrentWorkingDirectoryTest.class,
-		FileSystemModuleTest.LinesTest.class,
-		FileSystemModuleTest.FindTest.class,
-		FileSystemModuleTest.CopyTest.class,
-		FileSystemModuleTest.MoveTest.class,
-		FileSystemModuleTest.RemoveTest.class,
-})
 public class FileSystemModuleTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class ListTest {
 
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-		@Rule
-		public final IgnoreIf ignoreIf = new IgnoreIf();
 
 		@Mock(stubOnly = true)
 		private State state;
@@ -259,7 +241,7 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
-		@IgnoredIf(description = "File.setReadable() fails on windows", condition = OnWindows.class)
+		@DisabledOnOs(OS.WINDOWS) // File.setReadable() fails on windows
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test
 		public void accessDenied() {
@@ -276,7 +258,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class ChangeDirectoryTest {
 
 		@Rule
@@ -350,7 +332,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class CurrentWorkingDirectoryTest {
 
 		@Rule
@@ -391,7 +373,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class LinesTest {
 
 		@Rule
@@ -472,7 +454,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class CopyTest {
 
 		@Rule
@@ -541,7 +523,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class MoveTest {
 
 		@Rule
@@ -610,7 +592,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class RemoveTest {
 
 		@Rule
@@ -664,11 +646,8 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class FindTest {
-
-		@Rule
-		public final IgnoreIf ignoreIf = new IgnoreIf();
 
 		@Rule
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -741,7 +720,9 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 		}
 
-		@IgnoredIf(description = "on Windows 7 a special permission is needed to create symlinks (see https://stackoverflow.com/a/24353758)", condition = CannotCreateSymbolicLinks.class)
+		// on Windows a special permission is needed to create symlinks, see
+		// https://stackoverflow.com/a/24353758
+		@DisabledOnOs(OS.WINDOWS)
 		@Test
 		public void resolveSymlinks() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());

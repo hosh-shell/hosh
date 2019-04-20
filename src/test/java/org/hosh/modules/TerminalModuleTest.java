@@ -40,24 +40,16 @@ import org.hosh.spi.Values;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		TerminalModuleTest.ClearTest.class,
-		TerminalModuleTest.BellTest.class,
-		TerminalModuleTest.DumpTest.class,
-})
 public class TerminalModuleTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class ClearTest {
 
 		@Mock
@@ -99,7 +91,7 @@ public class TerminalModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class BellTest {
 
 		@Mock
@@ -141,7 +133,7 @@ public class TerminalModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class DumpTest {
 
 		@Mock

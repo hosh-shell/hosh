@@ -29,13 +29,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
+
 public class SimpleCommandRegistryTest {
 
 	@Mock(stubOnly = true)

@@ -43,50 +43,23 @@ import org.hosh.modules.TextModule.Schema;
 import org.hosh.modules.TextModule.Sort;
 import org.hosh.modules.TextModule.Table;
 import org.hosh.modules.TextModule.Take;
-import org.hosh.modules.TextModuleTest.CountTest;
-import org.hosh.modules.TextModuleTest.DistinctTest;
-import org.hosh.modules.TextModuleTest.DropTest;
-import org.hosh.modules.TextModuleTest.DuplicatedTest;
-import org.hosh.modules.TextModuleTest.EnumerateTest;
-import org.hosh.modules.TextModuleTest.FilterTest;
-import org.hosh.modules.TextModuleTest.RegexTest;
-import org.hosh.modules.TextModuleTest.SchemaTest;
-import org.hosh.modules.TextModuleTest.SortTest;
-import org.hosh.modules.TextModuleTest.TableTest;
-import org.hosh.modules.TextModuleTest.TakeTest;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		RegexTest.class,
-		SchemaTest.class,
-		CountTest.class,
-		EnumerateTest.class,
-		DropTest.class,
-		TakeTest.class,
-		FilterTest.class,
-		SortTest.class,
-		DistinctTest.class,
-		DuplicatedTest.class,
-		TableTest.class,
-})
 public class TextModuleTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class RegexTest {
 
 		@Mock
@@ -166,7 +139,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class SchemaTest {
 
 		@Mock
@@ -204,7 +177,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class CountTest {
 
 		@Mock
@@ -264,7 +237,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class EnumerateTest {
 
 		@Mock
@@ -303,7 +276,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class DropTest {
 
 		@Mock
@@ -362,7 +335,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class TakeTest {
 
 		@Mock
@@ -444,7 +417,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class FilterTest {
 
 		@Mock
@@ -504,7 +477,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class SortTest {
 
 		@Mock
@@ -559,7 +532,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class DistinctTest {
 
 		@Mock
@@ -629,7 +602,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class DuplicatedTest {
 
 		@Mock
@@ -699,7 +672,7 @@ public class TextModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class TableTest {
 
 		@Mock

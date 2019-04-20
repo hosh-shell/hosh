@@ -63,36 +63,18 @@ import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		SystemModuleTest.EchoTest.class,
-		SystemModuleTest.EnvTest.class,
-		SystemModuleTest.ExitTest.class,
-		SystemModuleTest.HelpCommandTest.class,
-		SystemModuleTest.SleepTest.class,
-		SystemModuleTest.ProcessListTest.class,
-		SystemModuleTest.ErrTest.class,
-		SystemModuleTest.BenchmarkTest.class,
-		SystemModuleTest.WithTimeTest.class,
-		SystemModuleTest.SinkTest.class,
-		SystemModuleTest.SetVariableTest.class,
-		SystemModuleTest.UnsetVariableTest.class,
-		SystemModuleTest.KillProcessTest.class,
-})
 public class SystemModuleTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class ExitTest {
 
 		@Spy
@@ -151,7 +133,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class EnvTest {
 
 		@Mock(stubOnly = true)
@@ -204,7 +186,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class HelpCommandTest {
 
 		@Mock
@@ -337,7 +319,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class EchoTest {
 
 		@Mock
@@ -380,7 +362,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class SleepTest {
 
 		@Rule
@@ -445,7 +427,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class ProcessListTest {
 
 		@Mock
@@ -479,7 +461,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class ErrTest {
 
 		@Mock
@@ -502,7 +484,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class SinkTest {
 
 		@Mock(stubOnly = true)
@@ -532,7 +514,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class BenchmarkTest {
 
 		@Mock
@@ -616,7 +598,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class WithTimeTest {
 
 		@Mock
@@ -653,7 +635,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class SetVariableTest {
 
 		@Mock
@@ -711,7 +693,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class UnsetVariableTest {
 
 		@Mock
@@ -760,7 +742,7 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
+	@ExtendWith(MockitoExtension.class)
 	public static class KillProcessTest {
 
 		@Mock(stubOnly = true)

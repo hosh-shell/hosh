@@ -40,15 +40,16 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.SneakySignal;
 import org.hosh.testsupport.WithThread;
-import org.junit.After;
 import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
+
 public class SupervisorTest {
 
 	@Rule
@@ -63,7 +64,7 @@ public class SupervisorTest {
 	@InjectMocks
 	private Supervisor sut;
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		sut.close();
 	}
