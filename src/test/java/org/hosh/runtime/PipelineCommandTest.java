@@ -84,11 +84,6 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void repr() {
-		assertThat(sut).hasToString("PipelineCommand[producer=producer,consumer=consumer]");
-	}
-
-	@Test
 	public void producerAndConsumerSuccess() {
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());

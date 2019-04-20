@@ -27,14 +27,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CancellationException;
 
 import org.hosh.runtime.Compiler.Program;
@@ -54,6 +52,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,10 +79,10 @@ public class InterpreterTest {
 	@Mock
 	private Command command;
 
-	@Mock
+	@Spy
 	private StateAwareCommand stateAwareCommand;
 
-	@Mock
+	@Spy
 	private TerminalAwareCommand terminalAwareCommand;
 
 	private final Map<String, String> variables = new HashMap<>();
@@ -112,7 +111,6 @@ public class InterpreterTest {
 	@Test
 	public void injectState() {
 		given(state.getVariables()).willReturn(variables);
-		doReturn(Optional.of(stateAwareCommand)).when(stateAwareCommand).downCast(StateAware.class);
 		given(stateAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(stateAwareCommand);
@@ -123,7 +121,6 @@ public class InterpreterTest {
 
 	@Test
 	public void injectTerminal() {
-		doReturn(Optional.of(terminalAwareCommand)).when(terminalAwareCommand).downCast(TerminalAware.class);
 		given(terminalAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(Arrays.asList(statement));
 		given(statement.getCommand()).willReturn(terminalAwareCommand);
