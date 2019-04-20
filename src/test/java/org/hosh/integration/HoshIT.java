@@ -46,7 +46,6 @@ import java.util.stream.Stream;
 
 import org.hosh.doc.Bug;
 import org.hosh.doc.Todo;
-import org.hosh.testsupport.IgnoreIf;
 import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,9 +57,6 @@ public class HoshIT {
 
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-	@Rule
-	public final IgnoreIf ignoreIf = new IgnoreIf();
 
 	@Rule
 	public final TestName testName = new TestName();
