@@ -308,7 +308,6 @@
 						</goals>
 						<configuration>
 							<configLocation>checkstyle.xml</configLocation>
-							<consoleOutput>true</consoleOutput>
 							<failsOnError>true</failsOnError>
 							<sourceDirectories>
 								<sourceDirectory>src/main/java</sourceDirectory>
