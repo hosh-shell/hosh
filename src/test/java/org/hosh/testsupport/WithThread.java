@@ -23,23 +23,26 @@
  */
 package org.hosh.testsupport;
 
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * To be used where a test is changing a thread names or interrupted flag.
  */
-public class WithThread extends ExternalResource {
+public class WithThread implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
 	private String backup;
 
 	@Override
-	protected void before() {
-		backup = Thread.currentThread().getName();
+	public void afterTestExecution(ExtensionContext context) throws Exception {
+		Thread.currentThread().setName(backup);
+		Thread.interrupted();
 	}
 
 	@Override
-	protected void after() {
-		Thread.currentThread().setName(backup);
-		Thread.interrupted();
+	public void beforeTestExecution(ExtensionContext context) throws Exception {
+		backup = Thread.currentThread().getName();
 	}
 }

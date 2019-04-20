@@ -61,9 +61,9 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -365,7 +365,7 @@ public class SystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class SleepTest {
 
-		@Rule
+		@RegisterExtension
 		public final WithThread withThread = new WithThread();
 
 		@Mock
