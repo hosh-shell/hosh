@@ -29,7 +29,6 @@ import static org.mockito.BDDMockito.then;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
@@ -60,6 +59,9 @@ public class SupervisorTest {
 	@Mock(stubOnly = true)
 	private Statement statement;
 
+	@Mock(stubOnly = true)
+	private Command command;
+
 	@InjectMocks
 	private Supervisor sut;
 
@@ -76,7 +78,7 @@ public class SupervisorTest {
 
 	@Test
 	public void handleSignals() {
-		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(Collections.emptyList());
 		sut.submit(statement, () -> {
 			SneakySignal.raise("INT");
@@ -99,7 +101,7 @@ public class SupervisorTest {
 
 	@Test
 	public void allSubmitInSuccess() {
-		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(Collections.emptyList());
 		sut.submit(statement, () -> ExitStatus.success());
 		sut.submit(statement, () -> ExitStatus.success());
@@ -109,7 +111,7 @@ public class SupervisorTest {
 
 	@Test
 	public void oneSubmitInError() {
-		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(Collections.emptyList());
 		sut.submit(statement, () -> ExitStatus.success());
 		sut.submit(statement, () -> ExitStatus.of(10));
@@ -119,7 +121,7 @@ public class SupervisorTest {
 
 	@Test
 	public void oneSubmitWithException() {
-		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(Collections.emptyList());
 		sut.submit(statement, () -> {
 			throw new NullPointerException("simulated error");
@@ -131,7 +133,7 @@ public class SupervisorTest {
 
 	@Test
 	public void oneSubmitWithExceptionButNoMessage() {
-		given(statement.getCommand()).willReturn(new TestCommand());
+		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(Collections.emptyList());
 		sut.submit(statement, () -> {
 			throw new NullPointerException();
@@ -143,10 +145,11 @@ public class SupervisorTest {
 
 	@Test
 	public void setThreadNameWithArgs() {
-		given(statement.getCommand()).willReturn(new TestCommand());
-		given(statement.getArguments()).willReturn(Arrays.asList("-a", "-b"));
+		given(command.describe()).willReturn("java");
+		given(statement.getCommand()).willReturn(command);
+		given(statement.getArguments()).willReturn(Arrays.asList("-jar", "hosh.jar"));
 		sut.submit(statement, () -> {
-			assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand -a -b'");
+			assertThat(Thread.currentThread().getName()).isEqualTo("command='java -jar hosh.jar'");
 			return ExitStatus.success();
 		});
 		sut.waitForAll(err);
@@ -155,22 +158,14 @@ public class SupervisorTest {
 
 	@Test
 	public void setThreadNameWithoutArgs() {
-		given(statement.getCommand()).willReturn(new TestCommand());
+		given(command.describe()).willReturn("java");
+		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(Arrays.asList());
 		sut.submit(statement, () -> {
-			assertThat(Thread.currentThread().getName()).isEqualTo("command='TestCommand'");
+			assertThat(Thread.currentThread().getName()).isEqualTo("command='java'");
 			return ExitStatus.success();
 		});
 		sut.waitForAll(err);
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
-	}
-
-	// cannot be a mock since we need a fixed name for testing purposes
-	private static class TestCommand implements Command {
-
-		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			return ExitStatus.success();
-		}
 	}
 }
