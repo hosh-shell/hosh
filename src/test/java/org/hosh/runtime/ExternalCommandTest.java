@@ -50,13 +50,12 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.TemporaryFolder;
 import org.hosh.testsupport.WithThread;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.rules.TemporaryFolder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -66,7 +65,7 @@ public class ExternalCommandTest {
 	@RegisterExtension
 	public final WithThread withThread = new WithThread();
 
-	@Rule
+	@RegisterExtension
 	public final TemporaryFolder folder = new TemporaryFolder();
 
 	@Mock(stubOnly = true)

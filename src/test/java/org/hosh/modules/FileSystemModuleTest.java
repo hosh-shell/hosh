@@ -53,12 +53,12 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
-import org.junit.Rule;
+import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -69,7 +69,7 @@ public class FileSystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class ListTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -261,7 +261,7 @@ public class FileSystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class ChangeDirectoryTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock
@@ -335,7 +335,7 @@ public class FileSystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class CurrentWorkingDirectoryTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -376,7 +376,7 @@ public class FileSystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class LinesTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -457,7 +457,7 @@ public class FileSystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class CopyTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -526,7 +526,7 @@ public class FileSystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class MoveTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -595,7 +595,7 @@ public class FileSystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class RemoveTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -649,7 +649,7 @@ public class FileSystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class FindTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)

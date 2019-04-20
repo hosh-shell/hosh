@@ -35,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,33 +45,14 @@ import java.util.stream.Stream;
 
 import org.hosh.doc.Bug;
 import org.hosh.doc.Todo;
-import org.junit.Rule;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class HoshIT {
 
-	@Rule
+	@RegisterExtension
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-	@Rule
-	public final TestName testName = new TestName();
-
-	private long nanos;
-
-	@BeforeEach
-	public void startTest() {
-		System.out.print("  " + testName.getMethodName());
-		nanos = System.nanoTime();
-	}
-
-	@AfterEach
-	public void stopTest() {
-		System.out.printf("...  %sms%n", Duration.ofNanos(System.nanoTime() - nanos).toMillis());
-	}
 
 	@Test
 	public void interactiveEndOfFile() throws Exception {

@@ -32,15 +32,15 @@ import java.util.List;
 
 import org.hosh.doc.Todo;
 import org.hosh.spi.State;
+import org.hosh.testsupport.TemporaryFolder;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -49,7 +49,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class FileSystemCompleterTest {
 
-	@Rule
+	@RegisterExtension
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Mock(stubOnly = true)

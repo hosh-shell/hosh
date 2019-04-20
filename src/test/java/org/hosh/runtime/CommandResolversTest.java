@@ -41,14 +41,14 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.State;
-import org.junit.Rule;
+import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -57,7 +57,7 @@ public class CommandResolversTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class BuiltinsThenSystemTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder folder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -204,7 +204,7 @@ public class CommandResolversTest {
 	@ExtendWith(MockitoExtension.class)
 	public static class WindowsCommandResolverTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder folder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
