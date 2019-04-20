@@ -39,6 +39,7 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -49,6 +50,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 public class TerminalModuleTest {
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class ClearTest {
 
@@ -91,6 +93,7 @@ public class TerminalModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class BellTest {
 
@@ -133,6 +136,7 @@ public class TerminalModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class DumpTest {
 

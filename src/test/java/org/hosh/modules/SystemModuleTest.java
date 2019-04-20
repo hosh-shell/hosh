@@ -61,6 +61,7 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -74,6 +75,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 public class SystemModuleTest {
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class ExitTest {
 
@@ -133,6 +135,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class EnvTest {
 
@@ -186,6 +189,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class HelpCommandTest {
 
@@ -319,6 +323,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class EchoTest {
 
@@ -362,6 +367,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class SleepTest {
 
@@ -427,6 +433,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class ProcessListTest {
 
@@ -461,6 +468,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class ErrTest {
 
@@ -484,6 +492,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class SinkTest {
 
@@ -514,6 +523,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class BenchmarkTest {
 
@@ -598,6 +608,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class WithTimeTest {
 
@@ -635,6 +646,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class SetVariableTest {
 
@@ -693,6 +705,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class UnsetVariableTest {
 
@@ -742,6 +755,7 @@ public class SystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class KillProcessTest {
 

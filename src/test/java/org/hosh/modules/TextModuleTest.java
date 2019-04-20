@@ -48,6 +48,7 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -59,6 +60,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 public class TextModuleTest {
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class RegexTest {
 
@@ -139,6 +141,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class SchemaTest {
 
@@ -177,6 +180,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class CountTest {
 
@@ -237,6 +241,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class EnumerateTest {
 
@@ -276,6 +281,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class DropTest {
 
@@ -335,6 +341,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class TakeTest {
 
@@ -417,6 +424,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class FilterTest {
 
@@ -477,6 +485,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class SortTest {
 
@@ -532,6 +541,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class DistinctTest {
 
@@ -602,6 +612,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class DuplicatedTest {
 
@@ -672,6 +683,7 @@ public class TextModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class TableTest {
 

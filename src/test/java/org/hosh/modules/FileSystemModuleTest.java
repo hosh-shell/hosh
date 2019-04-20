@@ -54,6 +54,7 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.TemporaryFolder;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -66,6 +67,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 public class FileSystemModuleTest {
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class ListTest {
 
@@ -258,6 +260,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class ChangeDirectoryTest {
 
@@ -332,6 +335,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class CurrentWorkingDirectoryTest {
 
@@ -373,6 +377,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class LinesTest {
 
@@ -454,6 +459,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class CopyTest {
 
@@ -523,6 +529,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class MoveTest {
 
@@ -592,6 +599,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class RemoveTest {
 
@@ -646,6 +654,7 @@ public class FileSystemModuleTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class FindTest {
 

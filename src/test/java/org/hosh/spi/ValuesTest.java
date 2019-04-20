@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.spi.Values.AlphaNumericStringComparator;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -47,6 +48,7 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class ValuesTest {
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class NoneValueTest {
 
@@ -75,6 +77,7 @@ public class ValuesTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class DurationValueTest {
 
@@ -112,6 +115,7 @@ public class ValuesTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class InstantValueTest {
 
@@ -149,6 +153,7 @@ public class ValuesTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class TextValueTest {
 
@@ -217,6 +222,7 @@ public class ValuesTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class NumericValueTest {
 
@@ -253,6 +259,7 @@ public class ValuesTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class SizeValueTest {
 
@@ -312,6 +319,7 @@ public class ValuesTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class PathValueTest {
 
@@ -342,6 +350,7 @@ public class ValuesTest {
 		}
 	}
 
+	@Nested
 	public static class AlphaNumericStringComparatorTest {
 
 		@Test
@@ -408,6 +417,7 @@ public class ValuesTest {
 		}
 	}
 
+	@Nested
 	public static class SortingBetweenValuesTest {
 
 		@Test

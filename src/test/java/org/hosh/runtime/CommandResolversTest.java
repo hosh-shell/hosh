@@ -43,6 +43,7 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.State;
 import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -54,6 +55,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 public class CommandResolversTest {
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class BuiltinsThenSystemTest {
 
@@ -201,6 +203,7 @@ public class CommandResolversTest {
 		}
 	}
 
+	@Nested
 	@ExtendWith(MockitoExtension.class)
 	public static class WindowsCommandResolverTest {
 
