@@ -46,13 +46,20 @@ import java.util.stream.Stream;
 import org.hosh.doc.Bug;
 import org.hosh.doc.Todo;
 import org.hosh.testsupport.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class HoshIT {
 
 	@RegisterExtension
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@AfterEach
+	void beforeEach(TestInfo testInfo) {
+		System.out.println(testInfo.getDisplayName());
+	}
 
 	@Test
 	public void interactiveEndOfFile() throws Exception {
