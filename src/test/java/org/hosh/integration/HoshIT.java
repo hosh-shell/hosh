@@ -100,13 +100,13 @@ public class HoshIT {
 	@Test
 	public void scriptWithCdAndCwd() throws Exception {
 		Path scriptPath = givenScript(
-				"cd " + temporaryFolder.getRoot().getAbsolutePath(),
+				"cd " + temporaryFolder.toPath().toAbsolutePath(),
 				"cwd"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).contains(temporaryFolder.getRoot().getAbsolutePath());
+		assertThat(output).contains(temporaryFolder.toPath().toAbsolutePath().toString());
 		assertThat(exitCode).isEqualTo(0);
 	}
 

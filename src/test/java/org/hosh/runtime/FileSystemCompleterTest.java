@@ -69,7 +69,7 @@ public class FileSystemCompleterTest {
 
 	@Test
 	public void emptyWordInEmptyDir() {
-		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
 		sut.complete(lineReader, line, candidates);
 		then(candidates).shouldHaveZeroInteractions();
@@ -77,7 +77,7 @@ public class FileSystemCompleterTest {
 
 	@Test
 	public void nonEmptyWordInEmptyDir() {
-		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("aaa");
 		sut.complete(lineReader, line, candidates);
 		then(candidates).shouldHaveZeroInteractions();
@@ -86,7 +86,7 @@ public class FileSystemCompleterTest {
 	@Test
 	public void emptyWordInNonEmptyDir() throws IOException {
 		temporaryFolder.newFile("a");
-		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
 		sut.complete(lineReader, line, candidates);
 		then(candidates).should().add(DebuggableCandidate.complete("a"));
@@ -106,7 +106,7 @@ public class FileSystemCompleterTest {
 		File newFile = temporaryFolder.newFile("aaa");
 		given(line.word()).willReturn(newFile.getParent());
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should().add(DebuggableCandidate.incomplete(temporaryFolder.getRoot().getAbsolutePath() + File.separator));
+		then(candidates).should().add(DebuggableCandidate.incomplete(temporaryFolder.toFile().getAbsolutePath() + File.separator));
 	}
 
 	@Test
@@ -119,7 +119,7 @@ public class FileSystemCompleterTest {
 
 	@Test
 	public void partialMatchDirectory() throws IOException {
-		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		temporaryFolder.newFolder(temporaryFolder.newFolder("aaa"), "bbb");
 		given(line.word()).willReturn("aaa" + File.separator + "b");
 		sut.complete(lineReader, line, candidates);

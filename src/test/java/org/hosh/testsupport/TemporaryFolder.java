@@ -25,6 +25,7 @@ package org.hosh.testsupport;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -64,7 +65,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	 * Returns a new fresh file with the given name under the temporary folder.
 	 */
 	public File newFile(String fileName) throws IOException {
-		File file = new File(getRoot(), fileName);
+		File file = new File(toFile(), fileName);
 		if (!file.createNewFile()) {
 			throw new IOException(
 					"a file with the name \'" + fileName + "\' already exists in the test folder");
@@ -76,7 +77,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	 * Returns a new fresh file with a random name under the temporary folder.
 	 */
 	public File newFile() throws IOException {
-		return File.createTempFile("junit", null, getRoot());
+		return File.createTempFile("junit", null, toFile());
 	}
 
 	/**
@@ -99,7 +100,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	 * Returns a new fresh folder with a random name under the temporary folder.
 	 */
 	public File newFolder() throws IOException {
-		return createTemporaryFolderIn(getRoot());
+		return createTemporaryFolderIn(toFile());
 	}
 
 	private File createTemporaryFolderIn(File parentFolder) throws IOException {
@@ -112,7 +113,11 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	/**
 	 * @return the location of this temporary folder.
 	 */
-	public File getRoot() {
+	public File toFile() {
 		return folder;
+	}
+
+	public Path toPath() {
+		return folder.toPath();
 	}
 }

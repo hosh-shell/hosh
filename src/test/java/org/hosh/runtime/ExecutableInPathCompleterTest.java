@@ -72,19 +72,19 @@ public class ExecutableInPathCompleterTest {
 
 	@Test
 	public void pathWithEmptyDir() {
-		given(state.getPath()).willReturn(List.of(temporaryFolder.getRoot().toPath()));
+		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		sut.complete(lineReader, line, candidates);
 		then(candidates).shouldHaveZeroInteractions();
 	}
 
 	@Test
 	public void pathWithExecutable() throws IOException {
-		given(state.getPath()).willReturn(List.of(temporaryFolder.getRoot().toPath()));
+		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		File file = temporaryFolder.newFile("executable");
 		assert file.setExecutable(true, true);
 		sut.complete(lineReader, line, candidates);
 		then(candidates).should()
-				.add(DebuggableCandidate.completeWithDescription("executable", "external " + temporaryFolder.getRoot().getAbsolutePath()));
+				.add(DebuggableCandidate.completeWithDescription("executable", "external " + temporaryFolder.toFile().getAbsolutePath()));
 	}
 
 	@Test
