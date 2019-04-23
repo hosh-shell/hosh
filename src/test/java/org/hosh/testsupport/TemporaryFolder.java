@@ -41,7 +41,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 
 	@Override
 	public void beforeEach(ExtensionContext context) throws Exception {
-		folder = createTemporaryFolderIn(null);
+		folder = createTemporary(null);
 	}
 
 	@Override
@@ -67,8 +67,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	public File newFile(String fileName) throws IOException {
 		File file = new File(toFile(), fileName);
 		if (!file.createNewFile()) {
-			throw new IOException(
-					"a file with the name \'" + fileName + "\' already exists in the test folder");
+			throw new IOException("a file with the name \'" + fileName + "\' already exists in the test folder");
 		}
 		return file;
 	}
@@ -77,7 +76,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	 * Returns a new fresh file with a random name under the temporary folder.
 	 */
 	public File newFile() throws IOException {
-		return File.createTempFile("junit", null, toFile());
+		return File.createTempFile("junit", null, folder);
 	}
 
 	/**
@@ -96,23 +95,17 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 		return newFolder;
 	}
 
-	/**
-	 * Returns a new fresh folder with a random name under the temporary folder.
-	 */
 	public File newFolder() throws IOException {
-		return createTemporaryFolderIn(toFile());
+		return createTemporary(folder);
 	}
 
-	private File createTemporaryFolderIn(File parentFolder) throws IOException {
+	private File createTemporary(File parentFolder) throws IOException {
 		File createdFolder = File.createTempFile("junit", "", parentFolder);
 		createdFolder.delete();
 		createdFolder.mkdir();
 		return createdFolder;
 	}
 
-	/**
-	 * @return the location of this temporary folder.
-	 */
 	public File toFile() {
 		return folder;
 	}
