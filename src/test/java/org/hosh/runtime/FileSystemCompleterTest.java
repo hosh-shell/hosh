@@ -120,7 +120,7 @@ public class FileSystemCompleterTest {
 	@Test
 	public void partialMatchDirectory() throws IOException {
 		given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
-		temporaryFolder.newFolder("aaa", "bbb");
+		temporaryFolder.newFolder(temporaryFolder.newFolder("aaa"), "bbb");
 		given(line.word()).willReturn("aaa" + File.separator + "b");
 		sut.complete(lineReader, line, candidates);
 		then(candidates).should(Mockito.atLeastOnce()).add(DebuggableCandidate.complete("aaa" + File.separator + "bbb"));
