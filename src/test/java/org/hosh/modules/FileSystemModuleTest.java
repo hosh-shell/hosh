@@ -287,16 +287,17 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 		}
 
 		@Test
 		public void twoArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList("asd", "asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 		}
 
 		@Test
