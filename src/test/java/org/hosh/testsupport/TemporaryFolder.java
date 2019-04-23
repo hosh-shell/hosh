@@ -21,15 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/**
- * JUnit
- *
- * Eclipse Public License - v 1.0
- *
- * THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC 
- * LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM
- * CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
- */
 package org.hosh.testsupport;
 
 import java.io.File;
@@ -41,39 +32,32 @@ import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
- * JUnit 4.12 org.junit.rules.TemporaryFolder rule re-arranged as JUnit 5
- * extension
+ * Heavily inspired by JUnit 4.12 TemporaryFolder
  */
 public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEachCallback {
 
-	private final File parentFolder;
-
 	private File folder;
-
-	public TemporaryFolder() {
-		this(null);
-	}
-
-	public TemporaryFolder(File parentFolder) {
-		this.parentFolder = parentFolder;
-	}
 
 	@Override
 	public void beforeEach(ExtensionContext context) throws Exception {
-		create();
+		folder = createTemporaryFolderIn(null);
 	}
 
 	@Override
 	public void afterEach(ExtensionContext context) throws Exception {
-		delete();
+		if (folder != null) {
+			recursiveDelete(folder);
+		}
 	}
 
-	// testing purposes only
-	/**
-	 * for testing purposes only. Do not use.
-	 */
-	public void create() throws IOException {
-		folder = createTemporaryFolderIn(parentFolder);
+	private void recursiveDelete(File file) {
+		File[] files = file.listFiles();
+		if (files != null) {
+			for (File each : files) {
+				recursiveDelete(each);
+			}
+		}
+		file.delete();
 	}
 
 	/**
@@ -158,30 +142,6 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	 * @return the location of this temporary folder.
 	 */
 	public File getRoot() {
-		if (folder == null) {
-			throw new IllegalStateException(
-					"the temporary folder has not yet been created");
-		}
 		return folder;
-	}
-
-	/**
-	 * Delete all files and folders under the temporary folder. Usually not
-	 * called directly, since it is automatically applied by the {@link Rule}
-	 */
-	public void delete() {
-		if (folder != null) {
-			recursiveDelete(folder);
-		}
-	}
-
-	private void recursiveDelete(File file) {
-		File[] files = file.listFiles();
-		if (files != null) {
-			for (File each : files) {
-				recursiveDelete(each);
-			}
-		}
-		file.delete();
 	}
 }
