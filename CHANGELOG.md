@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
    - no directory operation yet, only files
    - no overwrites
 - autocomplete of any executable in PATH
+- JUnit 4.x -> 5.x
 
 ## [0.0.29] - 2019-04-19
 - removed comand 'source'
