@@ -29,16 +29,16 @@ import java.util.Optional;
 
 import org.hosh.spi.Record;
 import org.hosh.testsupport.WithThread;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class PipelineChannelTest {
 
-	@Rule
+	@RegisterExtension
 	public final WithThread withThread = new WithThread();
 
 	@Mock(stubOnly = true)

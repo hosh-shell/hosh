@@ -32,18 +32,18 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import org.hosh.testsupport.WithTimeZone;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class AnsiFormatterTest {
 
-	@Rule
-	public final WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("PST"));
+	@RegisterExtension
+	public WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("PST"));
 
 	@Mock(stubOnly = true)
 	private LogRecord logRecord;

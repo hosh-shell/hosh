@@ -38,40 +38,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.spi.Values.AlphaNumericStringComparator;
-import org.hosh.spi.ValuesTest.AlphaNumericStringComparatorTest;
-import org.hosh.spi.ValuesTest.DurationValueTest;
-import org.hosh.spi.ValuesTest.InstantValueTest;
-import org.hosh.spi.ValuesTest.NoneValueTest;
-import org.hosh.spi.ValuesTest.NumericValueTest;
-import org.hosh.spi.ValuesTest.PathValueTest;
-import org.hosh.spi.ValuesTest.SizeValueTest;
-import org.hosh.spi.ValuesTest.SortingBetweenValuesTest;
-import org.hosh.spi.ValuesTest.TextValueTest;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		NoneValueTest.class,
-		InstantValueTest.class,
-		DurationValueTest.class,
-		TextValueTest.class,
-		NumericValueTest.class,
-		SizeValueTest.class,
-		PathValueTest.class,
-		AlphaNumericStringComparatorTest.class,
-		SortingBetweenValuesTest.class
-})
 public class ValuesTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class NoneValueTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class NoneValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -98,8 +77,9 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class DurationValueTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class DurationValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -135,8 +115,9 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class InstantValueTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class InstantValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -172,8 +153,9 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class TextValueTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class TextValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -240,8 +222,9 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class NumericValueTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class NumericValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -276,8 +259,9 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class SizeValueTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class SizeValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -335,8 +319,9 @@ public class ValuesTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class PathValueTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class PathValueTest {
 
 		@Mock
 		private PrintWriter printWriter;
@@ -365,7 +350,8 @@ public class ValuesTest {
 		}
 	}
 
-	public static class AlphaNumericStringComparatorTest {
+	@Nested
+	public class AlphaNumericStringComparatorTest {
 
 		@Test
 		public void sortLetters() {
@@ -431,7 +417,8 @@ public class ValuesTest {
 		}
 	}
 
-	public static class SortingBetweenValuesTest {
+	@Nested
+	public class SortingBetweenValuesTest {
 
 		@Test
 		public void instantWithNone() {

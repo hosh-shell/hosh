@@ -39,26 +39,20 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		TerminalModuleTest.ClearTest.class,
-		TerminalModuleTest.BellTest.class,
-		TerminalModuleTest.DumpTest.class,
-})
 public class TerminalModuleTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class ClearTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ClearTest {
 
 		@Mock
 		private Channel in;
@@ -99,8 +93,9 @@ public class TerminalModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class BellTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class BellTest {
 
 		@Mock
 		private Channel in;
@@ -141,8 +136,9 @@ public class TerminalModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class DumpTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class DumpTest {
 
 		@Mock
 		private Channel in;

@@ -39,14 +39,14 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class PipelineCommandTest {
 
 	@Mock
@@ -75,17 +75,12 @@ public class PipelineCommandTest {
 
 	private PipelineCommand sut;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		sut = new PipelineCommand(producer, consumer);
 		sut.setInterpreter(interpreter);
-	}
-
-	@Test
-	public void repr() {
-		assertThat(sut).hasToString("PipelineCommand[producer=producer,consumer=consumer]");
 	}
 
 	@Test

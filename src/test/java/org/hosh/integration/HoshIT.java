@@ -35,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,36 +45,20 @@ import java.util.stream.Stream;
 
 import org.hosh.doc.Bug;
 import org.hosh.doc.Todo;
-import org.hosh.testsupport.IgnoreIf;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestName;
+import org.hosh.testsupport.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class HoshIT {
 
-	@Rule
+	@RegisterExtension
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-	@Rule
-	public final IgnoreIf ignoreIf = new IgnoreIf();
-
-	@Rule
-	public final TestName testName = new TestName();
-
-	private long nanos;
-
-	@Before
-	public void startTest() {
-		System.out.print("  " + testName.getMethodName());
-		nanos = System.nanoTime();
-	}
-
-	@After
-	public void stopTest() {
-		System.out.printf("...  %sms%n", Duration.ofNanos(System.nanoTime() - nanos).toMillis());
+	@AfterEach
+	void beforeEach(TestInfo testInfo) {
+		System.out.println(testInfo.getDisplayName());
 	}
 
 	@Test
@@ -117,13 +100,13 @@ public class HoshIT {
 	@Test
 	public void scriptWithCdAndCwd() throws Exception {
 		Path scriptPath = givenScript(
-				"cd " + temporaryFolder.getRoot().getAbsolutePath(),
+				"cd " + temporaryFolder.toPath().toAbsolutePath(),
 				"cwd"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).contains(temporaryFolder.getRoot().getAbsolutePath());
+		assertThat(output).contains(temporaryFolder.toPath().toAbsolutePath().toString());
 		assertThat(exitCode).isEqualTo(0);
 	}
 

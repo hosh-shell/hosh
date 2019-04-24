@@ -30,7 +30,7 @@ import org.hosh.spi.Record.Empty;
 import org.hosh.spi.Record.Entry;
 import org.hosh.spi.Record.Generic;
 import org.hosh.spi.Record.Singleton;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 

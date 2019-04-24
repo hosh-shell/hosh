@@ -61,39 +61,23 @@ import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		SystemModuleTest.EchoTest.class,
-		SystemModuleTest.EnvTest.class,
-		SystemModuleTest.ExitTest.class,
-		SystemModuleTest.HelpCommandTest.class,
-		SystemModuleTest.SleepTest.class,
-		SystemModuleTest.ProcessListTest.class,
-		SystemModuleTest.ErrTest.class,
-		SystemModuleTest.BenchmarkTest.class,
-		SystemModuleTest.WithTimeTest.class,
-		SystemModuleTest.SinkTest.class,
-		SystemModuleTest.SetVariableTest.class,
-		SystemModuleTest.UnsetVariableTest.class,
-		SystemModuleTest.KillProcessTest.class,
-})
 public class SystemModuleTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class ExitTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ExitTest {
 
 		@Spy
 		private State state = new State();
@@ -151,8 +135,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class EnvTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class EnvTest {
 
 		@Mock(stubOnly = true)
 		private State state;
@@ -204,8 +189,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class HelpCommandTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class HelpCommandTest {
 
 		@Mock
 		private Channel in;
@@ -310,7 +296,7 @@ public class SystemModuleTest {
 		@Examples({
 				@Example(command = "true", description = "returns exit success")
 		})
-		private static class True implements Command {
+		private class True implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -319,7 +305,7 @@ public class SystemModuleTest {
 		}
 
 		@Help(description = "/bin/false replacement")
-		private static class False implements Command {
+		private class False implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -328,7 +314,7 @@ public class SystemModuleTest {
 		}
 
 		// no help and no examples
-		private static class Star implements Command {
+		private class Star implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
@@ -337,8 +323,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class EchoTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class EchoTest {
 
 		@Mock
 		private Channel in;
@@ -380,10 +367,11 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class SleepTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class SleepTest {
 
-		@Rule
+		@RegisterExtension
 		public final WithThread withThread = new WithThread();
 
 		@Mock
@@ -445,8 +433,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class ProcessListTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ProcessListTest {
 
 		@Mock
 		private Channel in;
@@ -479,8 +468,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class ErrTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ErrTest {
 
 		@Mock
 		private Channel in;
@@ -502,8 +492,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class SinkTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class SinkTest {
 
 		@Mock(stubOnly = true)
 		private Record record;
@@ -532,8 +523,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class BenchmarkTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class BenchmarkTest {
 
 		@Mock
 		private Channel in;
@@ -616,8 +608,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class WithTimeTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class WithTimeTest {
 
 		@Mock
 		private Channel in;
@@ -635,8 +628,8 @@ public class SystemModuleTest {
 		public void usage() {
 			Long resource = sut.before(Collections.emptyList(), in, out, err);
 			sut.after(resource, in, out, err);
-			then(out).should().send(Mockito.any());
 			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Mockito.any());
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -653,8 +646,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class SetVariableTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class SetVariableTest {
 
 		@Mock
 		private Channel in;
@@ -711,8 +705,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class UnsetVariableTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class UnsetVariableTest {
 
 		@Mock
 		private Channel in;
@@ -760,8 +755,9 @@ public class SystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class KillProcessTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class KillProcessTest {
 
 		@Mock(stubOnly = true)
 		private ProcessHandle processHandle;

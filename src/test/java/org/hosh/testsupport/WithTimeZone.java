@@ -25,9 +25,12 @@ package org.hosh.testsupport;
 
 import java.util.TimeZone;
 
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class WithTimeZone extends ExternalResource {
+public class WithTimeZone implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
 	private final TimeZone wanted;
 
@@ -38,13 +41,13 @@ public class WithTimeZone extends ExternalResource {
 	}
 
 	@Override
-	protected void before() {
+	public void beforeTestExecution(ExtensionContext context) throws Exception {
 		backup = TimeZone.getDefault();
 		TimeZone.setDefault(wanted);
 	}
 
 	@Override
-	protected void after() {
+	public void afterTestExecution(ExtensionContext context) throws Exception {
 		TimeZone.setDefault(backup);
 	}
 }

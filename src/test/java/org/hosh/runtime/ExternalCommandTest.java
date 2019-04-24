@@ -50,22 +50,22 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.TemporaryFolder;
 import org.hosh.testsupport.WithThread;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.StrictStubs.class)
+@ExtendWith(MockitoExtension.class)
 public class ExternalCommandTest {
 
-	@Rule
+	@RegisterExtension
 	public final WithThread withThread = new WithThread();
 
-	@Rule
+	@RegisterExtension
 	public final TemporaryFolder folder = new TemporaryFolder();
 
 	@Mock(stubOnly = true)
@@ -90,7 +90,7 @@ public class ExternalCommandTest {
 
 	private ExternalCommand sut;
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		executable = folder.newFile().toPath();
 		sut = new ExternalCommand(executable);

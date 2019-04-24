@@ -23,16 +23,13 @@
  */
 package org.hosh.runtime;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.hosh.doc.Bug;
 import org.hosh.runtime.Parser.ParseError;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 public class ParserTest {
-
-	@Rule
-	public final ExpectedException expectedException = ExpectedException.none();
 
 	private final Parser sut = new Parser();
 
@@ -96,16 +93,20 @@ public class ParserTest {
 
 	@Test
 	public void lexerError() {
-		expectedException.expect(ParseError.class);
-		expectedException.expectMessage("line 1:0: token recognition error at: '!'");
-		sut.parse("!");
+		assertThatThrownBy(() -> {
+			sut.parse("!");
+		})
+				.isInstanceOf(ParseError.class)
+				.hasMessage("line 1:0: token recognition error at: '!'");
 	}
 
 	@Test
 	public void refuseSpaceInsideVariableExpansion() {
-		expectedException.expect(ParseError.class);
-		expectedException.expectMessage("line 1:0: token recognition error at: '${ '");
-		sut.parse("${ EXECUTABLE }");
+		assertThatThrownBy(() -> {
+			sut.parse("${ EXECUTABLE }");
+		})
+				.isInstanceOf(ParseError.class)
+				.hasMessage("line 1:0: token recognition error at: '${ '");
 	}
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")

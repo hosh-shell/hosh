@@ -53,42 +53,26 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
-import org.hosh.testsupport.IgnoreIf;
-import org.hosh.testsupport.IgnoreIf.CannotCreateSymbolicLinks;
-import org.hosh.testsupport.IgnoreIf.IgnoredIf;
-import org.hosh.testsupport.IgnoreIf.OnWindows;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.hosh.testsupport.TemporaryFolder;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-		FileSystemModuleTest.ListTest.class,
-		FileSystemModuleTest.ChangeDirectoryTest.class,
-		FileSystemModuleTest.CurrentWorkingDirectoryTest.class,
-		FileSystemModuleTest.LinesTest.class,
-		FileSystemModuleTest.FindTest.class,
-		FileSystemModuleTest.CopyTest.class,
-		FileSystemModuleTest.MoveTest.class,
-		FileSystemModuleTest.RemoveTest.class,
-})
 public class FileSystemModuleTest {
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class ListTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ListTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-		@Rule
-		public final IgnoreIf ignoreIf = new IgnoreIf();
 
 		@Mock(stubOnly = true)
 		private State state;
@@ -116,7 +100,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void zeroArgsWithEmptyDirectory() {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -126,7 +110,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void zeroArgsWithOneDirectory() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			temporaryFolder.newFolder("dir").mkdir();
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -141,7 +125,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void zeroArgsWithOneFile() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			temporaryFolder.newFile("file").createNewFile();
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -154,7 +138,7 @@ public class FileSystemModuleTest {
 		@Test
 		public void oneArgWithRelativeFile() throws IOException {
 			Path file = temporaryFolder.newFile().toPath();
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(Arrays.asList(file.getFileName().toString()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -176,7 +160,7 @@ public class FileSystemModuleTest {
 		public void oneArgWithNonEmptyDirectory() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Files.createFile(new File(newFolder, "aaa").toPath());
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(Arrays.asList(newFolder.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -203,7 +187,7 @@ public class FileSystemModuleTest {
 		public void oneArgAbsoluteFile() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Path path = Files.createFile(new File(newFolder, "aaa").toPath()).toAbsolutePath();
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(Arrays.asList(path.toString()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -215,7 +199,7 @@ public class FileSystemModuleTest {
 		public void oneArgAbsoluteDir() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Files.createFile(new File(newFolder, "aaa").toPath());
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(Arrays.asList(newFolder.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -230,7 +214,7 @@ public class FileSystemModuleTest {
 		@Test
 		public void listDot() throws IOException {
 			temporaryFolder.newFile("aaa");
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(Arrays.asList("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -259,15 +243,15 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
-		@IgnoredIf(description = "File.setReadable() fails on windows", condition = OnWindows.class)
+		@DisabledOnOs(OS.WINDOWS) // File.setReadable() fails on windows
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test
 		public void accessDenied() {
-			File cwd = temporaryFolder.getRoot();
+			File cwd = temporaryFolder.toFile();
 			assert cwd.exists();
 			assert cwd.setReadable(false, true);
 			assert cwd.setExecutable(false, true);
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath().toAbsolutePath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -276,10 +260,11 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class ChangeDirectoryTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ChangeDirectoryTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock
@@ -302,21 +287,22 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 		}
 
 		@Test
 		public void twoArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList("asd", "asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
+			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 		}
 
 		@Test
 		public void oneDirectoryRelativeArgument() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFolder = temporaryFolder.newFolder("dir");
 			ExitStatus exitStatus = sut.run(Arrays.asList("dir"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -339,7 +325,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void oneFileArgument() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isError();
@@ -350,10 +336,11 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class CurrentWorkingDirectoryTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class CurrentWorkingDirectoryTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -373,11 +360,11 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Record.of(Keys.PATH, Values.ofPath(temporaryFolder.getRoot().toPath())));
+			then(out).should().send(Record.of(Keys.PATH, Values.ofPath(temporaryFolder.toPath())));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -391,10 +378,11 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class LinesTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class LinesTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -440,7 +428,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void nonEmptyFileInCwd() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("data.txt");
 			try (FileWriter writer = new FileWriter(newFile, StandardCharsets.UTF_8)) {
 				writer.write("a 1\n");
@@ -455,7 +443,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void directory() {
-			ExitStatus exitStatus = sut.run(Arrays.asList(temporaryFolder.getRoot().getAbsolutePath()), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
@@ -472,10 +460,11 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class CopyTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class CopyTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -513,7 +502,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void copyRelativeToRelative() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File source = temporaryFolder.newFile("source.txt");
 			File target = temporaryFolder.newFile("target.txt");
 			assert target.delete();
@@ -541,10 +530,11 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class MoveTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class MoveTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -582,7 +572,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void moveRelativeToRelative() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File source = temporaryFolder.newFile("source.txt");
 			File target = temporaryFolder.newFile("target.txt");
 			assert target.delete();
@@ -610,10 +600,11 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class RemoveTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class RemoveTest {
 
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -642,7 +633,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void removeRelative() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			ExitStatus exitStatus = sut.run(Arrays.asList(target.getName()), in, out, err);
 			assertThat(target.exists()).isFalse();
@@ -664,13 +655,11 @@ public class FileSystemModuleTest {
 		}
 	}
 
-	@RunWith(MockitoJUnitRunner.StrictStubs.class)
-	public static class FindTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class FindTest {
 
-		@Rule
-		public final IgnoreIf ignoreIf = new IgnoreIf();
-
-		@Rule
+		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
@@ -699,7 +688,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void relativePath() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(Arrays.asList("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -710,7 +699,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void nonExistentRelativePath() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			assert newFile.delete();
 			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getName()), in, out, err);
@@ -723,7 +712,7 @@ public class FileSystemModuleTest {
 		@Test
 		public void absolutePath() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
-			ExitStatus exitStatus = sut.run(Arrays.asList(temporaryFolder.getRoot().getAbsolutePath()), in, out, err);
+			ExitStatus exitStatus = sut.run(Arrays.asList(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(out).should().send(Record.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
 			then(err).shouldHaveZeroInteractions();
@@ -741,12 +730,14 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 		}
 
-		@IgnoredIf(description = "on Windows 7 a special permission is needed to create symlinks (see https://stackoverflow.com/a/24353758)", condition = CannotCreateSymbolicLinks.class)
+		// on Windows a special permission is needed to create symlinks, see
+		// https://stackoverflow.com/a/24353758
+		@DisabledOnOs(OS.WINDOWS)
 		@Test
 		public void resolveSymlinks() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.getRoot().toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFolder = temporaryFolder.newFolder("folder");
-			File symlink = new File(temporaryFolder.getRoot(), "symlink");
+			File symlink = new File(temporaryFolder.toFile(), "symlink");
 			Files.createSymbolicLink(symlink.toPath(), newFolder.toPath());
 			ExitStatus exitStatus = sut.run(Arrays.asList("symlink"), in, out, err);
 			assertThat(exitStatus).isSuccess();
