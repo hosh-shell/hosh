@@ -213,13 +213,6 @@ public class ValuesTest {
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("styles cannot be null");
 		}
-
-		@Test
-		public void nullStyle() {
-			assertThatThrownBy(() -> Values.ofStyledText("asd", new Ansi.Style[] { null }))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("style cannot be null");
-		}
 	}
 
 	@Nested
