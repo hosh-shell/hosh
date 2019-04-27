@@ -37,18 +37,18 @@
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal</artifactId>
-			<version>3.10.0</version>
+			<version>3.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal-jna</artifactId>
-			<version>3.10.0</version>
+			<version>3.11.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-reader</artifactId>
-			<version>3.10.0</version>
+			<version>3.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
