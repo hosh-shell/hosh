@@ -113,7 +113,6 @@ public class Hosh {
 				.map(Paths::get)
 				.collect(Collectors.toList());
 		State state = new State();
-		state.setId(1);
 		state.setCwd(Paths.get("."));
 		state.getVariables().putAll(System.getenv());
 		state.setPath(path);
@@ -170,7 +169,7 @@ public class Hosh {
 						new ExecutableInPathCompleter(state)))
 				.terminal(terminal)
 				.build();
-		Prompt prompt = new Prompt(state);
+		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);
 		while (true) {
 			Optional<String> line = reader.read();
@@ -183,7 +182,6 @@ public class Hosh {
 				if (state.isExit()) {
 					return exitStatus;
 				}
-				state.setId(state.getId() + 1);
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line), e);
 				err.send(Record.of(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));

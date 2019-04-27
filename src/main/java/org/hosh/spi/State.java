@@ -49,9 +49,6 @@ public class State {
 	// current working directory
 	private Path cwd;
 
-	// current command id: used by the REPL
-	private int id;
-
 	// PATH
 	private List<Path> path = new ArrayList<>();
 
@@ -74,14 +71,6 @@ public class State {
 		return variables;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getId() {
-		return id;
-	}
-
 	public List<Path> getPath() {
 		return path;
 	}
@@ -100,6 +89,6 @@ public class State {
 
 	@Override
 	public String toString() {
-		return String.format("State[cwd='%s',id=%s,path=%s,variables=%s,commands=%s]", cwd, id, path, variables, commands);
+		return String.format("State[cwd='%s',path=%s,variables=%s,commands=%s]", cwd, path, variables, commands);
 	}
 }

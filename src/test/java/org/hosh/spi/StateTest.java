@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 public class StateTest {
 
 	@Test
-	public void string() {
-		assertThat(new State()).hasToString("State[cwd='null',id=0,path=[],variables={},commands={}]");
+	public void repr() {
+		assertThat(new State()).hasToString("State[cwd='null',path=[],variables={},commands={}]");
 	}
 }
