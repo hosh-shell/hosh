@@ -36,6 +36,9 @@ import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Record;
 import org.hosh.spi.Values;
 
+/**
+ * A "private" channel implementation used by {@see PipelineCommand}.
+ */
 public class PipelineChannel implements Channel {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
@@ -61,7 +64,7 @@ public class PipelineChannel implements Channel {
 			LOGGER.finer("waiting for record... ");
 			Record record = queue.take();
 			if (record == poisonPill) {
-				LOGGER.finer("got POISON_PILL... ");
+				LOGGER.finer("got poison pill");
 				done = true;
 				return Optional.empty();
 			}
