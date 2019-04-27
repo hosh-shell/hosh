@@ -93,7 +93,7 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void hasSecureDirectoryStream() throws IOException {
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(temporaryFolder.getRoot().toPath())) {
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(temporaryFolder.toPath())) {
 				assertThat(stream).isInstanceOf(SecureDirectoryStream.class);
 			}
 		}
