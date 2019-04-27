@@ -31,13 +31,13 @@ import org.hosh.spi.Ansi;
 
 public class Prompt {
 
-	@Todo(description = "this should be user-configurable")
+	@Todo(description = "this should be user-configurable with a command")
 	public String compute() {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
-		Ansi.Style.FG_GREEN.enable(pw);
-		pw.append("hosh:");
-		Ansi.Style.FG_GREEN.enable(pw);
+		Ansi.Style.FG_CYAN.enable(pw);
+		pw.append("hosh");
+		Ansi.Style.FG_CYAN.disable(pw);
 		pw.append("> ");
 		Ansi.Style.RESET.enable(pw);
 		return sw.toString();
