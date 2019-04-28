@@ -52,6 +52,7 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.Value;
@@ -90,7 +91,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() > 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected at most 1 argument")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected at most 1 argument")));
 				return ExitStatus.error();
 			}
 			final Path cwd = state.getCwd();
@@ -103,7 +104,7 @@ public class FileSystemModule implements Module {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(followSymlinksRecursively(dir))) {
 				for (Path path : stream) {
 					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
-					Record entry = Record.builder()
+					Record entry = Records.builder()
 							.entry(Keys.PATH, Values.ofPath(path.getFileName()))
 							.entry(Keys.SIZE, size)
 							.build();
@@ -111,10 +112,10 @@ public class FileSystemModule implements Module {
 				}
 				return ExitStatus.success();
 			} catch (NotDirectoryException e) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("not a directory: " + e.getMessage())));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("not a directory: " + e.getMessage())));
 				return ExitStatus.error();
 			} catch (AccessDeniedException e) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("access denied: " + e.getMessage())));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + e.getMessage())));
 				return ExitStatus.error();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -138,10 +139,10 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
 			}
-			out.send(Record.of(Keys.PATH, Values.ofPath(state.getCwd())));
+			out.send(Records.singleton(Keys.PATH, Values.ofPath(state.getCwd())));
 			return ExitStatus.success();
 		}
 	}
@@ -163,12 +164,12 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 				return ExitStatus.error();
 			}
 			Path newCwd = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			if (!Files.isDirectory(newCwd)) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("not a directory")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
 				return ExitStatus.error();
 			}
 			state.setCwd(newCwd);
@@ -192,16 +193,16 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one path argument")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one path argument")));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			if (!Files.isRegularFile(source)) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("not readable file")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("not readable file")));
 				return ExitStatus.error();
 			}
 			try (Stream<String> lines = Files.lines(source, StandardCharsets.UTF_8)) {
-				lines.forEach(line -> out.send(Record.of(Keys.TEXT, Values.ofText(line))));
+				lines.forEach(line -> out.send(Records.singleton(Keys.TEXT, Values.ofText(line))));
 				return ExitStatus.success();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -226,18 +227,18 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			try (Stream<Path> stream = Files.walk(followSymlinksRecursively(target))) {
 				stream.forEach(path -> {
-					Record result = Record.of(Keys.PATH, Values.ofPath(path.toAbsolutePath()));
+					Record result = Records.singleton(Keys.PATH, Values.ofPath(path.toAbsolutePath()));
 					out.send(result);
 				});
 				return ExitStatus.success();
 			} catch (NoSuchFileException e) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("path does not exist: " + e.getFile())));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + e.getFile())));
 				return ExitStatus.error();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -262,7 +263,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -293,7 +294,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("usage: source target")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -324,7 +325,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("usage: rm target")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: rm target")));
 				return ExitStatus.error();
 			}
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -356,7 +357,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
 			}
 			Path dir = state.getCwd();
@@ -388,7 +389,7 @@ public class FileSystemModule implements Module {
 					}
 					@SuppressWarnings("unchecked")
 					WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
-					out.send(Record.builder()
+					out.send(Records.builder()
 							.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
 							.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
 							.build());

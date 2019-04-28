@@ -61,7 +61,7 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
-import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.jline.reader.LineReader;
@@ -141,7 +141,7 @@ public class Hosh {
 			return interpreter.eval(program);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "caught exception", e);
-			err.send(Record.of(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+			err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
 			return ExitStatus.error();
 		}
 	}
@@ -184,17 +184,17 @@ public class Hosh {
 				}
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line), e);
-				err.send(Record.of(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
 			}
 		}
 		return ExitStatus.success();
 	}
 
 	private static void welcome(Channel out, String version) {
-		out.send(Record.of(Keys.TEXT, Values.ofText("hosh " + version)));
-		out.send(Record.of(Keys.TEXT, Values.ofText("Running on Java " + System.getProperty("java.version"))));
-		out.send(Record.of(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));
-		out.send(Record.of(Keys.TEXT, Values.ofText("Locale is " + Locale.getDefault().toString())));
-		out.send(Record.of(Keys.TEXT, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
+		out.send(Records.singleton(Keys.TEXT, Values.ofText("hosh " + version)));
+		out.send(Records.singleton(Keys.TEXT, Values.ofText("Running on Java " + System.getProperty("java.version"))));
+		out.send(Records.singleton(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));
+		out.send(Records.singleton(Keys.TEXT, Values.ofText("Locale is " + Locale.getDefault().toString())));
+		out.send(Records.singleton(Keys.TEXT, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
 	}
 }

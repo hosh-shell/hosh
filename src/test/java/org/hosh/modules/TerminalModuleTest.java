@@ -35,7 +35,7 @@ import org.hosh.modules.TerminalModule.Dump;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
-import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.Values;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
@@ -88,7 +88,7 @@ public class TerminalModuleTest {
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no arguments expected")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -131,7 +131,7 @@ public class TerminalModuleTest {
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no arguments expected")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

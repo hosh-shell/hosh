@@ -40,7 +40,7 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
-import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.Values;
 
 /**
@@ -92,7 +92,7 @@ public class Supervisor implements AutoCloseable {
 		} catch (ExecutionException e) {
 			LOGGER.log(Level.SEVERE, "caught exception", e);
 			String message = messageFor(e);
-			err.send(Record.of(Keys.ERROR, Values.ofText(message)));
+			err.send(Records.singleton(Keys.ERROR, Values.ofText(message)));
 			return ExitStatus.error();
 		} finally {
 			restoreDefaultSigintHandler();

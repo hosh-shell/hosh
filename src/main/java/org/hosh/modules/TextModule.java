@@ -56,7 +56,7 @@ import org.hosh.spi.Key;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
-import org.hosh.spi.Record.Builder;
+import org.hosh.spi.Records;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
@@ -89,7 +89,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 2 arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -106,7 +106,7 @@ public class TextModule implements Module {
 					PrintWriter pw = new PrintWriter(sw);
 					record.print(pw, Locale.getDefault());
 					Matcher matcher = pattern.matcher(sw.toString());
-					Builder builder = Record.builder();
+					Records.Builder builder = Records.builder();
 					if (matcher.find()) {
 						for (String groupName : groupNames) {
 							builder.entry(Keys.of(groupName), Values.ofText(matcher.group(groupName)));
@@ -138,7 +138,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -148,7 +148,7 @@ public class TextModule implements Module {
 				}
 				Record record = incoming.get();
 				String schema = record.keys().stream().map(Key::name).collect(Collectors.joining(" "));
-				out.send(Record.of(Keys.of("schema"), Values.ofText(schema)));
+				out.send(Records.singleton(Keys.of("schema"), Values.ofText(schema)));
 			}
 		}
 	}
@@ -162,7 +162,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -190,7 +190,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			long i = 1;
@@ -216,7 +216,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -240,7 +240,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
@@ -271,7 +271,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
@@ -302,7 +302,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -346,12 +346,12 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
 			}
 			int take = Integer.parseInt(args.get(0));
 			if (take < 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -379,12 +379,12 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
 			}
 			int drop = Integer.parseInt(args.get(0));
 			if (drop < 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 				return ExitStatus.error();
 			}
 			while (true) {
@@ -414,13 +414,13 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			Random random = ThreadLocalRandom.current();
 			while (true) {
 				long next = random.nextLong();
-				Record of = Record.of(Keys.RAND, Values.ofNumeric(next));
+				Record of = Records.singleton(Keys.RAND, Values.ofNumeric(next));
 				out.send(of);
 			}
 		}
@@ -435,14 +435,14 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			long count = 0;
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					out.send(Record.of(Keys.COUNT, Values.ofNumeric(count)));
+					out.send(Records.singleton(Keys.COUNT, Values.ofNumeric(count)));
 					return ExitStatus.success();
 				} else {
 					count++;
@@ -462,7 +462,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			boolean headerSent = false;
@@ -495,7 +495,7 @@ public class TextModule implements Module {
 				formattedValues.add(writer.toString());
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
-			out.send(Record.of(Keys.of("row"), Values.ofStyledText(row, alternateColor())));
+			out.send(Records.singleton(Keys.of("row"), Values.ofStyledText(row, alternateColor())));
 		}
 
 		private Style alternateColor() {
@@ -512,7 +512,7 @@ public class TextModule implements Module {
 					.map(this::formatterFor)
 					.collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
-			out.send(Record.of(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.BOLD, Ansi.Style.FG_CYAN)));
+			out.send(Records.singleton(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.BOLD, Ansi.Style.FG_CYAN)));
 		}
 
 		@Todo(description = "be aware of width of unicode char, see https://github.com/joshuarubin/wcwidth9")

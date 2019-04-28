@@ -59,6 +59,7 @@ import org.hosh.spi.Key;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.Values;
@@ -95,7 +96,7 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			Record record = Record.of(Keys.VALUE, Values.ofText(String.join(" ", args)));
+			Record record = Records.singleton(Keys.VALUE, Values.ofText(String.join(" ", args)));
 			out.send(record);
 			return ExitStatus.success();
 		}
@@ -117,12 +118,12 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
 			}
 			Map<String, String> variables = state.getVariables();
 			for (var entry : variables.entrySet()) {
-				Record record = Record.builder()
+				Record record = Records.builder()
 						.entry(Keys.NAME, Values.ofText(entry.getKey()))
 						.entry(Keys.VALUE, Values.ofText(entry.getValue()))
 						.build();
@@ -160,11 +161,11 @@ public class SystemModule implements Module {
 						state.setExit(true);
 						return exitStatus.get();
 					} else {
-						err.send(Record.of(Keys.ERROR, Values.ofText("not a valid exit status: " + arg)));
+						err.send(Records.singleton(Keys.ERROR, Values.ofText("not a valid exit status: " + arg)));
 						return ExitStatus.error();
 					}
 				default:
-					err.send(Record.of(Keys.ERROR, Values.ofText("too many arguments")));
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 					return ExitStatus.error();
 			}
 		}
@@ -189,34 +190,34 @@ public class SystemModule implements Module {
 			if (args.size() == 0) {
 				Set<String> commands = state.getCommands().keySet();
 				for (String command : commands) {
-					out.send(Record.of(Keys.TEXT, Values.ofText(command)));
+					out.send(Records.singleton(Keys.TEXT, Values.ofText(command)));
 				}
 				return ExitStatus.success();
 			} else if (args.size() == 1) {
 				String commandName = args.get(0);
 				Class<? extends Command> commandClass = state.getCommands().get(commandName);
 				if (commandClass == null) {
-					err.send(Record.of(Keys.ERROR, Values.ofText("command not found: " + commandName)));
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("command not found: " + commandName)));
 					return ExitStatus.error();
 				}
 				Help help = commandClass.getAnnotation(Help.class);
 				if (help == null) {
-					err.send(Record.of(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
 					return ExitStatus.error();
 				}
-				out.send(Record.of(Keys.TEXT, Values.ofStyledText(commandName + " - " + help.description(), Style.BOLD)));
+				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(commandName + " - " + help.description(), Style.BOLD)));
 				Examples examples = commandClass.getAnnotation(Examples.class);
-				out.send(Record.of(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
+				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
 				if (examples != null) {
 					for (Example ex : examples.value()) {
-						out.send(Record.of(Keys.TEXT, Values.ofStyledText(ex.command() + " - " + ex.description(), Style.ITALIC)));
+						out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(ex.command() + " - " + ex.description(), Style.ITALIC)));
 					}
 				} else {
-					out.send(Record.of(Keys.TEXT, Values.ofStyledText("N/A", Style.FG_RED)));
+					out.send(Records.singleton(Keys.TEXT, Values.ofStyledText("N/A", Style.FG_RED)));
 				}
 				return ExitStatus.success();
 			} else {
-				err.send(Record.of(Keys.ERROR, Values.ofText("too many arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 				return ExitStatus.error();
 			}
 		}
@@ -231,7 +232,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting just one argument millis")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting just one argument millis")));
 				return ExitStatus.error();
 			}
 			String arg = args.get(0);
@@ -239,11 +240,11 @@ public class SystemModule implements Module {
 				Thread.sleep(Long.parseLong(arg));
 				return ExitStatus.success();
 			} catch (NumberFormatException e) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("not millis: " + arg)));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("not millis: " + arg)));
 				return ExitStatus.error();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				err.send(Record.of(Keys.ERROR, Values.ofText("interrupted")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 				return ExitStatus.error();
 			}
 		}
@@ -265,7 +266,7 @@ public class SystemModule implements Module {
 		public void after(Long startNanos, Channel in, Channel out, Channel err) {
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
-			out.send(Record.of(Keys.DURATION, Values.ofDuration(duration)));
+			out.send(Records.singleton(Keys.DURATION, Values.ofDuration(duration)));
 		}
 	}
 
@@ -278,12 +279,12 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting zero arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting zero arguments")));
 				return ExitStatus.error();
 			}
 			ProcessHandle.allProcesses().forEach(process -> {
 				Info info = process.info();
-				Record result = Record.builder()
+				Record result = Records.builder()
 						.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
 						.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
 						.entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
@@ -319,22 +320,22 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
 			if (!args.get(0).matches("[0-9]+")) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("not a valid pid: " + args.get(0))));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("not a valid pid: " + args.get(0))));
 				return ExitStatus.error();
 			}
 			long pid = Long.parseLong(args.get(0));
 			Optional<ProcessHandle> process = processLookup.of(pid);
 			if (process.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("cannot find pid: " + pid)));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("cannot find pid: " + pid)));
 				return ExitStatus.error();
 			}
 			boolean destroyed = process.get().destroy();
 			if (!destroyed) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("cannot destroy pid: " + pid)));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("cannot destroy pid: " + pid)));
 				return ExitStatus.error();
 			}
 			return ExitStatus.success();
@@ -382,7 +383,7 @@ public class SystemModule implements Module {
 			Duration worst = resource.results.stream().max(Comparator.naturalOrder()).orElse(Duration.ZERO);
 			int runs = resource.results.size();
 			Duration avg = runs == 0 ? Duration.ZERO : resource.results.stream().reduce(Duration.ZERO, (acc, d) -> acc.plus(d)).dividedBy(runs);
-			out.send(Record.builder()
+			out.send(Records.builder()
 					.entry(Keys.COUNT, Values.ofNumeric(runs))
 					.entry(BEST, Values.ofDuration(best))
 					.entry(WORST, Values.ofDuration(worst))
@@ -465,7 +466,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
@@ -491,7 +492,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("requires 1 argument: key")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("requires 1 argument: key")));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
@@ -518,7 +519,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 1) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
@@ -556,7 +557,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() <= 2) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("usage: filename [WRITE|APPEND|...]")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: filename [WRITE|APPEND|...]")));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();

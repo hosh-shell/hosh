@@ -34,7 +34,7 @@ import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
-import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.TerminalAware;
 import org.hosh.spi.Values;
 import org.jline.terminal.Attributes;
@@ -66,7 +66,8 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			Attributes attributes = terminal.getAttributes();
-			out.send(Record.builder()
+			out.send(Records
+					.builder()
 					.entry(Keys.of("type"), Values.ofText(terminal.getType()))
 					.entry(Keys.of("lflags"), Values.ofText(attributes.getLocalFlags().toString()))
 					.entry(Keys.of("iflags"), Values.ofText(attributes.getInputFlags().toString()))
@@ -94,7 +95,7 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("no arguments expected")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();
 			}
 			terminal.puts(InfoCmp.Capability.clear_screen);
@@ -119,7 +120,7 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("no arguments expected")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();
 			}
 			terminal.puts(InfoCmp.Capability.bell);

@@ -25,21 +25,17 @@ package org.hosh.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hosh.spi.Record.Builder;
-import org.hosh.spi.Record.Empty;
 import org.hosh.spi.Record.Entry;
-import org.hosh.spi.Record.Generic;
-import org.hosh.spi.Record.Singleton;
 import org.junit.jupiter.api.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-public class RecordTest {
+public class RecordsTest {
 
 	@Test
 	public void copy() {
-		Record a = Record.of(Keys.NAME, Values.ofText("a"));
-		Record b = Record.of(Keys.NAME, Values.ofText("a"));
+		Record a = Records.singleton(Keys.NAME, Values.ofText("a"));
+		Record b = Records.singleton(Keys.NAME, Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
 		assertThat(a).hasSameHashCodeAs(b);
 		assertThat(a.toString()).isEqualTo(b.toString());
@@ -47,7 +43,7 @@ public class RecordTest {
 
 	@Test
 	public void valueObject() {
-		Record a = Record.empty();
+		Record a = Records.empty();
 		Record b = a;
 		Record c = b.append(Keys.NAME, Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
@@ -57,15 +53,15 @@ public class RecordTest {
 
 	@Test
 	public void mutation() {
-		Record a = Record.empty();
-		Record b = Record.of(Keys.NAME, Values.ofText("a"));
+		Record a = Records.empty();
+		Record b = Records.singleton(Keys.NAME, Values.ofText("a"));
 		assertThat(a).isNotEqualTo(b);
 		assertThat(a).isNotSameAs(b);
 	}
 
 	@Test
 	public void representation() {
-		Record a = Record.empty();
+		Record a = Records.empty();
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
 		Record b = a.append(Keys.SIZE, Values.ofHumanizedSize(10));
 		assertThat(b.toString()).isEqualTo("Record[data={Key[size]=Size[10B]}]");
@@ -78,7 +74,8 @@ public class RecordTest {
 		Value value = Values.ofText("value");
 		Value anotherValue = Values.ofText("another_value");
 		Value lastValue = Values.ofText("lastValue");
-		Record a = Record.empty()
+		Record a = Records
+				.empty()
 				.append(Keys.of("key"), value)
 				.append(Keys.of("anotherkey"), anotherValue)
 				.prepend(Keys.of("first"), value)
@@ -89,23 +86,23 @@ public class RecordTest {
 
 	@Test
 	public void equalsContract() {
-		EqualsVerifier.forClass(Empty.class).verify();
-		EqualsVerifier.forClass(Singleton.class).verify();
-		EqualsVerifier.forClass(Generic.class).withNonnullFields("data").verify();
+		EqualsVerifier.forClass(Records.Empty.class).verify();
+		EqualsVerifier.forClass(Records.Singleton.class).verify();
+		EqualsVerifier.forClass(Records.Generic.class).withNonnullFields("data").verify();
 		EqualsVerifier.forClass(Entry.class).verify();
 	}
 
 	@Test
 	public void singletonEqualsGenericAndViceversa() {
-		Record singleton = Record.of(Keys.COUNT, Values.ofNumeric(1));
-		Record generic = Record.builder().entry(Keys.COUNT, Values.ofNumeric(1)).build();
+		Record singleton = Records.singleton(Keys.COUNT, Values.ofNumeric(1));
+		Record generic = Records.builder().entry(Keys.COUNT, Values.ofNumeric(1)).build();
 		assertThat(singleton).isEqualTo(generic);
 		assertThat(generic).isEqualTo(singleton);
 	}
 
 	@Test
 	public void value() {
-		Record record = Record.empty();
+		Record record = Records.empty();
 		assertThat(record.value(Keys.NAME)).isEmpty();
 		record = record.append(Keys.NAME, Values.none());
 		assertThat(record.value(Keys.NAME)).isNotEmpty().contains(Values.none());
@@ -113,7 +110,7 @@ public class RecordTest {
 
 	@Test
 	public void instanceIsDetachedFromBuilder() {
-		Builder builder = Record.builder();
+		Records.Builder builder = Records.builder();
 		builder.entry(Keys.NAME, Values.none());
 		Record record = builder.build();
 		builder.entry(Keys.COUNT, Values.none()); // please note that this has been added after build()
@@ -123,7 +120,7 @@ public class RecordTest {
 
 	@Test
 	public void empty() {
-		Record a = Record.empty();
+		Record a = Records.empty();
 		assertThat(a.keys()).isEmpty();
 		assertThat(a.values()).isEmpty();
 		assertThat(a.entries()).isEmpty();
@@ -131,7 +128,7 @@ public class RecordTest {
 
 	@Test
 	public void singleton() {
-		Record a = Record.of(Keys.NAME, Values.none());
+		Record a = Records.singleton(Keys.NAME, Values.none());
 		assertThat(a.keys()).containsExactly(Keys.NAME);
 		assertThat(a.values()).containsExactly(Values.none());
 		assertThat(a.entries()).containsExactly(new Entry(Keys.NAME, Values.none()));
@@ -139,7 +136,7 @@ public class RecordTest {
 
 	@Test
 	public void generic() {
-		Record a = Record.of(Keys.NAME, Values.none()).prepend(Keys.COUNT, Values.none());
+		Record a = Records.singleton(Keys.NAME, Values.none()).prepend(Keys.COUNT, Values.none());
 		assertThat(a.keys()).containsExactly(Keys.COUNT, Keys.NAME);
 		assertThat(a.values()).containsExactly(Values.none(), Values.none());
 		assertThat(a.entries()).containsExactly(new Entry(Keys.COUNT, Values.none()), new Entry(Keys.NAME, Values.none()));

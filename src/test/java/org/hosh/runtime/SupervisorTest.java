@@ -35,7 +35,7 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
-import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.SneakySignal;
 import org.hosh.testsupport.WithThread;
@@ -128,7 +128,7 @@ public class SupervisorTest {
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus.value()).isEqualTo(1);
-		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("simulated error")));
+		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated error")));
 	}
 
 	@Test
@@ -140,7 +140,7 @@ public class SupervisorTest {
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus.value()).isEqualTo(1);
-		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("(no message provided)")));
+		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("(no message provided)")));
 	}
 
 	@Test

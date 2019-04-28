@@ -47,7 +47,7 @@ import org.hosh.runtime.PipelineCommand.Position;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
-import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.TemporaryFolder;
@@ -179,7 +179,7 @@ public class ExternalCommandTest {
 				Position.SOLE);
 		then(in).should(times(1)).recv();
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("interrupted")));
+		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 	}
 
 	@Test
@@ -194,7 +194,7 @@ public class ExternalCommandTest {
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(in).should(times(1)).recv();
-		then(out).should().send(Record.of(Keys.TEXT, Values.ofText("test")));
+		then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("test")));
 		then(err).shouldHaveZeroInteractions();
 	}
 
@@ -211,7 +211,7 @@ public class ExternalCommandTest {
 		assertThat(exitStatus).isSuccess();
 		then(in).should(times(1)).recv();
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Record.of(Keys.TEXT, Values.ofText("test")));
+		then(err).should().send(Records.singleton(Keys.TEXT, Values.ofText("test")));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -219,7 +219,7 @@ public class ExternalCommandTest {
 	public void processRecordsFromIn() throws Exception {
 		ByteArrayOutputStream value = new ByteArrayOutputStream();
 		given(in.recv()).willReturn(
-				Optional.of(Record.builder().entry(Keys.PATH, Values.ofText("aaa")).entry(Keys.SIZE, Values.ofNumeric(10)).build()),
+				Optional.of(Records.builder().entry(Keys.PATH, Values.ofText("aaa")).entry(Keys.SIZE, Values.ofNumeric(10)).build()),
 				Optional.empty());
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
@@ -245,6 +245,6 @@ public class ExternalCommandTest {
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Record.of(Keys.ERROR, Values.ofText("simulated error")));
+		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated error")));
 	}
 }

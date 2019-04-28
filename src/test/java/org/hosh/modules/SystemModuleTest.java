@@ -58,6 +58,7 @@ import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.WithThread;
@@ -120,7 +121,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).hasExitCode(1);
 			then(state).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a valid exit status: asd")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a valid exit status: asd")));
 			then(out).shouldHaveZeroInteractions();
 		}
 
@@ -130,7 +131,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).hasExitCode(1);
 			then(state).shouldHaveZeroInteractions();
 			then(in).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("too many arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 			then(out).shouldHaveZeroInteractions();
 		}
 	}
@@ -175,7 +176,7 @@ public class SystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveZeroInteractions();
-			Record record = Record.builder().entry(Keys.NAME, Values.ofText("HOSH_VERSION")).entry(Keys.VALUE, Values.ofText("1.0")).build();
+			Record record = Records.builder().entry(Keys.NAME, Values.ofText("HOSH_VERSION")).entry(Keys.VALUE, Values.ofText("1.0")).build();
 			assertThat(records.getAllValues()).contains(record);
 		}
 
@@ -185,7 +186,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting no arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 		}
 	}
 
@@ -221,9 +222,9 @@ public class SystemModuleTest {
 			then(err).shouldHaveZeroInteractions();
 			assertThat(records.getAllValues())
 					.containsExactly(
-							Record.of(Keys.TEXT, Values.ofText("true - /bin/true replacement")),
-							Record.of(Keys.TEXT, Values.ofText("Examples")),
-							Record.of(Keys.TEXT, Values.ofText("true - returns exit success")));
+							Records.singleton(Keys.TEXT, Values.ofText("true - /bin/true replacement")),
+							Records.singleton(Keys.TEXT, Values.ofText("Examples")),
+							Records.singleton(Keys.TEXT, Values.ofText("true - returns exit success")));
 		}
 
 		@Test
@@ -236,9 +237,9 @@ public class SystemModuleTest {
 			then(err).shouldHaveZeroInteractions();
 			assertThat(records.getAllValues())
 					.containsExactly(
-							Record.of(Keys.TEXT, Values.ofText("false - /bin/false replacement")),
-							Record.of(Keys.TEXT, Values.ofText("Examples")),
-							Record.of(Keys.TEXT, Values.ofText("N/A")));
+							Records.singleton(Keys.TEXT, Values.ofText("false - /bin/false replacement")),
+							Records.singleton(Keys.TEXT, Values.ofText("Examples")),
+							Records.singleton(Keys.TEXT, Values.ofText("N/A")));
 		}
 
 		@Test
@@ -247,7 +248,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("command not found: test")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("command not found: test")));
 		}
 
 		@Test
@@ -257,7 +258,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("no help for command: *")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: *")));
 		}
 
 		@Test
@@ -270,7 +271,7 @@ public class SystemModuleTest {
 			then(err).shouldHaveZeroInteractions();
 			assertThat(records.getAllValues())
 					.containsExactly(
-							Record.of(Keys.TEXT, Values.ofText("true")));
+							Records.singleton(Keys.TEXT, Values.ofText("true")));
 		}
 
 		@Test
@@ -289,7 +290,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("too many arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 		}
 
 		@Help(description = "/bin/true replacement")
@@ -344,7 +345,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("")));
+			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("")));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -353,7 +354,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("a"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("a")));
+			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("a")));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -362,7 +363,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("a", "b"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Record.of(Keys.VALUE, Values.ofText("a b")));
+			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("a b")));
 			then(err).shouldHaveZeroInteractions();
 		}
 	}
@@ -393,7 +394,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("interrupted")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 		}
 
 		@Test
@@ -402,7 +403,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting just one argument millis")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting just one argument millis")));
 		}
 
 		@Test
@@ -420,7 +421,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not millis: a")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not millis: a")));
 		}
 
 		@Test
@@ -429,7 +430,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting just one argument millis")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting just one argument millis")));
 		}
 	}
 
@@ -464,7 +465,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting zero arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting zero arguments")));
 		}
 	}
 
@@ -548,7 +549,7 @@ public class SystemModuleTest {
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(
-					Record.builder()
+					Records.builder()
 							.entry(Keys.COUNT, Values.ofNumeric(2))
 							.entry(Benchmark.BEST, Values.ofDuration(Duration.ofMillis(10)))
 							.entry(Benchmark.WORST, Values.ofDuration(Duration.ofMillis(20)))
@@ -564,7 +565,7 @@ public class SystemModuleTest {
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(
-					Record.builder()
+					Records.builder()
 							.entry(Keys.COUNT, Values.ofNumeric(0))
 							.entry(Benchmark.BEST, Values.ofDuration(Duration.ZERO))
 							.entry(Benchmark.WORST, Values.ofDuration(Duration.ZERO))
@@ -671,7 +672,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
 		}
 
 		@Test
@@ -680,7 +681,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
 		}
 
 		@Test
@@ -730,7 +731,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("requires 1 argument: key")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("requires 1 argument: key")));
 		}
 
 		@Test
@@ -783,7 +784,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("expecting one argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 		}
 
 		@Test
@@ -792,7 +793,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("not a valid pid: FOO")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a valid pid: FOO")));
 		}
 
 		@Test
@@ -802,7 +803,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("cannot find pid: 42")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("cannot find pid: 42")));
 		}
 
 		@Test
@@ -813,7 +814,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Record.of(Keys.ERROR, Values.ofText("cannot destroy pid: 42")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("cannot destroy pid: 42")));
 		}
 
 		@Test

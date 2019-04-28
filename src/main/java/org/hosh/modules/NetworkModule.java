@@ -40,6 +40,7 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.Values;
 
 public class NetworkModule implements Module {
@@ -58,14 +59,15 @@ public class NetworkModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (!args.isEmpty()) {
-				err.send(Record.of(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
 			try {
 				Iterator<NetworkInterface> iterator = NetworkInterface.networkInterfaces().iterator();
 				while (iterator.hasNext()) {
 					NetworkInterface ni = iterator.next();
-					Record record = Record.builder()
+					Record record = Records
+							.builder()
 							.entry(Keys.of("alias"), Values.ofText(ni.getDisplayName()))
 							.entry(Keys.of("up"), Values.ofText(ni.isUp() ? "yes" : "no"))
 							.entry(Keys.of("loopback"), Values.ofText(ni.isLoopback() ? "yes" : "no"))

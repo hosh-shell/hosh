@@ -31,7 +31,7 @@ import java.io.PrintWriter;
 
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Keys;
-import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.Values;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,20 +59,20 @@ public class ConsoleChannelTest {
 
 	@Test
 	public void empty() {
-		sut.send(Record.empty());
+		sut.send(Records.empty());
 		then(printWriter).should().append(System.lineSeparator());
 	}
 
 	@Test
 	public void oneValue() {
-		sut.send(Record.of(Keys.NAME, Values.ofText("foo")));
+		sut.send(Records.singleton(Keys.NAME, Values.ofText("foo")));
 		then(printWriter).should().append("foo");
 		then(printWriter).should().append(System.lineSeparator());
 	}
 
 	@Test
 	public void twoValues() {
-		sut.send(Record.builder().entry(Keys.NAME, Values.ofText("foo")).entry(Keys.VALUE, Values.ofText("bar")).build());
+		sut.send(Records.builder().entry(Keys.NAME, Values.ofText("foo")).entry(Keys.VALUE, Values.ofText("bar")).build());
 		then(printWriter).should().append("foo");
 		then(printWriter).should().append(" ");
 		then(printWriter).should().append("bar");
