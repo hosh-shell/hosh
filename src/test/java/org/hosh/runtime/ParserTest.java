@@ -23,80 +23,35 @@
  */
 package org.hosh.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.hosh.antlr4.HoshParser.ProgramContext;
 import org.hosh.doc.Bug;
+import org.hosh.doc.Todo;
 import org.hosh.runtime.Parser.ParseError;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class ParserTest {
 
-	private final Parser sut = new Parser();
+	private Parser sut;
 
-	@Test
-	public void empty() {
-		sut.parse("");
-	}
-
-	@Test
-	public void usage() {
-		sut.parse("git");
-		sut.parse("git\n");
-		sut.parse("git status\n");
-		sut.parse("git commit --amend\n");
-		sut.parse("cd ..\n");
-		sut.parse("cd /tmp\n");
-		sut.parse("cd c:\\temp\n");
-		sut.parse("cd c:/temp\n");
-		sut.parse("${EXECUTABLE}");
-		sut.parse("cd ${DIR}");
-		sut.parse("vim 'filename with spaces'");
-		sut.parse("vim \"filename with spaces\"");
-		sut.parse("git commit -am \"commit message\"");
-		sut.parse("withTime { git push }");
-		sut.parse("withLock /tmp/push.lock { git push }");
-		sut.parse("withLock /tmp/push.lock { git push\n git push --tags\n }");
-		sut.parse("withTime { withLock /tmp/push.lock { git push } }");
-		sut.parse("cd C:\\Users\\VSSADM~1\\AppData\\Local\\Temp\\junit16864313966026428034");
-		sut.parse("regex line '\\w+'");
-		sut.parse("regex line \"\\w+\"");
-	}
-
-	@Test
-	public void newlines() {
-		sut.parse("\n");
-		sut.parse("\n\n");
-		sut.parse("\r\n");
-		sut.parse("\r\n\n");
-		sut.parse("\n\r\n");
-	}
-
-	@Test
-	public void comments() {
-		sut.parse("#\n");
-		sut.parse("#\r\n");
-		sut.parse("# comment\n");
-		sut.parse("# comment\r\n");
-		sut.parse("ls # comment\n");
-		sut.parse("ls # comment\r\n");
-		sut.parse("ls # comment");
-		sut.parse("ls # comment");
-	}
-
-	@Test
-	public void pipelines() {
-		sut.parse("env | grep /regexp/");
-		sut.parse("cat file.txt | grep /regexp/");
-		sut.parse("cat file.txt | grep /regexp/ | wc -l");
-		sut.parse("withTime { cat file.txt | grep /regexp/ | wc -l }");
+	@BeforeEach
+	public void setup() {
+		sut = new Parser();
 	}
 
 	@Test
 	public void lexerError() {
 		assertThatThrownBy(() -> {
 			sut.parse("!");
-		})
-				.isInstanceOf(ParseError.class)
+		}).isInstanceOf(ParseError.class)
 				.hasMessage("line 1:0: token recognition error at: '!'");
 	}
 
@@ -104,15 +59,92 @@ public class ParserTest {
 	public void refuseSpaceInsideVariableExpansion() {
 		assertThatThrownBy(() -> {
 			sut.parse("${ EXECUTABLE }");
-		})
-				.isInstanceOf(ParseError.class)
+		}).isInstanceOf(ParseError.class)
 				.hasMessage("line 1:0: token recognition error at: '${ '");
 	}
 
+	@ParameterizedTest
+	@MethodSource("all")
+	public void valid(String line) {
+		ProgramContext parse = sut.parse(line);
+		assertThat(parse)
+			.as("valid")
+			.isNotNull();
+	}
+
+	@Todo(description = "workaroud for eclipse bug", issue = "https://bugs.eclipse.org/bugs/show_bug.cgi?id=546084")
+	static Stream<String> all() {
+		return List.of(commands(), newLines(), comments(), pipelines(), incompletePipelines())
+				.stream()
+				.flatMap(List::stream);
+	}
+
+	static List<String> commands() {
+		return List.of(
+				"/usr/bin/git",
+				"/usr/bin/git --help",
+				"   /usr/bin/git",
+				"\t/usr/bin/git",
+				"git",
+				"git\n",
+				"git status\n",
+				"git commit --amend\n",
+				"cd ..\n",
+				"cd /tmp\n",
+				"cd c:\\temp\n",
+				"cd c:/temp\n",
+				"${EXECUTABLE}",
+				"cd ${DIR}",
+				"vim 'filename with spaces'",
+				"vim \"filename with spaces\"",
+				"git commit -am \"commit message\"",
+				"withTime { git push }",
+				"withLock /tmp/push.lock { git push }",
+				"withLock /tmp/push.lock { git push\n git push --tags\n }",
+				"withTime { withLock /tmp/push.lock { git push } }",
+				"cd C:\\Users\\VSSADM~1\\AppData\\Local\\Temp\\junit16864313966026428034",
+				"regex line '\\w+'",
+				"regex line \"\\w+\"");
+	}
+
+	static List<String> newLines() {
+		return List.of(
+				"\n",
+				"\n\n",
+				"\r\n",
+				"\r\n\n",
+				"\n\r\n");
+	}
+
+	static List<String> comments() {
+		return List.of(
+				"#\n",
+				"#\r\n",
+				"# comment\n",
+				"# comment\r\n",
+				"ls # comment\n",
+				"ls # comment\r\n",
+				"ls # comment");
+	}
+
+	static List<String> pipelines() {
+		return List.of(
+				"/usr/bin/git diff | grep /regexp/",
+				"env | grep /regexp/",
+				"cat file.txt | grep /regexp/",
+				"cat file.txt | grep /regexp/ | wc -l",
+				"withTime { cat file.txt | grep /regexp/ | wc -l }",
+				"withTime { cat file.txt } | schema",
+				"withTime { cat file.txt | grep /regexp/ } | schema"
+				);
+	}
+
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")
-	@Test
-	public void incompletePipeline() {
-		sut.parse("ls | take 1 | ");
-		sut.parse("ls | take | ");
+	static List<String> incompletePipelines() {
+		return List.of(
+				"ls | ",
+				"ls -a | ",
+				"ls | take 1 | ",
+				"ls | take | ");
 	}
 }
