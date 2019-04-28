@@ -47,6 +47,7 @@ import org.hosh.modules.FileSystemModule.Lines;
 import org.hosh.modules.FileSystemModule.ListFiles;
 import org.hosh.modules.FileSystemModule.Move;
 import org.hosh.modules.FileSystemModule.Partitions;
+import org.hosh.modules.FileSystemModule.Probe;
 import org.hosh.modules.FileSystemModule.Remove;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -781,6 +782,60 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveZeroInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFolder.toPath())));
 			then(in).shouldHaveZeroInteractions();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ProbeTest {
+
+		@RegisterExtension
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Probe sut;
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: probe file")));
+		}
+
+		@Test
+		public void probeKnownRelativeFile() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			File newFile = temporaryFolder.newFile("file.txt");
+			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getName()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Records.singleton(Keys.of("contenttype"), Values.ofText("text/plain")));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void probeUnknownRelativeFile() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			File newFile = temporaryFolder.newFile("file.hosh");
+			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getName()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
 		}
 	}
 }

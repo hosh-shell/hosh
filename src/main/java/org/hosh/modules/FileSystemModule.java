@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 import org.hosh.doc.Bug;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
+import org.hosh.doc.Experimental;
 import org.hosh.doc.Help;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -74,6 +75,7 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("mv", Move.class);
 		commandRegistry.registerCommand("rm", Remove.class);
 		commandRegistry.registerCommand("partitions", Partitions.class);
+		commandRegistry.registerCommand("probe", Probe.class);
 	}
 
 	@Help(description = "list files")
@@ -370,6 +372,41 @@ public class FileSystemModule implements Module {
 				}
 			}
 			return ExitStatus.success();
+		}
+	}
+
+	@Experimental(description = "usefulness of this command is quite limited right now")
+	@Help(description = "detect content type of a file")
+	@Examples({
+			@Example(command = "probe file", description = "attempt to detect content type"),
+	})
+	public static class Probe implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: probe file")));
+				return ExitStatus.error();
+			}
+			Path file = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+			try {
+				String contentType = Files.probeContentType(file);
+				if (contentType == null) {
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
+					return ExitStatus.success();
+				}
+				out.send(Records.singleton(Keys.of("contenttype"), Values.ofText(contentType)));
+				return ExitStatus.success();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		}
 	}
 
