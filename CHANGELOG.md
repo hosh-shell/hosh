@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
    - no overwrites
 - new command: 'partitions'
 - new command: 'probe'
+- new command: 'symlink', 'hardlink'
 - autocomplete of any executable in PATH
 - JUnit 4.x -> 5.x
 

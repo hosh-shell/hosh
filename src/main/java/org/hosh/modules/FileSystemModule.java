@@ -76,6 +76,8 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("rm", Remove.class);
 		commandRegistry.registerCommand("partitions", Partitions.class);
 		commandRegistry.registerCommand("probe", Probe.class);
+		commandRegistry.registerCommand("symlink", Symlink.class);
+		commandRegistry.registerCommand("hardlink", Hardlink.class);
 	}
 
 	@Help(description = "list files")
@@ -403,6 +405,66 @@ public class FileSystemModule implements Module {
 					return ExitStatus.success();
 				}
 				out.send(Records.singleton(Keys.of("contenttype"), Values.ofText(contentType)));
+				return ExitStatus.success();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+
+	@Help(description = "create symlink")
+	@Examples({
+			@Example(command = "symlink source target", description = "create symlink"),
+	})
+	public static class Symlink implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 2) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: symlink source target")));
+				return ExitStatus.error();
+			}
+			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
+			try {
+				Files.createSymbolicLink(target, source);
+				return ExitStatus.success();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+
+	@Help(description = "create hardlink")
+	@Examples({
+			@Example(command = "hardlink source target", description = "create hardlink"),
+	})
+	public static class Hardlink implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 2) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: hardlink source target")));
+				return ExitStatus.error();
+			}
+			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
+			try {
+				Files.createLink(target, source);
 				return ExitStatus.success();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
