@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
    - no recursion yet
    - no directory operation yet, only files
    - no overwrites
+- new command: 'partitions'
 - autocomplete of any executable in PATH
 - JUnit 4.x -> 5.x
 

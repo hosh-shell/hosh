@@ -28,6 +28,8 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
@@ -71,6 +73,7 @@ public class FileSystemModule implements Module {
 		commandRegistry.registerCommand("cp", Copy.class);
 		commandRegistry.registerCommand("mv", Move.class);
 		commandRegistry.registerCommand("rm", Remove.class);
+		commandRegistry.registerCommand("partitions", Partitions.class);
 	}
 
 	@Help(description = "list files")
@@ -335,6 +338,38 @@ public class FileSystemModule implements Module {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
+		}
+	}
+
+	@Help(description = "show partitions information like df -h")
+	@Examples({
+			@Example(command = "partitions", description = "show all partitions"),
+	})
+	public static class Partitions implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 0) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: partitions")));
+				return ExitStatus.error();
+			}
+			for (FileStore store : FileSystems.getDefault().getFileStores()) {
+				try {
+					out.send(Records
+							.builder()
+							.entry(Keys.of("name"), Values.ofText(store.name()))
+							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
+							.entry(Keys.of("total"), Values.ofHumanizedSize(store.getTotalSpace()))
+							.entry(Keys.of("used"), Values.ofHumanizedSize(store.getTotalSpace() - store.getUnallocatedSpace()))
+							.entry(Keys.of("free"), Values.ofHumanizedSize(store.getUsableSpace()))
+							.entry(Keys.of("blocksize"), Values.ofHumanizedSize(store.getBlockSize()))
+							.entry(Keys.of("type"), Values.ofText(store.type()))
+							.build());
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			}
+			return ExitStatus.success();
 		}
 	}
 

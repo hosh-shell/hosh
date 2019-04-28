@@ -46,6 +46,7 @@ import org.hosh.modules.FileSystemModule.Find;
 import org.hosh.modules.FileSystemModule.Lines;
 import org.hosh.modules.FileSystemModule.ListFiles;
 import org.hosh.modules.FileSystemModule.Move;
+import org.hosh.modules.FileSystemModule.Partitions;
 import org.hosh.modules.FileSystemModule.Remove;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -63,6 +64,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 public class FileSystemModuleTest {
@@ -652,6 +654,41 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class PartitionsTest {
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Partitions sut;
+
+		@Test
+		public void listAllPartitions() throws IOException {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should(Mockito.atLeastOnce()).send(Mockito.any());
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void tooManyArgs() throws IOException {
+			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: partitions")));
 		}
 	}
 
