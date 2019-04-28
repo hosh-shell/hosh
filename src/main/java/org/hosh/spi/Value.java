@@ -23,15 +23,10 @@
  */
 package org.hosh.spi;
 
-import java.io.PrintWriter;
-import java.util.Locale;
-
 /**
  * The value in @{see Record}.
  */
-public interface Value extends Comparable<Value> {
-
-	void append(PrintWriter printWriter, Locale locale);
+public interface Value extends Comparable<Value>, Printable {
 
 	boolean matches(Value that);
 }

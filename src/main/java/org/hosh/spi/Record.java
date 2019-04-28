@@ -34,13 +34,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hosh.doc.Experimental;
-
 /**
  * An immutable, persistent value object representing
  * a list of key-value pairs.
  */
-public interface Record {
+public interface Record extends Printable {
 
 	/**
 	 * Yields a new Record with the specified mapping as last one.
@@ -61,9 +59,6 @@ public interface Record {
 	Optional<Value> value(Key key);
 
 	int size();
-
-	@Experimental(description = "should have record_separator (hardcoded to ' ') and boolean newline, perhaps in a nice fluent interface")
-	void append(PrintWriter printWriter, Locale locale);
 
 	static Record empty() {
 		return new Record.Empty();
@@ -170,7 +165,7 @@ public interface Record {
 		}
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			// no-op
 		}
 	}
@@ -252,8 +247,8 @@ public interface Record {
 		}
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
-			value.append(printWriter, locale);
+		public void print(PrintWriter printWriter, Locale locale) {
+			value.print(printWriter, locale);
 		}
 	}
 
@@ -340,11 +335,11 @@ public interface Record {
 		}
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			Iterator<Value> iterator = values().iterator();
 			while (iterator.hasNext()) {
 				Value value = iterator.next();
-				value.append(printWriter, locale);
+				value.print(printWriter, locale);
 				if (iterator.hasNext()) {
 					printWriter.append(" ");
 				}

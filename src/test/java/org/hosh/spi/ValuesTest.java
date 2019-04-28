@@ -57,7 +57,7 @@ public class ValuesTest {
 
 		@Test
 		public void append() {
-			Values.none().append(printWriter, Locale.ENGLISH);
+			Values.none().print(printWriter, Locale.ENGLISH);
 			then(printWriter).should().append("");
 		}
 
@@ -86,7 +86,7 @@ public class ValuesTest {
 
 		@Test
 		public void append() {
-			Values.ofDuration(Duration.ofMillis(1)).append(printWriter, Locale.ENGLISH);
+			Values.ofDuration(Duration.ofMillis(1)).print(printWriter, Locale.ENGLISH);
 			then(printWriter).should().append("PT0.001S");
 		}
 
@@ -124,7 +124,7 @@ public class ValuesTest {
 
 		@Test
 		public void append() {
-			Values.ofInstant(Instant.EPOCH).append(printWriter, Locale.ENGLISH);
+			Values.ofInstant(Instant.EPOCH).print(printWriter, Locale.ENGLISH);
 			then(printWriter).should().append("1970-01-01T00:00:00Z");
 		}
 
@@ -169,7 +169,7 @@ public class ValuesTest {
 
 		@Test
 		public void appendOk() {
-			Values.ofText("aaa").append(printWriter, Locale.getDefault());
+			Values.ofText("aaa").print(printWriter, Locale.getDefault());
 			then(printWriter).should().append("aaa");
 		}
 
@@ -224,13 +224,13 @@ public class ValuesTest {
 
 		@Test
 		public void englishLocale() {
-			Values.ofNumeric(1_000_000).append(printWriter, Locale.ENGLISH);
+			Values.ofNumeric(1_000_000).print(printWriter, Locale.ENGLISH);
 			then(printWriter).should().append("1,000,000");
 		}
 
 		@Test
 		public void italianLocale() {
-			Values.ofNumeric(1_000_000).append(printWriter, Locale.ITALIAN);
+			Values.ofNumeric(1_000_000).print(printWriter, Locale.ITALIAN);
 			then(printWriter).should().append("1.000.000");
 		}
 
@@ -261,14 +261,14 @@ public class ValuesTest {
 
 		@Test
 		public void appendWithUkLocale() {
-			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).append(printWriter, Locale.UK);
+			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).print(printWriter, Locale.UK);
 			then(printWriter).should().append("2.5");
 			then(printWriter).should().append("KB");
 		}
 
 		@Test
 		public void appendWithItalianLocale() {
-			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).append(printWriter, Locale.ITALIAN);
+			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).print(printWriter, Locale.ITALIAN);
 			then(printWriter).should().append("2,5");
 			then(printWriter).should().append("KB");
 		}
@@ -321,7 +321,7 @@ public class ValuesTest {
 
 		@Test
 		public void appendOk() {
-			Values.ofPath(Paths.get(".")).append(printWriter, Locale.getDefault());
+			Values.ofPath(Paths.get(".")).print(printWriter, Locale.getDefault());
 			then(printWriter).should().append(".");
 		}
 

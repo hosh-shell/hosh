@@ -47,7 +47,7 @@ public class ConsoleChannel implements Channel {
 	public void send(Record record) {
 		Locale locale = Locale.getDefault();
 		style.enable(printWriter);
-		record.append(printWriter, locale);
+		record.print(printWriter, locale);
 		style.disable(printWriter);
 		printWriter.append(System.lineSeparator());
 		printWriter.flush();

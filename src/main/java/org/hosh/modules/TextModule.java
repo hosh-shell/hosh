@@ -104,7 +104,7 @@ public class TextModule implements Module {
 				record.value(key).ifPresent(v -> {
 					StringWriter sw = new StringWriter();
 					PrintWriter pw = new PrintWriter(sw);
-					record.append(pw, Locale.getDefault());
+					record.print(pw, Locale.getDefault());
 					Matcher matcher = pattern.matcher(sw.toString());
 					Builder builder = Record.builder();
 					if (matcher.find()) {
@@ -491,7 +491,7 @@ public class TextModule implements Module {
 				StringWriter writer = new StringWriter();
 				PrintWriter printWriter = new PrintWriter(writer);
 				formatter.append(formatterFor(entry.getKey()));
-				entry.getValue().append(printWriter, locale);
+				entry.getValue().print(printWriter, locale);
 				formattedValues.add(writer.toString());
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());

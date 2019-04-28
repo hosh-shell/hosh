@@ -531,7 +531,7 @@ public class SystemModule implements Module {
 					break;
 				}
 				Record record = recv.get();
-				record.append(pw, locale);
+				record.print(pw, locale);
 			}
 			state.getVariables().put(key, result.toString());
 			return ExitStatus.success();
@@ -568,7 +568,7 @@ public class SystemModule implements Module {
 						break;
 					}
 					Record record = recv.get();
-					record.append(pw, locale);
+					record.print(pw, locale);
 					pw.append(System.lineSeparator());
 				}
 				return ExitStatus.success();

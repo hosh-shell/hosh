@@ -122,7 +122,7 @@ public class ExternalCommand implements Command, StateAware {
 					break;
 				}
 				Record record = recv.get();
-				record.append(pw, locale);
+				record.print(pw, locale);
 				pw.println();
 			}
 		}

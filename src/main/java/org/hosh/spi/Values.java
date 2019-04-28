@@ -128,7 +128,7 @@ public class Values {
 		}
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			for (var style : styles) {
 				style.enable(printWriter);
 			}
@@ -199,7 +199,7 @@ public class Values {
 		}
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			NumberFormat instance = NumberFormat.getInstance(locale);
 			printWriter.append(instance.format(value));
 			printWriter.append(unit.toString());
@@ -264,7 +264,7 @@ public class Values {
 		}
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			NumberFormat instance = NumberFormat.getInstance(locale);
 			printWriter.append(instance.format(number));
 		}
@@ -310,7 +310,7 @@ public class Values {
 	static final class None implements Value {
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			printWriter.append("");
 		}
 
@@ -368,7 +368,7 @@ public class Values {
 		}
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			printWriter.append(duration.toString());
 		}
 
@@ -423,7 +423,7 @@ public class Values {
 
 		@Todo(description = "use Locale to print in a more readable manner")
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			printWriter.append(instant.toString());
 		}
 
@@ -465,7 +465,7 @@ public class Values {
 		}
 
 		@Override
-		public void append(PrintWriter printWriter, Locale locale) {
+		public void print(PrintWriter printWriter, Locale locale) {
 			printWriter.append(path.toString());
 		}
 
