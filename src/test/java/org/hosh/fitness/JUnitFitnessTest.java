@@ -23,7 +23,12 @@
  */
 package org.hosh.fitness;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -38,7 +43,7 @@ public class JUnitFitnessTest {
 	@Test
 	public void enforcePresenceOfTestAnnotation() {
 		try (ScanResult scanResult = new ClassGraph().whitelistPackages("org.hosh").scan()) {
-			scanResult
+			List<Method> methodsMissingTestAnnotation = scanResult
 					.getAllClasses()
 					.loadClasses()
 					.stream()
@@ -49,9 +54,10 @@ public class JUnitFitnessTest {
 					.filter(m -> m.getDeclaredAnnotation(Test.class) == null)
 					.filter(m -> m.getDeclaredAnnotation(BeforeEach.class) == null)
 					.filter(m -> m.getDeclaredAnnotation(AfterEach.class) == null)
-					.forEach(m -> {
-						throw new IllegalStateException("method should be annotated with @Test: " + m);
-					});
+					.collect(Collectors.toList());
+			assertThat(methodsMissingTestAnnotation)
+					.overridingErrorMessage("please add @Test to the following methods: %n%s", methodsMissingTestAnnotation)
+					.isEmpty();
 		}
 	}
 }
