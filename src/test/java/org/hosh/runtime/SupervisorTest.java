@@ -24,6 +24,7 @@
 package org.hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -73,7 +74,7 @@ public class SupervisorTest {
 	@Test
 	public void noSubmit() {
 		ExitStatus exitStatus = sut.waitForAll(err);
-		assertThat(exitStatus.value()).isEqualTo(0);
+		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
@@ -85,7 +86,7 @@ public class SupervisorTest {
 			return ExitStatus.success();
 		});
 		ExitStatus waitForAll = sut.waitForAll(err);
-		assertThat(waitForAll.isError()).isTrue();
+		assertThat(waitForAll).isError();
 	}
 
 	@Test
@@ -96,7 +97,7 @@ public class SupervisorTest {
 		});
 		Thread.currentThread().interrupt(); // next call to Future.get() will throw InterruptedException
 		ExitStatus waitForAll = sut.waitForAll(err);
-		assertThat(waitForAll.isError()).isTrue();
+		assertThat(waitForAll).isError();
 	}
 
 	@Test
@@ -106,7 +107,7 @@ public class SupervisorTest {
 		sut.submit(statement, () -> ExitStatus.success());
 		sut.submit(statement, () -> ExitStatus.success());
 		ExitStatus exitStatus = sut.waitForAll(err);
-		assertThat(exitStatus.value()).isEqualTo(0);
+		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
@@ -114,9 +115,9 @@ public class SupervisorTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(Collections.emptyList());
 		sut.submit(statement, () -> ExitStatus.success());
-		sut.submit(statement, () -> ExitStatus.of(10));
+		sut.submit(statement, () -> ExitStatus.error());
 		ExitStatus exitStatus = sut.waitForAll(err);
-		assertThat(exitStatus.value()).isEqualTo(10);
+		assertThat(exitStatus).isError();
 	}
 
 	@Test
@@ -127,7 +128,7 @@ public class SupervisorTest {
 			throw new NullPointerException("simulated error");
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
-		assertThat(exitStatus.value()).isEqualTo(1);
+		assertThat(exitStatus).isError();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated error")));
 	}
 
@@ -139,7 +140,7 @@ public class SupervisorTest {
 			throw new NullPointerException();
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
-		assertThat(exitStatus.value()).isEqualTo(1);
+		assertThat(exitStatus).isError();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("(no message provided)")));
 	}
 
