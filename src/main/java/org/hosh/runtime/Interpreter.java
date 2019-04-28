@@ -96,15 +96,14 @@ public class Interpreter {
 		return run(statement, new NullChannel(), out, err);
 	}
 
-	@SuppressWarnings("hiding")
-	public ExitStatus run(Statement statement, Channel in, Channel out, Channel err) {
+	protected ExitStatus run(Statement statement, Channel in, Channel out, Channel err) {
 		Command command = statement.getCommand();
 		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		return command.run(resolvedArguments, in, out, err);
 	}
 
-	public void injectDeps(Command command) {
+	protected void injectDeps(Command command) {
 		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
 		command.downCast(InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));
