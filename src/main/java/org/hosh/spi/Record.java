@@ -28,8 +28,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * An immutable, persistent value object representing
- * a list of key-value pairs.
+ * An immutable value object representing a collection of key/value pairs.
+ *
+ * Iteration order is well defined.
  */
 public interface Record extends Printable {
 

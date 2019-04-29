@@ -362,12 +362,12 @@ public class FileSystemModule implements Module {
 					out.send(Records
 							.builder()
 							.entry(Keys.of("name"), Values.ofText(store.name()))
-							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
+							.entry(Keys.of("type"), Values.ofText(store.type()))
 							.entry(Keys.of("total"), Values.ofHumanizedSize(store.getTotalSpace()))
 							.entry(Keys.of("used"), Values.ofHumanizedSize(store.getTotalSpace() - store.getUnallocatedSpace()))
 							.entry(Keys.of("free"), Values.ofHumanizedSize(store.getUsableSpace()))
 							.entry(Keys.of("blocksize"), Values.ofHumanizedSize(store.getBlockSize()))
-							.entry(Keys.of("type"), Values.ofText(store.type()))
+							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
 							.build());
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
