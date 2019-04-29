@@ -535,21 +535,25 @@ public class FileSystemModule implements Module {
 			for (;;) {
 				LOGGER.info("waiting for events");
 				WatchKey key = watchService.take();
-				for (var event : key.pollEvents()) {
-					if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
-						LOGGER.warning("got overflow");
-						continue;
-					}
-					@SuppressWarnings("unchecked")
-					WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
-					out.send(Records.builder()
-							.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
-							.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
-							.build());
-				}
+				handle(out, key);
 				if (!key.reset()) {
 					break;
 				}
+			}
+		}
+
+		private void handle(Channel out, WatchKey key) {
+			for (var event : key.pollEvents()) {
+				if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
+					LOGGER.warning("got overflow");
+					continue;
+				}
+				@SuppressWarnings("unchecked")
+				WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
+				out.send(Records.builder()
+						.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
+						.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
+						.build());
 			}
 		}
 	}
