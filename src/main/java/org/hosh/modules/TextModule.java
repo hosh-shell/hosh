@@ -519,7 +519,7 @@ public class TextModule implements Module {
 		private final Map<Key, Integer> paddings = Map.of(
 				Keys.NAME, 30,
 				Keys.PATH, 30,
-				Keys.SIZE, 5,
+				Keys.SIZE, 8,
 				Keys.TIMESTAMP, 30,
 				Keys.of("hwaddress"), 14);
 	}

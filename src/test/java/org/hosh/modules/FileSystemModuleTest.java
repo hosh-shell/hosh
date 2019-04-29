@@ -57,6 +57,7 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.RecordMatcher;
 import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -121,10 +122,9 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(
-					Records.builder()
-							.entry(Keys.PATH, Values.ofPath(Paths.get("dir")))
-							.entry(Keys.SIZE, Values.none())
-							.build());
+					RecordMatcher.of(
+							Keys.PATH, Values.ofPath(Paths.get("dir")),
+							Keys.SIZE, Values.none()));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -135,8 +135,9 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(Records.builder().entry(Keys.PATH, Values.ofPath(Paths.get("file"))).entry(Keys.SIZE, Values.ofHumanizedSize(0))
-					.build());
+			then(out).should().send(RecordMatcher.of(
+					Keys.PATH, Values.ofPath(Paths.get("file")),
+					Keys.SIZE, Values.ofHumanizedSize(0)));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -181,11 +182,10 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(RecordMatcher.of(
+					Keys.PATH, Values.ofPath(Paths.get("aaa")),
+					Keys.SIZE, Values.ofHumanizedSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
-			then(out).should().send(Records.builder()
-					.entry(Keys.PATH, Values.ofPath(Paths.get("aaa")))
-					.entry(Keys.SIZE, Values.ofHumanizedSize(0))
-					.build());
 		}
 
 		@Test
@@ -208,11 +208,9 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList(newFolder.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(
-					Records.builder()
-							.entry(Keys.PATH, Values.ofPath(Paths.get("aaa")))
-							.entry(Keys.SIZE, Values.ofHumanizedSize(0))
-							.build());
+			then(out).should().send(RecordMatcher.of(
+					Keys.PATH, Values.ofPath(Paths.get("aaa")),
+					Keys.SIZE, Values.ofHumanizedSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -223,11 +221,9 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(Arrays.asList("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should().send(
-					Records.builder()
-							.entry(Keys.PATH, Values.ofPath(Paths.get("aaa")))
-							.entry(Keys.SIZE, Values.ofHumanizedSize(0))
-							.build());
+			then(out).should().send(RecordMatcher.of(
+					Keys.PATH, Values.ofPath(Paths.get("aaa")),
+					Keys.SIZE, Values.ofHumanizedSize(0)));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -240,10 +236,9 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(
-					Records.builder()
-							.entry(Keys.PATH, Values.ofPath(Path.of("aaa")))
-							.entry(Keys.SIZE, Values.none())
-							.build());
+					RecordMatcher.of(
+							Keys.PATH, Values.ofPath(Path.of("aaa")),
+							Keys.SIZE, Values.none()));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}

@@ -38,6 +38,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -47,6 +48,7 @@ import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Experimental;
 import org.hosh.doc.Help;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -86,6 +88,7 @@ public class FileSystemModule implements Module {
 			@Example(command = "ls /tmp", description = "list specified absolute directory"),
 			@Example(command = "ls directory", description = "list relative directory")
 	})
+	@Todo(description = "add support for atime and ctime")
 	public static class ListFiles implements Command, StateAware {
 
 		private State state;
@@ -110,10 +113,13 @@ public class FileSystemModule implements Module {
 			}
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(followSymlinksRecursively(dir))) {
 				for (Path path : stream) {
-					Value size = Files.isRegularFile(path) ? Values.ofHumanizedSize(Files.size(path)) : Values.none();
+					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+					Value size = attributes.isRegularFile() ? Values.ofHumanizedSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
 							.entry(Keys.PATH, Values.ofPath(path.getFileName()))
 							.entry(Keys.SIZE, size)
+							.entry(Keys.of("type"), Values.ofText(typeFrom(attributes)))
+							.entry(Keys.of("mtime"), Values.ofInstant(attributes.lastModifiedTime().toInstant()))
 							.build();
 					out.send(entry);
 				}
@@ -127,6 +133,19 @@ public class FileSystemModule implements Module {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
+		}
+
+		private String typeFrom(BasicFileAttributes attributes) {
+			if (attributes.isDirectory()) {
+				return "<dir>";
+			}
+			if (attributes.isRegularFile()) {
+				return "file";
+			}
+			if (attributes.isSymbolicLink()) {
+				return "symlink";
+			}
+			return "";
 		}
 	}
 
