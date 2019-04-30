@@ -86,18 +86,6 @@ public class HoshIT {
 	}
 
 	@Test
-	public void wrapperThenPipeline() throws Exception {
-		Path scriptPath = givenScript(
-				"withTime { cwd } | count"//
-		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).isEqualToNormalizingNewlines("2");
-		assertThat(exitCode).isEqualTo(0);
-	}
-
-	@Test
 	public void scriptWithCdAndCwd() throws Exception {
 		Path scriptPath = givenScript(
 				"cd " + temporaryFolder.toPath().toAbsolutePath(),
@@ -131,18 +119,6 @@ public class HoshIT {
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(output).contains("unknown variable: OS_ENV_VARIABLE");
-		assertThat(exitCode).isEqualTo(1);
-	}
-
-	@Test
-	public void scriptWithUnknownCommand() throws Exception {
-		Path scriptPath = givenScript(
-				"AAAAB"//
-		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("line 1: 'AAAAB' unknown command");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
@@ -304,17 +280,17 @@ public class HoshIT {
 	@Test
 	public void benchmark() throws Exception {
 		Path scriptPath = givenScript(
-				"benchmark 10 { rand | take 100 | count } "//
+				"benchmark 2 { rand | take 100 | count } "//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
-		assertThat(output).startsWith("10");
+		assertThat(output).matches("100\n100\n2 PT\\d+.\\d+S PT\\d+.\\d+S PT\\d+.\\d+S");
 	}
 
 	@Test
-	public void unknownCommandScript() throws Exception {
+	public void unknownCommandInScript() throws Exception {
 		Path scriptPath = givenScript(
 				"FOOBAR"//
 		);
