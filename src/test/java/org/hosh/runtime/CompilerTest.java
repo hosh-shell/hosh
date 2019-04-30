@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hosh.doc.Bug;
-import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.CompileError;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
@@ -43,7 +42,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@Todo(description = "improve assertions (e.g. check arguments parsing and proper nesting of objects)")
 @ExtendWith(MockitoExtension.class)
 public class CompilerTest {
 

@@ -286,7 +286,7 @@ public class HoshIT {
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
-		assertThat(output).matches("100\n100\n2 PT\\d+.\\d+S PT\\d+.\\d+S PT\\d+.\\d+S");
+		assertThat(output).matches("100\r?\n100\r?\n2 PT\\d+.\\d+S PT\\d+.\\d+S PT\\d+.\\d+S");
 	}
 
 	@Test
