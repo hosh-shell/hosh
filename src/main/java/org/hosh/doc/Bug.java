@@ -29,12 +29,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Links to an existing bug in github.
- *
- * For production code means that the bug is still unresolved.
- *
- * For test code means that the bug has been fixed and the test method is the
- * regression test.
+ * Link to an existing bug.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ ElementType.TYPE, ElementType.METHOD })

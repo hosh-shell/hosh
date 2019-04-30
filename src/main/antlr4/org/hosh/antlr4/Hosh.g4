@@ -61,5 +61,5 @@ WS
     ;
 
 LINE_COMMENT
-    : '#' .*? -> skip
+    :  '#' ~[\r\n]* -> skip
     ;

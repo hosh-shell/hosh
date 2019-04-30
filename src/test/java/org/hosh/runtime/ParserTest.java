@@ -68,8 +68,8 @@ public class ParserTest {
 	public void valid(String line) {
 		ProgramContext parse = sut.parse(line);
 		assertThat(parse)
-			.as("valid")
-			.isNotNull();
+				.as("valid")
+				.isNotNull();
 	}
 
 	@Todo(description = "workaroud for eclipse bug", issue = "https://bugs.eclipse.org/bugs/show_bug.cgi?id=546084")
@@ -124,7 +124,8 @@ public class ParserTest {
 				"# comment\r\n",
 				"ls # comment\n",
 				"ls # comment\r\n",
-				"ls # comment");
+				"ls # comment",
+				"benchmark { ls | sink } # comment");
 	}
 
 	static List<String> pipelines() {
@@ -135,8 +136,7 @@ public class ParserTest {
 				"cat file.txt | grep /regexp/ | wc -l",
 				"withTime { cat file.txt | grep /regexp/ | wc -l }",
 				"withTime { cat file.txt } | schema",
-				"withTime { cat file.txt | grep /regexp/ } | schema"
-				);
+				"withTime { cat file.txt | grep /regexp/ } | schema");
 	}
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")
