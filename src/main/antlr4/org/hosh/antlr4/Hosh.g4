@@ -1,33 +1,33 @@
 grammar Hosh;
 
 program
-    : ( stmt )* 
-    ;
+	: ( stmt )* 
+	;
 
 stmt
-    : pipeline NEWLINE?
-    ;
+	: pipeline NEWLINE?
+	;
 
 pipeline
-    : command '|' stmt
-    | command '|' // will be rejected by compiler
-    | command
-    ;
+	: command '|' stmt
+	| command '|' // will be rejected by compiler
+	| command
+	;
 
 command
-    : wrapped
-    | simple
-    ;
+	: wrapped
+	| simple
+	;
 
 wrapped
-    : invocation '{' stmt '}'
-    | invocation '{' '}' // will be rejected by compiler
-    | wrapped '}' // will be rejected by compiler 
-    ;
+	: invocation '{' stmt '}'
+	| invocation '{' '}' // will be rejected by compiler
+	| wrapped '}' // will be rejected by compiler
+	;
 
 simple
-    : invocation
-    ;
+	: invocation
+	;
 
 invocation
 	: ID ( arg )*
@@ -40,8 +40,8 @@ arg
 	;
 
 ID
-    : ( [a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/' | '\\' | '~' )+
-    ;
+	: ( [a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/' | '\\' | '~' )+
+	;
 
 STRING
 	: '\'' ( ~['] )* '\''
@@ -53,13 +53,13 @@ VARIABLE
 	;
 
 NEWLINE
-    : '\r'? '\n'
-    ;
+	: '\r'? '\n'
+	;
 
 WS
-    : [ \t]+ -> skip
-    ;
+	: [ \t]+ -> skip
+	;
 
 LINE_COMMENT
-    :  '#' ~[\r\n]* -> skip
-    ;
+	:  '#' ~[\r\n]* -> skip
+	;
