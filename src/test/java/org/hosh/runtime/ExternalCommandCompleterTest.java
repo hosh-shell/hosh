@@ -43,7 +43,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class ExecutableInPathCompleterTest {
+public class ExternalCommandCompleterTest {
 
 	@RegisterExtension
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -61,7 +61,7 @@ public class ExecutableInPathCompleterTest {
 	private List<Candidate> candidates;
 
 	@InjectMocks
-	private ExecutableInPathCompleter sut;
+	private ExternalCommandCompleter sut;
 
 	@Test
 	public void emptyPath() {

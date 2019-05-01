@@ -42,14 +42,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.runtime.AnsiFormatter;
+import org.hosh.runtime.BuiltinCommandCompleter;
 import org.hosh.runtime.CancellableChannel;
-import org.hosh.runtime.CommandCompleter;
 import org.hosh.runtime.CommandResolver;
 import org.hosh.runtime.CommandResolvers;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.ConsoleChannel;
-import org.hosh.runtime.ExecutableInPathCompleter;
+import org.hosh.runtime.ExternalCommandCompleter;
 import org.hosh.runtime.FileSystemCompleter;
 import org.hosh.runtime.Interpreter;
 import org.hosh.runtime.Prompt;
@@ -163,10 +163,10 @@ public class Hosh {
 				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
 				.variable(LineReader.HISTORY_FILE_SIZE, "1000")
 				.completer(new AggregateCompleter(
-						new CommandCompleter(state),
+						new ExternalCommandCompleter(state),
+						new BuiltinCommandCompleter(state),
 						new FileSystemCompleter(state),
-						new VariableExpansionCompleter(state),
-						new ExecutableInPathCompleter(state)))
+						new VariableExpansionCompleter(state)))
 				.terminal(terminal)
 				.build();
 		Prompt prompt = new Prompt();

@@ -23,54 +23,27 @@
  */
 package org.hosh.runtime;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
 
-import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.State;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
-public class ExecutableInPathCompleter implements Completer {
-
-	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+public class BuiltinCommandCompleter implements Completer {
 
 	private final State state;
 
-	public ExecutableInPathCompleter(State state) {
+	public BuiltinCommandCompleter(State state) {
 		this.state = state;
 	}
 
 	@Override
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-		for (Path path : state.getPath()) {
-			if (Files.isDirectory(path)) {
-				executableInPath(path, candidates);
-			}
-		}
-	}
-
-	private void executableInPath(Path dir, List<Candidate> candidates) {
-		try (Stream<Path> list = Files.list(dir)) {
-			list
-					.filter(p -> Files.isExecutable(p))
-					.map(p -> toCandidate(p))
-					.forEach(candidates::add);
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "got exception while listing " + dir, e);
-		}
-	}
-
-	private DebuggableCandidate toCandidate(Path p) {
-		String name = p.getFileName().toString();
-		String description = "external in " + p.getParent();
-		return DebuggableCandidate.completeWithDescription(name, description);
+		state.getCommands().keySet()
+				.stream()
+				.map(command -> DebuggableCandidate.completeWithDescription(command, "built-in"))
+				.forEach(candidates::add);
 	}
 }

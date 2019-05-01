@@ -43,7 +43,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class CommandCompleterTest {
+public class BuiltinCommandCompleterTest {
 
 	@Mock(stubOnly = true)
 	private State state;
@@ -58,7 +58,7 @@ public class CommandCompleterTest {
 	private ParsedLine parsedLine;
 
 	@InjectMocks
-	private CommandCompleter sut;
+	private BuiltinCommandCompleter sut;
 
 	@Test
 	public void emptyCommands() {
