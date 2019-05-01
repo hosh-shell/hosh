@@ -40,7 +40,9 @@ import org.hosh.modules.TextModule.Enumerate;
 import org.hosh.modules.TextModule.Filter;
 import org.hosh.modules.TextModule.Regex;
 import org.hosh.modules.TextModule.Schema;
+import org.hosh.modules.TextModule.Select;
 import org.hosh.modules.TextModule.Sort;
+import org.hosh.modules.TextModule.Split;
 import org.hosh.modules.TextModule.Table;
 import org.hosh.modules.TextModule.Take;
 import org.hosh.spi.Channel;
@@ -60,6 +62,129 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 public class TextModuleTest {
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class SelectTest {
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Select sut;
+
+		@Test
+		public void empty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.COUNT.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void noArgs() {
+			given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.NAME, Values.ofNumeric(1))), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.empty());
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void oneArgKeepKey() {
+			Record record = Records.singleton(Keys.NAME, Values.ofText("foo"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.NAME.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void twoArgsIgnoreMissingKeys() {
+			Record record = Records.singleton(Keys.NAME, Values.ofText("foo"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.NAME.name(), Keys.COUNT.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class SplitTest {
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Split sut;
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
+		}
+
+		@Test
+		public void oneArg() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name()), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
+		}
+
+		@Test
+		public void twoArgsNoInput() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), " "), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void twoArgsMatching() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("1 2 3"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), " "), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Records.builder()
+					.entry(Keys.of("a"), Values.ofText("1"))
+					.entry(Keys.of("b"), Values.ofText("2"))
+					.entry(Keys.of("c"), Values.ofText("3"))
+					.build());
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)

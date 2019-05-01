@@ -57,6 +57,7 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.Records;
+import org.hosh.spi.Records.Builder;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
@@ -64,6 +65,8 @@ public class TextModule implements Module {
 
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
+		commandRegistry.registerCommand("select", Select.class);
+		commandRegistry.registerCommand("split", Split.class);
 		commandRegistry.registerCommand("regex", Regex.class);
 		commandRegistry.registerCommand("schema", Schema.class);
 		commandRegistry.registerCommand("filter", Filter.class);
@@ -79,7 +82,70 @@ public class TextModule implements Module {
 		commandRegistry.registerCommand("table", Table.class);
 	}
 
-	@Help(description = "regex with named groups to record")
+	@Help(description = "select a subset of keys from a record")
+	@Examples({
+			@Example(description = "select some keys from TSV file", command = "lines file.tsv | split text '\\t' | select b c"),
+	})
+	public static class Select implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			Set<Key> keys = args.stream().map(Keys::of).collect(Collectors.toUnmodifiableSet());
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				Record record = incoming.get();
+				Records.Builder builder = Records.builder();
+				record.entries().forEach(kv -> {
+					if (keys.contains(kv.getKey())) {
+						builder.entry(kv.getKey(), kv.getValue());
+					}
+				});
+				out.send(builder.build());
+			}
+			return ExitStatus.success();
+		}
+	}
+
+	@Help(description = "convert a line to record with numerical keys by splitting")
+	@Examples({
+			@Example(description = "tab separated file to records", command = "lines file.tsv | split text '\\t'"),
+	})
+	public static class Split implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 2) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
+				return ExitStatus.error();
+			}
+			Key key = Keys.of(args.get(0));
+			Pattern pattern = Pattern.compile(args.get(1));
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				Record record = incoming.get();
+				record.value(key).ifPresent(line -> {
+					line.unwrap(String.class).ifPresent(str -> {
+						int i = 0;
+						Builder builder = Records.builder();
+						for (String value : pattern.split(str)) {
+							builder.entry(Keys.of(Character.toString(i + 'a')), Values.ofText(value));
+							i++;
+						}
+						out.send(builder.build());
+					});
+				});
+			}
+			return ExitStatus.success();
+		}
+	}
+
+	@Help(description = "convert a line to a record using a regex with named groups")
 	@Examples({
 			@Example(description = "parse format k=v", command = "git config -l | regex text '(?<key>.+)=(?<value>.+)' | schema"),
 	})
