@@ -237,12 +237,15 @@ public class TextModule implements Module {
 					return ExitStatus.success();
 				}
 				Key key = Keys.of(args.get(0));
-				Value regex = Values.ofText(args.get(1));
+				Pattern pattern = Pattern.compile(args.get(1));
 				Record record = incoming.get();
-				Optional<Value> value = record.value(key);
-				if (value.isPresent() && value.get().matches(regex)) {
-					out.send(record);
-				}
+				// this could be allocation intensive but let's see
+				record.value(key)
+						.flatMap(v -> v.unwrap(String.class))
+						.filter(s -> pattern.matcher(s).matches())
+						.ifPresent(v -> {
+							out.send(record);
+						});
 			}
 		}
 	}

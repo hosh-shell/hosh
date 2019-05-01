@@ -70,11 +70,6 @@ public class ValuesTest {
 		public void asString() {
 			assertThat(Values.none()).hasToString("None");
 		}
-
-		@Test
-		public void matches() {
-			assertThat(Values.none().matches(Values.none())).isFalse();
-		}
 	}
 
 	@Nested
@@ -183,14 +178,6 @@ public class ValuesTest {
 		@Test
 		public void asString() {
 			assertThat(Values.ofText("aaa")).hasToString("Text[aaa]");
-		}
-
-		@Test
-		public void matches() {
-			Value text = Values.ofText("aaabaaa");
-			assertThat(text.matches(Values.ofText("a+ba+"))).isTrue();
-			assertThat(text.matches(Values.ofText(".*b.*"))).isTrue();
-			assertThat(text.matches(Values.ofText(".*c.*"))).isFalse();
 		}
 
 		@Test

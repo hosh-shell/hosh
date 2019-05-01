@@ -172,15 +172,6 @@ public class Values {
 			}
 		}
 
-		@Override
-		public boolean matches(Value that) {
-			if (that instanceof TextValue) {
-				return value.matches(((TextValue) that).value);
-			} else {
-				return false;
-			}
-		}
-
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> Optional<T> unwrap(Class<T> type) {
@@ -258,11 +249,6 @@ public class Values {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
-
-		@Override
-		public boolean matches(Value that) {
-			return false;
-		}
 	}
 
 	static final class NumericValue implements Value {
@@ -310,11 +296,6 @@ public class Values {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
-
-		@Override
-		public boolean matches(Value that) {
-			return false;
-		}
 	}
 
 	static final class None implements Value {
@@ -346,11 +327,6 @@ public class Values {
 			} else {
 				return -1;
 			}
-		}
-
-		@Override
-		public boolean matches(Value that) {
-			return false;
 		}
 	}
 
@@ -401,11 +377,6 @@ public class Values {
 		public int hashCode() {
 			return Objects.hash(duration);
 		}
-
-		@Override
-		public boolean matches(Value that) {
-			return false;
-		}
 	}
 
 	static final class InstantValue implements Value {
@@ -455,11 +426,6 @@ public class Values {
 		@Override
 		public int hashCode() {
 			return Objects.hash(instant);
-		}
-
-		@Override
-		public boolean matches(Value that) {
-			return false;
 		}
 	}
 
@@ -512,11 +478,6 @@ public class Values {
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
-		}
-
-		@Override
-		public boolean matches(Value that) {
-			return false;
 		}
 	}
 
