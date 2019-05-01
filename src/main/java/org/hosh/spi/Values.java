@@ -33,6 +33,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -178,6 +179,15 @@ public class Values {
 			} else {
 				return false;
 			}
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> Optional<T> unwrap(Class<T> type) {
+			if (type.isAssignableFrom(String.class)) {
+				return (Optional<T>) Optional.of(value);
+			}
+			return Optional.empty();
 		}
 	}
 

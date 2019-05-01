@@ -213,6 +213,14 @@ public class ValuesTest {
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("styles cannot be null");
 		}
+
+		@Test
+		public void unwrap() {
+			Value value = Values.ofText("aaa");
+			assertThat(value.unwrap(int.class)).isEmpty();
+			assertThat(value.unwrap(String.class)).hasValue("aaa");
+			assertThat(value.unwrap(CharSequence.class)).hasValue("aaa");
+		}
 	}
 
 	@Nested

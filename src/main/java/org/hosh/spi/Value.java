@@ -23,10 +23,19 @@
  */
 package org.hosh.spi;
 
+import java.util.Optional;
+
+import org.hosh.doc.Experimental;
+
 /**
  * The value in @{see Record}.
  */
 public interface Value extends Comparable<Value>, Printable {
 
 	boolean matches(Value that);
+
+	@Experimental(description = "this could replace matches() very easily")
+	default <T> Optional<T> unwrap(Class<T> type) {
+		return Optional.empty();
+	}
 }
