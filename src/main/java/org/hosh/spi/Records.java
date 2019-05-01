@@ -115,7 +115,12 @@ public class Records {
 
 		@Override
 		public final boolean equals(Object obj) {
-			return obj instanceof Empty;
+			if (obj instanceof Record) {
+				Record that = (Record) obj;
+				return this.size() == that.size() && this.entries().equals(that.entries());
+			} else {
+				return false;
+			}
 		}
 
 		@Override

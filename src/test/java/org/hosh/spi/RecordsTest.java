@@ -93,6 +93,14 @@ public class RecordsTest {
 	}
 
 	@Test
+	public void emptyWithGenericEmpty() {
+		Record empty = Records.empty();
+		Record generic = Records.builder().build(); // instance of Generic but empty
+		assertThat(empty).isEqualTo(generic);
+		assertThat(generic).isEqualTo(empty);
+	}
+
+	@Test
 	public void singletonEqualsGenericAndViceversa() {
 		Record singleton = Records.singleton(Keys.COUNT, Values.ofNumeric(1));
 		Record generic = Records.builder().entry(Keys.COUNT, Values.ofNumeric(1)).build();
