@@ -37,9 +37,6 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Records;
 import org.hosh.spi.Values;
 
-/**
- * A "private" channel implementation used by {@see PipelineCommand}.
- */
 public class PipelineChannel implements Channel {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
@@ -113,13 +110,8 @@ public class PipelineChannel implements Channel {
 		return String.format("PipelineChannel[done=%s,queue=%s]", done, queue);
 	}
 
-	/**
-	 * Since send() is a void method an exception is needed
-	 * to forcibly stop a producer.
-	 *
-	 * This is the dual of poison pill record, sent by a producer to
-	 * stop any downstream readers.
-	 */
+	// Since send() is a void method an exception is needed
+	// to forcibly stop a producer.
 	public static class ProducerPoisonPill extends RuntimeException {
 
 		private static final long serialVersionUID = 1L;

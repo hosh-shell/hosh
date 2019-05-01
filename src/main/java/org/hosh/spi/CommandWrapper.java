@@ -25,24 +25,15 @@ package org.hosh.spi;
 
 import java.util.List;
 
-import org.hosh.doc.Experimental;
+import org.hosh.doc.Todo;
 
-/**
- * A @{see Command} specialization that performs set-up and clean-up.
- */
+@Todo(description = "rename to WithResource")
 public interface CommandWrapper<T> extends Command {
 
-	/**
-	 * Create and set-up a resource.
-	 */
 	T before(List<String> args, Channel in, Channel out, Channel err);
 
-	/**
-	 * Clean-up the resource.
-	 */
 	void after(T resource, Channel in, Channel out, Channel err);
 
-	@Experimental(description = "retry the inner start if this method reports true, required by 'benchmark'")
 	default boolean retry(T resource, Channel in, Channel out, Channel err) {
 		return false;
 	}
