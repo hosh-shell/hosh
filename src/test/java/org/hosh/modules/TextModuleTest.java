@@ -172,15 +172,15 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoArgsMatching() {
-			Record record = Records.singleton(Keys.TEXT, Values.ofText("1 2 3"));
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("a b c"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), " "), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Records.builder()
-					.entry(Keys.of("a"), Values.ofText("1"))
-					.entry(Keys.of("b"), Values.ofText("2"))
-					.entry(Keys.of("c"), Values.ofText("3"))
+					.entry(Keys.of("1"), Values.ofText("a"))
+					.entry(Keys.of("2"), Values.ofText("b"))
+					.entry(Keys.of("3"), Values.ofText("c"))
 					.build());
 			then(err).shouldHaveZeroInteractions();
 		}

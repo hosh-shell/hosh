@@ -84,7 +84,7 @@ public class TextModule implements Module {
 
 	@Help(description = "select a subset of keys from a record")
 	@Examples({
-			@Example(description = "select some keys from TSV file", command = "lines file.tsv | split text '\\t' | select b c"),
+			@Example(description = "select some keys from TSV file", command = "lines file.tsv | split text '\\t' | select 1 2 3"),
 	})
 	public static class Select implements Command {
 
@@ -141,18 +141,18 @@ public class TextModule implements Module {
 		}
 
 		private Record split(Pattern pattern, String str, Map<Integer, Key> cachedKeys) {
-			int i = 0;
+			int k = 1;
 			Records.Builder builder = Records.builder();
 			for (String value : pattern.split(str)) {
-				Key key = cachedKeys.computeIfAbsent(i, this::makeKey);
+				Key key = cachedKeys.computeIfAbsent(k, this::makeKey);
 				builder.entry(key, Values.ofText(value));
-				i++;
+				k++;
 			}
 			return builder.build();
 		}
 
 		private Key makeKey(Integer i) {
-			return Keys.of(Character.toString(i + 'a'));
+			return Keys.of(Integer.toString(i));
 		}
 	}
 
