@@ -98,10 +98,10 @@ public class TextModule implements Module {
 				}
 				Record record = incoming.get();
 				Records.Builder builder = Records.builder();
-				record.entries().forEach(kv -> {
-					if (keys.contains(kv.getKey())) {
-						builder.entry(kv.getKey(), kv.getValue());
-					}
+				keys.forEach(k -> {
+					record.value(k).ifPresent(v -> {
+						builder.entry(k, v);
+					});
 				});
 				out.send(builder.build());
 			}
