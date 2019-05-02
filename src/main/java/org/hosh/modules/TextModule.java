@@ -57,7 +57,6 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.Records;
-import org.hosh.spi.Records.Builder;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
@@ -129,19 +128,25 @@ public class TextModule implements Module {
 					break;
 				}
 				Record record = incoming.get();
-				record.value(key).ifPresent(line -> {
-					line.unwrap(String.class).ifPresent(str -> {
-						int i = 0;
-						Builder builder = Records.builder();
-						for (String value : pattern.split(str)) {
-							builder.entry(Keys.of(Character.toString(i + 'a')), Values.ofText(value));
-							i++;
-						}
-						out.send(builder.build());
-					});
-				});
+				record.value(key)
+						.flatMap(v -> v.unwrap(String.class))
+						.ifPresent(str -> {
+							Record splitted = split(pattern, str);
+							out.send(splitted);
+						});
 			}
 			return ExitStatus.success();
+		}
+
+		private Record split(Pattern pattern, String str) {
+			int i = 0;
+			Records.Builder builder = Records.builder();
+			for (String value : pattern.split(str)) {
+				String keyName = Character.toString(i + 'a');
+				builder.entry(Keys.of(keyName), Values.ofText(value));
+				i++;
+			}
+			return builder.build();
 		}
 	}
 
