@@ -117,7 +117,7 @@ public class Records {
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record) {
 				Record that = (Record) obj;
-				return this.size() == that.size() && this.entries().equals(that.entries());
+				return that.size() == 0;
 			} else {
 				return false;
 			}
@@ -199,7 +199,7 @@ public class Records {
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record) {
 				Record that = (Record) obj;
-				return this.size() == that.size() && this.entries().equals(that.entries());
+				return that.size() == 1 && this.entries().equals(that.entries());
 			} else {
 				return false;
 			}
