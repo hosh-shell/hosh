@@ -64,9 +64,9 @@ public class RecordsTest {
 		Record a = Records.empty();
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
 		Record b = a.append(Keys.SIZE, Values.ofHumanizedSize(10));
-		assertThat(b.toString()).isEqualTo("Record[data={Key[size]=Size[10B]}]");
+		assertThat(b.toString()).isEqualTo("Record[data={Key['size']=Size[10B]}]");
 		Record c = b.append(Keys.NAME, Values.ofText("foo"));
-		assertThat(c.toString()).isEqualTo("Record[data={Key[size]=Size[10B], Key[name]=Text[foo]}]");
+		assertThat(c.toString()).isEqualTo("Record[data={Key['size']=Size[10B], Key['name']=Text[foo]}]");
 	}
 
 	@Test
@@ -153,7 +153,7 @@ public class RecordsTest {
 	@Test
 	public void entry() {
 		Entry entry = new Entry(Keys.NAME, Values.none());
-		assertThat(entry).hasToString("Entry[key=Key[name],value=None]");
+		assertThat(entry).hasToString("Entry[key=Key['name'],value=None]");
 		assertThat(entry.getKey()).isEqualTo(Keys.NAME);
 		assertThat(entry.getValue()).isEqualTo(Values.none());
 	}

@@ -27,8 +27,8 @@ import java.util.Objects;
 
 /**
  * Standard keys used over and over through all commands. Usually such keys
- * convey some semantic information
- * and some defaults regarding textual representation in terminal.
+ * convey some semantic information and some defaults regarding textual
+ * representation in terminal.
  *
  * Built-in commands can use "private" keys when appropriate.
  */
@@ -96,19 +96,19 @@ public class Keys {
 	}
 
 	public static Key of(String key) {
-		return new SingleWordKey(key);
+		return new StringKey(key);
 	}
 
-	static final class SingleWordKey implements Key {
+	static final class StringKey implements Key {
 
 		private final String name;
 
-		public SingleWordKey(String name) {
+		public StringKey(String name) {
 			if (name == null) {
 				throw new IllegalArgumentException("name must be not null");
 			}
-			if (!name.matches("[a-z]+")) {
-				throw new IllegalArgumentException("name must be a single lowercase word");
+			if (name.isBlank()) {
+				throw new IllegalArgumentException("name must be not blank");
 			}
 			this.name = name;
 		}
@@ -119,10 +119,10 @@ public class Keys {
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (obj instanceof SingleWordKey) {
-				final SingleWordKey that = (SingleWordKey) obj;
-				return Objects.equals(this.name, that.name);
+		public final boolean equals(Object obj) {
+			if (obj instanceof Key) {
+				final Key that = (Key) obj;
+				return Objects.equals(this.name(), that.name());
 			} else {
 				return false;
 			}
@@ -135,12 +135,12 @@ public class Keys {
 
 		@Override
 		public String toString() {
-			return String.format("Key[%s]", this.name);
+			return String.format("Key['%s']", this.name);
 		}
 
 		@Override
 		public int compareTo(Key o) {
-			return this.name().compareTo(o.name());
+			return this.name.compareTo(o.name());
 		}
 	}
 }

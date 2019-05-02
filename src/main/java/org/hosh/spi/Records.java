@@ -56,7 +56,7 @@ public class Records {
 	 */
 	public static class Builder {
 
-		private final LinkedHashMap<Key, Value> data = new LinkedHashMap<>(2);
+		private final LinkedHashMap<Key, Value> data = new LinkedHashMap<>();
 
 		private Builder() {
 		}

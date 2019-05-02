@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hosh.doc.Todo;
+import org.hosh.spi.Ansi.Style;
 
 /**
  * Built-in value objects to be used in @{see Record}.
@@ -67,8 +68,10 @@ public class Values {
 		return new NumericValue(number);
 	}
 
+	private static final Style[] EMPTY_STYLE = new Ansi.Style[0];
+
 	public static Value ofText(String text) {
-		return new TextValue(text);
+		return new TextValue(text, EMPTY_STYLE);
 	}
 
 	public static Value ofStyledText(String text, Ansi.Style... styles) {
@@ -117,7 +120,7 @@ public class Values {
 
 		private final Ansi.Style[] styles;
 
-		public TextValue(String value, Ansi.Style... styles) {
+		public TextValue(String value, Ansi.Style[] styles) {
 			if (value == null) {
 				throw new IllegalArgumentException("text cannot be null");
 			}

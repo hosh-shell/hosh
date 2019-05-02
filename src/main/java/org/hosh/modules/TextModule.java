@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -122,6 +123,7 @@ public class TextModule implements Module {
 			}
 			Key key = Keys.of(args.get(0));
 			Pattern pattern = Pattern.compile(args.get(1));
+			Map<Integer, Key> cachedKeys = new HashMap<>();
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
@@ -131,22 +133,26 @@ public class TextModule implements Module {
 				record.value(key)
 						.flatMap(v -> v.unwrap(String.class))
 						.ifPresent(str -> {
-							Record splitted = split(pattern, str);
+							Record splitted = split(pattern, str, cachedKeys);
 							out.send(splitted);
 						});
 			}
 			return ExitStatus.success();
 		}
 
-		private Record split(Pattern pattern, String str) {
+		private Record split(Pattern pattern, String str, Map<Integer, Key> cachedKeys) {
 			int i = 0;
 			Records.Builder builder = Records.builder();
 			for (String value : pattern.split(str)) {
-				String keyName = Character.toString(i + 'a');
-				builder.entry(Keys.of(keyName), Values.ofText(value));
+				Key key = cachedKeys.computeIfAbsent(i, this::makeKey);
+				builder.entry(key, Values.ofText(value));
 				i++;
 			}
 			return builder.build();
+		}
+
+		private Key makeKey(Integer i) {
+			return Keys.of(Character.toString(i + 'a'));
 		}
 	}
 
