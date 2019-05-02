@@ -24,15 +24,17 @@
 package org.hosh.spi;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.hosh.spi.Record.Entry;
 
 public class Records {
 
@@ -56,18 +58,18 @@ public class Records {
 	 */
 	public static class Builder {
 
-		private final LinkedHashMap<Key, Value> data = new LinkedHashMap<>();
+		private final ArrayList<Entry> data = new ArrayList<>();
 
 		private Builder() {
 		}
 
 		public Builder entry(Key key, Value value) {
-			data.put(key, value);
+			data.add(new Entry(key, value));
 			return this;
 		}
 
 		public Record build() {
-			return new Generic(new LinkedHashMap<>(data));
+			return new Generic(data.toArray(Entry[]::new));
 		}
 	}
 
@@ -218,69 +220,71 @@ public class Records {
 
 	static class Generic implements Record {
 
-		private final Map<Key, Value> data;
+		private final Entry[] entries;
 
-		private Generic(Map<Key, Value> data) {
-			if (data == null) {
+		private Generic(Entry[] entries) {
+			if (entries == null) {
 				throw new IllegalArgumentException("data cannot be null");
 			}
-			this.data = data;
+			this.entries = entries;
 		}
 
 		@Override
 		public Record append(Key key, Value value) {
-			Map<Key, Value> copy = new LinkedHashMap<>(data.size() + 1);
-			copy.putAll(this.data);
-			copy.put(key, value);
-			return new Generic(copy);
+			Entry[] newEntries = Arrays.copyOf(entries, entries.length + 1);
+			newEntries[entries.length] = new Entry(key, value);
+			return new Generic(newEntries);
 		}
 
 		@Override
 		public Record prepend(Key key, Value value) {
-			Map<Key, Value> copy = new LinkedHashMap<>(data.size() + 1);
-			copy.put(key, value);
-			copy.putAll(this.data);
-			return new Generic(copy);
+			Entry[] newEntries = new Entry[entries.length + 1];
+			newEntries[0] = new Entry(key, value);
+			for (int i = 0; i < entries.length; i++) {
+				newEntries[i + 1] = entries[i];
+			}
+			return new Generic(newEntries);
 		}
 
 		@Override
 		public List<Key> keys() {
-			return data
-					.keySet()
-					.stream()
+			return Arrays
+					.stream(entries)
+					.map(Entry::getKey)
 					.collect(Collectors.toUnmodifiableList());
 		}
 
 		@Override
 		public List<Value> values() {
-			return data
-					.values()
-					.stream()
+			return Arrays
+					.stream(entries)
+					.map(Entry::getValue)
 					.collect(Collectors.toUnmodifiableList());
 		}
 
 		@Override
 		public List<Entry> entries() {
-			return data
-					.entrySet()
-					.stream()
-					.map(kv -> new Entry(kv.getKey(), kv.getValue()))
-					.collect(Collectors.toList());
+			return List.of(entries);
 		}
 
 		@Override
 		public Optional<Value> value(Key key) {
-			return Optional.ofNullable(data.get(key));
+			for (Entry entry : entries) {
+				if (entry.getKey().equals(key)) {
+					return Optional.of(entry.getValue());
+				}
+			}
+			return Optional.empty();
 		}
 
 		@Override
 		public int size() {
-			return data.size();
+			return entries.length;
 		}
 
 		@Override
 		public final int hashCode() {
-			return Objects.hash(data);
+			return Objects.hash((Object[]) entries);
 		}
 
 		@Override
@@ -295,7 +299,11 @@ public class Records {
 
 		@Override
 		public String toString() {
-			return String.format("Record[data=%s]", data);
+			return String.format("Record[data={%s}]",
+					Arrays
+							.stream(entries)
+							.map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+							.collect(Collectors.joining(",")));
 		}
 
 		@Override

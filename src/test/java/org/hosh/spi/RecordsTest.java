@@ -66,7 +66,7 @@ public class RecordsTest {
 		Record b = a.append(Keys.SIZE, Values.ofHumanizedSize(10));
 		assertThat(b.toString()).isEqualTo("Record[data={Key['size']=Size[10B]}]");
 		Record c = b.append(Keys.NAME, Values.ofText("foo"));
-		assertThat(c.toString()).isEqualTo("Record[data={Key['size']=Size[10B], Key['name']=Text[foo]}]");
+		assertThat(c.toString()).isEqualTo("Record[data={Key['size']=Size[10B],Key['name']=Text[foo]}]");
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class RecordsTest {
 	public void equalsContract() {
 		EqualsVerifier.forClass(Records.Empty.class).verify();
 		EqualsVerifier.forClass(Records.Singleton.class).verify();
-		EqualsVerifier.forClass(Records.Generic.class).withNonnullFields("data").verify();
+		EqualsVerifier.forClass(Records.Generic.class).withNonnullFields("entries").verify();
 		EqualsVerifier.forClass(Entry.class).verify();
 	}
 
