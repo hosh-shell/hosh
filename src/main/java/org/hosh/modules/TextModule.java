@@ -90,7 +90,7 @@ public class TextModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			Set<Key> keys = args.stream().map(Keys::of).collect(Collectors.toUnmodifiableSet());
+			List<Key> keys = args.stream().map(Keys::of).collect(Collectors.toUnmodifiableList());
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
