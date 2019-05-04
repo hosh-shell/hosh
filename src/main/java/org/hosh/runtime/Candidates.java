@@ -23,52 +23,25 @@
  */
 package org.hosh.runtime;
 
-import java.util.Objects;
-
 import org.jline.reader.Candidate;
 
 /**
- * {@link Candidate} as value object
+ * Facade to simplify creation of JLine candidates.
  */
-public class DebuggableCandidate extends Candidate {
+public class Candidates {
 
-	public static DebuggableCandidate incomplete(String value) {
-		return new DebuggableCandidate(value, false);
+	public static Candidate incomplete(String value) {
+		return new Candidate(value, value, null, null, null, null, false);
 	}
 
-	public static DebuggableCandidate complete(String value) {
-		return new DebuggableCandidate(value, true);
+	public static Candidate complete(String value) {
+		return new Candidate(value, value, null, null, null, null, true);
 	}
 
-	public static DebuggableCandidate completeWithDescription(String value, String description) {
-		return new DebuggableCandidate(value, description, true);
+	public static Candidate completeWithDescription(String value, String description) {
+		return new Candidate(value, value, null, description, null, null, true);
 	}
 
-	private DebuggableCandidate(String value, String desc, boolean complete) {
-		super(value, value, null, desc, null, null, complete);
-	}
-
-	private DebuggableCandidate(String value, boolean complete) {
-		this(value, null, complete);
-	}
-
-	@Override
-	public final boolean equals(Object obj) {
-		if (obj instanceof DebuggableCandidate) {
-			DebuggableCandidate that = (DebuggableCandidate) obj;
-			return Objects.equals(this.value(), that.value());
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public final int hashCode() {
-		return Objects.hash(this.value());
-	}
-
-	@Override
-	public String toString() {
-		return String.format("Candidate[value='%s',complete=%s]", value(), complete());
+	private Candidates() {
 	}
 }

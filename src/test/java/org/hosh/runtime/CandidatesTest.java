@@ -25,24 +25,32 @@ package org.hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.jline.reader.Candidate;
 import org.junit.jupiter.api.Test;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-
-public class DebuggableCandidateTest {
+public class CandidatesTest {
 
 	@Test
-	public void equalsContract() {
-		EqualsVerifier.configure()
-				.suppress(Warning.ALL_FIELDS_SHOULD_BE_USED)
-				.forClass(DebuggableCandidate.class)
-				.verify();
+	public void incomplete() {
+		Candidate incomplete = Candidates.incomplete("file");
+		assertThat(incomplete.value()).isEqualTo("file");
+		assertThat(incomplete.complete()).isFalse();
+		assertThat(incomplete.descr()).isNull();
 	}
 
 	@Test
-	public void stringValue() {
-		assertThat(DebuggableCandidate.complete("aa")).hasToString("Candidate[value='aa',complete=true]");
-		assertThat(DebuggableCandidate.incomplete("aa")).hasToString("Candidate[value='aa',complete=false]");
+	public void complete() {
+		Candidate complete = Candidates.complete("file");
+		assertThat(complete.value()).isEqualTo("file");
+		assertThat(complete.complete()).isTrue();
+		assertThat(complete.descr()).isNull();
+	}
+
+	@Test
+	public void completeWithDescription() {
+		Candidate complete = Candidates.completeWithDescription("file", "external command");
+		assertThat(complete.value()).isEqualTo("file");
+		assertThat(complete.complete()).isTrue();
+		assertThat(complete.descr()).isEqualTo("external command");
 	}
 }

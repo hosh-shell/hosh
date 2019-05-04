@@ -85,11 +85,11 @@ public class FileSystemCompleter implements Completer {
 		}
 	}
 
-	private DebuggableCandidate toCandidate(Path path) {
+	private Candidate toCandidate(Path path) {
 		if (Files.isDirectory(path)) {
-			return DebuggableCandidate.incomplete(path.toString() + File.separator);
+			return Candidates.incomplete(path.toString() + File.separator);
 		} else {
-			return DebuggableCandidate.complete(path.toString());
+			return Candidates.complete(path.toString());
 		}
 	}
 }

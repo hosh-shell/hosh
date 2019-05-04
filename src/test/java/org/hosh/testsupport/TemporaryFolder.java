@@ -60,12 +60,16 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 		recursiveDelete(folder);
 	}
 
-	public File newFile(String fileName) throws IOException {
-		File file = new File(folder, fileName);
+	public File newFile(File parent, String fileName) throws IOException {
+		File file = new File(parent, fileName);
 		if (!file.createNewFile()) {
 			throw new IOException("cannot create new file: " + file);
 		}
 		return file;
+	}
+
+	public File newFile(String fileName) throws IOException {
+		return newFile(folder, fileName);
 	}
 
 	public File newFile() throws IOException {

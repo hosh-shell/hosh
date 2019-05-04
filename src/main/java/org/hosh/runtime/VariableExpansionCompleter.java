@@ -46,7 +46,7 @@ public class VariableExpansionCompleter implements Completer {
 					.keySet()
 					.stream()
 					.map(s -> "${" + s + "}")
-					.map(DebuggableCandidate::complete)
+					.map(Candidates::complete)
 					.forEach(candidates::add);
 		}
 	}

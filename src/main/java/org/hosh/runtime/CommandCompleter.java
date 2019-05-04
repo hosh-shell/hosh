@@ -61,7 +61,7 @@ public class CommandCompleter implements Completer {
 		state.getCommands().keySet()
 				.stream()
 				.filter(command -> !builtinOverrides.contains(command))
-				.map(command -> DebuggableCandidate.completeWithDescription(command, "built-in"))
+				.map(command -> Candidates.completeWithDescription(command, "built-in"))
 				.forEach(candidates::add);
 	}
 
@@ -84,7 +84,7 @@ public class CommandCompleter implements Completer {
 		}
 	}
 
-	private DebuggableCandidate toCandidate(Path p, Set<String> builtinOverrides) {
+	private Candidate toCandidate(Path p, Set<String> builtinOverrides) {
 		String name = p.getFileName().toString();
 		String description;
 		if (state.getCommands().containsKey(name)) {
@@ -93,6 +93,6 @@ public class CommandCompleter implements Completer {
 		} else {
 			description = "external in " + p.getParent();
 		}
-		return DebuggableCandidate.completeWithDescription(name, description);
+		return Candidates.completeWithDescription(name, description);
 	}
 }

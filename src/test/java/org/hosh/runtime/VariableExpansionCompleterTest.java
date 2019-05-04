@@ -23,9 +23,10 @@
  */
 package org.hosh.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,33 +53,42 @@ public class VariableExpansionCompleterTest {
 	@Spy
 	private State state = new State();
 
-	@Mock
-	private List<Candidate> candidates;
-
 	@InjectMocks
 	private VariableExpansionCompleter sut;
 
 	@Test
 	public void notInExpansion() {
 		given(parsedLine.word()).willReturn("a");
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
-		then(candidates).shouldHaveZeroInteractions();
+		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	public void inExpansionMatchingSingle() {
 		given(parsedLine.word()).willReturn("${");
 		given(state.getVariables()).willReturn(Map.of("FOO", "whatever"));
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
-		then(candidates).should().add(DebuggableCandidate.complete("${FOO}"));
+		assertThat(candidates)
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("${FOO}");
+					assertThat(candidate.descr()).isNull();
+				});
 	}
 
 	@Test
 	public void inExpansionMatchingMultiple() {
 		given(parsedLine.word()).willReturn("${");
 		given(state.getVariables()).willReturn(Map.of("FOO", "whatever", "BAR", "whatever"));
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
-		then(candidates).should().add(DebuggableCandidate.complete("${FOO}"));
-		then(candidates).should().add(DebuggableCandidate.complete("${BAR}"));
+		assertThat(candidates)
+				.hasSize(2)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).matches("\\Q${FOO}\\E|\\Q${BAR}\\E");
+					assertThat(candidate.descr()).isNull();
+				});
 	}
 }

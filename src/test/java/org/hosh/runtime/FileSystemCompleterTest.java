@@ -23,11 +23,12 @@
  */
 package org.hosh.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hosh.doc.Todo;
@@ -43,7 +44,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,9 +61,6 @@ public class FileSystemCompleterTest {
 	@Mock(stubOnly = true)
 	private ParsedLine line;
 
-	@Mock
-	private List<Candidate> candidates;
-
 	@InjectMocks
 	private FileSystemCompleter sut;
 
@@ -71,16 +68,18 @@ public class FileSystemCompleterTest {
 	public void emptyWordInEmptyDir() {
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).shouldHaveZeroInteractions();
+		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	public void nonEmptyWordInEmptyDir() {
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("aaa");
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).shouldHaveZeroInteractions();
+		assertThat(candidates).isEmpty();
 	}
 
 	@Test
@@ -88,8 +87,14 @@ public class FileSystemCompleterTest {
 		temporaryFolder.newFile("a");
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should().add(DebuggableCandidate.complete("a"));
+		assertThat(candidates)
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("a");
+					assertThat(candidate.complete()).isTrue();
+				});
 	}
 
 	@Test
@@ -97,32 +102,57 @@ public class FileSystemCompleterTest {
 	@DisabledOnOs(OS.WINDOWS)
 	public void slash() {
 		given(line.word()).willReturn("/");
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should(Mockito.atLeastOnce()).add(Mockito.any());
+		assertThat(candidates)
+				.isNotEmpty()
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isNotBlank();
+				});
 	}
 
 	@Test
 	public void absoluteDirWithoutEndingSeparator() throws IOException {
-		File newFile = temporaryFolder.newFile("aaa");
+		File dir = temporaryFolder.newFolder("dir");
+		File newFile = temporaryFolder.newFile(dir, "aaa");
 		given(line.word()).willReturn(newFile.getParent());
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should().add(DebuggableCandidate.incomplete(temporaryFolder.toFile().getAbsolutePath() + File.separator));
+		assertThat(candidates)
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo(dir.getAbsolutePath() + File.separator);
+					assertThat(candidate.complete()).isFalse();
+				});
 	}
 
 	@Test
 	public void absoluteDirWithEndingSeparator() throws IOException {
-		File newFile = temporaryFolder.newFile("aaa");
+		File dir = temporaryFolder.newFolder("dir");
+		File newFile = temporaryFolder.newFile(dir, "aaa");
 		given(line.word()).willReturn(newFile.getParent() + File.separator);
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should().add(DebuggableCandidate.complete(newFile.getAbsolutePath()));
+		assertThat(candidates)
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo(newFile.getAbsolutePath());
+					assertThat(candidate.complete()).isTrue();
+				});
 	}
 
 	@Test
 	public void partialMatchDirectory() throws IOException {
-		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		temporaryFolder.newFolder(temporaryFolder.newFolder("aaa"), "bbb");
+		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("aaa" + File.separator + "b");
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should(Mockito.atLeastOnce()).add(DebuggableCandidate.complete("aaa" + File.separator + "bbb"));
+		assertThat(candidates)
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("aaa" + File.separator + "bbb");
+					assertThat(candidate.complete()).isTrue();
+				});
 	}
 }

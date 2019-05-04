@@ -25,7 +25,6 @@ package org.hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,26 +63,28 @@ public class CommandCompleterTest {
 	@Mock(stubOnly = true)
 	private ParsedLine line;
 
-	@Mock
-	private List<Candidate> candidates;
-
 	@InjectMocks
 	private CommandCompleter sut;
 
 	@Test
 	public void emptyPathAndNoBuitins() {
 		given(state.getPath()).willReturn(List.of());
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).shouldHaveZeroInteractions();
+		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	public void builtin() {
-		List<Candidate> candidates = new ArrayList<>();
 		given(state.getCommands()).willReturn(Collections.singletonMap("cmd", command.getClass()));
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.containsExactly(DebuggableCandidate.completeWithDescription("cmd", "built-in"));
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("cmd");
+					assertThat(candidate.descr()).isEqualTo("built-in");
+				});
 	}
 
 	@Test
@@ -91,13 +92,13 @@ public class CommandCompleterTest {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		File file = temporaryFolder.newFile("cmd");
 		assert file.setExecutable(true, true);
-		List<Candidate> candidates = new ArrayList<>();
 		given(state.getCommands()).willReturn(Collections.singletonMap("cmd", command.getClass()));
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
 				.hasSize(1)
-				.first()
-				.satisfies(candidate -> {
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("cmd");
 					assertThat(candidate.descr()).isEqualTo("built-in, overrides " + file.getAbsolutePath());
 				});
 	}
@@ -105,26 +106,34 @@ public class CommandCompleterTest {
 	@Test
 	public void pathWithEmptyDir() {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).shouldHaveZeroInteractions();
+		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	public void pathWithExecutable() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
-		File file = temporaryFolder.newFile("executable");
+		File file = temporaryFolder.newFile("cmd");
 		assert file.setExecutable(true, true);
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).should()
-				.add(DebuggableCandidate.completeWithDescription("executable", "external " + temporaryFolder.toFile().getAbsolutePath()));
+		assertThat(candidates)
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("cmd");
+					assertThat(candidate.descr()).isEqualTo("external in " + temporaryFolder.toPath().toAbsolutePath());
+				});
 	}
 
 	@Test
 	public void skipNonInPathDirectory() throws IOException {
 		File file = temporaryFolder.newFile();
 		given(state.getPath()).willReturn(List.of(file.toPath()));
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).shouldHaveZeroInteractions();
+		assertThat(candidates)
+				.isEmpty();
 	}
 
 	@Test
@@ -133,7 +142,8 @@ public class CommandCompleterTest {
 		bin.setExecutable(false);
 		bin.setReadable(false); // throws java.nio.file.AccessDeniedException
 		given(state.getPath()).willReturn(List.of(bin.toPath().toAbsolutePath()));
+		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
-		then(candidates).shouldHaveZeroInteractions();
+		assertThat(candidates).isEmpty();
 	}
 }
