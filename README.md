@@ -22,6 +22,22 @@
 - distributed as uber-jar or docker image
 - MIT license
 
+## Examples
+
+### HTTP
+
+Stream line by line a TSV file via HTTPS, take first 10 lines, split each line by tab yielding a 1-indexed record and finally show a subset of keys:
+
+```
+hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
+```
+
+that could be translated to the following UNIX pipeline:
+
+```
+bash$ wget -q -O - -- https://git.io/v9MjZ | head -n 10 | awk -v OFS='\t' '{print $10, $1, $12}'
+```
+
 
 ## Inspired by
 - https://zsh.org
