@@ -38,7 +38,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hosh.doc.Todo;
-import org.hosh.spi.Ansi.Style;
 
 /**
  * Built-in value objects to be used in @{see Record}.
@@ -68,14 +67,12 @@ public class Values {
 		return new NumericValue(number);
 	}
 
-	private static final Style[] EMPTY_STYLE = new Ansi.Style[0];
-
 	public static Value ofText(String text) {
-		return new TextValue(text, EMPTY_STYLE);
+		return new TextValue(text, Ansi.Style.NONE);
 	}
 
-	public static Value ofStyledText(String text, Ansi.Style... styles) {
-		return new TextValue(text, styles);
+	public static Value ofStyledText(String text, Ansi.Style style) {
+		return new TextValue(text, style);
 	}
 
 	public enum Unit {
@@ -118,28 +115,24 @@ public class Values {
 
 		private final String value;
 
-		private final Ansi.Style[] styles;
+		private final Ansi.Style style;
 
-		public TextValue(String value, Ansi.Style[] styles) {
+		public TextValue(String value, Ansi.Style style) {
 			if (value == null) {
 				throw new IllegalArgumentException("text cannot be null");
 			}
-			if (styles == null) {
-				throw new IllegalArgumentException("styles cannot be null");
+			if (style == null) {
+				throw new IllegalArgumentException("style cannot be null");
 			}
-			this.styles = styles;
+			this.style = style;
 			this.value = value;
 		}
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			for (var style : styles) {
-				style.enable(printWriter);
-			}
+			style.enable(printWriter);
 			printWriter.append(value);
-			for (var style : styles) {
-				style.disable(printWriter);
-			}
+			style.disable(printWriter);
 			printWriter.flush();
 		}
 

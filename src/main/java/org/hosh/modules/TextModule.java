@@ -535,6 +535,7 @@ public class TextModule implements Module {
 	@Examples({
 			@Example(command = "rand | enumerate |take 3 | table", description = "output a nicely formatted table")
 	})
+	@Todo(description = "this is just a proof of concept")
 	public static class Table implements Command {
 
 		private int i = 0;
@@ -592,7 +593,7 @@ public class TextModule implements Module {
 					.map(this::formatterFor)
 					.collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
-			out.send(Records.singleton(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.BOLD, Ansi.Style.FG_CYAN)));
+			out.send(Records.singleton(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.FG_CYAN)));
 		}
 
 		@Todo(description = "be aware of width of unicode char, see https://github.com/joshuarubin/wcwidth9")

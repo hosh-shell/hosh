@@ -171,7 +171,7 @@ public class ValuesTest {
 		@Test
 		public void equalsContract() {
 			EqualsVerifier.forClass(Values.TextValue.class)
-					.withIgnoredFields("styles")
+					.withIgnoredFields("style")
 					.verify();
 		}
 
@@ -196,9 +196,9 @@ public class ValuesTest {
 
 		@Test
 		public void nullStyles() {
-			assertThatThrownBy(() -> Values.ofStyledText("asd", (Ansi.Style[]) null))
+			assertThatThrownBy(() -> Values.ofStyledText("asd", null))
 					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("styles cannot be null");
+					.hasMessage("style cannot be null");
 		}
 
 		@Test
