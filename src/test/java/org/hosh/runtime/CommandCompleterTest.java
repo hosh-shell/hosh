@@ -23,13 +23,17 @@
  */
 package org.hosh.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.hosh.spi.Command;
 import org.hosh.spi.State;
 import org.hosh.testsupport.TemporaryFolder;
 import org.jline.reader.Candidate;
@@ -43,10 +47,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class ExternalCommandCompleterTest {
+public class CommandCompleterTest {
 
 	@RegisterExtension
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Mock(stubOnly = true)
+	private Command command;
 
 	@Mock(stubOnly = true)
 	private State state;
@@ -61,13 +68,38 @@ public class ExternalCommandCompleterTest {
 	private List<Candidate> candidates;
 
 	@InjectMocks
-	private ExternalCommandCompleter sut;
+	private CommandCompleter sut;
 
 	@Test
-	public void emptyPath() {
+	public void emptyPathAndNoBuitins() {
 		given(state.getPath()).willReturn(List.of());
 		sut.complete(lineReader, line, candidates);
 		then(candidates).shouldHaveZeroInteractions();
+	}
+
+	@Test
+	public void builtin() {
+		List<Candidate> candidates = new ArrayList<>();
+		given(state.getCommands()).willReturn(Collections.singletonMap("cmd", command.getClass()));
+		sut.complete(lineReader, line, candidates);
+		assertThat(candidates)
+				.containsExactly(DebuggableCandidate.completeWithDescription("cmd", "built-in"));
+	}
+
+	@Test
+	public void builtinOverridesExternal() throws IOException {
+		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
+		File file = temporaryFolder.newFile("cmd");
+		assert file.setExecutable(true, true);
+		List<Candidate> candidates = new ArrayList<>();
+		given(state.getCommands()).willReturn(Collections.singletonMap("cmd", command.getClass()));
+		sut.complete(lineReader, line, candidates);
+		assertThat(candidates)
+				.hasSize(1)
+				.first()
+				.satisfies(candidate -> {
+					assertThat(candidate.descr()).isEqualTo("built-in, overrides " + file.getAbsolutePath());
+				});
 	}
 
 	@Test
@@ -99,7 +131,7 @@ public class ExternalCommandCompleterTest {
 	public void ioErrorsAreIgnored() throws IOException {
 		File bin = temporaryFolder.newFolder("bin");
 		bin.setExecutable(false);
-		bin.setReadable(false);
+		bin.setReadable(false); // throws java.nio.file.AccessDeniedException
 		given(state.getPath()).willReturn(List.of(bin.toPath().toAbsolutePath()));
 		sut.complete(lineReader, line, candidates);
 		then(candidates).shouldHaveZeroInteractions();

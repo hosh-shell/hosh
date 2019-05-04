@@ -26,7 +26,9 @@ package org.hosh.runtime;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -38,39 +40,59 @@ import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
-public class ExternalCommandCompleter implements Completer {
+public class CommandCompleter implements Completer {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 	private final State state;
 
-	public ExternalCommandCompleter(State state) {
+	public CommandCompleter(State state) {
 		this.state = state;
 	}
 
 	@Override
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
+		Set<String> builtinOverrides = new HashSet<>();
+		completeExternals(candidates, builtinOverrides);
+		completeBuiltinsExcludingOverrides(candidates, builtinOverrides);
+	}
+
+	private void completeBuiltinsExcludingOverrides(List<Candidate> candidates, Set<String> builtinOverrides) {
+		state.getCommands().keySet()
+				.stream()
+				.filter(command -> !builtinOverrides.contains(command))
+				.map(command -> DebuggableCandidate.completeWithDescription(command, "built-in"))
+				.forEach(candidates::add);
+	}
+
+	private void completeExternals(List<Candidate> candidates, Set<String> builtinOverrides) {
 		for (Path path : state.getPath()) {
 			if (Files.isDirectory(path)) {
-				executableInPath(path, candidates);
+				executableInPath(path, candidates, builtinOverrides);
 			}
 		}
 	}
 
-	private void executableInPath(Path dir, List<Candidate> candidates) {
+	private void executableInPath(Path dir, List<Candidate> candidates, Set<String> builtinOverrides) {
 		try (Stream<Path> list = Files.list(dir)) {
 			list
 					.filter(p -> Files.isExecutable(p))
-					.map(p -> toCandidate(p))
+					.map(p -> toCandidate(p, builtinOverrides))
 					.forEach(candidates::add);
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, "got exception while listing " + dir, e);
 		}
 	}
 
-	private DebuggableCandidate toCandidate(Path p) {
+	private DebuggableCandidate toCandidate(Path p, Set<String> builtinOverrides) {
 		String name = p.getFileName().toString();
-		String description = "external in " + p.getParent();
+		String description;
+		if (state.getCommands().containsKey(name)) {
+			description = "built-in, overrides " + p.toAbsolutePath();
+			builtinOverrides.add(name);
+		} else {
+			description = "external in " + p.getParent();
+		}
 		return DebuggableCandidate.completeWithDescription(name, description);
 	}
 }
