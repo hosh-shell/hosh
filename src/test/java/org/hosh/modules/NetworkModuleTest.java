@@ -24,11 +24,16 @@
 package org.hosh.modules;
 
 import static org.hosh.testsupport.ExitStatusAssert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import java.net.http.HttpResponse;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import org.hosh.doc.Todo;
+import org.hosh.modules.NetworkModule.Http;
+import org.hosh.modules.NetworkModule.Http.Requestor;
 import org.hosh.modules.NetworkModule.Network;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -79,6 +84,49 @@ public class NetworkModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class HttpTest {
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@Mock(stubOnly = true)
+		private Requestor requestor;
+
+		@Mock(stubOnly = true)
+		private HttpResponse<Stream<String>> response;
+
+		@InjectMocks
+		private Http sut;
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: http URL")));
+		}
+
+		@Test
+		public void oneArg() {
+			given(requestor.send(Mockito.any())).willReturn(response);
+			given(response.body()).willReturn(Stream.of("line1"));
+			ExitStatus exitStatus = sut.run(Arrays.asList("https://example.org"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
+			then(err).shouldHaveZeroInteractions();
 		}
 	}
 }

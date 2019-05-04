@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- introducing very primitive 'http' command
+    - GET only
+    - HTTP 1.1/2.0
+    - detect system proxy
 
 ## [0.0.30] - 2019-05-01
 - new commands: 'cp', 'mv', 'rm'

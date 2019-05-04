@@ -23,16 +23,27 @@
  */
 package org.hosh.modules;
 
+import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.NetworkInterface;
+import java.net.ProxySelector;
 import java.net.SocketException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Help;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandRegistry;
@@ -48,6 +59,7 @@ public class NetworkModule implements Module {
 	@Override
 	public void onStartup(CommandRegistry commandRegistry) {
 		commandRegistry.registerCommand("network", Network.class);
+		commandRegistry.registerCommand("http", Http.class);
 	}
 
 	@Help(description = "list network interfaces")
@@ -100,6 +112,62 @@ public class NetworkModule implements Module {
 					}
 				}
 				return formatter.toString();
+			}
+		}
+	}
+
+	@Help(description = "http client (supports HTTP 1.1/2.0, HTTPS, system proxy)")
+	@Examples({
+			@Example(command = "http https://git.io/v9MjZ | take 10", description = "take first 10 lines of https://git.io/v9MjZ ")
+	})
+	@Todo(description = "support additional methods (e.g. POST, DELETE), set headers, inspect response headers, integration tests (httpbin?)")
+	public static class Http implements Command {
+
+		private Requestor requestor = new DefaultRequestor();
+
+		public void setRequestor(Requestor requestor) {
+			this.requestor = requestor;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: http URL")));
+				return ExitStatus.error();
+			}
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create(args.get(0)))
+					.GET()
+					.build();
+			HttpResponse<Stream<String>> response = requestor.send(request);
+			response.body().forEach(line -> {
+				out.send(Records.singleton(Keys.TEXT, Values.ofText(line)));
+			});
+			return ExitStatus.success();
+		}
+
+		interface Requestor {
+
+			HttpResponse<Stream<String>> send(HttpRequest request);
+		}
+
+		private static class DefaultRequestor implements Requestor {
+
+			@Override
+			public HttpResponse<Stream<String>> send(HttpRequest request) {
+				HttpClient client = HttpClient.newBuilder()
+						.version(Version.HTTP_2)
+						.followRedirects(Redirect.NORMAL)
+						.proxy(ProxySelector.getDefault())
+						.build();
+				try {
+					return client.send(request, BodyHandlers.ofLines());
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					throw new RuntimeException(e);
+				}
 			}
 		}
 	}
