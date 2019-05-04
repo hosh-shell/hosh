@@ -602,6 +602,6 @@ public class TextModule implements Module {
 				Keys.PATH, 30,
 				Keys.SIZE, 8,
 				Keys.TIMESTAMP, 30,
-				Keys.of("hwaddress"), 14);
+				Keys.of("hwaddress"), 20);
 	}
 }

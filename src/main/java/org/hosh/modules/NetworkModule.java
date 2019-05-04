@@ -107,8 +107,11 @@ public class NetworkModule implements Module {
 		private String formatHex(byte[] bytes) {
 			try (Formatter formatter = new Formatter()) {
 				if (bytes != null) {
-					for (byte b : bytes) {
-						formatter.format("%02x", b);
+					for (int i = 0; i < bytes.length; i++) {
+						formatter.format("%02x", bytes[i]);
+						if (i < bytes.length - 1) {
+							formatter.format(":");
+						}
 					}
 				}
 				return formatter.toString();
