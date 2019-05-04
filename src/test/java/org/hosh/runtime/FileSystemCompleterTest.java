@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hosh.doc.Todo;
 import org.hosh.spi.State;
 import org.hosh.testsupport.TemporaryFolder;
 import org.jline.reader.Candidate;
@@ -39,6 +38,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -97,11 +97,25 @@ public class FileSystemCompleterTest {
 				});
 	}
 
-	@Test
-	@Todo(description = "fails on windows, / should be C:/, use Path.getRoot?")
 	@DisabledOnOs(OS.WINDOWS)
-	public void slash() {
-		given(line.word()).willReturn("/");
+	@Test
+	public void rootDirUnix() {
+		String rootDir = "/";
+		given(line.word()).willReturn(rootDir);
+		List<Candidate> candidates = new ArrayList<>();
+		sut.complete(lineReader, line, candidates);
+		assertThat(candidates)
+				.isNotEmpty()
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isNotBlank();
+				});
+	}
+
+	@EnabledOnOs(OS.WINDOWS)
+	@Test
+	public void rootDirWindows() {
+		String rootDir = "c:\\";
+		given(line.word()).willReturn(rootDir);
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
