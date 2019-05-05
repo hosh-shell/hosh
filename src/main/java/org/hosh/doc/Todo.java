@@ -29,7 +29,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Document a planned feature or improvement.
+ * Document a planned feature or idea.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({

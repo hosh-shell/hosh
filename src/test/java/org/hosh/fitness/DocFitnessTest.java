@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.BootstrapBuiltins;
+import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Examples;
-import org.hosh.doc.Help;
 import org.hosh.runtime.CommandResolvers;
 import org.hosh.runtime.Compiler;
 import org.hosh.runtime.Compiler.CompileError;
@@ -89,7 +89,7 @@ public class DocFitnessTest {
 					.stream()
 					.filter(c -> c.getEnclosingClass() != null && c.getEnclosingClass().getSimpleName().endsWith("Module"))
 					.collect(Collectors.toList());
-			List<Class<?>> withHelp = commands.stream().filter(c -> c.isAnnotationPresent(Help.class)).collect(Collectors.toList());
+			List<Class<?>> withHelp = commands.stream().filter(c -> c.isAnnotationPresent(BuiltIn.class)).collect(Collectors.toList());
 			List<Class<?>> withExamples = commands.stream().filter(c -> c.isAnnotationPresent(Examples.class))
 					.collect(Collectors.toList());
 			assertThat(withHelp).as("@Help").containsExactlyInAnyOrderElementsOf(commands);

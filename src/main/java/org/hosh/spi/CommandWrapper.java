@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.hosh.doc.Todo;
 
-@Todo(description = "rename to WithResource")
+@Todo(description = "rename to WithResource?")
 public interface CommandWrapper<T> extends Command {
 
 	T before(List<String> args, Channel in, Channel out, Channel err);

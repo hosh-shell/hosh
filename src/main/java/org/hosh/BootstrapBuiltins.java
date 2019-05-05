@@ -25,7 +25,7 @@ package org.hosh;
 
 import java.util.ServiceLoader;
 
-import org.hosh.doc.Help;
+import org.hosh.doc.BuiltIn;
 import org.hosh.runtime.CommandRegistry;
 import org.hosh.runtime.SimpleCommandRegistry;
 import org.hosh.spi.Command;
@@ -45,8 +45,8 @@ public class BootstrapBuiltins {
 			Class<?>[] declaredClasses = module.getClass().getDeclaredClasses();
 			for (Class<?> declaredClass : declaredClasses) {
 				if (Command.class.isAssignableFrom(declaredClass)) {
-					Help annotation = declaredClass.getAnnotation(Help.class);
-					commandRegistry.registerCommand(annotation.name(), (Class<? extends Command>) declaredClass);
+					BuiltIn builtIn = declaredClass.getAnnotation(BuiltIn.class);
+					commandRegistry.registerCommand(builtIn.name(), (Class<? extends Command>) declaredClass);
 				}
 			}
 		}

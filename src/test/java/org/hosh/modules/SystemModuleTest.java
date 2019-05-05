@@ -35,9 +35,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
-import org.hosh.doc.Help;
 import org.hosh.modules.SystemModule.Benchmark;
 import org.hosh.modules.SystemModule.Benchmark.Accumulator;
 import org.hosh.modules.SystemModule.Echo;
@@ -293,7 +293,7 @@ public class SystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 		}
 
-		@Help(name = "true", description = "/bin/true replacement")
+		@BuiltIn(name = "true", description = "/bin/true replacement")
 		@Examples({
 				@Example(command = "true", description = "returns exit success")
 		})
@@ -305,7 +305,7 @@ public class SystemModuleTest {
 			}
 		}
 
-		@Help(name = "false", description = "/bin/false replacement")
+		@BuiltIn(name = "false", description = "/bin/false replacement")
 		private class False implements Command {
 
 			@Override

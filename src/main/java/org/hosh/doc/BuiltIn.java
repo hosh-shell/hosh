@@ -29,11 +29,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is used to produce user-facing documentation.
+ * Register a built-in command and allows to
+ * automatically generate user-facing documentation via 'help' command.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-public @interface Help {
+public @interface BuiltIn {
 
 	String name();
 

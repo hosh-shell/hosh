@@ -47,7 +47,7 @@ import java.util.Set;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Experimental;
-import org.hosh.doc.Help;
+import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Ansi.Style;
 import org.hosh.spi.Channel;
@@ -65,7 +65,7 @@ import org.hosh.spi.Values;
 
 public class SystemModule implements Module {
 
-	@Help(name = "echo", description = "write arguments to output")
+	@BuiltIn(name = "echo", description = "write arguments to output")
 	@Examples({
 			@Example(command = "echo", description = "write empty line"),
 			@Example(command = "echo hello", description = "write 'hello'"),
@@ -81,7 +81,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "env", description = "display all variables")
+	@BuiltIn(name = "env", description = "display all variables")
 	@Examples({
 			@Example(command = "env", description = "display all environment variables"),
 	})
@@ -112,7 +112,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "exit", description = "exit current interactive session or script")
+	@BuiltIn(name = "exit", description = "exit current interactive session or script")
 	@Examples({
 			@Example(command = "exit", description = "exit with status 0 (success)"),
 			@Example(command = "exit 1", description = "exit with status 1 (error)"),
@@ -150,7 +150,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "help", description = "built-in help system")
+	@BuiltIn(name = "help", description = "built-in help system")
 	@Examples({
 			@Example(command = "help", description = "print all built-in commands"),
 			@Example(command = "help command", description = "print help for specified command")
@@ -179,7 +179,7 @@ public class SystemModule implements Module {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("command not found: " + commandName)));
 					return ExitStatus.error();
 				}
-				Help help = commandClass.getAnnotation(Help.class);
+				BuiltIn help = commandClass.getAnnotation(BuiltIn.class);
 				if (help == null) {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
 					return ExitStatus.error();
@@ -202,7 +202,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "sleep", description = "suspend execution for given duration, measured in millis")
+	@BuiltIn(name = "sleep", description = "suspend execution for given duration, measured in millis")
 	@Examples({
 			@Example(command = "sleep 1000", description = "suspend execution for 1000 millis (1s)"),
 	})
@@ -229,7 +229,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "withTime", description = "measure execution time of command or pipeline")
+	@BuiltIn(name = "withTime", description = "measure execution time of command or pipeline")
 	@Examples({
 			@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
 			@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
@@ -249,7 +249,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "ps", description = "process status")
+	@BuiltIn(name = "ps", description = "process status")
 	@Examples({
 			@Example(command = "ps", description = "list all running process in the system as the current user"),
 	})
@@ -276,7 +276,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "kill", description = "kill process")
+	@BuiltIn(name = "kill", description = "kill process")
 	@Examples({
 			@Example(command = "kill 38878", description = "kill process with PID 38878"),
 	})
@@ -321,7 +321,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "err", description = "create a runtime error, mostly for testing purposes")
+	@BuiltIn(name = "err", description = "create a runtime error, mostly for testing purposes")
 	@Examples({
 			@Example(command = "lines file.txt | err", description = "inject an error in this pipeline")
 	})
@@ -333,7 +333,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "benchmark", description = "measure execution time (best, worst, average) of inner command")
+	@BuiltIn(name = "benchmark", description = "measure execution time (best, worst, average) of inner command")
 	@Examples({
 			@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
 	})
@@ -410,7 +410,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "sink", description = "consume any record (e.g. like /dev/null)")
+	@BuiltIn(name = "sink", description = "consume any record (e.g. like /dev/null)")
 	@Examples({
 			@Example(command = "ls | sink", description = "consume any record produced by ls")
 	})
@@ -428,7 +428,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "set", description = "create or update a variable binding)")
+	@BuiltIn(name = "set", description = "create or update a variable binding)")
 	@Examples({
 			@Example(command = "set FILE file.txt", description = "create variable FILE"),
 			@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
@@ -459,7 +459,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "unset", description = "delete a variable binding)")
+	@BuiltIn(name = "unset", description = "delete a variable binding)")
 	@Examples({
 			@Example(command = "unset FILE", description = "delete variable FILE, cannot be reference anymore after this command"),
 	})
@@ -484,7 +484,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "capture", description = "capture output of a command into a variable")
+	@BuiltIn(name = "capture", description = "capture output of a command into a variable")
 	@Examples({
 			@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
 	})
@@ -522,7 +522,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(name = "open", description = "send output of a command into a file")
+	@BuiltIn(name = "open", description = "send output of a command into a file")
 	@Examples({
 			@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
 	})

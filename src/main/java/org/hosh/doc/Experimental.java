@@ -31,7 +31,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks an experimental API, subject to change, removal, etc.
+ * Marks an experimental API/command as subject to change, removal, etc.
  */
 @Documented
 @Inherited

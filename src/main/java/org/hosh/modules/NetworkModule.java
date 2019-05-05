@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
-import org.hosh.doc.Help;
+import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -55,7 +55,7 @@ import org.hosh.spi.Values;
 
 public class NetworkModule implements Module {
 
-	@Help(name = "network", description = "list network interfaces")
+	@BuiltIn(name = "network", description = "list network interfaces")
 	@Examples({
 			@Example(command = "network", description = "list all network interfaces")
 	})
@@ -112,7 +112,7 @@ public class NetworkModule implements Module {
 		}
 	}
 
-	@Help(name = "http", description = "http client (supports HTTP 1.1/2.0, HTTPS, system proxy)")
+	@BuiltIn(name = "http", description = "http client (supports HTTP 1.1/2.0, HTTPS, system proxy)")
 	@Examples({
 			@Example(command = "http https://git.io/v9MjZ | take 10", description = "take first 10 lines of https://git.io/v9MjZ ")
 	})

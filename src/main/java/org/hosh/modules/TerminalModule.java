@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
-import org.hosh.doc.Help;
+import org.hosh.doc.BuiltIn;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
@@ -42,7 +42,7 @@ import org.jline.utils.InfoCmp;
 
 public class TerminalModule implements Module {
 
-	@Help(name = "dump", description = "dump terminal info")
+	@BuiltIn(name = "dump", description = "dump terminal info")
 	@Examples({
 			@Example(command = "dump", description = "output current terminal information (similar to stty -a)"),
 	})
@@ -71,7 +71,7 @@ public class TerminalModule implements Module {
 		}
 	}
 
-	@Help(name = "clear", description = "clear the terminal screen")
+	@BuiltIn(name = "clear", description = "clear the terminal screen")
 	@Examples({
 			@Example(command = "clear", description = "clear terminal screen"),
 	})
@@ -96,7 +96,7 @@ public class TerminalModule implements Module {
 		}
 	}
 
-	@Help(name = "bell", description = "ring/bell the terminal screen")
+	@BuiltIn(name = "bell", description = "ring/bell the terminal screen")
 	@Examples({
 			@Example(command = "bell", description = "send 'bell' command to the terminal"),
 	})
