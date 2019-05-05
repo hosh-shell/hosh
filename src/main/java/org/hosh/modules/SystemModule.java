@@ -52,7 +52,6 @@ import org.hosh.doc.Todo;
 import org.hosh.spi.Ansi.Style;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
-import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Key;
@@ -66,27 +65,7 @@ import org.hosh.spi.Values;
 
 public class SystemModule implements Module {
 
-	@Override
-	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("echo", Echo.class);
-		commandRegistry.registerCommand("env", Env.class);
-		commandRegistry.registerCommand("quit", Exit.class);
-		commandRegistry.registerCommand("exit", Exit.class);
-		commandRegistry.registerCommand("help", HelpCommand.class);
-		commandRegistry.registerCommand("sleep", Sleep.class);
-		commandRegistry.registerCommand("withTime", WithTime.class);
-		commandRegistry.registerCommand("ps", ProcessList.class);
-		commandRegistry.registerCommand("kill", KillProcess.class);
-		commandRegistry.registerCommand("err", Err.class);
-		commandRegistry.registerCommand("benchmark", Benchmark.class);
-		commandRegistry.registerCommand("sink", Sink.class);
-		commandRegistry.registerCommand("set", SetVariable.class);
-		commandRegistry.registerCommand("unset", UnsetVariable.class);
-		commandRegistry.registerCommand("capture", CaptureVariable.class);
-		commandRegistry.registerCommand("open", Open.class);
-	}
-
-	@Help(description = "write arguments to output")
+	@Help(name = "echo", description = "write arguments to output")
 	@Examples({
 			@Example(command = "echo", description = "write empty line"),
 			@Example(command = "echo hello", description = "write 'hello'"),
@@ -102,7 +81,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "display all variables")
+	@Help(name = "env", description = "display all variables")
 	@Examples({
 			@Example(command = "env", description = "display all environment variables"),
 	})
@@ -133,7 +112,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "exit current interactive session or script")
+	@Help(name = "exit", description = "exit current interactive session or script")
 	@Examples({
 			@Example(command = "exit", description = "exit with status 0 (success)"),
 			@Example(command = "exit 1", description = "exit with status 1 (error)"),
@@ -171,7 +150,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "built-in help system")
+	@Help(name = "help", description = "built-in help system")
 	@Examples({
 			@Example(command = "help", description = "print all built-in commands"),
 			@Example(command = "help command", description = "print help for specified command")
@@ -223,7 +202,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "suspend execution for given duration, measured in millis")
+	@Help(name = "sleep", description = "suspend execution for given duration, measured in millis")
 	@Examples({
 			@Example(command = "sleep 1000", description = "suspend execution for 1000 millis (1s)"),
 	})
@@ -250,7 +229,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "measure execution time of command or pipeline")
+	@Help(name = "withTime", description = "measure execution time of command or pipeline")
 	@Examples({
 			@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
 			@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
@@ -270,7 +249,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "process status")
+	@Help(name = "ps", description = "process status")
 	@Examples({
 			@Example(command = "ps", description = "list all running process in the system as the current user"),
 	})
@@ -297,7 +276,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "kill process")
+	@Help(name = "kill", description = "kill process")
 	@Examples({
 			@Example(command = "kill 38878", description = "kill process with PID 38878"),
 	})
@@ -342,7 +321,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "create a runtime error, mostly for testing purposes")
+	@Help(name = "err", description = "create a runtime error, mostly for testing purposes")
 	@Examples({
 			@Example(command = "lines file.txt | err", description = "inject an error in this pipeline")
 	})
@@ -354,7 +333,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "measure execution time (best, worst, average) of inner command")
+	@Help(name = "benchmark", description = "measure execution time (best, worst, average) of inner command")
 	@Examples({
 			@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
 	})
@@ -431,7 +410,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "consume any record (e.g. like /dev/null)")
+	@Help(name = "sink", description = "consume any record (e.g. like /dev/null)")
 	@Examples({
 			@Example(command = "ls | sink", description = "consume any record produced by ls")
 	})
@@ -449,7 +428,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "create or update a variable binding)")
+	@Help(name = "set", description = "create or update a variable binding)")
 	@Examples({
 			@Example(command = "set FILE file.txt", description = "create variable FILE"),
 			@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
@@ -480,7 +459,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "delete a variable binding)")
+	@Help(name = "unset", description = "delete a variable binding)")
 	@Examples({
 			@Example(command = "unset FILE", description = "delete variable FILE, cannot be reference anymore after this command"),
 	})
@@ -505,7 +484,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "capture output of a command into a variable")
+	@Help(name = "capture", description = "capture output of a command into a variable")
 	@Examples({
 			@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
 	})
@@ -543,7 +522,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Help(description = "send output of a command into a file")
+	@Help(name = "open", description = "send output of a command into a file")
 	@Examples({
 			@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
 	})

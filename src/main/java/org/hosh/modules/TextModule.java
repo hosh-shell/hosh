@@ -51,7 +51,6 @@ import org.hosh.spi.Ansi;
 import org.hosh.spi.Ansi.Style;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
-import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Key;
 import org.hosh.spi.Keys;
@@ -63,26 +62,7 @@ import org.hosh.spi.Values;
 
 public class TextModule implements Module {
 
-	@Override
-	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("select", Select.class);
-		commandRegistry.registerCommand("split", Split.class);
-		commandRegistry.registerCommand("regex", Regex.class);
-		commandRegistry.registerCommand("schema", Schema.class);
-		commandRegistry.registerCommand("filter", Filter.class);
-		commandRegistry.registerCommand("enumerate", Enumerate.class);
-		commandRegistry.registerCommand("timestamp", Timestamp.class);
-		commandRegistry.registerCommand("sort", Sort.class);
-		commandRegistry.registerCommand("distinct", Distinct.class);
-		commandRegistry.registerCommand("duplicated", Duplicated.class);
-		commandRegistry.registerCommand("take", Take.class);
-		commandRegistry.registerCommand("drop", Drop.class);
-		commandRegistry.registerCommand("rand", Rand.class);
-		commandRegistry.registerCommand("count", Count.class);
-		commandRegistry.registerCommand("table", Table.class);
-	}
-
-	@Help(description = "select a subset of keys from a record")
+	@Help(name = "select", description = "select a subset of keys from a record")
 	@Examples({
 			@Example(description = "select some keys from TSV file", command = "lines file.tsv | split text '\\t' | select 1 2 3"),
 	})
@@ -109,7 +89,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "convert a line to record with numerical keys by splitting")
+	@Help(name = "split", description = "convert a line to record with numerical keys by splitting")
 	@Examples({
 			@Example(description = "tab separated file to records", command = "lines file.tsv | split text '\\t'"),
 	})
@@ -156,7 +136,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "convert a line to a record using a regex with named groups")
+	@Help(name = "regex", description = "convert a line to a record using a regex with named groups")
 	@Examples({
 			@Example(description = "parse format k=v", command = "git config -l | regex text '(?<key>.+)=(?<value>.+)' | schema"),
 	})
@@ -205,7 +185,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "output keys of incoming records")
+	@Help(name = "schema", description = "output keys of incoming records")
 	@Examples({
 			@Example(command = "ls | schema", description = "output 'path size'"),
 			@Example(command = "ls | count | schema", description = "output 'count'"),
@@ -230,7 +210,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "copy incoming records to the output only if they match a regex")
+	@Help(name = "filter", description = "copy incoming records to the output only if they match a regex")
 	@Examples({
 			@Example(command = "lines file.txt | filter text '.*The.*' ", description = "output only lines containing 'The' somewhere"),
 	})
@@ -261,7 +241,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "prepend 'index' key to all incoming records")
+	@Help(name = "enumerate", description = "prepend 'index' key to all incoming records")
 	@Examples({
 			@Example(command = "lines file.txt | enumerate", description = "similar to 'cat -n'"),
 	})
@@ -286,7 +266,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "prepend 'timestamp' key to all incoming records")
+	@Help(name = "timestamp", description = "prepend 'timestamp' key to all incoming records")
 	@Examples({
 			@Example(command = "watch | timestamp", description = "tag each event with current timestamp"),
 	})
@@ -311,7 +291,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "only output records that are not repeated in the input according to the specified key")
+	@Help(name = "distinct", description = "only output records that are not repeated in the input according to the specified key")
 	@Examples({
 			@Example(command = "lines file.txt | distinct text", description = "output all unique lines in 'file.txt'")
 	})
@@ -342,7 +322,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "only output records that are repeated in the input, according to the specified key")
+	@Help(name = "duplicated", description = "only output records that are repeated in the input, according to the specified key")
 	@Examples({
 			@Example(command = "lines file.txt | duplicated text", description = "output all non-unique lines in 'file.txt'")
 	})
@@ -373,7 +353,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "sort records according to the specified key")
+	@Help(name = "sort", description = "sort records according to the specified key")
 	@Examples({
 			@Example(command = "lines file.txt | sort text", description = "sort lines in 'file.txt'")
 	})
@@ -417,7 +397,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "take first n records, discarding everything else")
+	@Help(name = "take", description = "take first n records, discarding everything else")
 	@Examples({
 			@Example(command = "lines file.txt | take 1", description = "output first line of 'file.txt'")
 	})
@@ -450,7 +430,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "drop first n records, then keep everything else")
+	@Help(name = "drop", description = "drop first n records, then keep everything else")
 	@Examples({
 			@Example(command = "lines file.txt | drop 1", description = "output 'file.txt', except the first line")
 	})
@@ -483,7 +463,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "create an infinite sequence of random numbers, remember to always limit it with '| take n'")
+	@Help(name = "rand", description = "create an infinite sequence of random numbers, remember to always limit it with '| take n'")
 	@Examples({
 			@Example(command = "rand | enumerate | take 3", description = "create 3 random records")
 	})
@@ -506,7 +486,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "count incoming records")
+	@Help(name = "count", description = "count incoming records")
 	@Examples({
 			@Example(command = "rand | take 3 | count", description = "output 3")
 	})
@@ -531,7 +511,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Help(description = "create a nicely formatted table with keys a columns")
+	@Help(name = "table", description = "create a nicely formatted table with keys a columns")
 	@Examples({
 			@Example(command = "rand | enumerate |take 3 | table", description = "output a nicely formatted table")
 	})

@@ -35,5 +35,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE })
 public @interface Help {
 
+	String name();
+
 	String description();
 }

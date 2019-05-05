@@ -21,7 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.spi;
+package org.hosh.runtime;
+
+import org.hosh.spi.Command;
 
 /** Modules uses this to register command classes */
 public interface CommandRegistry {

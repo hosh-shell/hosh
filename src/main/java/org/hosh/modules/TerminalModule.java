@@ -30,7 +30,6 @@ import org.hosh.doc.Examples;
 import org.hosh.doc.Help;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
-import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
@@ -43,14 +42,7 @@ import org.jline.utils.InfoCmp;
 
 public class TerminalModule implements Module {
 
-	@Override
-	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("dump", Dump.class);
-		commandRegistry.registerCommand("clear", Clear.class);
-		commandRegistry.registerCommand("bell", Bell.class);
-	}
-
-	@Help(description = "dump terminal info")
+	@Help(name = "dump", description = "dump terminal info")
 	@Examples({
 			@Example(command = "dump", description = "output current terminal information (similar to stty -a)"),
 	})
@@ -79,7 +71,7 @@ public class TerminalModule implements Module {
 		}
 	}
 
-	@Help(description = "clear the terminal screen")
+	@Help(name = "clear", description = "clear the terminal screen")
 	@Examples({
 			@Example(command = "clear", description = "clear terminal screen"),
 	})
@@ -104,7 +96,7 @@ public class TerminalModule implements Module {
 		}
 	}
 
-	@Help(description = "ring/bell the terminal screen")
+	@Help(name = "bell", description = "ring/bell the terminal screen")
 	@Examples({
 			@Example(command = "bell", description = "send 'bell' command to the terminal"),
 	})

@@ -51,7 +51,6 @@ import org.hosh.doc.Help;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
-import org.hosh.spi.CommandRegistry;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
@@ -65,24 +64,7 @@ import org.hosh.spi.Values;
 
 public class FileSystemModule implements Module {
 
-	@Override
-	public void onStartup(CommandRegistry commandRegistry) {
-		commandRegistry.registerCommand("cd", ChangeDirectory.class);
-		commandRegistry.registerCommand("ls", ListFiles.class);
-		commandRegistry.registerCommand("cwd", CurrentWorkingDirectory.class);
-		commandRegistry.registerCommand("lines", Lines.class);
-		commandRegistry.registerCommand("find", Find.class);
-		commandRegistry.registerCommand("watch", Watch.class);
-		commandRegistry.registerCommand("cp", Copy.class);
-		commandRegistry.registerCommand("mv", Move.class);
-		commandRegistry.registerCommand("rm", Remove.class);
-		commandRegistry.registerCommand("partitions", Partitions.class);
-		commandRegistry.registerCommand("probe", Probe.class);
-		commandRegistry.registerCommand("symlink", Symlink.class);
-		commandRegistry.registerCommand("hardlink", Hardlink.class);
-	}
-
-	@Help(description = "list files")
+	@Help(name = "ls", description = "list files")
 	@Examples({
 			@Example(command = "ls", description = "list current directory"),
 			@Example(command = "ls /tmp", description = "list specified absolute directory"),
@@ -149,7 +131,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "output current working directory")
+	@Help(name = "cwd", description = "output current working directory")
 	@Examples({
 			@Example(command = "cwd", description = "current working directory"),
 	})
@@ -173,7 +155,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "set new current working directory")
+	@Help(name = "cd", description = "set new current working directory")
 	@Examples({
 			@Example(command = "cd dir", description = "change current working directory to 'dir'"),
 			@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
@@ -203,7 +185,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "output file line by line")
+	@Help(name = "lines", description = "output file line by line")
 	@Examples({
 			@Example(command = "lines file.txt", description = "output all lines of 'file.txt'"),
 	})
@@ -236,7 +218,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "walk directory recursively")
+	@Help(name = "find", description = "walk directory recursively")
 	@Examples({
 			@Example(command = "find .", description = "recursively output all paths in '.'"),
 			@Example(command = "find /tmp", description = "recursively output all paths in '/tmp'"),
@@ -272,7 +254,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "copy file")
+	@Help(name = "cp", description = "copy file")
 	@Examples({
 			@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
 			@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"),
@@ -303,7 +285,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "move file")
+	@Help(name = "mv", description = "move file")
 	@Examples({
 			@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
 			@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"),
@@ -334,7 +316,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "remove file")
+	@Help(name = "rm", description = "remove file")
 	@Examples({
 			@Example(command = "rm target.txt", description = "remove file using current working directory"),
 			@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"),
@@ -364,7 +346,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "show partitions information like df -h")
+	@Help(name = "partitions", description = "show partitions information like df -h")
 	@Examples({
 			@Example(command = "partitions", description = "show all partitions"),
 	})
@@ -397,7 +379,7 @@ public class FileSystemModule implements Module {
 	}
 
 	@Experimental(description = "usefulness of this command is quite limited right now")
-	@Help(description = "detect content type of a file")
+	@Help(name = "probe", description = "detect content type of a file")
 	@Examples({
 			@Example(command = "probe file", description = "attempt to detect content type"),
 	})
@@ -431,7 +413,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "create symlink")
+	@Help(name = "symlink", description = "create symlink")
 	@Examples({
 			@Example(command = "symlink source target", description = "create symlink"),
 	})
@@ -461,7 +443,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "create hardlink")
+	@Help(name = "hardlink", description = "create hardlink")
 	@Examples({
 			@Example(command = "hardlink source target", description = "create hardlink"),
 	})
@@ -491,7 +473,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Help(description = "watch for filesystem change in the given path")
+	@Help(name = "watch", description = "watch for filesystem change in the given path")
 	@Examples({
 			@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
 	})

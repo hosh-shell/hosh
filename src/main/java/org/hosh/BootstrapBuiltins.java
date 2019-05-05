@@ -25,19 +25,30 @@ package org.hosh;
 
 import java.util.ServiceLoader;
 
+import org.hosh.doc.Help;
+import org.hosh.runtime.CommandRegistry;
 import org.hosh.runtime.SimpleCommandRegistry;
-import org.hosh.spi.CommandRegistry;
+import org.hosh.spi.Command;
 import org.hosh.spi.Module;
 import org.hosh.spi.State;
 
-/** Registers all built-in command, used in both production and test. */
+/**
+ * Registers all built-in command, used in both production and test.
+ */
 public class BootstrapBuiltins {
 
+	@SuppressWarnings("unchecked")
 	public void registerAllBuiltins(State state) {
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {
-			module.onStartup(commandRegistry);
+			Class<?>[] declaredClasses = module.getClass().getDeclaredClasses();
+			for (Class<?> declaredClass : declaredClasses) {
+				if (Command.class.isAssignableFrom(declaredClass)) {
+					Help annotation = declaredClass.getAnnotation(Help.class);
+					commandRegistry.registerCommand(annotation.name(), (Class<? extends Command>) declaredClass);
+				}
+			}
 		}
 	}
 }

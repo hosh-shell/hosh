@@ -293,7 +293,7 @@ public class SystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 		}
 
-		@Help(description = "/bin/true replacement")
+		@Help(name = "true", description = "/bin/true replacement")
 		@Examples({
 				@Example(command = "true", description = "returns exit success")
 		})
@@ -305,7 +305,7 @@ public class SystemModuleTest {
 			}
 		}
 
-		@Help(description = "/bin/false replacement")
+		@Help(name = "false", description = "/bin/false replacement")
 		private class False implements Command {
 
 			@Override
