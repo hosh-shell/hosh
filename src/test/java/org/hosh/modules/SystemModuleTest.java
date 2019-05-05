@@ -672,7 +672,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
 		}
 
 		@Test
@@ -681,28 +681,38 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
 		}
 
 		@Test
-		public void createsNewBinding() {
-			ExitStatus exitStatus = sut.run(List.of("FOO", "BAR"), in, out, err);
+		public void createNewVariable() {
+			ExitStatus exitStatus = sut.run(List.of("FOO", "bar"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "BAR");
+			assertThat(state.getVariables()).containsEntry("FOO", "bar");
 		}
 
 		@Test
-		public void updatesExistingBinding() {
-			state.getVariables().put("FOO", "BAR");
-			ExitStatus exitStatus = sut.run(List.of("FOO", "BAZ"), in, out, err);
+		public void updatesExistingVariable() {
+			state.getVariables().put("FOO", "baz");
+			ExitStatus exitStatus = sut.run(List.of("FOO", "baz"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "BAZ");
+			assertThat(state.getVariables()).containsEntry("FOO", "baz");
+		}
+
+		@Test
+		public void invalidVariableName() {
+			ExitStatus exitStatus = sut.run(List.of("${", "baz"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+			assertThat(state.getVariables()).isEmpty();
 		}
 	}
 

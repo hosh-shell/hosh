@@ -466,11 +466,15 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("requires 2 arguments: key value")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
 			String value = args.get(1);
+			if (!key.matches("[A-Z][A-Z0-9_]*")) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				return ExitStatus.error();
+			}
 			state.getVariables().put(key, value);
 			return ExitStatus.success();
 		}
