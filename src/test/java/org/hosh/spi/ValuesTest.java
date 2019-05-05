@@ -70,6 +70,11 @@ public class ValuesTest {
 		public void asString() {
 			assertThat(Values.none()).hasToString("None");
 		}
+
+		@Test
+		public void unwrap() throws Exception {
+			assertThat(Values.none().unwrap(Object.class)).isEmpty();
+		}
 	}
 
 	@Nested
@@ -335,6 +340,13 @@ public class ValuesTest {
 			assertThatThrownBy(() -> Values.ofPath(Paths.get("file")).compareTo(Values.ofText("2")))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Path[file] to Text[2]");
+		}
+
+		@Test
+		public void nullPath() {
+			assertThatThrownBy(() -> Values.ofPath(null))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("path cannot be null");
 		}
 	}
 

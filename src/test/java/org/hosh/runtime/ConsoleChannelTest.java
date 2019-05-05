@@ -80,6 +80,11 @@ public class ConsoleChannelTest {
 	}
 
 	@Test
+	public void recvIsEmpty() {
+		assertThat(sut.recv()).isEmpty();
+	}
+
+	@Test
 	public void repr() {
 		assertThat(sut).hasToString("ConsoleChannel[style=NONE]");
 	}
