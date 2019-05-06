@@ -25,7 +25,6 @@ package org.hosh.runtime;
 
 import org.hosh.spi.Command;
 
-/** Modules uses this to register command classes */
 public interface CommandRegistry {
 
 	void registerCommand(String name, Class<? extends Command> command);

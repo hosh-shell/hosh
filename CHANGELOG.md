@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     - GET only
     - HTTP 1.1/2.0
     - detect system proxy
+- new commands 'trim'
 
 ## [0.0.30] - 2019-05-01
 - new commands: 'cp', 'mv', 'rm'

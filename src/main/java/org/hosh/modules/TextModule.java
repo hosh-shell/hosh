@@ -42,10 +42,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Experimental;
-import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Ansi.Style;
@@ -56,7 +56,9 @@ import org.hosh.spi.Key;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
+import org.hosh.spi.Record.Entry;
 import org.hosh.spi.Records;
+import org.hosh.spi.Records.Builder;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
@@ -136,6 +138,48 @@ public class TextModule implements Module {
 		}
 	}
 
+	@BuiltIn(name = "trim", description = "trim strings")
+	@Examples({
+			@Example(command = "lines pom.xml | trim text", description = "trim")
+	})
+	public static class Trim implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 argument")));
+				return ExitStatus.error();
+			}
+			Key key = Keys.of(args.get(0));
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				Record record = incoming.get();
+				out.send(trimByKey(record, key));
+			}
+			return ExitStatus.success();
+		}
+
+		@Todo(description = "this method is recreating entries wastefully, " +
+				"perhaps would be possible to introduce some form of structural sharing in Builder")
+		private Record trimByKey(Record record, Key key) {
+			Builder builder = Records.builder();
+			List<Entry> entries = record.entries();
+			for (Entry entry : entries) {
+				if (entry.getKey().equals(key)) {
+					Value value = entry.getValue();
+					Value trimmed = value.unwrap(String.class).map(s -> s.trim()).map(s -> Values.ofText(s)).orElse(value);
+					builder.entry(key, trimmed);
+				} else {
+					builder.entry(entry.getKey(), entry.getValue());
+				}
+			}
+			return builder.build();
+		}
+	}
+
 	@BuiltIn(name = "regex", description = "convert a line to a record using a regex with named groups")
 	@Examples({
 			@Example(description = "parse format k=v", command = "git config -l | regex text '(?<key>.+)=(?<value>.+)' | schema"),
@@ -155,7 +199,7 @@ public class TextModule implements Module {
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
-					return ExitStatus.success();
+					break;
 				}
 				Record record = incoming.get();
 				record.value(key).ifPresent(v -> {
@@ -172,6 +216,7 @@ public class TextModule implements Module {
 					}
 				});
 			}
+			return ExitStatus.success();
 		}
 
 		private List<String> extractNamedGroups(String pattern) {

@@ -45,6 +45,7 @@ import org.hosh.modules.TextModule.Sort;
 import org.hosh.modules.TextModule.Split;
 import org.hosh.modules.TextModule.Table;
 import org.hosh.modules.TextModule.Take;
+import org.hosh.modules.TextModule.Trim;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
@@ -62,6 +63,78 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 public class TextModuleTest {
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class TrimTest {
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Trim sut;
+
+		@Test
+		public void empty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList("text"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 argument")));
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void trimMissingKey() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("  abc  "));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.ERROR.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void trimKey() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("  abc  "));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("abc")));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void trimKeyOfDifferentType() {
+			Record record = Records.singleton(Keys.COUNT, Values.ofNumeric(42));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.COUNT.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
