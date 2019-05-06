@@ -147,7 +147,7 @@ public class Hosh {
 
 	private static String loadScript(Path path) {
 		try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-			return lines.collect(Collectors.joining("\n"));
+			return lines.collect(Collectors.joining(";\n"));
 		} catch (IOException e) {
 			throw new UncheckedIOException("unable to load: " + path, e);
 		}

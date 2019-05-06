@@ -93,7 +93,6 @@ public class ParserTest {
 				"cd /tmp\n",
 				"cd c:\\temp\n",
 				"cd c:/temp\n",
-				"${EXECUTABLE}",
 				"cd ${DIR}",
 				"vim 'filename with spaces'",
 				"vim \"filename with spaces\"",

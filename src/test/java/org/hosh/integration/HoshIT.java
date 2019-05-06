@@ -351,6 +351,18 @@ public class HoshIT {
 		assertThat(output).isEmpty();
 	}
 
+	@Test
+	public void sequence() throws Exception {
+		Path scriptPath = givenScript(
+				"echo a ; echo b"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).contains("a", "b");
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();

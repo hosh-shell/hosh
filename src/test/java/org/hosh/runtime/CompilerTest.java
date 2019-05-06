@@ -36,6 +36,7 @@ import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -243,9 +244,10 @@ public class CompilerTest {
 		assertThat(program.getStatements()).hasSize(1);
 	}
 
-	@Bug(description = "this is a known bug", issue = "https://github.com/dfa1/hosh/issues/63")
+	@Disabled
 	@Test
-	public void variableExpansionInCommand() {
+	@Bug(description = "this is a known bug", issue = "https://github.com/dfa1/hosh/issues/63")
+	public void commandAsVariableExpansion() {
 		Program program = sut.compile("${JAVA_HOME}/bin/java");
 		assertThat(program.getStatements()).hasSize(0); // should be 1
 	}

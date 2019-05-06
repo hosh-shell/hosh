@@ -1,7 +1,7 @@
 grammar Hosh;
 
 program
-	: ( stmt )* 
+	: ( stmt )* EOF
 	;
 
 stmt
@@ -29,6 +29,8 @@ simple
 	: invocation
 	;
 
+// commands must be statically resolved before execution 
+// this is way hosh requires ID and not VARIABLE here
 invocation
 	: ID ( arg )*
 	;
@@ -40,8 +42,8 @@ arg
 	;
 
 terminator
-	: terminator NEWLINE
-	| NEWLINE?
+	: terminator ';'
+	| ';'?
 	;
 
 NEWLINE
