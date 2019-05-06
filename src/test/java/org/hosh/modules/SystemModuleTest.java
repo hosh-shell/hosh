@@ -518,7 +518,7 @@ public class SystemModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}

@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -402,7 +401,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(2)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -414,7 +413,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(1)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -424,7 +423,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(1)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -463,7 +462,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.TEXT, Values.ofText("some data")).build());
 			then(out).should().send(Records.singleton(Keys.INDEX, Values.ofNumeric(2)));
 			then(err).shouldHaveNoMoreInteractions();
@@ -503,7 +502,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("0"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -515,7 +514,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -572,7 +571,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(1)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -584,7 +583,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("1"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(1)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -597,9 +596,10 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("5"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
 			then(out).should().send(record2);
+			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -646,7 +646,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(Keys.TEXT.name(), ".*string.*"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -658,7 +658,7 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("key", ".*number.*"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -711,9 +711,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(2)).send(records.capture());
+			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record2, record1);
 		}
 
@@ -724,9 +724,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(1)).send(records.capture());
+			then(out).should(Mockito.times(1)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
 		}
 
@@ -734,6 +734,7 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -767,9 +768,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(0)).send(records.capture());
+			then(out).should(Mockito.never()).send(records.capture());
 			assertThat(records.getAllValues()).isEmpty();
 		}
 
@@ -781,9 +782,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(2)).send(records.capture());
+			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1, record2);
 		}
 
@@ -795,9 +796,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(1)).send(records.capture());
+			then(out).should().send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
 		}
 
@@ -805,6 +806,7 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -838,9 +840,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("anotherkey"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(0)).send(records.capture());
+			then(out).should(Mockito.times(0)).send(records.capture());
 			assertThat(records.getAllValues()).isEmpty();
 		}
 
@@ -852,9 +854,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(0)).send(records.capture());
+			then(out).should(Mockito.never()).send(records.capture());
 			assertThat(records.getAllValues()).isEmpty();
 		}
 
@@ -866,9 +868,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(3)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(1)).send(records.capture());
+			then(out).should(Mockito.times(1)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
 		}
 
@@ -876,6 +878,7 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -908,9 +911,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(2)).send(records.capture());
+			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
 					Records.singleton(Keys.of("header"), Values.ofText("count     text      ")),
 					Records.singleton(Keys.of("row"), Values.ofText("2         zvrnv     ")));
@@ -923,9 +926,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).should(Mockito.times(2)).recv();
+			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			verify(out, Mockito.times(2)).send(records.capture());
+			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
 					Records.singleton(Keys.of("header"), Values.ofText("count     text      ")),
 					Records.singleton(Keys.of("row"), Values.ofText("          zvrnv     ")));
@@ -935,6 +938,7 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(Arrays.asList("a"), in, out, err);
 			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
