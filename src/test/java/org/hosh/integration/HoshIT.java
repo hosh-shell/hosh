@@ -342,12 +342,12 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"# echo 'hello'",
 				"# ls",
-				"exit 0"//
+				"exit 42"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
+		assertThat(exitCode).isEqualTo(42);
 		assertThat(output).isEmpty();
 	}
 

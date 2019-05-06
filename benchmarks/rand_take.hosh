@@ -1,1 +1,5 @@
-benchmark 5 { rand | drop 10000 | take 10000 | count } | enumerate
+# simple benchmark for pipelines
+#
+# please don't change this file since it is used as baseline
+# in https://github.com/dfa1/hosh/issues/85
+benchmark 50 { rand | take 10000 | count }

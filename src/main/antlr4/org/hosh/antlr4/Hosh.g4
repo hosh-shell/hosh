@@ -5,7 +5,7 @@ program
 	;
 
 stmt
-	: pipeline NEWLINE?
+	: pipeline terminator
 	;
 
 pipeline
@@ -39,6 +39,15 @@ arg
 	| VARIABLE
 	;
 
+terminator
+	: terminator NEWLINE
+	| NEWLINE?
+	;
+
+NEWLINE
+	: '\r'? '\n' -> skip
+	;
+
 ID
 	: ( [a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/' | '\\' | '~' )+
 	;
@@ -52,14 +61,11 @@ VARIABLE
 	: '$' '{' ( [a-zA-Z0-9] | '_' | '-' )+ '}'
 	;
 
-NEWLINE
-	: '\r'? '\n'
+COMMENT
+	:  '#' ~('\r' | '\n')* -> skip
 	;
 
 WS
 	: [ \t]+ -> skip
 	;
-
-LINE_COMMENT
-	:  '#' ~[\r\n]* -> skip
-	;
+	

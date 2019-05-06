@@ -276,4 +276,18 @@ public class CompilerTest {
 					assertThat(stmt.getArguments()).isEmpty();
 				});
 	}
+
+	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/112")
+	@Test
+	public void commandAfterCommentBlock() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cmd");
+		Program program = sut.compile("#\ncmd");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first()
+				.satisfies(stmt -> {
+					assertThat(stmt.getCommand()).isSameAs(command);
+					assertThat(stmt.getArguments()).isEmpty();
+				});
+	}
 }
