@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.doc.Bug;
-import org.hosh.doc.Todo;
 import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -376,8 +375,8 @@ public class HoshIT {
 
 	private Process givenHoshProcess(Map<String, String> additionalEnv, String... args) throws IOException {
 		List<String> cmd = new ArrayList<>();
-		cmd.add(absoluteJavaFromJavaPath());
-		cmd.addAll(jacocoAgentIfPresent());
+		cmd.add(absoluteJavaBinary());
+		cmd.addAll(propagateJacocoAgentInvocation());
 		cmd.addAll(Arrays.asList("-jar", "target/dist/hosh.jar"));
 		cmd.addAll(Arrays.asList(args));
 		ProcessBuilder pb = new ProcessBuilder()
@@ -387,7 +386,7 @@ public class HoshIT {
 		return pb.start();
 	}
 
-	private String absoluteJavaFromJavaPath() {
+	private String absoluteJavaBinary() {
 		String javaHome = System.getenv("JAVA_HOME");
 		if (javaHome == null) {
 			return "java";
@@ -395,8 +394,7 @@ public class HoshIT {
 		return javaHome + File.separator + "bin" + File.separator + "java";
 	}
 
-	@Todo(description = "please feel free to improve this method :-)")
-	private List<String> jacocoAgentIfPresent() {
+	private List<String> propagateJacocoAgentInvocation() {
 		String[] arguments = ProcessHandle
 				.current()
 				.info()
@@ -422,7 +420,6 @@ public class HoshIT {
 		}
 	}
 
-	// send end of file to the process
 	private void closeInput(Process hosh) throws IOException {
 		hosh.getOutputStream().close();
 	}
