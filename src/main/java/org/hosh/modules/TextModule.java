@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
-import org.hosh.doc.Experimental;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Ansi.Style;
@@ -182,9 +181,8 @@ public class TextModule implements Module {
 
 	@BuiltIn(name = "regex", description = "convert a line to a record using a regex with named groups")
 	@Examples({
-			@Example(description = "parse format k=v", command = "git config -l | regex text '(?<key>.+)=(?<value>.+)' | schema"),
+			@Example(description = "parse k=v format into record", command = "echo \"aaa=bbb\" | regex value '(?<name>.+)=(?<value>.+)' | schema"),
 	})
-	@Experimental(description = "very hard to use")
 	public static class Regex implements Command {
 
 		@Override

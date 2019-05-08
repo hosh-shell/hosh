@@ -25,7 +25,6 @@ package org.hosh.fitness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,11 +52,7 @@ public class DocFitnessTest {
 		BootstrapBuiltins bootstrapBuiltins = new BootstrapBuiltins();
 		bootstrapBuiltins.registerAllBuiltins(state);
 		assertThat(state.getCommands()).isNotEmpty();
-		Compiler compiler = new Compiler(
-				new CommandResolvers.AggregateCommandResolver(
-						Arrays.asList(
-								new CommandResolvers.BuiltinCommandResolver(state),
-								new CommandResolvers.InfallibleResolver())));
+		Compiler compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state));
 		try (ScanResult scanResult = new ClassGraph().whitelistPackages("org.hosh").scan()) {
 			scanResult
 					.getClassesImplementing(Command.class.getCanonicalName())

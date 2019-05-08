@@ -31,12 +31,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
-import org.hosh.spi.ExitStatus;
 import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.State;
 
+/**
+ * Various strategies to resolve a string
+ * into a {@link Command} instance.
+ */
 public class CommandResolvers {
 
 	private CommandResolvers() {
@@ -175,25 +177,6 @@ public class CommandResolvers {
 				}
 			}
 			return Optional.empty();
-		}
-	}
-
-	/**
-	 * This is just a stub used to check examples (see @Examples).
-	 */
-	public static class InfallibleResolver implements CommandResolver {
-
-		@Override
-		public Optional<Command> tryResolve(String commandName) {
-			return Optional.of(new Stub());
-		}
-
-		private static class Stub implements Command {
-
-			@Override
-			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-				return ExitStatus.success();
-			}
 		}
 	}
 }

@@ -31,7 +31,9 @@ import org.antlr.v4.runtime.Recognizer;
 import org.hosh.antlr4.HoshLexer;
 import org.hosh.antlr4.HoshParser;
 
-/** Facade for ANTLR4 runtime. */
+/**
+ * Facade for ANTLR4 runtime.
+ */
 public class Parser {
 
 	public HoshParser.ProgramContext parse(String input) {

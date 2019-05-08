@@ -67,14 +67,14 @@ public class Compiler {
 	}
 
 	private Statement compilePipeline(PipelineContext ctx) {
-		if (ctx.getChildCount() == 1) {
+		if (ctx.getChildCount() == 1) { // simple command
 			return compileCommand(ctx.command());
 		}
 		if (ctx.getChildCount() == 2) { // unfinished pipeline such as "command | "
 			throw new CompileError(String.format("line %d:%d: incomplete pipeline near '%s'", ctx.getStart().getLine(),
 					ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
 		}
-		if (ctx.getChildCount() == 3) {
+		if (ctx.getChildCount() == 3) { // pipeline
 			Statement producer = compileCommand(ctx.command());
 			Statement consumer = compileStatement(ctx.stmt());
 			Statement pipeline = new Statement();
