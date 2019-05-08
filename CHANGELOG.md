@@ -5,15 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.0.31] - 2019-05-08
 - commands must be terminated with ';'
     - script are backward-compatible because Hosh is automatically ending every line with ';'
     - this allows sequence of commands like 'ls ; ls'
-- introducing very primitive 'http' command
+- new command 'http':
     - GET only
     - HTTP 1.1/2.0
     - detect system proxy
-- new commands 'trim'
-
+- new command 'trim'
 
 ## [0.0.30] - 2019-05-01
 - new commands: 'cp', 'mv', 'rm'
