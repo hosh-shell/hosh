@@ -40,9 +40,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
-import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -135,22 +135,28 @@ public class NetworkModule implements Module {
 					.uri(URI.create(args.get(0)))
 					.GET()
 					.build();
-			HttpResponse<Stream<String>> response = requestor.send(request);
-			response.body().forEach(line -> {
-				out.send(Records.singleton(Keys.TEXT, Values.ofText(line)));
-			});
-			return ExitStatus.success();
+			try {
+				HttpResponse<Stream<String>> response = requestor.send(request);
+				response.body().forEach(line -> {
+					out.send(Records.singleton(Keys.TEXT, Values.ofText(line)));
+				});
+				return ExitStatus.success();
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
+				return ExitStatus.error();
+			}
 		}
 
 		interface Requestor {
 
-			HttpResponse<Stream<String>> send(HttpRequest request);
+			HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException;
 		}
 
 		private static class DefaultRequestor implements Requestor {
 
 			@Override
-			public HttpResponse<Stream<String>> send(HttpRequest request) {
+			public HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException {
 				HttpClient client = HttpClient.newBuilder()
 						.version(Version.HTTP_2)
 						.followRedirects(Redirect.NORMAL)
@@ -160,9 +166,6 @@ public class NetworkModule implements Module {
 					return client.send(request, BodyHandlers.ofLines());
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					throw new RuntimeException(e);
 				}
 			}
 		}

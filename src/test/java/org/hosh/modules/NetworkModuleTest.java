@@ -41,9 +41,11 @@ import org.hosh.spi.Keys;
 import org.hosh.spi.Record;
 import org.hosh.spi.Records;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.WithThread;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -91,6 +93,9 @@ public class NetworkModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public class HttpTest {
 
+		@RegisterExtension
+		public final WithThread withThread = new WithThread();
+
 		@Mock
 		private Channel in;
 
@@ -119,7 +124,7 @@ public class NetworkModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		public void oneArg() throws InterruptedException {
 			given(requestor.send(Mockito.any())).willReturn(response);
 			given(response.body()).willReturn(Stream.of("line1"));
 			ExitStatus exitStatus = sut.run(Arrays.asList("https://example.org"), in, out, err);
@@ -127,6 +132,16 @@ public class NetworkModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
 			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void interrupted() throws InterruptedException {
+			given(requestor.send(Mockito.any())).willThrow(new InterruptedException("simulated"));
+			ExitStatus exitStatus = sut.run(Arrays.asList("https://example.org"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 		}
 	}
 }
