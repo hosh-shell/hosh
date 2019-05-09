@@ -61,10 +61,18 @@ public class CancellableChannelTest {
 	}
 
 	@Test
-	public void interrupted() {
+	public void recvInterrupted() {
+		Thread.currentThread().interrupt();
+		assertThatThrownBy(() -> sut.recv())
+				.hasMessage("interrupted")
+				.isInstanceOf(CancellationException.class);
+	}
+
+	@Test
+	public void sendInterrupted() {
 		Thread.currentThread().interrupt();
 		assertThatThrownBy(() -> sut.send(record))
-				.hasMessage("thread has been interrupted")
+				.hasMessage("interrupted")
 				.isInstanceOf(CancellationException.class);
 	}
 }

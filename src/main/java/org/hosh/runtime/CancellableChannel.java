@@ -30,7 +30,10 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Record;
 
 /**
- * A decorator that makes any channel implementation cancellable on send().
+ * A decorator that makes any channel implementation cancellable.
+ *
+ * This is needed to avoid handling interruptions in several classes
+ * (i.e. commands and other channels).
  */
 public class CancellableChannel implements Channel {
 
@@ -42,15 +45,17 @@ public class CancellableChannel implements Channel {
 
 	@Override
 	public void send(Record record) {
-		// this is needed to let ctrl-C interrupt the currently running thread
 		if (Thread.interrupted()) {
-			throw new CancellationException("thread has been interrupted");
+			throw new CancellationException("interrupted");
 		}
 		channel.send(record);
 	}
 
 	@Override
 	public Optional<Record> recv() {
+		if (Thread.interrupted()) {
+			throw new CancellationException("interrupted");
+		}
 		return channel.recv();
 	}
 }
