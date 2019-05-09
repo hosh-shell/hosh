@@ -34,7 +34,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -67,7 +66,6 @@ public class Supervisor implements AutoCloseable {
 		executor.shutdownNow();
 	}
 
-	@Todo(description = "use java.lang.Fiber instead of java.lang.Thread", issue = "https://github.com/dfa1/hosh/issues/85")
 	public void submit(Statement statement, Callable<ExitStatus> task) {
 		Future<ExitStatus> future = executor.submit(() -> {
 			setThreadName(statement);
@@ -141,12 +139,6 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	private void cancelIfStillRunning(Future<ExitStatus> future) {
-		if (future.isDone()) {
-			return;
-		}
-		if (future.isCancelled()) {
-			return;
-		}
 		LOGGER.finer(() -> String.format("cancelling future %s", future));
 		future.cancel(true);
 	}
