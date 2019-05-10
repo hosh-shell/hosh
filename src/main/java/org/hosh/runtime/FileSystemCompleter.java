@@ -31,10 +31,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.UnaryOperator;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import org.hosh.spi.LoggerFactory;
 import org.hosh.spi.State;
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
@@ -42,8 +40,6 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 
 public class FileSystemCompleter implements Completer {
-
-	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 	private final State state;
 
@@ -74,7 +70,6 @@ public class FileSystemCompleter implements Completer {
 	}
 
 	private void listCandidates(Path dir, UnaryOperator<Path> toPath, List<Candidate> candidates) {
-		LOGGER.fine(() -> String.format("completing %s", dir));
 		try (Stream<Path> list = Files.list(dir)) {
 			list
 					.map(toPath)
