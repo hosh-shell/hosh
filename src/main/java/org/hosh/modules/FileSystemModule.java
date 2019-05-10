@@ -44,10 +44,10 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.hosh.doc.Bug;
+import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Experimental;
-import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -473,6 +473,37 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@BuiltIn(name = "resolve", description = "resolve to canonical absolute path")
+	@Examples({
+			@Example(command = "resolve ./symlink", description = "resolve symlink to the absolute path"),
+	})
+	public static class Resolve implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: resolve file")));
+				return ExitStatus.error();
+			}
+			try {
+				Path unresolved = Path.of(args.get(0));
+				Path partiallyResolved = resolveAsAbsolutePath(state.getCwd(), unresolved);
+				Path resolved = partiallyResolved.toRealPath();
+				out.send(Records.singleton(Keys.PATH, Values.ofPath(resolved)));
+				return ExitStatus.success();
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}
+	}
+
 	@BuiltIn(name = "watch", description = "watch for filesystem change in the given path")
 	@Examples({
 			@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
@@ -554,13 +585,9 @@ public class FileSystemModule implements Module {
 	}
 
 	private static Path resolveAsAbsolutePath(Path cwd, Path file) {
-		Path resolved;
 		if (file.isAbsolute()) {
-			resolved = file;
-		} else {
-			resolved = cwd.resolve(file).normalize().toAbsolutePath();
+			return file;
 		}
-		assert resolved.isAbsolute();
-		return resolved;
+		return cwd.resolve(file).normalize().toAbsolutePath();
 	}
 }

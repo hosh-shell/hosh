@@ -50,6 +50,7 @@ import org.hosh.modules.FileSystemModule.Move;
 import org.hosh.modules.FileSystemModule.Partitions;
 import org.hosh.modules.FileSystemModule.Probe;
 import org.hosh.modules.FileSystemModule.Remove;
+import org.hosh.modules.FileSystemModule.Resolve;
 import org.hosh.modules.FileSystemModule.Symlink;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -922,6 +923,72 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ResolveTest {
+
+		@RegisterExtension
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Resolve sut;
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: resolve file")));
+		}
+
+		@Test
+		public void regularRelative() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			File newFile = temporaryFolder.newFile("file.txt");
+			ExitStatus exitStatus = sut.run(Arrays.asList("file.txt"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath().toRealPath())));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void regularaAbsolute() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			File newFile = temporaryFolder.newFile("file.txt");
+			ExitStatus exitStatus = sut.run(Arrays.asList(newFile.getAbsolutePath()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath().toRealPath())));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void symlink() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			File newFile = temporaryFolder.newFile("file.txt");
+			Files.createSymbolicLink(Path.of(temporaryFolder.toFile().getAbsolutePath(), "link"), newFile.toPath());
+			ExitStatus exitStatus = sut.run(Arrays.asList("link"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath().toRealPath())));
 			then(err).shouldHaveZeroInteractions();
 		}
 	}
