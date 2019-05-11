@@ -52,10 +52,12 @@ public class AnsiFormatter extends Formatter {
 			pw.append(logRecord.getLevel().toString());
 			style.disable(pw);
 			pw.append(']');
-			pw.append(' ');
-			pw.append('[');
-			pw.append(Thread.currentThread().getName()); // looks like logging happens in the same thread of the 'Logger.log' method call
-			pw.append(']');
+			if (logThreadName(logRecord)) {
+				pw.append(' ');
+				pw.append('[');
+				pw.append(Thread.currentThread().getName());
+				pw.append(']');
+			}
 			pw.append(' ');
 			pw.append('-');
 			pw.append(' ');
@@ -68,6 +70,12 @@ public class AnsiFormatter extends Formatter {
 			}
 			return sw.toString();
 		}
+	}
+
+	private boolean logThreadName(LogRecord logRecord) {
+		// HttpClient message already contains [threadName]
+		String loggerName = logRecord.getLoggerName();
+		return loggerName == null || !loggerName.startsWith("jdk.internal.httpclient");
 	}
 
 	private Ansi.Style colorize(Level level) {

@@ -80,6 +80,16 @@ public class AnsiFormatterTest {
 		assertThat(result).isEqualToNormalizingNewlines("1969-12-31T16:00:00.000 [INFO] [main] - message\n");
 	}
 
+	@Test
+	public void skipThreadNameForHttpClient() {
+		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
+		given(logRecord.getLevel()).willReturn(Level.INFO);
+		given(logRecord.getMessage()).willReturn("message");
+		given(logRecord.getLoggerName()).willReturn("jdk.internal.httpclient");
+		String result = sut.format(logRecord);
+		assertThat(result).isEqualToNormalizingNewlines("1969-12-31T16:00:00.000 [INFO] - message\n");
+	}
+
 	@SuppressWarnings("serial")
 	static class Stacktraceless extends RuntimeException {
 
