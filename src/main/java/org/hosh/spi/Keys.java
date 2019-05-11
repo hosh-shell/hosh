@@ -40,6 +40,11 @@ public class Keys {
 	public static final Key NAME = Keys.of("name");
 
 	/**
+	 * Human readable description of something.
+	 */
+	public static final Key DESCRIPTION = Keys.of("description");
+
+	/**
 	 * Human readable value of something (e.g. value of env variable).
 	 */
 	public static final Key VALUE = Keys.of("value");

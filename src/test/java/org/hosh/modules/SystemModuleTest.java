@@ -44,7 +44,7 @@ import org.hosh.modules.SystemModule.Echo;
 import org.hosh.modules.SystemModule.Env;
 import org.hosh.modules.SystemModule.Err;
 import org.hosh.modules.SystemModule.Exit;
-import org.hosh.modules.SystemModule.HelpCommand;
+import org.hosh.modules.SystemModule.Help;
 import org.hosh.modules.SystemModule.KillProcess;
 import org.hosh.modules.SystemModule.KillProcess.ProcessLookup;
 import org.hosh.modules.SystemModule.ProcessList;
@@ -61,6 +61,7 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.RecordMatcher;
 import org.hosh.testsupport.WithThread;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -192,7 +193,7 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class HelpCommandTest {
+	public class HelpTest {
 
 		@Mock
 		private Channel in;
@@ -210,7 +211,7 @@ public class SystemModuleTest {
 		private ArgumentCaptor<Record> records;
 
 		@InjectMocks
-		private HelpCommand sut;
+		private Help sut;
 
 		@Test
 		public void specificCommandWithExamples() {
@@ -267,11 +268,9 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
-			then(out).should(Mockito.atLeastOnce()).send(records.capture());
+			then(out).should(Mockito.atLeastOnce()).send(
+					RecordMatcher.of(Keys.NAME, Values.ofText("true"), Keys.DESCRIPTION, Values.ofText("/bin/true replacement")));
 			then(err).shouldHaveZeroInteractions();
-			assertThat(records.getAllValues())
-					.containsExactly(
-							Records.singleton(Keys.TEXT, Values.ofText("true")));
 		}
 
 		@Test

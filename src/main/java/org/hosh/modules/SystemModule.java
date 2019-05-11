@@ -42,12 +42,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
+import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Experimental;
-import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Ansi.Style;
 import org.hosh.spi.Channel;
@@ -155,7 +154,7 @@ public class SystemModule implements Module {
 			@Example(command = "help", description = "print all built-in commands"),
 			@Example(command = "help command", description = "print help for specified command")
 	})
-	public static class HelpCommand implements Command, StateAware {
+	public static class Help implements Command, StateAware {
 
 		private State state;
 
@@ -167,9 +166,15 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() == 0) {
-				Set<String> commands = state.getCommands().keySet();
-				for (String command : commands) {
-					out.send(Records.singleton(Keys.TEXT, Values.ofText(command)));
+				for (var command : state.getCommands().entrySet()) {
+					BuiltIn builtIn = command.getValue().getAnnotation(BuiltIn.class);
+					String name = builtIn.name();
+					String description = builtIn.description();
+					Record record = Records.builder()
+							.entry(Keys.NAME, Values.ofText(name))
+							.entry(Keys.DESCRIPTION, Values.ofText(description))
+							.build();
+					out.send(record);
 				}
 				return ExitStatus.success();
 			} else if (args.size() == 1) {
@@ -179,12 +184,12 @@ public class SystemModule implements Module {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("command not found: " + commandName)));
 					return ExitStatus.error();
 				}
-				BuiltIn help = commandClass.getAnnotation(BuiltIn.class);
-				if (help == null) {
+				BuiltIn builtIn = commandClass.getAnnotation(BuiltIn.class);
+				if (builtIn == null) {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
 					return ExitStatus.error();
 				}
-				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(commandName + " - " + help.description(), Style.BOLD)));
+				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(commandName + " - " + builtIn.description(), Style.BOLD)));
 				Examples examples = commandClass.getAnnotation(Examples.class);
 				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
 				if (examples != null) {
