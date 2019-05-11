@@ -53,14 +53,14 @@ public class FileSystemCompleter implements Completer {
 		if (line.word().endsWith(File.separator)) {
 			listCandidates(path, p -> p, candidates);
 		} else if (path.isAbsolute()) {
-			listCandidates(parent(path), Path::toAbsolutePath, candidates);
+			listCandidates(parent(path), p -> p.toAbsolutePath(), candidates);
 		} else if (path.getParent() != null) {
 			Path resolved = state.getCwd().resolve(path.getParent());
 			int from = state.getCwd().getNameCount();
 			int to = resolved.getNameCount() + 1;
 			listCandidates(resolved, p -> p.subpath(from, to), candidates);
 		} else {
-			listCandidates(state.getCwd(), Path::getFileName, candidates);
+			listCandidates(state.getCwd(), p -> p.getFileName(), candidates);
 		}
 	}
 
@@ -81,7 +81,13 @@ public class FileSystemCompleter implements Completer {
 	}
 
 	private Candidate toCandidate(Path path) {
-		if (Files.isDirectory(path)) {
+		Path resolved;
+		if (path.isAbsolute()) {
+			resolved = path;
+		} else {
+			resolved = state.getCwd().resolve(path);
+		}
+		if (Files.isDirectory(resolved)) {
 			return Candidates.incomplete(path.toString() + File.separator);
 		} else {
 			return Candidates.complete(path.toString());

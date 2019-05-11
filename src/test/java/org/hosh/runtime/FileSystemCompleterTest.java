@@ -165,8 +165,8 @@ public class FileSystemCompleterTest {
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo("aaa" + File.separator + "bbb");
-					assertThat(candidate.complete()).isTrue();
+					assertThat(candidate.value()).isEqualTo("aaa" + File.separator + "bbb" + File.separator);
+					assertThat(candidate.complete()).isFalse();
 				});
 	}
 }
