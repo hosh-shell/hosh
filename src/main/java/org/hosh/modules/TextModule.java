@@ -603,7 +603,7 @@ public class TextModule implements Module {
 		}
 
 		private Style alternateColor() {
-			return ++i % 2 == 0 ? Ansi.Style.BG_WHITE : Ansi.Style.BG_CYAN;
+			return ++i % 2 == 0 ? Ansi.Style.BG_WHITE : Ansi.Style.BG_BLUE;
 		}
 
 		private String formatterFor(Key key) {
@@ -623,7 +623,7 @@ public class TextModule implements Module {
 		private final Map<Key, Integer> paddings = Map.of(
 				Keys.NAME, 30,
 				Keys.PATH, 30,
-				Keys.SIZE, 8,
+				Keys.SIZE, 10,
 				Keys.TIMESTAMP, 30,
 				Keys.of("hwaddress"), 20);
 	}

@@ -49,6 +49,7 @@ import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.doc.Experimental;
 import org.hosh.doc.Todo;
+import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
@@ -70,7 +71,7 @@ public class FileSystemModule implements Module {
 			@Example(command = "ls /tmp", description = "list specified absolute directory"),
 			@Example(command = "ls directory", description = "list relative directory")
 	})
-	@Todo(description = "add support for atime and ctime")
+	@Todo(description = "add support for mtime, atime, ctime, uid, gid, etc")
 	public static class ListFiles implements Command, StateAware {
 
 		private State state;
@@ -98,10 +99,8 @@ public class FileSystemModule implements Module {
 					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
 					Value size = attributes.isRegularFile() ? Values.ofHumanizedSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
-							.entry(Keys.PATH, Values.ofPath(path.getFileName()))
+							.entry(Keys.PATH, Values.ofStyledPath(path.getFileName(), colorFor(attributes)))
 							.entry(Keys.SIZE, size)
-							.entry(Keys.of("type"), Values.ofText(typeFrom(attributes)))
-							.entry(Keys.of("mtime"), Values.ofInstant(attributes.lastModifiedTime().toInstant()))
 							.build();
 					out.send(entry);
 				}
@@ -117,17 +116,17 @@ public class FileSystemModule implements Module {
 			}
 		}
 
-		private String typeFrom(BasicFileAttributes attributes) {
+		private Ansi.Style colorFor(BasicFileAttributes attributes) {
 			if (attributes.isDirectory()) {
-				return "<dir>";
-			}
-			if (attributes.isRegularFile()) {
-				return "file";
+				return Ansi.Style.FG_CYAN;
 			}
 			if (attributes.isSymbolicLink()) {
-				return "symlink";
+				return Ansi.Style.FG_MAGENTA;
 			}
-			return "";
+			if (attributes.isOther()) {
+				return Ansi.Style.FG_YELLOW;
+			}
+			return Ansi.Style.NONE;
 		}
 	}
 

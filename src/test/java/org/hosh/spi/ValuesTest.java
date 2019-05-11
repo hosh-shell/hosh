@@ -327,7 +327,9 @@ public class ValuesTest {
 
 		@Test
 		public void equalsContract() {
-			EqualsVerifier.forClass(Values.PathValue.class).verify();
+			EqualsVerifier.forClass(Values.PathValue.class)
+					.withIgnoredFields("style")
+					.verify();
 		}
 
 		@Test

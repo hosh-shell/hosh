@@ -75,7 +75,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ListTest {
+	public class ListFilesTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();

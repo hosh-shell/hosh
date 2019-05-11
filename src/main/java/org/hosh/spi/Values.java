@@ -71,6 +71,7 @@ public class Values {
 		return new TextValue(text, Ansi.Style.NONE);
 	}
 
+	@Todo(description = "create a StyledValue decorator? be careful around equals/hashCode")
 	public static Value ofStyledText(String text, Ansi.Style style) {
 		return new TextValue(text, style);
 	}
@@ -100,11 +101,12 @@ public class Values {
 		return new SizeValue(value, unit);
 	}
 
-	/**
-	 * Paths, without any special attributes.
-	 */
 	public static Value ofPath(Path path) {
-		return new PathValue(path);
+		return new PathValue(path, Ansi.Style.NONE);
+	}
+
+	public static Value ofStyledPath(Path path, Ansi.Style style) {
+		return new PathValue(path, style);
 	}
 
 	/**
@@ -429,16 +431,25 @@ public class Values {
 
 		private final Path path;
 
-		public PathValue(Path path) {
+		private final Ansi.Style style;
+
+		public PathValue(Path path, Ansi.Style style) {
 			if (path == null) {
 				throw new IllegalArgumentException("path cannot be null");
 			}
+			if (style == null) {
+				throw new IllegalArgumentException("style cannot be null");
+			}
 			this.path = path;
+			this.style = style;
 		}
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
+			style.enable(printWriter);
 			printWriter.append(path.toString());
+			style.disable(printWriter);
+			printWriter.flush();
 		}
 
 		@Override
