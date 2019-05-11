@@ -32,8 +32,11 @@ import java.util.Optional;
 
 import org.hosh.doc.Bug;
 import org.hosh.runtime.Compiler.CompileError;
+import org.hosh.runtime.Compiler.Constant;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Statement;
+import org.hosh.runtime.Compiler.Variable;
+import org.hosh.runtime.Compiler.VariableOrFallback;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.junit.jupiter.api.Disabled;
@@ -81,20 +84,15 @@ public class CompilerTest {
 	@Test
 	public void pipelineOfCommandsWithoutArguments() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
-		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("take");
-		Program program = sut.compile("ls | take 2 | take 1");
-		assertThat(program.getStatements()).hasSize(1);
-		List<Statement> statements = program.getStatements();
-		assertThat(statements).hasSize(1);
-		Statement statement = statements.get(0);
-		assertThat(statement.getArguments()).isEmpty();
-		assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
-		statement.getCommand().downCast(PipelineCommand.class).ifPresent(outerCmd -> {
-			outerCmd.getConsumer().getCommand().downCast(PipelineCommand.class).ifPresent(innerCmd -> {
-				assertThat(innerCmd.getProducer().getArguments()).containsExactly("2");
-				assertThat(innerCmd.getConsumer().getArguments()).containsExactly("1");
-			});
-		});
+		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("count");
+		Program program = sut.compile("ls | count");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
+					statement.getCommand().downCast(PipelineCommand.class).ifPresent(outerCmd -> {
+					});
+				});
 	}
 
 	@Test
@@ -104,50 +102,78 @@ public class CompilerTest {
 		Program program = sut.compile("ls /home | grep /regex/");
 		assertThat(program.getStatements()).hasSize(1);
 		List<Statement> statements = program.getStatements();
-		assertThat(statements).hasSize(1);
-		Statement statement = statements.get(0);
-		assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
-		assertThat(statement.getArguments()).isEmpty();
+		assertThat(statements)
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
+					assertThat(statement.getArguments()).isEmpty();
+				});
 	}
 
 	@Test
-	public void commandWithVariableExpansionWithSpace() {
+	public void commandWithConstant() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
+		Program program = sut.compile("cd /tmp");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments())
+							.hasSize(1)
+							.first().isInstanceOf(Constant.class);
+				});
+	}
+
+	@Test
+	public void commandWithVariable() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
 		Program program = sut.compile("cd ${DIR}");
-		assertThat(program.getStatements()).hasSize(1);
-		List<Statement> statements = program.getStatements();
-		assertThat(statements.get(0).getCommand()).isSameAs(command);
-		assertThat(statements.get(0).getArguments()).contains("${DIR}");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments())
+							.hasSize(1)
+							.first().isInstanceOf(Variable.class);
+				});
 	}
 
 	@Test
-	public void commandWithVariableExpansionNoSpace() {
-		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
-		Program program = sut.compile("echo ${DIR}/aaa");
-		assertThat(program.getStatements()).hasSize(1);
-		List<Statement> statements = program.getStatements();
-		assertThat(statements.get(0).getCommand()).isSameAs(command);
-		assertThat(statements.get(0).getArguments()).contains("${DIR}", "/aaa");
+	public void commandWithVariableOrFallback() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
+		Program program = sut.compile("cd ${DIR!/tmp}");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments())
+							.hasSize(1)
+							.first().isInstanceOf(VariableOrFallback.class);
+				});
 	}
 
 	@Test
 	public void commandWithoutArguments() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
 		Program program = sut.compile("env");
-		assertThat(program.getStatements()).hasSize(1);
-		List<Statement> statements = program.getStatements();
-		assertThat(statements.get(0).getCommand()).isSameAs(command);
-		assertThat(statements.get(0).getArguments()).isEmpty();
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).isEmpty();
+				});
 	}
 
 	@Test
 	public void commandWithArguments() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
 		Program program = sut.compile("env --system");
-		assertThat(program.getStatements()).hasSize(1);
-		List<Statement> statements = program.getStatements();
-		assertThat(statements.get(0).getCommand()).isSameAs(command);
-		assertThat(statements.get(0).getArguments()).containsExactly("--system");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).hasSize(1);
+				});
 	}
 
 	@Test
@@ -167,7 +193,7 @@ public class CompilerTest {
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
-					assertThat(statement.getArguments()).containsExactly("-t", "-a");
+					assertThat(statement.getArguments()).hasSize(2);
 				});
 	}
 
@@ -177,27 +203,35 @@ public class CompilerTest {
 		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime { withTime { git push } }");
-		assertThat(program.getStatements()).hasSize(1);
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isInstanceOf(DefaultCommandWrapper.class);
+				});
 	}
 
 	@Test
-	public void wrappedCommandInPipeline() {
-		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
-		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
-		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
-		doReturn(Optional.of(command)).when(commandResolver).tryResolve("count");
-		Program program = sut.compile("withTime { git push } | count");
-		assertThat(program.getStatements()).hasSize(1);
-	}
-
-	@Test
-	public void strings() {
+	public void singleQuotedString() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 		Program program = sut.compile("vim 'file with spaces'");
-		assertThat(program.getStatements()).hasSize(1);
-		List<Statement> statements = program.getStatements();
-		assertThat(statements.get(0).getCommand()).isSameAs(command);
-		assertThat(statements.get(0).getArguments()).containsExactly("file with spaces");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).hasSize(1); // check string content
+				});
+	}
+
+	@Test
+	public void doubleQuotedString() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
+		Program program = sut.compile("vim \"file with spaces\"");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).hasSize(1); // check string content
+				});
 	}
 
 	@Test
@@ -241,7 +275,15 @@ public class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
 		Program program = sut.compile("benchmark 50 { ls } | schema");
-		assertThat(program.getStatements()).hasSize(1);
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getArguments()).isEmpty();
+					assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
+					PipelineCommand pipeline = (PipelineCommand) statement.getCommand();
+					assertThat(pipeline.getProducer().getCommand()).isInstanceOf(DefaultCommandWrapper.class);
+					assertThat(pipeline.getConsumer().getCommand()).isSameAs(anotherCommand);
+				});
 	}
 
 	@Disabled
@@ -259,9 +301,8 @@ public class CompilerTest {
 		Program program = sut.compile("echo ${JAVA_HOME}/bin/${JAVA_CMD}");
 		assertThat(program.getStatements())
 				.hasSize(1)
-				.first()
-				.satisfies(stmt -> {
-					assertThat(stmt.getArguments()).hasSize(3); // should be 1
+				.first().satisfies(statement -> {
+					assertThat(statement.getArguments()).hasSize(3); // should be 1
 				});
 	}
 
@@ -272,10 +313,9 @@ public class CompilerTest {
 		Program program = sut.compile("cmd # ls /tmp");
 		assertThat(program.getStatements())
 				.hasSize(1)
-				.first()
-				.satisfies(stmt -> {
-					assertThat(stmt.getCommand()).isSameAs(command);
-					assertThat(stmt.getArguments()).isEmpty();
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).isEmpty();
 				});
 	}
 
@@ -286,10 +326,9 @@ public class CompilerTest {
 		Program program = sut.compile("#\ncmd");
 		assertThat(program.getStatements())
 				.hasSize(1)
-				.first()
-				.satisfies(stmt -> {
-					assertThat(stmt.getCommand()).isSameAs(command);
-					assertThat(stmt.getArguments()).isEmpty();
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).isEmpty();
 				});
 	}
 }

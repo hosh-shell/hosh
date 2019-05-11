@@ -39,6 +39,7 @@ arg
 	: ID
 	| STRING
 	| VARIABLE
+	| VARIABLE_OR_FALLBACK
 	;
 
 terminator
@@ -51,7 +52,7 @@ NEWLINE
 	;
 
 ID
-	: ( [a-zA-Z0-9] | '_' | ':' | '-' | '.' | '/' | '\\' | '~' )+
+	: I+
 	;
 
 STRING
@@ -60,8 +61,24 @@ STRING
 	;
 
 VARIABLE
-	: '$' '{' ( [a-zA-Z0-9] | '_' | '-' )+ '}'
+	: '$' '{' V+ '}'
 	;
+
+VARIABLE_OR_FALLBACK
+	: '$' '{' V+ '!' I+ '}'
+	;
+
+fragment I : LETTER | DIGIT | ':' | '_' | '-' | '.' | '/' | '\\' | '~' ;
+
+fragment V : LETTER | '_' | '-' ;
+
+fragment LETTER: LOWER | UPPER;
+
+fragment LOWER: 'a'..'z';
+
+fragment UPPER: 'A'..'Z';
+
+fragment DIGIT: '0'..'9';
 
 COMMENT
 	:  '#' ~('\r' | '\n')* -> skip

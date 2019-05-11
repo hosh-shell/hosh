@@ -117,8 +117,20 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).contains("unknown variable: OS_ENV_VARIABLE");
+		assertThat(output).contains("cannot resolve variable: OS_ENV_VARIABLE");
 		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@Test
+	public void scriptWithMissingOsVarWithFallback() throws Exception {
+		Path scriptPath = givenScript(
+				"echo ${OS_ENV_VARIABLE!fallback}"//
+		);
+		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).contains("fallback");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test

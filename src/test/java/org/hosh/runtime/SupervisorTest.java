@@ -23,17 +23,10 @@
  */
 package org.hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hosh.testsupport.ExitStatusAssert.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
-import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.Records;
@@ -57,12 +50,6 @@ public class SupervisorTest {
 	@Mock
 	private Channel err;
 
-	@Mock(stubOnly = true)
-	private Statement statement;
-
-	@Mock(stubOnly = true)
-	private Command command;
-
 	@InjectMocks
 	private Supervisor sut;
 
@@ -79,9 +66,7 @@ public class SupervisorTest {
 
 	@Test
 	public void handleSignals() {
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Collections.emptyList());
-		sut.submit(statement, () -> {
+		sut.submit(() -> {
 			SneakySignal.raise("INT");
 			return ExitStatus.success();
 		});
@@ -91,7 +76,7 @@ public class SupervisorTest {
 
 	@Test
 	public void handleInterruptions() {
-		sut.submit(statement, () -> {
+		sut.submit(() -> {
 			Thread.sleep(10_000);
 			return ExitStatus.success();
 		});
@@ -102,29 +87,23 @@ public class SupervisorTest {
 
 	@Test
 	public void allSubmitInSuccess() {
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Collections.emptyList());
-		sut.submit(statement, () -> ExitStatus.success());
-		sut.submit(statement, () -> ExitStatus.success());
+		sut.submit(() -> ExitStatus.success());
+		sut.submit(() -> ExitStatus.success());
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
 	public void oneSubmitInError() {
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Collections.emptyList());
-		sut.submit(statement, () -> ExitStatus.success());
-		sut.submit(statement, () -> ExitStatus.error());
+		sut.submit(() -> ExitStatus.success());
+		sut.submit(() -> ExitStatus.error());
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus).isError();
 	}
 
 	@Test
 	public void oneSubmitWithException() {
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Collections.emptyList());
-		sut.submit(statement, () -> {
+		sut.submit(() -> {
 			throw new NullPointerException("simulated error");
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
@@ -134,39 +113,11 @@ public class SupervisorTest {
 
 	@Test
 	public void oneSubmitWithExceptionButNoMessage() {
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Collections.emptyList());
-		sut.submit(statement, () -> {
+		sut.submit(() -> {
 			throw new NullPointerException();
 		});
 		ExitStatus exitStatus = sut.waitForAll(err);
 		assertThat(exitStatus).isError();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("(no message provided)")));
-	}
-
-	@Test
-	public void setThreadNameWithArgs() {
-		given(command.describe()).willReturn("java");
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Arrays.asList("-jar", "hosh.jar"));
-		sut.submit(statement, () -> {
-			assertThat(Thread.currentThread().getName()).isEqualTo("command='java -jar hosh.jar'");
-			return ExitStatus.success();
-		});
-		sut.waitForAll(err);
-		then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
-	}
-
-	@Test
-	public void setThreadNameWithoutArgs() {
-		given(command.describe()).willReturn("java");
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Arrays.asList());
-		sut.submit(statement, () -> {
-			assertThat(Thread.currentThread().getName()).isEqualTo("command='java'");
-			return ExitStatus.success();
-		});
-		sut.waitForAll(err);
-		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
 	}
 }

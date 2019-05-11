@@ -122,7 +122,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 	}
 
 	private void runAsync(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err, Position position) {
-		supervisor.submit(statement, () -> {
+		supervisor.submit(() -> {
 			Command command = statement.getCommand();
 			command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline(position));
 			try {

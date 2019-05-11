@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- variable expansion with fallback
+   - echo ${VAR!hello} expands to 'hello' when VAR is not defined
 - new command 'resolve'
    - similar to "readlink -f" or "realpath"
 

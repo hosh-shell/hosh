@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.hosh.antlr4.HoshParser;
 import org.hosh.antlr4.HoshParser.ArgContext;
 import org.hosh.antlr4.HoshParser.CommandContext;
@@ -40,6 +41,7 @@ import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
+import org.hosh.spi.State;
 
 public class Compiler {
 
@@ -82,7 +84,7 @@ public class Compiler {
 			pipeline.setArguments(Collections.emptyList());
 			return pipeline;
 		}
-		throw new InternalBug();
+		throw new InternalBug(ctx);
 	}
 
 	private Statement compileCommand(CommandContext ctx) {
@@ -92,7 +94,7 @@ public class Compiler {
 		if (ctx.wrapped() != null) {
 			return compileWrappedCommand(ctx.wrapped());
 		}
-		throw new InternalBug();
+		throw new InternalBug(ctx);
 	}
 
 	private Statement compileSimple(SimpleContext ctx) {
@@ -104,7 +106,7 @@ public class Compiler {
 		command.downCast(CommandWrapper.class).ifPresent(cmd -> {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		});
-		List<String> commandArgs = compileArguments(ctx.invocation());
+		List<Resolvable> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
@@ -128,14 +130,14 @@ public class Compiler {
 			throw new CompileError(String.format("line %d: '%s' with empty wrapping statement", line, commandName));
 		}
 		Statement nestedStatement = compileStatement(ctx.stmt());
-		List<String> commandArgs = compileArguments(ctx.invocation());
+		List<Resolvable> commandArgs = compileArguments(ctx.invocation());
 		Statement statement = new Statement();
 		statement.setCommand(new DefaultCommandWrapper<>(nestedStatement, commandWrapper));
 		statement.setArguments(commandArgs);
 		return statement;
 	}
 
-	private List<String> compileArguments(InvocationContext ctx) {
+	private List<Resolvable> compileArguments(InvocationContext ctx) {
 		return ctx
 				.arg()
 				.stream()
@@ -143,26 +145,39 @@ public class Compiler {
 				.collect(Collectors.toList());
 	}
 
-	private String compileArgument(ArgContext ctx) {
-		if (ctx.VARIABLE() != null) {
-			Token token = ctx.VARIABLE().getSymbol();
-			return token.getText();
-		}
+	private Resolvable compileArgument(ArgContext ctx) {
 		if (ctx.ID() != null) {
 			Token token = ctx.ID().getSymbol();
-			return token.getText();
+			String value = token.getText();
+			return new Constant(value);
+		}
+		if (ctx.VARIABLE() != null) {
+			Token token = ctx.VARIABLE().getSymbol();
+			String name = dropDeref(token.getText());
+			return new Variable(name);
+		}
+		if (ctx.VARIABLE_OR_FALLBACK() != null) {
+			Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
+			String[] nameAndFallback = dropDeref(token.getText()).split("!");
+			return new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]);
 		}
 		if (ctx.STRING() != null) {
 			Token token = ctx.STRING().getSymbol();
-			return dropQuotes(token);
+			String value = dropQuotes(token);
+			return new Constant(value);
 		}
-		throw new InternalBug();
+		throw new InternalBug(ctx);
 	}
 
 	// "some text" -> some text
 	private String dropQuotes(Token token) {
 		String text = token.getText();
 		return text.substring(1, text.length() - 1);
+	}
+
+	// ${VARIABLE} -> VARIABLE
+	private String dropDeref(String variable) {
+		return variable.substring(2, variable.length() - 1);
 	}
 
 	public static class Program {
@@ -187,7 +202,7 @@ public class Compiler {
 
 		private Command command;
 
-		private List<String> arguments;
+		private List<Resolvable> arguments;
 
 		public void setCommand(Command command) {
 			this.command = command;
@@ -197,17 +212,88 @@ public class Compiler {
 			return command;
 		}
 
-		public List<String> getArguments() {
+		public List<Resolvable> getArguments() {
 			return arguments;
 		}
 
-		public void setArguments(List<String> arguments) {
+		public void setArguments(List<Resolvable> arguments) {
 			this.arguments = arguments;
 		}
 
 		@Override
 		public String toString() {
 			return String.format("Statement[command=%s,arguments=%s]", command, arguments);
+		}
+	}
+
+	interface Resolvable {
+
+		Optional<String> resolve(State state);
+
+		// called when resolve() yields empty
+		// this is user-facing message
+		String describe();
+	}
+
+	public static class Constant implements Resolvable {
+
+		private final String value;
+
+		public Constant(String value) {
+			this.value = value;
+		}
+
+		@Override
+		public Optional<String> resolve(State state) {
+			return Optional.of(value);
+		}
+
+		@Override
+		public String describe() {
+			return String.format("cannot resolve constant: %s", value);
+		}
+	}
+
+	public static class Variable implements Resolvable {
+
+		private final String name;
+
+		public Variable(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public Optional<String> resolve(State state) {
+			String value = state.getVariables().get(name);
+			return Optional.ofNullable(value);
+		}
+
+		@Override
+		public String describe() {
+			return String.format("cannot resolve variable: %s", name);
+		}
+	}
+
+	public static class VariableOrFallback implements Resolvable {
+
+		private final String name;
+
+		private final String fallback;
+
+		public VariableOrFallback(String name, String fallback) {
+			this.name = name;
+			this.fallback = fallback;
+		}
+
+		@Override
+		public Optional<String> resolve(State state) {
+			String value = state.getVariables().getOrDefault(name, fallback);
+			return Optional.ofNullable(value);
+		}
+
+		@Override
+		public String describe() {
+			return String.format("cannot resolve variable with fallback: %s", name);
 		}
 	}
 
@@ -223,5 +309,9 @@ public class Compiler {
 	public static class InternalBug extends RuntimeException {
 
 		private static final long serialVersionUID = 1L;
+
+		public InternalBug(ParseTree parseTree) {
+			super("internal bug in compiler near: " + parseTree.getText());
+		}
 	}
 }

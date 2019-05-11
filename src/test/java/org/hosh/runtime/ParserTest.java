@@ -84,6 +84,9 @@ public class ParserTest {
 				"/usr/bin/git",
 				"/usr/bin/git --help",
 				"   /usr/bin/git",
+				"/usr/bin/git   ",
+				"   /usr/bin/git    ",
+				"\t/usr/bin/git\t",
 				"\t/usr/bin/git",
 				"git",
 				"git\n",
@@ -103,7 +106,8 @@ public class ParserTest {
 				"withTime { withLock /tmp/push.lock { git push } }",
 				"cd C:\\Users\\VSSADM~1\\AppData\\Local\\Temp\\junit16864313966026428034",
 				"regex line '\\w+'",
-				"regex line \"\\w+\"");
+				"regex line \"\\w+\"",
+				"ls ${VAR!/tmp}");
 	}
 
 	static List<String> newLines() {

@@ -23,12 +23,14 @@
  */
 package org.hosh.runtime;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hosh.runtime.Compiler.Program;
+import org.hosh.runtime.Compiler.Resolvable;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
@@ -58,7 +60,6 @@ public class Interpreter {
 	public ExitStatus eval(Program program) {
 		ExitStatus exitStatus = ExitStatus.success();
 		for (Statement statement : program.getStatements()) {
-			resolveArguments(statement.getArguments());
 			exitStatus = execute(statement);
 			store(exitStatus);
 			if (userRequestedExit() || lastCommandFailed(exitStatus)) {
@@ -89,7 +90,7 @@ public class Interpreter {
 	}
 
 	private void runSupervised(Statement statement, Supervisor supervisor) {
-		supervisor.submit(statement, () -> run(statement));
+		supervisor.submit(() -> run(statement));
 	}
 
 	private ExitStatus run(Statement statement) {
@@ -100,7 +101,16 @@ public class Interpreter {
 		Command command = statement.getCommand();
 		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
+		changeCurrentThreadName(command.describe(), resolvedArguments);
 		return command.run(resolvedArguments, in, out, err);
+	}
+
+	private void changeCurrentThreadName(String commandName, List<String> resolvedArguments) {
+		List<String> commandWithArguments = new ArrayList<>();
+		commandWithArguments.add(commandName);
+		commandWithArguments.addAll(resolvedArguments);
+		String name = String.format("command='%s'", String.join(" ", commandWithArguments));
+		Thread.currentThread().setName(name);
 	}
 
 	protected void injectDeps(Command command) {
@@ -109,30 +119,18 @@ public class Interpreter {
 		command.downCast(InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));
 	}
 
-	private List<String> resolveArguments(List<String> arguments) {
+	private List<String> resolveArguments(List<Resolvable> arguments) {
 		return arguments
 				.stream()
 				.map(this::resolveVariable)
 				.collect(Collectors.toList());
 	}
 
-	private String resolveVariable(String argument) {
-		if (argument.startsWith("${") && argument.endsWith("}")) {
-			String variableName = variableName(argument);
-			Map<String, String> variables = state.getVariables();
-			String variableValue = variables.get(variableName);
-			if (variableValue != null) {
-				return variableValue;
-			} else {
-				throw new IllegalStateException("unknown variable: " + variableName);
-			}
-		} else {
-			return argument;
+	private String resolveVariable(Resolvable argument) {
+		Optional<String> resolved = argument.resolve(state);
+		if (resolved.isEmpty()) {
+			throw new IllegalStateException(argument.describe());
 		}
-	}
-
-	// ${VARIABLE} -> VARIABLE
-	private String variableName(String variable) {
-		return variable.substring(2, variable.length() - 1);
+		return resolved.get();
 	}
 }

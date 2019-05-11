@@ -34,7 +34,6 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
@@ -66,11 +65,8 @@ public class Supervisor implements AutoCloseable {
 		executor.shutdownNow();
 	}
 
-	public void submit(Statement statement, Callable<ExitStatus> task) {
-		Future<ExitStatus> future = executor.submit(() -> {
-			setThreadName(statement);
-			return task.call();
-		});
+	public void submit(Callable<ExitStatus> task) {
+		Future<ExitStatus> future = executor.submit(task);
 		LOGGER.finer(() -> String.format("adding future %s", future));
 		futures.add(future);
 	}
@@ -141,14 +137,5 @@ public class Supervisor implements AutoCloseable {
 	private void cancelIfStillRunning(Future<ExitStatus> future) {
 		LOGGER.finer(() -> String.format("cancelling future %s", future));
 		future.cancel(true);
-	}
-
-	private void setThreadName(Statement statement) {
-		String commandName = statement.getCommand().describe();
-		List<String> commandWithArguments = new ArrayList<>();
-		commandWithArguments.add(commandName);
-		commandWithArguments.addAll(statement.getArguments());
-		String name = String.format("command='%s'", String.join(" ", commandWithArguments));
-		Thread.currentThread().setName(name);
 	}
 }
