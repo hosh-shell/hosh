@@ -29,7 +29,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +108,7 @@ public class InterpreterTest {
 	public void storeCommandExitStatus() {
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program);
@@ -121,7 +120,7 @@ public class InterpreterTest {
 	public void injectState() {
 		given(state.getVariables()).willReturn(variables);
 		given(stateAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(stateAwareCommand);
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
@@ -131,7 +130,7 @@ public class InterpreterTest {
 	@Test
 	public void injectTerminal() {
 		given(terminalAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(terminalAwareCommand);
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
@@ -142,7 +141,7 @@ public class InterpreterTest {
 	public void handleCancellations() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new CancellationException("simulated cancellation"));
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program);
@@ -153,7 +152,7 @@ public class InterpreterTest {
 	public void handleExceptionWithoutMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new NullPointerException());
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program);
@@ -165,7 +164,7 @@ public class InterpreterTest {
 	public void handleExceptionWithMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new IllegalArgumentException("simulated error"));
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program);
@@ -178,11 +177,11 @@ public class InterpreterTest {
 		args.add(new Compiler.Constant("file"));
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
-		then(command).should().run(Mockito.eq(Arrays.asList("file")), Mockito.any(), Mockito.any(), Mockito.any());
+		then(command).should().run(Mockito.eq(List.of("file")), Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -191,7 +190,7 @@ public class InterpreterTest {
 		variables.put("VARIABLE", "1");
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program);
@@ -199,7 +198,7 @@ public class InterpreterTest {
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
-		then(command).should().run(Mockito.eq(Arrays.asList("1")), Mockito.any(), Mockito.any(), Mockito.any());
+		then(command).should().run(Mockito.eq(List.of("1")), Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -207,7 +206,7 @@ public class InterpreterTest {
 		args.add(new Compiler.Variable("VARIABLE"));
 		variables.put("VARIABLE", null);
 		given(state.getVariables()).willReturn(variables);
-		given(program.getStatements()).willReturn(Arrays.asList(statement));
+		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program);
@@ -222,7 +221,7 @@ public class InterpreterTest {
 		given(command.describe()).willReturn("java");
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Arrays.asList(new Compiler.Constant("-jar"), new Compiler.Constant("hosh.jar")));
+		given(statement.getArguments()).willReturn(List.of(new Compiler.Constant("-jar"), new Compiler.Constant("hosh.jar")));
 		sut.run(statement, in, out, err);
 		assertThat(Thread.currentThread().getName()).isEqualTo("command='java -jar hosh.jar'");
 		then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
@@ -233,7 +232,7 @@ public class InterpreterTest {
 		given(command.describe()).willReturn("java");
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(Arrays.asList());
+		given(statement.getArguments()).willReturn(List.of());
 		sut.run(statement, in, out, err);
 		assertThat(Thread.currentThread().getName()).isEqualTo("command='java'");
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened

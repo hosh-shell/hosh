@@ -28,7 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.net.http.HttpResponse;
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.hosh.doc.Todo;
@@ -72,7 +72,7 @@ public class NetworkModuleTest {
 		@Todo(description = "this is a very bland test: let's try to consolidate this command before investing more")
 		@Test
 		public void noArgs() {
-			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(Mockito.any(Record.class));
@@ -81,7 +81,7 @@ public class NetworkModuleTest {
 
 		@Test
 		public void oneArg() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("whatever"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
@@ -116,7 +116,7 @@ public class NetworkModuleTest {
 
 		@Test
 		public void noArgs() {
-			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
@@ -127,7 +127,7 @@ public class NetworkModuleTest {
 		public void oneArg() throws InterruptedException {
 			given(requestor.send(Mockito.any())).willReturn(response);
 			given(response.body()).willReturn(Stream.of("line1"));
-			ExitStatus exitStatus = sut.run(Arrays.asList("https://example.org"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
@@ -137,7 +137,7 @@ public class NetworkModuleTest {
 		@Test
 		public void interrupted() throws InterruptedException {
 			given(requestor.send(Mockito.any())).willThrow(new InterruptedException("simulated"));
-			ExitStatus exitStatus = sut.run(Arrays.asList("https://example.org"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();

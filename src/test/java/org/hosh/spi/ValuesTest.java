@@ -383,9 +383,9 @@ public class ValuesTest {
 
 		@Test
 		public void sortEmpty() {
-			List<String> input = Arrays.asList("", "", "", "");
+			List<String> input = Arrays.asList("", "");
 			input.sort(new AlphaNumericStringComparator());
-			assertThat(input).containsExactly("", "", "", "");
+			assertThat(input).containsExactly("", "");
 		}
 
 		@Test

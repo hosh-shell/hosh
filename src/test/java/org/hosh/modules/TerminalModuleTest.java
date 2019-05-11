@@ -27,7 +27,7 @@ import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.hosh.modules.TerminalModule.Bell;
 import org.hosh.modules.TerminalModule.Clear;
@@ -71,7 +71,7 @@ public class TerminalModuleTest {
 
 		@Test
 		public void noArgs() {
-			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
@@ -83,7 +83,7 @@ public class TerminalModuleTest {
 
 		@Test
 		public void oneArg() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveZeroInteractions();
@@ -114,7 +114,7 @@ public class TerminalModuleTest {
 
 		@Test
 		public void noArgs() {
-			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
@@ -126,7 +126,7 @@ public class TerminalModuleTest {
 
 		@Test
 		public void oneArg() {
-			ExitStatus exitStatus = sut.run(Arrays.asList("asd"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveZeroInteractions();
@@ -159,7 +159,7 @@ public class TerminalModuleTest {
 		public void noArgs() {
 			given(terminal.getType()).willReturn("xterm");
 			given(terminal.getAttributes()).willReturn(new Attributes());
-			ExitStatus exitStatus = sut.run(Arrays.asList(), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Mockito.any());

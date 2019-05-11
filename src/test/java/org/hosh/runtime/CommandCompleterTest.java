@@ -29,8 +29,8 @@ import static org.mockito.BDDMockito.given;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.hosh.spi.Command;
 import org.hosh.spi.State;
@@ -76,7 +76,7 @@ public class CommandCompleterTest {
 
 	@Test
 	public void builtin() {
-		given(state.getCommands()).willReturn(Collections.singletonMap("cmd", command.getClass()));
+		given(state.getCommands()).willReturn(Map.of("cmd", command.getClass()));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
@@ -92,7 +92,7 @@ public class CommandCompleterTest {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		File file = temporaryFolder.newFile("cmd");
 		assert file.setExecutable(true, true);
-		given(state.getCommands()).willReturn(Collections.singletonMap("cmd", command.getClass()));
+		given(state.getCommands()).willReturn(Map.of("cmd", command.getClass()));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)

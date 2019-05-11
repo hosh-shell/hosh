@@ -36,7 +36,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +101,7 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"echo ${OS_ENV_VARIABLE}"//
 		);
-		Process hosh = givenHoshProcess(Collections.singletonMap("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(output).contains("hello world!");
@@ -232,7 +231,7 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"echo ${OS_ENV_VARIABLE} | take 1"//
 		);
-		Process hosh = givenHoshProcess(Collections.singletonMap("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(output).isEqualTo("hello world!");
@@ -245,7 +244,7 @@ public class HoshIT {
 		Path scriptPath = givenScript(
 				"withTime { echo ${OS_ENV_VARIABLE} } "//
 		);
-		Process hosh = givenHoshProcess(Collections.singletonMap("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(output).contains("hello world!");
@@ -377,7 +376,7 @@ public class HoshIT {
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
-		Files.write(scriptPath, Arrays.asList(lines));
+		Files.write(scriptPath, List.of(lines));
 		return scriptPath;
 	}
 
@@ -389,8 +388,8 @@ public class HoshIT {
 		List<String> cmd = new ArrayList<>();
 		cmd.add(absoluteJavaBinary());
 		cmd.addAll(propagateJacocoAgentInvocation());
-		cmd.addAll(Arrays.asList("-jar", "target/dist/hosh.jar"));
-		cmd.addAll(Arrays.asList(args));
+		cmd.addAll(List.of("-jar", "target/dist/hosh.jar"));
+		cmd.addAll(List.of(args));
 		ProcessBuilder pb = new ProcessBuilder()
 				.command(cmd)
 				.redirectErrorStream(true);
