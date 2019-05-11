@@ -137,9 +137,11 @@ public class NetworkModule implements Module {
 					.build();
 			try {
 				HttpResponse<Stream<String>> response = requestor.send(request);
-				response.body().forEach(line -> {
-					out.send(Records.singleton(Keys.TEXT, Values.ofText(line)));
-				});
+				try (Stream<String> body = response.body()) {
+					body.forEach(line -> {
+						out.send(Records.singleton(Keys.TEXT, Values.ofText(line)));
+					});
+				}
 				return ExitStatus.success();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -157,16 +159,25 @@ public class NetworkModule implements Module {
 
 			@Override
 			public HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException {
-				HttpClient client = HttpClient.newBuilder()
-						.version(Version.HTTP_2)
-						.followRedirects(Redirect.NORMAL)
-						.proxy(ProxySelector.getDefault())
-						.build();
 				try {
-					return client.send(request, BodyHandlers.ofLines());
+					return HttpClientHolder.getInstance().send(request, BodyHandlers.ofLines());
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
+			}
+		}
+
+		private static class HttpClientHolder {
+
+			private static HttpClient httpClient = HttpClient.newBuilder()
+					.version(Version.HTTP_2)
+					.followRedirects(Redirect.NORMAL)
+					.proxy(ProxySelector.getDefault())
+					.executor(runnable -> runnable.run())
+					.build();
+
+			public static HttpClient getInstance() {
+				return httpClient;
 			}
 		}
 	}
