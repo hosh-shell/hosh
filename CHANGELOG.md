@@ -6,14 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 - variable expansion with fallback
-   - echo ${VAR!hello} expands to 'hello' when VAR is not defined
+   - `echo ${VAR!hello}` expands to `'hello'` when VAR is not defined
 - new command 'resolve'
-   - similar to "readlink -f" or "realpath"
+   - similar to `readlink -f` or `realpath`
 
 ## [0.0.31] - 2019-05-08
 - commands must be terminated with ';'
     - script are backward-compatible because Hosh is automatically ending every line with ';'
-    - this allows sequence of commands like 'ls ; ls'
+    - this allows sequence of commands like `ls ; ls`
 - new command 'http':
     - GET only
     - HTTP 1.1/2.0

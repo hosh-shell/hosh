@@ -4,8 +4,18 @@
 
 ## Main features
 - written in Java 11
-- portable, works out-of-the-box in Windows, MacOS and Linux
+    - distributed as uber-jar or docker image
+- portable
+    - works out-of-the-box in Windows, MacOS and Linux
     - it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
+- robust scripts by default
+    - something similar to bash `set -euo pipefail`
+- usability features (although much more work is needed in this area)
+    - ANSI colors
+    - stderr always colored in red
+    - sorting using http://davekoelle.com/alphanum.html
+    - file sizes reported by default using KB, MB, etc
+    - by default history works like bash with HISTCONTROL=ignoredups
 - pipelines built around schema-less records
     - built-in commands produce records with well defined keys
     - interoperability is achieved by using single-key records with "line" as value
@@ -13,14 +23,6 @@
 - wrappers
     - grouping commands, with before/after behavior
     - `withTime { lines pom.xml | sink }`
-- usability features (although much more work is needed in this area)
-    - ANSI colors
-    - stderr always colored in red
-    - sorting using http://davekoelle.com/alphanum.html
-    - file sizes reported by default using KB, MB, etc
-    - by default history works like bash with HISTCONTROL=ignoredups
-- distributed as uber-jar or docker image
-- MIT license
 
 ## Examples
 
@@ -84,9 +86,9 @@ Preliminary docker support (openjdk:11-jre-slim-stretch):
 Project specific settings can be found under `./eclipse` directory.
 
 ## Inspired by
+- https://www.martinfowler.com/articles/collection-pipeline/
+- https://mywiki.wooledge.org/BashPitfalls
+- http://redsymbol.net/articles/unofficial-bash-strict-mode/
 - https://zsh.org
 - https://fishshell.com
-- https://mywiki.wooledge.org/BashPitfalls
-- https://michaelfeathers.silvrback.com/collection-pipelines-the-revenge-of-c
-- https://www.martinfowler.com/articles/collection-pipeline/
 
