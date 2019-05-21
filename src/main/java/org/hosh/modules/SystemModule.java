@@ -56,16 +56,14 @@ import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Key;
 import org.hosh.spi.Keys;
+import org.hosh.spi.LineReaderAware;
 import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
-import org.hosh.spi.TerminalAware;
 import org.hosh.spi.Values;
 import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.terminal.Terminal;
 
 public class SystemModule implements Module {
 
@@ -501,11 +499,11 @@ public class SystemModule implements Module {
 	@Examples({
 			@Example(command = "input FOO", description = "save string read to variable 'FOO'"),
 	})
-	public static class Input implements Command, StateAware, TerminalAware {
+	public static class Input implements Command, StateAware, LineReaderAware {
 
 		private State state;
 
-		private Terminal terminal;
+		private LineReader lineReader;
 
 		@Override
 		public void setState(State state) {
@@ -513,8 +511,8 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public void setTerminal(Terminal terminal) {
-			this.terminal = terminal;
+		public void setLineReader(LineReader lineReader) {
+			this.lineReader = lineReader;
 		}
 
 		@Override
@@ -528,8 +526,7 @@ public class SystemModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 				return ExitStatus.error();
 			}
-			LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
-			Optional<String> read = read(lineReader);
+			Optional<String> read = input();
 			if (read.isEmpty()) {
 				return ExitStatus.error();
 			}
@@ -537,7 +534,7 @@ public class SystemModule implements Module {
 			return ExitStatus.success();
 		}
 
-		private Optional<String> read(LineReader lineReader) {
+		private Optional<String> input() {
 			try {
 				return Optional.of(lineReader.readLine("input> "));
 			} catch (Exception e) {
@@ -551,11 +548,11 @@ public class SystemModule implements Module {
 	@Examples({
 			@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
 	})
-	public static class Secret implements Command, StateAware, TerminalAware {
+	public static class Secret implements Command, StateAware, LineReaderAware {
 
 		private State state;
 
-		private Terminal terminal;
+		private LineReader lineReader;
 
 		@Override
 		public void setState(State state) {
@@ -563,8 +560,8 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public void setTerminal(Terminal terminal) {
-			this.terminal = terminal;
+		public void setLineReader(LineReader lineReader) {
+			this.lineReader = lineReader;
 		}
 
 		@Override
@@ -578,8 +575,7 @@ public class SystemModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 				return ExitStatus.error();
 			}
-			LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
-			Optional<String> read = read(lineReader);
+			Optional<String> read = secret();
 			if (read.isEmpty()) {
 				return ExitStatus.error();
 			}
@@ -587,7 +583,7 @@ public class SystemModule implements Module {
 			return ExitStatus.success();
 		}
 
-		private Optional<String> read(LineReader lineReader) {
+		private Optional<String> secret() {
 			try {
 				return Optional.of(lineReader.readLine('\0'));
 			} catch (Exception e) {

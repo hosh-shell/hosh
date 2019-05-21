@@ -56,6 +56,7 @@ import org.hosh.modules.SystemModule.KillProcess;
 import org.hosh.modules.SystemModule.KillProcess.ProcessLookup;
 import org.hosh.modules.SystemModule.Open;
 import org.hosh.modules.SystemModule.ProcessList;
+import org.hosh.modules.SystemModule.Secret;
 import org.hosh.modules.SystemModule.SetVariable;
 import org.hosh.modules.SystemModule.Sink;
 import org.hosh.modules.SystemModule.Sleep;
@@ -72,7 +73,8 @@ import org.hosh.spi.Values;
 import org.hosh.testsupport.RecordMatcher;
 import org.hosh.testsupport.TemporaryFolder;
 import org.hosh.testsupport.WithThread;
-import org.jline.terminal.Terminal;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1036,7 +1038,7 @@ public class SystemModuleTest {
 	public class InputTest {
 
 		@Mock(stubOnly = true)
-		private Terminal terminal;
+		private LineReader lineReader;
 
 		@Spy
 		private State state = new State();
@@ -1069,6 +1071,91 @@ public class SystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+		}
+
+		@Test
+		public void inputNonEmptyString() {
+			given(lineReader.readLine(Mockito.eq("input> "))).willReturn("1");
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+			assertThat(state.getVariables()).containsEntry("FOO", "1");
+		}
+
+		@Test
+		public void emptyInput() {
+			given(lineReader.readLine(Mockito.eq("input> "))).willThrow(new EndOfFileException("simulated"));
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+			assertThat(state.getVariables()).isEmpty();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class SecretTest {
+
+		@Mock(stubOnly = true)
+		private LineReader lineReader;
+
+		@Spy
+		private State state = new State();
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Secret sut;
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret VARIABLE")));
+		}
+
+		@Test
+		public void invalidVariableName() {
+			ExitStatus exitStatus = sut.run(List.of("$"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+		}
+
+		@Test
+		public void inputNonEmptyString() {
+			given(lineReader.readLine(Mockito.eq('\0'))).willReturn("1");
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+			assertThat(state.getVariables()).containsEntry("FOO", "1");
+		}
+
+		@Test
+		public void emptyInput() {
+			given(lineReader.readLine(Mockito.eq("input> "))).willThrow(new EndOfFileException("simulated"));
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+			assertThat(state.getVariables()).isEmpty();
 		}
 	}
 }

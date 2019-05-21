@@ -35,9 +35,12 @@ import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.LineReaderAware;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 
 public class Interpreter {
@@ -46,6 +49,10 @@ public class Interpreter {
 
 	private final Terminal terminal;
 
+	// this is a "private" LineReader to be injected in commands: it has no history
+	// and no autocomplete
+	private final LineReader lineReader;
+
 	private final Channel out;
 
 	private final Channel err;
@@ -53,6 +60,7 @@ public class Interpreter {
 	public Interpreter(State state, Terminal terminal, Channel out, Channel err) {
 		this.state = state;
 		this.terminal = terminal;
+		this.lineReader = LineReaderBuilder.builder().terminal(terminal).build();
 		this.out = out;
 		this.err = err;
 	}
@@ -116,6 +124,7 @@ public class Interpreter {
 	protected void injectDeps(Command command) {
 		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
+		command.downCast(LineReaderAware.class).ifPresent(cmd -> cmd.setLineReader(lineReader));
 		command.downCast(InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));
 	}
 
