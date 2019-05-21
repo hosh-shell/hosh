@@ -60,7 +60,11 @@ import org.hosh.spi.Record;
 import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
+import org.hosh.spi.TerminalAware;
 import org.hosh.spi.Values;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
 
 public class SystemModule implements Module {
 
@@ -486,6 +490,55 @@ public class SystemModule implements Module {
 			String key = args.get(0);
 			state.getVariables().remove(key);
 			return ExitStatus.success();
+		}
+	}
+
+	@BuiltIn(name = "input", description = "Read a string from standard input and assign result to variable. The trailing newline is stripped.")
+	@Examples({
+			@Example(command = "input FOO", description = "save string read to variable 'FOO'"),
+	})
+	public static class Input implements Command, StateAware, TerminalAware {
+
+		private State state;
+
+		private Terminal terminal;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public void setTerminal(Terminal terminal) {
+			this.terminal = terminal;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: input VARIABLE")));
+				return ExitStatus.error();
+			}
+			String key = args.get(0);
+			if (!key.matches("[A-Z][A-Z0-9_]*")) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				return ExitStatus.error();
+			}
+			LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
+			Optional<String> read = read(lineReader);
+			if (read.isEmpty()) {
+				return ExitStatus.error();
+			}
+			state.getVariables().put(key, read.get());
+			return ExitStatus.success();
+		}
+
+		private Optional<String> read(LineReader lineReader) {
+			try {
+				return Optional.of(lineReader.readLine("input> "));
+			} catch (Exception e) {
+				return Optional.empty();
+			}
 		}
 	}
 
