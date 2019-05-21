@@ -5,10 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added
 - variable expansion with fallback
    - `echo ${VAR!hello}` expands to `'hello'` when VAR is not defined
-- new command 'resolve'
+- new command `resolve`
    - similar to `readlink -f` or `realpath`
+- new command `intput` and `secret`
+   - `input FOO` for saving non-secure user input into a variable
+   - `secure FOO' like `input` but masking input
 
 ## [0.0.31] - 2019-05-08
 - commands must be terminated with ';'

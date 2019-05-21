@@ -542,6 +542,56 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Experimental(description = "probably should be merged with input? not sure about name")
+	@BuiltIn(name = "secret", description = "Read a string from standard input in a secure way and assign result to variable. The trailing newline is stripped.")
+	@Examples({
+			@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
+	})
+	public static class Secret implements Command, StateAware, TerminalAware {
+
+		private State state;
+
+		private Terminal terminal;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public void setTerminal(Terminal terminal) {
+			this.terminal = terminal;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret VARIABLE")));
+				return ExitStatus.error();
+			}
+			String key = args.get(0);
+			if (!key.matches("[A-Z][A-Z0-9_]*")) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				return ExitStatus.error();
+			}
+			LineReader lineReader = LineReaderBuilder.builder().terminal(terminal).build();
+			Optional<String> read = read(lineReader);
+			if (read.isEmpty()) {
+				return ExitStatus.error();
+			}
+			state.getVariables().put(key, read.get());
+			return ExitStatus.success();
+		}
+
+		private Optional<String> read(LineReader lineReader) {
+			try {
+				return Optional.of(lineReader.readLine('\0'));
+			} catch (Exception e) {
+				return Optional.empty();
+			}
+		}
+	}
+
 	@BuiltIn(name = "capture", description = "capture output of a command into a variable")
 	@Examples({
 			@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
