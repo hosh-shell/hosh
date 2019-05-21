@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.hosh.doc.BuiltIn;
 import org.hosh.doc.Example;
@@ -67,6 +68,9 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 
 public class SystemModule implements Module {
+
+	// this must keep in sync with Hosh.g4
+	private static final Pattern VARIABLE = Pattern.compile("[A-Za-z_\\-]+");
 
 	@BuiltIn(name = "echo", description = "write arguments to output")
 	@Examples({
@@ -459,7 +463,7 @@ public class SystemModule implements Module {
 			}
 			String key = args.get(0);
 			String value = args.get(1);
-			if (!key.matches("[A-Z][A-Z0-9_]*")) {
+			if (!VARIABLE.matcher(key).matches()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 				return ExitStatus.error();
 			}
@@ -470,7 +474,7 @@ public class SystemModule implements Module {
 
 	@BuiltIn(name = "unset", description = "delete a variable binding)")
 	@Examples({
-			@Example(command = "unset FILE", description = "delete variable FILE, cannot be reference anymore after this command"),
+			@Example(command = "unset FILE", description = "delete variable FILE, cannot be referenced anymore after this command"),
 	})
 	public static class UnsetVariable implements Command, StateAware {
 
@@ -520,7 +524,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
-			if (!key.matches("[A-Z][A-Z0-9_]*")) {
+			if (!VARIABLE.matcher(key).matches()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 				return ExitStatus.error();
 			}
@@ -570,7 +574,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
-			if (!key.matches("[A-Z][A-Z0-9_]*")) {
+			if (!VARIABLE.matcher(key).matches()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 				return ExitStatus.error();
 			}
@@ -615,6 +619,10 @@ public class SystemModule implements Module {
 			}
 			Locale locale = Locale.getDefault();
 			String key = args.get(0);
+			if (!VARIABLE.matcher(key).matches()) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				return ExitStatus.error();
+			}
 			StringWriter result = new StringWriter();
 			PrintWriter pw = new PrintWriter(result);
 			for (;;) {
