@@ -51,14 +51,6 @@ that could be translated to the following UNIX pipeline:
 bash$ wget -q -O - -- https://git.io/v9MjZ | head -n 10 | awk -v OFS='\t' '{print $10, $1, $12}'
 ```
 
-
-## Inspired by
-- https://zsh.org
-- https://fishshell.com
-- https://mywiki.wooledge.org/BashPitfalls
-- https://michaelfeathers.silvrback.com/collection-pipelines-the-revenge-of-c
-- https://www.martinfowler.com/articles/collection-pipeline/
-
 ## Requirements
 
 Java 11
@@ -90,3 +82,11 @@ Preliminary docker support (openjdk:11-jre-slim-stretch):
 ## Eclipse support
 
 Project specific settings can be found under `./eclipse` directory.
+
+## Inspired by
+- https://zsh.org
+- https://fishshell.com
+- https://mywiki.wooledge.org/BashPitfalls
+- https://michaelfeathers.silvrback.com/collection-pipelines-the-revenge-of-c
+- https://www.martinfowler.com/articles/collection-pipeline/
+
