@@ -6,12 +6,12 @@
 - written in Java 11
 - portable, works out-of-the-box in Windows, MacOS and Linux
     - it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
-- pipelines built around schemaless records
+- pipelines built around schema-less records
     - built-in commands produce records with well defined keys
     - interoperability is achieved by using single-key records with "line" as value
     - `lines pom.xml | enumerate | take 10`
 - wrappers
-    - grouping commands, with before/after behaviour
+    - grouping commands, with before/after behavior
     - `withTime { lines pom.xml | sink }`
 - usability features (although much more work is needed in this area)
     - ANSI colors
