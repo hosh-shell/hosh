@@ -67,25 +67,25 @@ public class Ansi {
 
 		private final String endCode;
 
-		Style(String startCode, String endCode) {
+		private Style(String startCode, String endCode) {
 			this.startCode = startCode;
 			this.endCode = endCode;
 		}
 
-		public void enable(PrintWriter pw) {
+		private void output(PrintWriter pw, String code) {
 			if (this != NONE) {
 				pw.append(CSI);
-				pw.append(this.startCode);
+				pw.append(code);
 				pw.append("m");
 			}
 		}
 
+		public void enable(PrintWriter pw) {
+			output(pw, this.startCode);
+		}
+
 		public void disable(PrintWriter pw) {
-			if (this != NONE) {
-				pw.append(CSI);
-				pw.append(this.endCode);
-				pw.append("m");
-			}
+			output(pw, this.endCode);
 		}
 	}
 }

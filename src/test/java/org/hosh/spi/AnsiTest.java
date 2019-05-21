@@ -23,23 +23,30 @@
  */
 package org.hosh.spi;
 
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hosh.spi.Ansi.Style;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.junit.jupiter.api.Test;
 
 public class AnsiTest {
 
 	@Test
-	public void coloring() {
-		PrintWriter pw = new PrintWriter(System.out, true, StandardCharsets.UTF_8);
-		for (Style style : Ansi.Style.values()) {
-			pw.printf("%s ", style.name());
-			style.enable(pw);
-			pw.print("test".repeat(10));
-			style.disable(pw);
-			pw.println();
-		}
+	public void none() {
+		StringWriter out = new StringWriter();
+		PrintWriter pw = new PrintWriter(out, true);
+		Ansi.Style.NONE.enable(pw);
+		Ansi.Style.NONE.disable(pw);
+		assertThat(out).hasToString("");
+	}
+
+	@Test
+	public void redForeground() {
+		StringWriter out = new StringWriter();
+		PrintWriter pw = new PrintWriter(out, true);
+		Ansi.Style.FG_RED.enable(pw);
+		Ansi.Style.FG_RED.disable(pw);
+		assertThat(out).hasToString("\u001b[31m\u001b[39m");
 	}
 }
