@@ -29,6 +29,11 @@ import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -40,13 +45,16 @@ import org.hosh.doc.Example;
 import org.hosh.doc.Examples;
 import org.hosh.modules.SystemModule.Benchmark;
 import org.hosh.modules.SystemModule.Benchmark.Accumulator;
+import org.hosh.modules.SystemModule.Capture;
 import org.hosh.modules.SystemModule.Echo;
 import org.hosh.modules.SystemModule.Env;
 import org.hosh.modules.SystemModule.Err;
 import org.hosh.modules.SystemModule.Exit;
 import org.hosh.modules.SystemModule.Help;
+import org.hosh.modules.SystemModule.Input;
 import org.hosh.modules.SystemModule.KillProcess;
 import org.hosh.modules.SystemModule.KillProcess.ProcessLookup;
+import org.hosh.modules.SystemModule.Open;
 import org.hosh.modules.SystemModule.ProcessList;
 import org.hosh.modules.SystemModule.SetVariable;
 import org.hosh.modules.SystemModule.Sink;
@@ -62,7 +70,9 @@ import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.Values;
 import org.hosh.testsupport.RecordMatcher;
+import org.hosh.testsupport.TemporaryFolder;
 import org.hosh.testsupport.WithThread;
+import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -835,6 +845,230 @@ public class SystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class CaptureTest {
+
+		@Spy
+		private State state = new State();
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Capture sut;
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
+		}
+
+		@Test
+		public void invalidVariableName() {
+			ExitStatus exitStatus = sut.run(List.of("$AAA"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+		}
+
+		@Test
+		public void emptyCapture() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			assertThat(state.getVariables()).containsEntry("FOO", "");
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void oneLine() {
+			given(in.recv()).willReturn(
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			assertThat(state.getVariables()).containsEntry("FOO", "1");
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void twoLines() {
+			given(in.recv()).willReturn(
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
+					Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			assertThat(state.getVariables()).containsEntry("FOO", "12");
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class OpenTest {
+
+		@RegisterExtension
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Open sut;
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
+		}
+
+		@Test
+		public void oneArgs() {
+			ExitStatus exitStatus = sut.run(List.of("filename"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
+		}
+
+		@Test
+		public void emptyCapture() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			List<String> result = Files.readAllLines(Paths.get(temporaryFolder.toPath().toString(), "filename"));
+			assertThat(result).isEmpty();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void oneLine() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			given(in.recv()).willReturn(
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			List<String> result = Files.readAllLines(Paths.get(temporaryFolder.toPath().toString(), "filename"));
+			assertThat(result).containsExactly("1");
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void twoLines() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			given(in.recv()).willReturn(
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
+					Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			List<String> result = Files.readAllLines(Paths.get(temporaryFolder.toPath().toString(), "filename"));
+			assertThat(result).containsExactly("1", "2");
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void appendExisting() throws IOException {
+			Path file = temporaryFolder.newFile("filename").toPath();
+			Files.write(file, List.of("existing line"), StandardCharsets.UTF_8);
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			given(in.recv()).willReturn(
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "APPEND"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			List<String> result = Files.readAllLines(Paths.get(temporaryFolder.toPath().toString(), "filename"));
+			assertThat(result).containsExactly("existing line", "1");
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class InputTest {
+
+		@Mock(stubOnly = true)
+		private Terminal terminal;
+
+		@Spy
+		private State state = new State();
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Input sut;
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: input VARIABLE")));
+		}
+
+		@Test
+		public void invalidVariableName() {
+			ExitStatus exitStatus = sut.run(List.of("$"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 		}
 	}
 }

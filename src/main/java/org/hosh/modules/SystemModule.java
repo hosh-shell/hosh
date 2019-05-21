@@ -602,7 +602,7 @@ public class SystemModule implements Module {
 	})
 	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
 	@Experimental(description = "too low level compared to simply VARNAME=$(ls)")
-	public static class CaptureVariable implements Command, StateAware {
+	public static class Capture implements Command, StateAware {
 
 		private State state;
 
@@ -642,7 +642,6 @@ public class SystemModule implements Module {
 	@Examples({
 			@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
 	})
-	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
 	@Experimental(description = "too low level compared to simply > file.txt or >> file.txt? too much power for end user (e.g. they could use DSYNC or READ)?")
 	public static class Open implements Command, StateAware {
 
@@ -656,7 +655,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() <= 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: filename [WRITE|APPEND|...]")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
