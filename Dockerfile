@@ -1,5 +1,5 @@
 FROM openjdk:11-jre-slim-stretch
-MAINTAINER Davide Angelocola <davide.angelocola@gmail.com>
+LABEL maintainer="Davide Angelocola <davide.angelocola@gmail.com>"
 
 ENTRYPOINT ["/usr/bin/java", "-jar", "/usr/local/bin/hosh.jar"]
 
