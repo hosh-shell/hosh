@@ -75,7 +75,7 @@ Java 11
 
 ## Docker support
 
-Preliminary docker support (openjdk:11-jre-slim-stretch):
+Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/) with [alpine-jre](https://hub.docker.com/r/adoptopenjdk/openjdk11):
 
 `$ ./mvnw -Pdocker clean verify`
 
