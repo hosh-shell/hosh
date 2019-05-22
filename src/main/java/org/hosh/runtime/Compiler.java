@@ -228,11 +228,8 @@ public class Compiler {
 
 	interface Resolvable {
 
-		Optional<String> resolve(State state);
-
-		// called when resolve() yields empty
-		// this is user-facing message
-		String describe();
+		// resolve or throw
+		String resolve(State state);
 	}
 
 	public static class Constant implements Resolvable {
@@ -244,13 +241,8 @@ public class Compiler {
 		}
 
 		@Override
-		public Optional<String> resolve(State state) {
-			return Optional.of(value);
-		}
-
-		@Override
-		public String describe() {
-			return String.format("cannot resolve constant: %s", value);
+		public String resolve(State state) {
+			return value;
 		}
 	}
 
@@ -263,14 +255,12 @@ public class Compiler {
 		}
 
 		@Override
-		public Optional<String> resolve(State state) {
+		public String resolve(State state) {
 			String value = state.getVariables().get(name);
-			return Optional.ofNullable(value);
-		}
-
-		@Override
-		public String describe() {
-			return String.format("cannot resolve variable: %s", name);
+			if (value == null) {
+				throw new IllegalStateException(String.format("cannot resolve variable: %s", name));
+			}
+			return value;
 		}
 	}
 
@@ -286,14 +276,8 @@ public class Compiler {
 		}
 
 		@Override
-		public Optional<String> resolve(State state) {
-			String value = state.getVariables().getOrDefault(name, fallback);
-			return Optional.ofNullable(value);
-		}
-
-		@Override
-		public String describe() {
-			return String.format("cannot resolve variable with fallback: %s", name);
+		public String resolve(State state) {
+			return state.getVariables().getOrDefault(name, fallback);
 		}
 	}
 

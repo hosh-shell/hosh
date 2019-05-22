@@ -26,7 +26,6 @@ package org.hosh.runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hosh.runtime.Compiler.Program;
@@ -50,7 +49,7 @@ public class Interpreter {
 	private final Terminal terminal;
 
 	// this is a "private" LineReader to be injected in commands: it has no history
-	// and no autocomplete
+	// and no auto-complete
 	private final LineReader lineReader;
 
 	private final Channel out;
@@ -131,15 +130,7 @@ public class Interpreter {
 	private List<String> resolveArguments(List<Resolvable> arguments) {
 		return arguments
 				.stream()
-				.map(this::resolveVariable)
+				.map(resolvable -> resolvable.resolve(state))
 				.collect(Collectors.toList());
-	}
-
-	private String resolveVariable(Resolvable argument) {
-		Optional<String> resolved = argument.resolve(state);
-		if (resolved.isEmpty()) {
-			throw new IllegalStateException(argument.describe());
-		}
-		return resolved.get();
 	}
 }
