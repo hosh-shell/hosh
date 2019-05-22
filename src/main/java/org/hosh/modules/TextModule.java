@@ -25,7 +25,7 @@ package org.hosh.modules;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.Instant;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -316,6 +316,12 @@ public class TextModule implements Module {
 	@Todo(description = "use local time?")
 	public static class Timestamp implements Command {
 
+		private Clock clock = Clock.systemUTC();
+
+		public void setClock(Clock clock) {
+			this.clock = clock;
+		}
+
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
@@ -328,7 +334,7 @@ public class TextModule implements Module {
 					break;
 				}
 				Record record = incoming.get();
-				out.send(record.prepend(Keys.TIMESTAMP, Values.ofInstant(Instant.now())));
+				out.send(record.prepend(Keys.TIMESTAMP, Values.ofInstant(clock.instant())));
 			}
 			return ExitStatus.success();
 		}

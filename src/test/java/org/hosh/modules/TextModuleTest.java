@@ -28,6 +28,8 @@ import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +46,7 @@ import org.hosh.modules.TextModule.Sort;
 import org.hosh.modules.TextModule.Split;
 import org.hosh.modules.TextModule.Table;
 import org.hosh.modules.TextModule.Take;
+import org.hosh.modules.TextModule.Timestamp;
 import org.hosh.modules.TextModule.Trim;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
@@ -465,6 +468,53 @@ public class TextModuleTest {
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.TEXT, Values.ofText("some data")).build());
 			then(out).should().send(Records.singleton(Keys.INDEX, Values.ofNumeric(2)));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void oneArg() {
+			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class TimestampTest {
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@Mock
+		private Clock clock;
+
+		@InjectMocks
+		private Timestamp sut;
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void zeroArg() {
+			given(clock.instant()).willReturn(Instant.EPOCH);
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(
+					Records.builder()
+							.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
+							.entry(Keys.TEXT, Values.ofText("some data"))
+							.build());
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
