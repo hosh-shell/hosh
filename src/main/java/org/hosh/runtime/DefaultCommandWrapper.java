@@ -51,7 +51,6 @@ public class DefaultCommandWrapper<T> implements Command, InterpreterAware {
 
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-		interpreter.injectDeps(commandWrapper);
 		T resource = commandWrapper.before(args, in, out, err);
 		try {
 			for (;;) {
