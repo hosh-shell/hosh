@@ -7,15 +7,15 @@
     - distributed as uber-jar or docker image
 - portable
     - works out-of-the-box in Windows, MacOS and Linux
-    - it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
+    - **it is not intended** to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
 - robust scripts by default
-    - something similar to bash `set -euo pipefail`
+    - like running bash scripts with `set -euo pipefail` (see [unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/))
 - usability features (although much more work is needed in this area)
     - ANSI colors
     - stderr always colored in red
     - sorting using http://davekoelle.com/alphanum.html
     - file sizes reported by default using KB, MB, etc
-    - by default history works like bash with HISTCONTROL=ignoredups
+    - by default history works like bash with `HISTCONTROL=ignoredups`
 - pipelines built around schema-less records
     - built-in commands produce records with well defined keys
     - interoperability is achieved by using single-key records with "line" as value
@@ -88,7 +88,6 @@ Project specific settings can be found under `./eclipse` directory.
 ## Inspired by
 - https://www.martinfowler.com/articles/collection-pipeline/
 - https://mywiki.wooledge.org/BashPitfalls
-- http://redsymbol.net/articles/unofficial-bash-strict-mode/
 - https://zsh.org
 - https://fishshell.com
 
