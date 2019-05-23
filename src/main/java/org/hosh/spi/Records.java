@@ -240,9 +240,7 @@ public class Records {
 		public Record prepend(Key key, Value value) {
 			Entry[] newEntries = new Entry[entries.length + 1];
 			newEntries[0] = new Entry(key, value);
-			for (int i = 0; i < entries.length; i++) {
-				newEntries[i + 1] = entries[i];
-			}
+			System.arraycopy(entries, 0, newEntries, 1, entries.length);
 			return new Generic(newEntries);
 		}
 
