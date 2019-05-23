@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.hosh.runtime.Compiler.Statement;
@@ -38,7 +37,9 @@ import org.hosh.spi.ExitStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,6 +63,7 @@ public class DefaultCommandWrapperTest {
 	@Mock
 	private CommandWrapper<Object> commandWrapper;
 
+	@InjectMocks
 	private DefaultCommandWrapper<Object> sut;
 
 	@BeforeEach
@@ -73,7 +75,7 @@ public class DefaultCommandWrapperTest {
 	@Test
 	public void callsBeforeAndAfterWhenStatementCompletesNormally() {
 		Object resource = new Object();
-		List<String> args = Collections.emptyList();
+		List<String> args = List.of();
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
 		given(interpreter.run(statement, in, out, err)).willReturn(ExitStatus.success());
 		ExitStatus exitStatus = sut.run(args, in, out, err);
@@ -85,13 +87,25 @@ public class DefaultCommandWrapperTest {
 	@Test
 	public void callsBeforeAndAfterWhenStatementThrows() {
 		Object resource = new Object();
-		List<String> args = Collections.emptyList();
+		List<String> args = List.of();
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
 		given(interpreter.run(statement, in, out, err)).willThrow(NullPointerException.class);
 		assertThatThrownBy(() -> sut.run(args, in, out, err))
 				.isInstanceOf(NullPointerException.class);
 		then(commandWrapper).should().before(args, in, out, err);
 		then(commandWrapper).should().after(resource, in, out, err);
+	}
+
+	@Test
+	public void keepRetryingAndReturnsLastExitStatus() {
+		Object resource = new Object();
+		List<String> args = List.of();
+		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
+		given(commandWrapper.retry(resource, in, out, err)).willReturn(true, false);
+		given(interpreter.run(statement, in, out, err)).willReturn(ExitStatus.success(), ExitStatus.error());
+		ExitStatus exitStatus = sut.run(args, in, out, err);
+		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+		then(commandWrapper).should(Mockito.times(2)).retry(resource, in, out, err);
 	}
 
 	@Test
