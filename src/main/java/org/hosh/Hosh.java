@@ -181,7 +181,7 @@ public class Hosh {
 					return exitStatus;
 				}
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line), e);
+				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line.get()), e);
 				err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
 			}
 		}
