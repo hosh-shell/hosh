@@ -35,6 +35,7 @@ import org.hosh.antlr4.HoshParser.ArgContext;
 import org.hosh.antlr4.HoshParser.CommandContext;
 import org.hosh.antlr4.HoshParser.InvocationContext;
 import org.hosh.antlr4.HoshParser.PipelineContext;
+import org.hosh.antlr4.HoshParser.SequenceContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
@@ -62,8 +63,18 @@ public class Compiler {
 	}
 
 	private Statement compileStatement(StmtContext ctx) {
+		return compileSequence(ctx.sequence());
+	}
+
+	private Statement compileSequence(SequenceContext ctx) {
 		if (ctx.getChildCount() == 1) {
 			return compilePipeline(ctx.pipeline());
+		}
+		if (ctx.getChildCount() == 3) {
+			Statement first = compilePipeline(ctx.pipeline());
+			Statement second = compileSequence(ctx.sequence());
+			SequenceCommand command = new SequenceCommand(first, second);
+			return new Statement(command, List.of(), "");
 		}
 		throw new InternalBug(ctx);
 	}

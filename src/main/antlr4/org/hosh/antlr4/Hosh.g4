@@ -6,9 +6,13 @@ program
 
 
 stmt
-	: pipeline terminator? 
-	| stmt terminator pipeline terminator?   
+	: sequence terminator?
 	;
+
+sequence
+    : pipeline terminator sequence
+    | pipeline
+    ; 
 
 pipeline
 	: command '|' stmt
