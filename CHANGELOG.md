@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - introducing `withLock` wrapper
-- improved error messages by using command name prefix (#88)
+- improved error messages by using command name prefix (fix #88)
+
+### Fixed
+- allowing sequence commands everywhere (fix #130)
 
 ## [0.0.32] - 2019-05-22
 ### Added
