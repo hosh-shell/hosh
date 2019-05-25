@@ -62,7 +62,10 @@ public class Compiler {
 	}
 
 	private Statement compileStatement(StmtContext ctx) {
-		return compilePipeline(ctx.pipeline());
+		if (ctx.getChildCount() == 1) {
+			return compilePipeline(ctx.pipeline());
+		}
+		throw new InternalBug(ctx);
 	}
 
 	private Statement compilePipeline(PipelineContext ctx) {

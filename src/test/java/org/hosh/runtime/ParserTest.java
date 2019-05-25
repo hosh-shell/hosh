@@ -81,6 +81,8 @@ public class ParserTest {
 
 	static List<String> commands() {
 		return List.of(
+				"/usr/bin/git; ls",
+				"/usr/bin/git; ls;",
 				"/usr/bin/git",
 				"/usr/bin/git --help",
 				"   /usr/bin/git",
@@ -101,6 +103,10 @@ public class ParserTest {
 				"vim \"filename with spaces\"",
 				"git commit -am \"commit message\"",
 				"withTime { git push }",
+				"withTime { git push | sink }",
+				"withTime { git push | sink; }",
+				"withTime { git push ; clear }",
+				"withTime { git push ; clear; }",
 				"withLock /tmp/push.lock { git push }",
 				"withLock /tmp/push.lock { git push\n git push --tags\n }",
 				"withTime { withLock /tmp/push.lock { git push } }",
