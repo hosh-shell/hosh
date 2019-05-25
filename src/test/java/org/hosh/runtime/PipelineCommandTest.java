@@ -36,9 +36,6 @@ import org.hosh.runtime.PipelineChannel.ProducerPoisonPill;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
-import org.hosh.spi.Keys;
-import org.hosh.spi.Records;
-import org.hosh.spi.Values;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -112,30 +109,6 @@ public class PipelineCommandTest {
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
 		then(err).shouldHaveZeroInteractions();
-	}
-
-	@Test
-	public void producerUnhandledException() throws Exception {
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
-		willThrow(new NullPointerException("simulated exception")).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(),
-				Mockito.any());
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-		assertThat(exitStatus.isSuccess()).isEqualTo(false);
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated exception")));
-	}
-
-	@Test
-	public void consumerUnhandledException() throws Exception {
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
-		willThrow(new NullPointerException("simulated exception")).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(),
-				Mockito.any());
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-		assertThat(exitStatus.isSuccess()).isEqualTo(false);
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated exception")));
 	}
 
 	@Test

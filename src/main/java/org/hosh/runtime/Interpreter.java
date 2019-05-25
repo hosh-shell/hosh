@@ -26,7 +26,6 @@ package org.hosh.runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -103,13 +102,6 @@ public class Interpreter {
 		try (Supervisor supervisor = new Supervisor()) {
 			runSupervised(statement, supervisor);
 			return supervisor.waitForAll();
-		} catch (CancellationException e) {
-			LOGGER.log(Level.INFO, "got cancellation", e);
-			return ExitStatus.error();
-		} catch (InterruptedException e) {
-			LOGGER.log(Level.INFO, "got interrupt", e);
-			Thread.currentThread().interrupt();
-			return ExitStatus.error();
 		} catch (ExecutionException e) {
 			LOGGER.log(Level.SEVERE, "caught exception", e);
 			String message = messageFor(e);

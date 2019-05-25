@@ -26,6 +26,7 @@ package org.hosh.runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,11 +66,16 @@ public class Supervisor implements AutoCloseable {
 		futures.add(future);
 	}
 
-	public ExitStatus waitForAll() throws InterruptedException, ExecutionException {
+	public ExitStatus waitForAll() throws ExecutionException {
 		cancelFuturesOnSigint();
 		try {
 			List<ExitStatus> results = waitForCompletion();
 			return deriveExitStatus(results);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			return ExitStatus.error();
+		} catch (CancellationException e) {
+			return ExitStatus.error();
 		} finally {
 			restoreDefaultSigintHandler();
 		}
