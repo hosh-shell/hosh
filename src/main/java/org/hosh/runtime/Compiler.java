@@ -24,7 +24,6 @@
 package org.hosh.runtime;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,14 +53,12 @@ public class Compiler {
 	public Program compile(String input) {
 		Parser parser = new Parser();
 		HoshParser.ProgramContext programContext = parser.parse(input);
-		Program program = new Program();
 		List<Statement> statements = new ArrayList<>();
 		for (StmtContext stmtContext : programContext.stmt()) {
 			Statement statement = compileStatement(stmtContext);
 			statements.add(statement);
 		}
-		program.setStatements(statements);
-		return program;
+		return new Program(statements);
 	}
 
 	private Statement compileStatement(StmtContext ctx) {
@@ -79,11 +76,8 @@ public class Compiler {
 		if (ctx.getChildCount() == 3) { // pipeline
 			Statement producer = compileCommand(ctx.command());
 			Statement consumer = compileStatement(ctx.stmt());
-			Statement pipeline = new Statement();
-			pipeline.setCommand(new PipelineCommand(producer, consumer));
-			pipeline.setArguments(Collections.emptyList());
-			pipeline.setLocation("");
-			return pipeline;
+			PipelineCommand command = new PipelineCommand(producer, consumer);
+			return new Statement(command, List.of(), "");
 		}
 		throw new InternalBug(ctx);
 	}
@@ -107,12 +101,8 @@ public class Compiler {
 		command.downCast(CommandWrapper.class).ifPresent(cmd -> {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		});
-		List<Resolvable> commandArgs = compileArguments(ctx.invocation());
-		Statement statement = new Statement();
-		statement.setCommand(command);
-		statement.setArguments(commandArgs);
-		statement.setLocation(commandName + ":");
-		return statement;
+		List<Resolvable> arguments = compileArguments(ctx.invocation());
+		return new Statement(command, arguments, commandName + ":");
 	}
 
 	private Statement compileWrappedCommand(WrappedContext ctx) {
@@ -132,12 +122,9 @@ public class Compiler {
 			throw new CompileError(String.format("line %d: '%s' with empty wrapping statement", line, commandName));
 		}
 		Statement nestedStatement = compileStatement(ctx.stmt());
-		List<Resolvable> commandArgs = compileArguments(ctx.invocation());
-		Statement statement = new Statement();
-		statement.setCommand(new DefaultCommandWrapper<>(nestedStatement, commandWrapper));
-		statement.setArguments(commandArgs);
-		statement.setLocation(commandName + ":");
-		return statement;
+		DefaultCommandWrapper<?> wrappedCommand = new DefaultCommandWrapper<>(nestedStatement, commandWrapper);
+		List<Resolvable> arguments = compileArguments(ctx.invocation());
+		return new Statement(wrappedCommand, arguments, commandName + ":");
 	}
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {
@@ -145,7 +132,7 @@ public class Compiler {
 				.arg()
 				.stream()
 				.map(this::compileArgument)
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
 	private Resolvable compileArgument(ArgContext ctx) {
@@ -185,9 +172,9 @@ public class Compiler {
 
 	public static class Program {
 
-		private List<Statement> statements;
+		private final List<Statement> statements;
 
-		public void setStatements(List<Statement> statements) {
+		public Program(List<Statement> statements) {
 			this.statements = statements;
 		}
 
@@ -198,14 +185,16 @@ public class Compiler {
 
 	public static class Statement {
 
-		private Command command;
+		private final Command command;
 
-		private List<Resolvable> arguments;
+		private final List<Resolvable> arguments;
 
-		private String location;
+		private final String location;
 
-		public void setCommand(Command command) {
+		public Statement(Command command, List<Resolvable> arguments, String location) {
 			this.command = command;
+			this.arguments = arguments;
+			this.location = location;
 		}
 
 		public Command getCommand() {
@@ -216,23 +205,14 @@ public class Compiler {
 			return arguments;
 		}
 
-		public void setArguments(List<Resolvable> arguments) {
-			this.arguments = arguments;
-		}
-
 		/**
-		 * Describe command in a human readable form. By default this is the class name
-		 * of the command.
+		 * Describe command in a human readable form.
 		 *
 		 * @return a human readable description of the command
 		 *         (e.g. 'ls' or '/usr/bin/cat')
 		 */
 		public String getLocation() {
 			return location;
-		}
-
-		public void setLocation(String location) {
-			this.location = location;
 		}
 	}
 
