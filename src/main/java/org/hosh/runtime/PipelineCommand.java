@@ -24,9 +24,9 @@
 package org.hosh.runtime;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
-import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.runtime.PipelineChannel.ProducerPoisonPill;
 import org.hosh.spi.Channel;
@@ -98,7 +98,6 @@ public class PipelineCommand implements Command, InterpreterAware {
 		}
 	}
 
-	@Todo(description = "error channel it not sent downstream", issue = "https://github.com/dfa1/hosh/issues/66")
 	@Override
 	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 		try (Supervisor supervisor = new Supervisor()) {
@@ -106,7 +105,9 @@ public class PipelineCommand implements Command, InterpreterAware {
 			Channel pipeChannel = new PipelineChannel();
 			runAsync(supervisor, producer, in, pipeChannel, err, Position.FIRST);
 			assemblePipeline(supervisor, consumer, pipeChannel, out, err);
-			return supervisor.waitForAll(err);
+			return supervisor.waitForAll();
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
