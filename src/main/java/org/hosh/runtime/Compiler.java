@@ -111,7 +111,7 @@ public class Compiler {
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
-		statement.setLocation(commandName + ": ");
+		statement.setLocation(commandName + ":");
 		return statement;
 	}
 
@@ -136,7 +136,7 @@ public class Compiler {
 		Statement statement = new Statement();
 		statement.setCommand(new DefaultCommandWrapper<>(nestedStatement, commandWrapper));
 		statement.setArguments(commandArgs);
-		statement.setLocation(commandName + ": ");
+		statement.setLocation(commandName + ":");
 		return statement;
 	}
 

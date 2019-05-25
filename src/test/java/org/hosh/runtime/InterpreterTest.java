@@ -39,6 +39,7 @@ import org.hosh.runtime.Compiler.Resolvable;
 import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
+import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.State;
@@ -91,6 +92,9 @@ public class InterpreterTest {
 	private StateAwareCommand stateAwareCommand;
 
 	@Spy
+	private StateAwareCommandWrapper stateAwareCommandWrapper;
+
+	@Spy
 	private TerminalAwareCommand terminalAwareCommand;
 
 	private final Map<String, String> variables = new HashMap<>();
@@ -135,6 +139,16 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(args);
 		sut.eval(program);
 		then(terminalAwareCommand).should().setTerminal(terminal);
+	}
+
+	@Test
+	public void injectStateInCommandWrapper() {
+		given(program.getStatements()).willReturn(List.of(statement));
+		given(statement.getCommand()).willReturn(stateAwareCommandWrapper);
+		given(statement.getArguments()).willReturn(args);
+		given(statement.getLocation()).willReturn("cmd:");
+		sut.eval(program);
+		then(stateAwareCommandWrapper).should().setState(state);
 	}
 
 	@Test
@@ -243,6 +257,9 @@ public class InterpreterTest {
 	}
 
 	public interface StateAwareCommand extends Command, StateAware {
+	}
+
+	public interface StateAwareCommandWrapper extends CommandWrapper<Object>, StateAware {
 	}
 
 	public interface TerminalAwareCommand extends Command, TerminalAware {

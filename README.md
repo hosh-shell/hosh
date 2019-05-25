@@ -23,6 +23,7 @@
 - wrappers
     - grouping commands, with before/after behavior
     - `withTime { lines pom.xml | sink }`
+    - `withLock file.lock { ... }`
 
 ## Examples
 

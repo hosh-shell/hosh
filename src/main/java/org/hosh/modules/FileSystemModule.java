@@ -24,6 +24,7 @@
 package org.hosh.modules;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
@@ -40,6 +41,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -52,6 +54,7 @@ import org.hosh.doc.Todo;
 import org.hosh.spi.Ansi;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
+import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
@@ -566,6 +569,54 @@ public class FileSystemModule implements Module {
 						.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
 						.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
 						.build());
+			}
+		}
+	}
+
+	@BuiltIn(name = "withLock", description = "execute code inside after successfully locking file")
+	@Examples({
+			@Example(command = "withLock file.lock { echo inside }", description = "echo only if lock has been acquired")
+	})
+	public static class WithLock implements CommandWrapper<RandomAccessFile>, StateAware {
+
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public RandomAccessFile before(List<String> args, Channel in, Channel out, Channel err) {
+			try {
+				Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+				RandomAccessFile resource = new RandomAccessFile(path.toFile(), "rw");
+				while (true) {
+					if (resource.getChannel().tryLock() != null) {
+						break;
+					}
+					Thread.sleep(200);
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("failed to acquire lock")));
+				}
+				return resource;
+			} catch (IOException e) {
+				LOGGER.log(Level.INFO, "caught error", e);
+				throw new UncheckedIOException(e);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new RuntimeException(e);
+			}
+		}
+
+		@Override
+		public void after(RandomAccessFile resource, Channel in, Channel out, Channel err) {
+			try {
+				resource.close();
+			} catch (IOException e) {
+				LOGGER.log(Level.INFO, "caught exception", e);
+				err.send(Records.singleton(Keys.ERROR, Values.ofText(e.getMessage())));
 			}
 		}
 	}
