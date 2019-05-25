@@ -39,7 +39,6 @@ import org.hosh.antlr4.HoshParser.PipelineContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
-import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.State;
@@ -83,6 +82,7 @@ public class Compiler {
 			Statement pipeline = new Statement();
 			pipeline.setCommand(new PipelineCommand(producer, consumer));
 			pipeline.setArguments(Collections.emptyList());
+			pipeline.setLocation("");
 			return pipeline;
 		}
 		throw new InternalBug(ctx);
@@ -111,6 +111,7 @@ public class Compiler {
 		Statement statement = new Statement();
 		statement.setCommand(command);
 		statement.setArguments(commandArgs);
+		statement.setLocation(commandName);
 		return statement;
 	}
 
@@ -135,6 +136,7 @@ public class Compiler {
 		Statement statement = new Statement();
 		statement.setCommand(new DefaultCommandWrapper<>(nestedStatement, commandWrapper));
 		statement.setArguments(commandArgs);
+		statement.setLocation(commandName);
 		return statement;
 	}
 
@@ -192,11 +194,6 @@ public class Compiler {
 		public List<Statement> getStatements() {
 			return statements;
 		}
-
-		@Override
-		public String toString() {
-			return String.format("Program[%s]", statements);
-		}
 	}
 
 	public static class Statement {
@@ -204,6 +201,8 @@ public class Compiler {
 		private Command command;
 
 		private List<Resolvable> arguments;
+
+		private String location;
 
 		public void setCommand(Command command) {
 			this.command = command;
@@ -221,14 +220,12 @@ public class Compiler {
 			this.arguments = arguments;
 		}
 
-		@Todo(description = "add line number + real command name")
 		public String getLocation() {
-			return command.describe();
+			return location;
 		}
 
-		@Override
-		public String toString() {
-			return String.format("Statement[command=%s,arguments=%s]", command, arguments);
+		public void setLocation(String location) {
+			this.location = location;
 		}
 	}
 
