@@ -331,4 +331,33 @@ public class CompilerTest {
 					assertThat(statement.getArguments()).isEmpty();
 				});
 	}
+
+	@Test
+	public void sequenceOfSimpleCommands() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
+		Program program = sut.compile("ls /tmp; schema");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getArguments()).isEmpty();
+					assertThat(statement.getCommand()).isInstanceOf(SequenceCommand.class);
+					SequenceCommand sequenceCommand = (SequenceCommand) statement.getCommand();
+					assertThat(sequenceCommand.getFirst().getArguments()).hasSize(1);
+					assertThat(sequenceCommand.getSecond().getArguments()).hasSize(0);
+				});
+	}
+
+	@Test
+	public void sequenceOfPipelines() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
+		Program program = sut.compile("ls /tmp | schema; ls /tmp | schema");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getArguments()).isEmpty();
+					assertThat(statement.getCommand()).isInstanceOf(SequenceCommand.class);
+				});
+	}
 }

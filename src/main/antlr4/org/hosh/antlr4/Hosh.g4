@@ -4,9 +4,15 @@ program
 	: ( stmt )* EOF
 	;
 
+
 stmt
-	: pipeline terminator?
+	: sequence terminator?
 	;
+
+sequence
+    : pipeline terminator sequence
+    | pipeline
+    ; 
 
 pipeline
 	: command '|' stmt
@@ -15,7 +21,7 @@ pipeline
 	;
 
 command
-	: wrapped
+	: wrapped 
 	| simple
 	;
 
@@ -24,6 +30,7 @@ wrapped
 	| invocation '{' '}' // will be rejected by compiler
 	| wrapped '}' // will be rejected by compiler
 	;
+
 
 simple
 	: invocation
