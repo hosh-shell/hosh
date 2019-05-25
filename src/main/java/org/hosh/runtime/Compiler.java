@@ -220,6 +220,13 @@ public class Compiler {
 			this.arguments = arguments;
 		}
 
+		/**
+		 * Describe command in a human readable form. By default this is the class name
+		 * of the command.
+		 *
+		 * @return a human readable description of the command
+		 *         (e.g. 'ls' or '/usr/bin/cat')
+		 */
 		public String getLocation() {
 			return location;
 		}

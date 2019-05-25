@@ -129,7 +129,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 			try {
 				return interpreter.run(statement, in, out, err);
 			} catch (ProducerPoisonPill e) {
-				LOGGER.finer(() -> String.format("got poison pill from command '%s'", command.describe()));
+				LOGGER.finer(() -> String.format("got poison pill from command '%s'", statement.getLocation()));
 				return ExitStatus.success();
 			} finally {
 				stopProducer(in);

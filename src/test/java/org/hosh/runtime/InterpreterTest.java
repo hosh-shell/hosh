@@ -236,10 +236,10 @@ public class InterpreterTest {
 
 	@Test
 	public void setThreadNameWithArgs() {
-		given(command.describe()).willReturn("java");
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Constant("-jar"), new Compiler.Constant("hosh.jar")));
+		given(statement.getLocation()).willReturn("java");
 		sut.run(statement, in, out, err);
 		assertThat(Thread.currentThread().getName()).isEqualTo("command='java -jar hosh.jar'");
 		then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
@@ -247,10 +247,10 @@ public class InterpreterTest {
 
 	@Test
 	public void setThreadNameWithoutArgs() {
-		given(command.describe()).willReturn("java");
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
+		given(statement.getLocation()).willReturn("java");
 		sut.run(statement, in, out, err);
 		assertThat(Thread.currentThread().getName()).isEqualTo("command='java'");
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened

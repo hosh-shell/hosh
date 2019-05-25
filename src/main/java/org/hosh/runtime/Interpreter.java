@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import org.hosh.doc.Todo;
 import org.hosh.runtime.Compiler.Program;
 import org.hosh.runtime.Compiler.Resolvable;
 import org.hosh.runtime.Compiler.Statement;
@@ -121,7 +122,7 @@ public class Interpreter {
 		Command command = statement.getCommand();
 		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
-		changeCurrentThreadName(command.describe(), resolvedArguments);
+		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
 		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
 	}
 
@@ -133,6 +134,7 @@ public class Interpreter {
 		Thread.currentThread().setName(name);
 	}
 
+	@Todo(description = "to extract Injector class here?")
 	protected void injectDeps(Command command) {
 		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
