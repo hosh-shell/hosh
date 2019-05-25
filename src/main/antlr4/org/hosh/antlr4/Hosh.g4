@@ -5,7 +5,7 @@ program
 	;
 
 stmt
-	: pipeline terminator
+	: pipeline terminator?
 	;
 
 pipeline
@@ -43,8 +43,7 @@ arg
 	;
 
 terminator
-	: terminator ';'
-	| ';'?
+	:  ';'
 	;
 
 NEWLINE
