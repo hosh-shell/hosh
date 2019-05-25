@@ -41,11 +41,11 @@ import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
-import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
 import org.hosh.spi.Values;
+import org.hosh.testsupport.RecordMatcher;
 import org.hosh.testsupport.WithThread;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,7 +144,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		given(command.describe()).willReturn("cmd");
+		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 	}
@@ -156,10 +156,10 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		given(command.describe()).willReturn("cmd");
+		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
-		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("(no message provided)")));
+		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("(no message provided)")));
 	}
 
 	@Test
@@ -169,10 +169,10 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		given(command.describe()).willReturn("cmd");
+		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
-		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated error")));
+		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("simulated error")));
 	}
 
 	@Test
@@ -212,12 +212,12 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		given(command.describe()).willReturn("cmd");
+		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
-		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("cannot resolve variable: VARIABLE")));
+		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("cannot resolve variable: VARIABLE")));
 	}
 
 	@Test

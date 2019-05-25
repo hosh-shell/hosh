@@ -122,7 +122,7 @@ public class Interpreter {
 		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(command.describe(), resolvedArguments);
-		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getCommand().describe()));
+		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
 	}
 
 	private void changeCurrentThreadName(String commandName, List<String> resolvedArguments) {
