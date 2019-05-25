@@ -96,7 +96,7 @@ public class FileSystemModuleTest {
 		private ListFiles sut;
 
 		@Test
-		public void errorTwoOrMoreArgs() {
+		public void errorTwoOrMoreArgs() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of("dir1", "dir2"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -105,7 +105,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void zeroArgsWithEmptyDirectory() {
+		public void zeroArgsWithEmptyDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -246,7 +246,7 @@ public class FileSystemModuleTest {
 		@DisabledOnOs(OS.WINDOWS) // File.setReadable() fails on windows
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test
-		public void accessDenied() {
+		public void accessDenied() throws IOException {
 			File cwd = temporaryFolder.toFile();
 			assert cwd.exists();
 			assert cwd.setReadable(false, true);
@@ -442,7 +442,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void directory() {
+		public void directory() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -451,7 +451,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void noArgs() {
+		public void noArgs() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -713,7 +713,7 @@ public class FileSystemModuleTest {
 		private Find sut;
 
 		@Test
-		public void noArgs() {
+		public void noArgs() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -805,7 +805,7 @@ public class FileSystemModuleTest {
 		private Probe sut;
 
 		@Test
-		public void noArgs() {
+		public void noArgs() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -859,7 +859,7 @@ public class FileSystemModuleTest {
 		private Symlink sut;
 
 		@Test
-		public void noArgs() {
+		public void noArgs() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -904,7 +904,7 @@ public class FileSystemModuleTest {
 		private Hardlink sut;
 
 		@Test
-		public void noArgs() {
+		public void noArgs() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -949,7 +949,7 @@ public class FileSystemModuleTest {
 		private Resolve sut;
 
 		@Test
-		public void noArgs() {
+		public void noArgs() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();

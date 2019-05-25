@@ -24,7 +24,6 @@
 package org.hosh.modules;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
@@ -82,7 +81,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() > 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected at most 1 argument")));
 				return ExitStatus.error();
@@ -111,8 +110,6 @@ public class FileSystemModule implements Module {
 			} catch (AccessDeniedException e) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + e.getMessage())));
 				return ExitStatus.error();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
 			}
 		}
 
@@ -198,7 +195,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one path argument")));
 				return ExitStatus.error();
@@ -211,8 +208,6 @@ public class FileSystemModule implements Module {
 			try (Stream<String> lines = Files.lines(source, StandardCharsets.UTF_8)) {
 				lines.forEach(line -> out.send(Records.singleton(Keys.TEXT, Values.ofText(line))));
 				return ExitStatus.success();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
 			}
 		}
 	}
@@ -232,7 +227,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
@@ -247,8 +242,6 @@ public class FileSystemModule implements Module {
 			} catch (NoSuchFileException e) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + e.getFile())));
 				return ExitStatus.error();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
 			}
 		}
 	}
@@ -268,19 +261,15 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
-			try {
-				Files.copy(source, target);
-				return ExitStatus.success();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			Files.copy(source, target);
+			return ExitStatus.success();
 		}
 	}
 
@@ -299,19 +288,15 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
-			try {
-				Files.move(source, target);
-				return ExitStatus.success();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			Files.move(source, target);
+			return ExitStatus.success();
 		}
 	}
 
@@ -330,18 +315,14 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: rm target")));
 				return ExitStatus.error();
 			}
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
-			try {
-				Files.delete(target);
-				return ExitStatus.success();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			Files.delete(target);
+			return ExitStatus.success();
 		}
 	}
 
@@ -352,26 +333,22 @@ public class FileSystemModule implements Module {
 	public static class Partitions implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: partitions")));
 				return ExitStatus.error();
 			}
 			for (FileStore store : FileSystems.getDefault().getFileStores()) {
-				try {
-					out.send(Records
-							.builder()
-							.entry(Keys.of("name"), Values.ofText(store.name()))
-							.entry(Keys.of("type"), Values.ofText(store.type()))
-							.entry(Keys.of("total"), Values.ofHumanizedSize(store.getTotalSpace()))
-							.entry(Keys.of("used"), Values.ofHumanizedSize(store.getTotalSpace() - store.getUnallocatedSpace()))
-							.entry(Keys.of("free"), Values.ofHumanizedSize(store.getUsableSpace()))
-							.entry(Keys.of("blocksize"), Values.ofHumanizedSize(store.getBlockSize()))
-							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
-							.build());
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
+				out.send(Records
+						.builder()
+						.entry(Keys.of("name"), Values.ofText(store.name()))
+						.entry(Keys.of("type"), Values.ofText(store.type()))
+						.entry(Keys.of("total"), Values.ofHumanizedSize(store.getTotalSpace()))
+						.entry(Keys.of("used"), Values.ofHumanizedSize(store.getTotalSpace() - store.getUnallocatedSpace()))
+						.entry(Keys.of("free"), Values.ofHumanizedSize(store.getUsableSpace()))
+						.entry(Keys.of("blocksize"), Values.ofHumanizedSize(store.getBlockSize()))
+						.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
+						.build());
 			}
 			return ExitStatus.success();
 		}
@@ -392,23 +369,19 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: probe file")));
 				return ExitStatus.error();
 			}
 			Path file = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
-			try {
-				String contentType = Files.probeContentType(file);
-				if (contentType == null) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
-					return ExitStatus.success();
-				}
-				out.send(Records.singleton(Keys.of("contenttype"), Values.ofText(contentType)));
+			String contentType = Files.probeContentType(file);
+			if (contentType == null) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
 				return ExitStatus.success();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
 			}
+			out.send(Records.singleton(Keys.of("contenttype"), Values.ofText(contentType)));
+			return ExitStatus.success();
 		}
 	}
 
@@ -426,19 +399,15 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: symlink source target")));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
-			try {
-				Files.createSymbolicLink(target, source);
-				return ExitStatus.success();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			Files.createSymbolicLink(target, source);
+			return ExitStatus.success();
 		}
 	}
 
@@ -456,19 +425,15 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: hardlink source target")));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
-			try {
-				Files.createLink(target, source);
-				return ExitStatus.success();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			Files.createLink(target, source);
+			return ExitStatus.success();
 		}
 	}
 
@@ -486,20 +451,16 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: resolve file")));
 				return ExitStatus.error();
 			}
-			try {
-				Path unresolved = Path.of(args.get(0));
-				Path partiallyResolved = resolveAsAbsolutePath(state.getCwd(), unresolved);
-				Path resolved = partiallyResolved.toRealPath();
-				out.send(Records.singleton(Keys.PATH, Values.ofPath(resolved)));
-				return ExitStatus.success();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			Path unresolved = Path.of(args.get(0));
+			Path partiallyResolved = resolveAsAbsolutePath(state.getCwd(), unresolved);
+			Path resolved = partiallyResolved.toRealPath();
+			out.send(Records.singleton(Keys.PATH, Values.ofPath(resolved)));
+			return ExitStatus.success();
 		}
 	}
 
@@ -520,7 +481,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException, InterruptedException {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
@@ -535,11 +496,6 @@ public class FileSystemModule implements Module {
 				dir.register(watchService, events);
 				withService(watchService, out);
 				return ExitStatus.success();
-			} catch (InterruptedException ex) {
-				Thread.currentThread().interrupt();
-				return ExitStatus.error();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
 			}
 		}
 
