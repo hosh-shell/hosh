@@ -26,6 +26,10 @@ package org.hosh.runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.hosh.runtime.Compiler.Program;
@@ -34,15 +38,21 @@ import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.LineReaderAware;
+import org.hosh.spi.LoggerFactory;
+import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
+import org.hosh.spi.Values;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 
 public class Interpreter {
+
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 	private final State state;
 
@@ -92,7 +102,27 @@ public class Interpreter {
 	private ExitStatus execute(Statement statement) {
 		try (Supervisor supervisor = new Supervisor()) {
 			runSupervised(statement, supervisor);
-			return supervisor.waitForAll(err);
+			return supervisor.waitForAll();
+		} catch (CancellationException e) {
+			LOGGER.log(Level.INFO, "got cancellation", e);
+			return ExitStatus.error();
+		} catch (InterruptedException e) {
+			LOGGER.log(Level.INFO, "got interrupt", e);
+			Thread.currentThread().interrupt();
+			return ExitStatus.error();
+		} catch (ExecutionException e) {
+			LOGGER.log(Level.SEVERE, "caught exception", e);
+			String message = messageFor(e);
+			err.send(Records.singleton(Keys.ERROR, Values.ofText(message)));
+			return ExitStatus.error();
+		}
+	}
+
+	private String messageFor(ExecutionException e) {
+		if (e.getCause() != null && e.getCause().getMessage() != null) {
+			return e.getCause().getMessage();
+		} else {
+			return "(no message provided)";
 		}
 	}
 
@@ -100,11 +130,11 @@ public class Interpreter {
 		supervisor.submit(() -> run(statement));
 	}
 
-	private ExitStatus run(Statement statement) {
+	private ExitStatus run(Statement statement) throws Exception {
 		return run(statement, new NullChannel(), out, err);
 	}
 
-	public ExitStatus run(Statement statement, Channel in, Channel out, Channel err) {
+	public ExitStatus run(Statement statement, Channel in, Channel out, Channel err) throws Exception {
 		Command command = statement.getCommand();
 		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());

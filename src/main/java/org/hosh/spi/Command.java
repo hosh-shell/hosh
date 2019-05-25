@@ -31,7 +31,7 @@ import java.util.Optional;
  */
 public interface Command {
 
-	ExitStatus run(List<String> args, Channel in, Channel out, Channel err);
+	ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws Exception;
 
 	default <T> Optional<T> downCast(Class<T> requiredClass) {
 		if (requiredClass.isInstance(this)) {

@@ -84,7 +84,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void producerAndConsumerSuccess() {
+	public void producerAndConsumerSuccess() throws Exception {
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -95,7 +95,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void producerError() {
+	public void producerError() throws Exception {
 		willReturn(ExitStatus.error()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -104,7 +104,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void consumerError() {
+	public void consumerError() throws Exception {
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.error()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -115,7 +115,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void producerUnhandledException() {
+	public void producerUnhandledException() throws Exception {
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		willThrow(new NullPointerException("simulated exception")).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(),
 				Mockito.any());
@@ -127,7 +127,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void consumerUnhandledException() {
+	public void consumerUnhandledException() throws Exception {
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willThrow(new NullPointerException("simulated exception")).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(),
 				Mockito.any());
@@ -139,7 +139,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void producerPoisonPill() {
+	public void producerPoisonPill() throws Exception {
 		willThrow(new ProducerPoisonPill()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(),
 				Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
@@ -151,7 +151,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void consumerPoisonPill() {
+	public void consumerPoisonPill() throws Exception {
 		willThrow(new ProducerPoisonPill()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(),
 				Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
@@ -163,7 +163,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void recursive() {
+	public void recursive() throws Exception {
 		PipelineCommand downStream = new PipelineCommand(producer, consumer);
 		downStream.setInterpreter(interpreter);
 		willReturn(downStream).given(consumerProducer).getCommand();

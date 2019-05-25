@@ -105,7 +105,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void storeCommandExitStatus() {
+	public void storeCommandExitStatus() throws Exception {
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -117,7 +117,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void injectState() {
+	public void injectState() throws Exception {
 		given(state.getVariables()).willReturn(variables);
 		given(stateAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -128,7 +128,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void injectTerminal() {
+	public void injectTerminal() throws Exception {
 		given(terminalAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(terminalAwareCommand);
@@ -138,7 +138,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleCancellations() {
+	public void handleCancellations() throws Exception {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new CancellationException("simulated cancellation"));
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -149,7 +149,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleExceptionWithoutMessage() {
+	public void handleExceptionWithoutMessage() throws Exception {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new NullPointerException());
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -161,7 +161,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleExceptionWithMessage() {
+	public void handleExceptionWithMessage() throws Exception {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new IllegalArgumentException("simulated error"));
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -173,7 +173,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void constantArgument() {
+	public void constantArgument() throws Exception {
 		args.add(new Compiler.Constant("file"));
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
@@ -185,7 +185,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void presentVariable() {
+	public void presentVariable() throws Exception {
 		args.add(new Compiler.Variable("VARIABLE"));
 		variables.put("VARIABLE", "1");
 		given(state.getVariables()).willReturn(variables);
@@ -217,7 +217,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void setThreadNameWithArgs() {
+	public void setThreadNameWithArgs() throws Exception {
 		given(command.describe()).willReturn("java");
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
@@ -228,7 +228,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void setThreadNameWithoutArgs() {
+	public void setThreadNameWithoutArgs() throws Exception {
 		given(command.describe()).willReturn("java");
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);

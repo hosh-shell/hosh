@@ -24,13 +24,10 @@
 package org.hosh.runtime;
 
 import static org.hosh.testsupport.ExitStatusAssert.assertThat;
-import static org.mockito.BDDMockito.then;
 
-import org.hosh.spi.Channel;
+import java.util.concurrent.ExecutionException;
+
 import org.hosh.spi.ExitStatus;
-import org.hosh.spi.Keys;
-import org.hosh.spi.Records;
-import org.hosh.spi.Values;
 import org.hosh.testsupport.SneakySignal;
 import org.hosh.testsupport.WithThread;
 import org.junit.jupiter.api.AfterEach;
@@ -38,7 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,9 +42,6 @@ public class SupervisorTest {
 
 	@RegisterExtension
 	public final WithThread withThread = new WithThread();
-
-	@Mock
-	private Channel err;
 
 	@InjectMocks
 	private Supervisor sut;
@@ -59,65 +52,45 @@ public class SupervisorTest {
 	}
 
 	@Test
-	public void noSubmit() {
-		ExitStatus exitStatus = sut.waitForAll(err);
+	public void noSubmit() throws InterruptedException, ExecutionException {
+		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
-	public void handleSignals() {
+	public void handleSignals() throws InterruptedException, ExecutionException {
 		sut.submit(() -> {
 			SneakySignal.raise("INT");
 			return ExitStatus.success();
 		});
-		ExitStatus waitForAll = sut.waitForAll(err);
+		ExitStatus waitForAll = sut.waitForAll();
 		assertThat(waitForAll).isError();
 	}
 
 	@Test
-	public void handleInterruptions() {
+	public void handleInterruptions() throws InterruptedException, ExecutionException {
 		sut.submit(() -> {
 			Thread.sleep(10_000);
 			return ExitStatus.success();
 		});
 		Thread.currentThread().interrupt(); // next call to Future.get() will throw InterruptedException
-		ExitStatus waitForAll = sut.waitForAll(err);
+		ExitStatus waitForAll = sut.waitForAll();
 		assertThat(waitForAll).isError();
 	}
 
 	@Test
-	public void allSubmitInSuccess() {
+	public void allSubmitInSuccess() throws InterruptedException, ExecutionException {
 		sut.submit(() -> ExitStatus.success());
 		sut.submit(() -> ExitStatus.success());
-		ExitStatus exitStatus = sut.waitForAll(err);
+		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
-	public void oneSubmitInError() {
+	public void oneSubmitInError() throws InterruptedException, ExecutionException {
 		sut.submit(() -> ExitStatus.success());
 		sut.submit(() -> ExitStatus.error());
-		ExitStatus exitStatus = sut.waitForAll(err);
+		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isError();
-	}
-
-	@Test
-	public void oneSubmitWithException() {
-		sut.submit(() -> {
-			throw new NullPointerException("simulated error");
-		});
-		ExitStatus exitStatus = sut.waitForAll(err);
-		assertThat(exitStatus).isError();
-		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated error")));
-	}
-
-	@Test
-	public void oneSubmitWithExceptionButNoMessage() {
-		sut.submit(() -> {
-			throw new NullPointerException();
-		});
-		ExitStatus exitStatus = sut.waitForAll(err);
-		assertThat(exitStatus).isError();
-		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("(no message provided)")));
 	}
 }

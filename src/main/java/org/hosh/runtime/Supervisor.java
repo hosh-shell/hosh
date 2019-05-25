@@ -26,20 +26,14 @@ package org.hosh.runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
-import org.hosh.spi.Keys;
 import org.hosh.spi.LoggerFactory;
-import org.hosh.spi.Records;
-import org.hosh.spi.Values;
 
 /**
  * Manages execution of built-in commands as well as external commands.
@@ -71,33 +65,13 @@ public class Supervisor implements AutoCloseable {
 		futures.add(future);
 	}
 
-	public ExitStatus waitForAll(Channel err) {
+	public ExitStatus waitForAll() throws InterruptedException, ExecutionException {
 		cancelFuturesOnSigint();
 		try {
 			List<ExitStatus> results = waitForCompletion();
 			return deriveExitStatus(results);
-		} catch (CancellationException e) {
-			LOGGER.log(Level.INFO, "got cancellation", e);
-			return ExitStatus.error();
-		} catch (InterruptedException e) {
-			LOGGER.log(Level.INFO, "got interrupt", e);
-			Thread.currentThread().interrupt();
-			return ExitStatus.error();
-		} catch (ExecutionException e) {
-			LOGGER.log(Level.SEVERE, "caught exception", e);
-			String message = messageFor(e);
-			err.send(Records.singleton(Keys.ERROR, Values.ofText(message)));
-			return ExitStatus.error();
 		} finally {
 			restoreDefaultSigintHandler();
-		}
-	}
-
-	private String messageFor(ExecutionException e) {
-		if (e.getCause() != null && e.getCause().getMessage() != null) {
-			return e.getCause().getMessage();
-		} else {
-			return "(no message provided)";
 		}
 	}
 
