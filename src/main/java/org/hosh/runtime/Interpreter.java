@@ -26,6 +26,7 @@ package org.hosh.runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.hosh.runtime.Compiler.Program;
@@ -34,10 +35,13 @@ import org.hosh.runtime.Compiler.Statement;
 import org.hosh.spi.Channel;
 import org.hosh.spi.Command;
 import org.hosh.spi.ExitStatus;
+import org.hosh.spi.Keys;
 import org.hosh.spi.LineReaderAware;
+import org.hosh.spi.Record;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
+import org.hosh.spi.Values;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
@@ -109,7 +113,7 @@ public class Interpreter {
 		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(command.describe(), resolvedArguments);
-		return command.run(resolvedArguments, in, out, err);
+		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getCommand().describe()));
 	}
 
 	private void changeCurrentThreadName(String commandName, List<String> resolvedArguments) {
@@ -132,5 +136,28 @@ public class Interpreter {
 				.stream()
 				.map(resolvable -> resolvable.resolve(state))
 				.collect(Collectors.toList());
+	}
+
+	// enrich any record sent to the inner channel with locations
+	private static class WithLocation implements Channel {
+
+		private final Channel channel;
+
+		private final String location;
+
+		public WithLocation(Channel channel, String location) {
+			this.channel = channel;
+			this.location = location;
+		}
+
+		@Override
+		public void send(Record record) {
+			channel.send(record.prepend(Keys.of("LOCATION"), Values.ofText(location)));
+		}
+
+		@Override
+		public Optional<Record> recv() {
+			return channel.recv();
+		}
 	}
 }
