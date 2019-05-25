@@ -27,6 +27,7 @@ import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Stream;
@@ -71,7 +72,7 @@ public class NetworkModuleTest {
 
 		@Todo(description = "this is a very bland test: let's try to consolidate this command before investing more")
 		@Test
-		public void noArgs() {
+		public void noArgs() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -80,7 +81,7 @@ public class NetworkModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		public void oneArg() throws IOException {
 			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -115,7 +116,7 @@ public class NetworkModuleTest {
 		private Http sut;
 
 		@Test
-		public void noArgs() {
+		public void noArgs() throws Exception {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -124,7 +125,7 @@ public class NetworkModuleTest {
 		}
 
 		@Test
-		public void oneArg() throws InterruptedException {
+		public void oneArg() throws Exception {
 			given(requestor.send(Mockito.any())).willReturn(response);
 			given(response.body()).willReturn(Stream.of("line1"));
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
@@ -132,16 +133,6 @@ public class NetworkModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
 			then(err).shouldHaveZeroInteractions();
-		}
-
-		@Test
-		public void interrupted() throws InterruptedException {
-			given(requestor.send(Mockito.any())).willThrow(new InterruptedException("simulated"));
-			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
-			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 		}
 	}
 }

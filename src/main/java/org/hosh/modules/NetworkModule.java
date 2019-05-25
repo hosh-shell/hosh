@@ -24,10 +24,8 @@
 package org.hosh.modules;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.NetworkInterface;
 import java.net.ProxySelector;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
@@ -62,31 +60,27 @@ public class NetworkModule implements Module {
 	public static class Network implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws IOException {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
-			try {
-				Iterator<NetworkInterface> iterator = NetworkInterface.networkInterfaces().iterator();
-				while (iterator.hasNext()) {
-					NetworkInterface ni = iterator.next();
-					Record record = Records
-							.builder()
-							.entry(Keys.of("alias"), Values.ofText(ni.getDisplayName()))
-							.entry(Keys.of("up"), Values.ofText(ni.isUp() ? "yes" : "no"))
-							.entry(Keys.of("loopback"), Values.ofText(ni.isLoopback() ? "yes" : "no"))
-							.entry(Keys.of("virtual"), Values.ofText(ni.isVirtual() ? "yes" : "no"))
-							.entry(Keys.of("mtu"), Values.ofNumeric(ni.getMTU()))
-							.entry(Keys.of("hwaddress"), Values.ofText(formatHex(ni.getHardwareAddress())))
-							.entry(Keys.of("address"), Values.ofText(formatInterfaceAddress(ni)))
-							.build();
-					out.send(record);
-				}
-				return ExitStatus.success();
-			} catch (SocketException e) {
-				throw new UncheckedIOException(e);
+			Iterator<NetworkInterface> iterator = NetworkInterface.networkInterfaces().iterator();
+			while (iterator.hasNext()) {
+				NetworkInterface ni = iterator.next();
+				Record record = Records
+						.builder()
+						.entry(Keys.of("alias"), Values.ofText(ni.getDisplayName()))
+						.entry(Keys.of("up"), Values.ofText(ni.isUp() ? "yes" : "no"))
+						.entry(Keys.of("loopback"), Values.ofText(ni.isLoopback() ? "yes" : "no"))
+						.entry(Keys.of("virtual"), Values.ofText(ni.isVirtual() ? "yes" : "no"))
+						.entry(Keys.of("mtu"), Values.ofNumeric(ni.getMTU()))
+						.entry(Keys.of("hwaddress"), Values.ofText(formatHex(ni.getHardwareAddress())))
+						.entry(Keys.of("address"), Values.ofText(formatInterfaceAddress(ni)))
+						.build();
+				out.send(record);
 			}
+			return ExitStatus.success();
 		}
 
 		private String formatInterfaceAddress(NetworkInterface ni) {
@@ -126,7 +120,7 @@ public class NetworkModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) throws Exception {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: http URL")));
 				return ExitStatus.error();
@@ -135,35 +129,25 @@ public class NetworkModule implements Module {
 					.uri(URI.create(args.get(0)))
 					.GET()
 					.build();
-			try {
-				HttpResponse<Stream<String>> response = requestor.send(request);
-				try (Stream<String> body = response.body()) {
-					body.forEach(line -> {
-						out.send(Records.singleton(Keys.TEXT, Values.ofText(line)));
-					});
-				}
-				return ExitStatus.success();
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
-				return ExitStatus.error();
+			HttpResponse<Stream<String>> response = requestor.send(request);
+			try (Stream<String> body = response.body()) {
+				body.forEach(line -> {
+					out.send(Records.singleton(Keys.TEXT, Values.ofText(line)));
+				});
 			}
+			return ExitStatus.success();
 		}
 
 		interface Requestor {
 
-			HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException;
+			HttpResponse<Stream<String>> send(HttpRequest request) throws Exception;
 		}
 
 		private static class DefaultRequestor implements Requestor {
 
 			@Override
-			public HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException {
-				try {
-					return HttpClientHolder.getInstance().send(request, BodyHandlers.ofLines());
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
+			public HttpResponse<Stream<String>> send(HttpRequest request) throws Exception {
+				return HttpClientHolder.getInstance().send(request, BodyHandlers.ofLines());
 			}
 		}
 
