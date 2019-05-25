@@ -39,6 +39,7 @@ import org.hosh.antlr4.HoshParser.PipelineContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.State;
@@ -218,6 +219,11 @@ public class Compiler {
 
 		public void setArguments(List<Resolvable> arguments) {
 			this.arguments = arguments;
+		}
+
+		@Todo(description = "add line number + real command name")
+		public String getLocation() {
+			return command.describe();
 		}
 
 		@Override

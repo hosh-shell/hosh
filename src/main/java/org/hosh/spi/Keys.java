@@ -55,6 +55,11 @@ public class Keys {
 	public static final Key ERROR = Keys.of("error");
 
 	/**
+	 * A human readable location of an error.
+	 */
+	public static final Key LOCATION = Keys.of("location");
+
+	/**
 	 * Denotes an unstructured text value. Usually text is the output of a native
 	 * command but also some built-it commands are using this standard key (e.g.
 	 * lines).

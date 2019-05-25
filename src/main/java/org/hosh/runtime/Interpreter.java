@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.hosh.runtime.Compiler.Program;
@@ -38,6 +39,7 @@ import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
 import org.hosh.spi.LineReaderAware;
 import org.hosh.spi.Record;
+import org.hosh.spi.Records;
 import org.hosh.spi.State;
 import org.hosh.spi.StateAware;
 import org.hosh.spi.TerminalAware;
@@ -96,7 +98,14 @@ public class Interpreter {
 	private ExitStatus execute(Statement statement) {
 		try (Supervisor supervisor = new Supervisor()) {
 			runSupervised(statement, supervisor);
-			return supervisor.waitForAll(err);
+			return supervisor.waitForAll();
+		} catch (ExecutionException e) {
+			Record record = Records.builder()
+					.entry(Keys.LOCATION, Values.ofText(statement.getLocation()))
+					.entry(Keys.ERROR, Values.ofText(messageFor(e)))
+					.build();
+			err.send(record);
+			return ExitStatus.error();
 		}
 	}
 
@@ -138,6 +147,14 @@ public class Interpreter {
 				.collect(Collectors.toList());
 	}
 
+	private String messageFor(ExecutionException e) {
+		if (e.getCause() != null && e.getCause().getMessage() != null) {
+			return e.getCause().getMessage();
+		} else {
+			return "(no message provided)";
+		}
+	}
+
 	// enrich any record sent to the inner channel with locations
 	private static class WithLocation implements Channel {
 
@@ -152,7 +169,7 @@ public class Interpreter {
 
 		@Override
 		public void send(Record record) {
-			channel.send(record.prepend(Keys.of("LOCATION"), Values.ofText(location)));
+			channel.send(record.prepend(Keys.LOCATION, Values.ofText(location)));
 		}
 
 		@Override

@@ -144,6 +144,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
+		given(command.describe()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 	}
@@ -155,6 +156,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
+		given(command.describe()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("(no message provided)")));
@@ -167,6 +169,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
+		given(command.describe()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated error")));
@@ -209,6 +212,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
+		given(command.describe()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program);
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveZeroInteractions();
