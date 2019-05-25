@@ -39,8 +39,10 @@ import org.hosh.spi.LoggerFactory;
 
 /**
  * Manages execution of built-in commands as well as external commands.
- *
  * SIGINT is handled as well, if requested.
+ *
+ * This class implements the idea of structured concurrency presented in
+ * http://250bpm.com/blog:71
  */
 public class Supervisor implements AutoCloseable {
 
