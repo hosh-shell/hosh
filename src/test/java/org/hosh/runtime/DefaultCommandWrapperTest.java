@@ -73,7 +73,7 @@ public class DefaultCommandWrapperTest {
 	}
 
 	@Test
-	public void callsBeforeAndAfterWhenStatementCompletesNormally() {
+	public void callsBeforeAndAfterWhenStatementCompletesNormally() throws Exception {
 		Object resource = new Object();
 		List<String> args = List.of();
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
@@ -85,7 +85,7 @@ public class DefaultCommandWrapperTest {
 	}
 
 	@Test
-	public void callsBeforeAndAfterWhenStatementThrows() {
+	public void callsBeforeAndAfterWhenStatementThrows() throws Exception {
 		Object resource = new Object();
 		List<String> args = List.of();
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
@@ -97,7 +97,7 @@ public class DefaultCommandWrapperTest {
 	}
 
 	@Test
-	public void keepRetryingAndReturnsLastExitStatus() {
+	public void keepRetryingAndReturnsLastExitStatus() throws Exception {
 		Object resource = new Object();
 		List<String> args = List.of();
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
