@@ -105,17 +105,23 @@ public class Supervisor implements AutoCloseable {
 	private void restoreDefaultSigintHandler() {
 		if (handleSignals) {
 			LOGGER.fine("restoring default INT signal handler");
-			org.jline.utils.Signals.registerDefault("INT");
+			Object handler = org.jline.utils.Signals.registerDefault("INT");
+			if (handler == null) {
+				throw new IllegalStateException("failed to register custom signal handler");
+			}
 		}
 	}
 
 	private void cancelFuturesOnSigint() {
 		if (handleSignals) {
 			LOGGER.fine("register INT signal handler");
-			org.jline.utils.Signals.register("INT", () -> {
+			Object handler = org.jline.utils.Signals.register("INT", () -> {
 				LOGGER.info("  got INT signal");
 				futures.forEach(this::cancelIfStillRunning);
 			});
+			if (handler == null) {
+				throw new IllegalStateException("failed to register custom signal handler");
+			}
 		}
 	}
 
