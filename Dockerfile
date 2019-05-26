@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM gcr.io/distroless/java:11
 LABEL maintainer="Davide Angelocola <davide.angelocola@gmail.com>"
 
 ENTRYPOINT ["java", "-jar", "/usr/local/bin/hosh.jar"]
