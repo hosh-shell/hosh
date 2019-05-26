@@ -573,6 +573,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@Experimental(description = "still experimental because of sleep(200) and output on err")
 	@BuiltIn(name = "withLock", description = "execute code inside after successfully locking file")
 	@Examples({
 			@Example(command = "withLock file.lock { echo inside }", description = "echo only if lock has been acquired")
@@ -590,6 +591,9 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public RandomAccessFile before(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				throw new IllegalArgumentException("expecting file name");
+			}
 			try {
 				Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 				RandomAccessFile resource = new RandomAccessFile(path.toFile(), "rw");
@@ -602,7 +606,6 @@ public class FileSystemModule implements Module {
 				}
 				return resource;
 			} catch (IOException e) {
-				LOGGER.log(Level.INFO, "caught error", e);
 				throw new UncheckedIOException(e);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();

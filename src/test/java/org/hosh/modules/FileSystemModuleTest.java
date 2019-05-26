@@ -24,6 +24,7 @@
 package org.hosh.modules;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -31,6 +32,9 @@ import static org.mockito.BDDMockito.then;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.UncheckedIOException;
+import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,6 +55,7 @@ import org.hosh.modules.FileSystemModule.Probe;
 import org.hosh.modules.FileSystemModule.Remove;
 import org.hosh.modules.FileSystemModule.Resolve;
 import org.hosh.modules.FileSystemModule.Symlink;
+import org.hosh.modules.FileSystemModule.WithLock;
 import org.hosh.spi.Channel;
 import org.hosh.spi.ExitStatus;
 import org.hosh.spi.Keys;
@@ -988,6 +993,64 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath().toRealPath())));
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class WithLockTest {
+
+		@RegisterExtension
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private WithLock sut;
+
+		@Test
+		public void noArgs() {
+			assertThatThrownBy(() -> sut.before(List.of(), in, out, err))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("expecting file name");
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void wrongFile() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			assertThatThrownBy(() -> sut.before(List.of("../missing_directory/file.txt"), in, out, err))
+					.isInstanceOf(UncheckedIOException.class);
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void lock() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			temporaryFolder.newFile("file.txt");
+			RandomAccessFile resource = sut.before(List.of("file.txt"), in, out, err);
+			assertThat(resource).isNotNull();
+			// under same JVM tryLock throws exception
+			assertThatThrownBy(() -> resource.getChannel().tryLock())
+					.isInstanceOf(OverlappingFileLockException.class);
+			sut.after(resource, in, out, err);
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 	}
