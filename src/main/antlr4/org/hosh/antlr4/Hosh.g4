@@ -36,18 +36,27 @@ simple
 	: invocation
 	;
 
-// commands must be statically resolved before execution 
-// this is way hosh requires ID and not VARIABLE here
+// by now compiler requires command (ID) to be statically defined
+// later should be possible to compile line by line, performing variable expansion before compiling
 invocation
-	: ID ( arg )*
+	: ID ( expression )*
 	;
 
-arg
-	: ID
-	| STRING
-	| VARIABLE
-	| VARIABLE_OR_FALLBACK
-	;
+expression
+    : ( expansion )+
+    | string
+    ;
+    
+string
+    : '\'' ( expansion )+ '\''
+    | '"' ( expansion )+ '"' 
+    ;
+    
+expansion
+    : ID
+    | VARIABLE
+    | VARIABLE_OR_FALLBACK
+    ;    
 
 terminator
 	:  ';'
@@ -56,14 +65,10 @@ terminator
 NEWLINE
 	: '\r'? '\n' -> skip
 	;
-
+	
+// rename to LITERAL 
 ID
 	: I+
-	;
-
-STRING
-	: '\'' ( ~['] )* '\''
-	| '"' ( ~["] )* '"'
 	;
 
 VARIABLE
@@ -74,7 +79,7 @@ VARIABLE_OR_FALLBACK
 	: '$' '{' V+ '!' I+ '}'
 	;
 
-fragment I : LETTER | DIGIT | ':' | '_' | '-' | '.' | '/' | '\\' | '~' ;
+fragment I : LETTER | DIGIT | ':' | '_' | '-' | '.' | '/' | '\\' | '~' | '+';
 
 fragment V : LETTER | '_' | '-' ;
 

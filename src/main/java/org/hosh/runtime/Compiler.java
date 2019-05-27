@@ -31,14 +31,16 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.hosh.antlr4.HoshParser;
-import org.hosh.antlr4.HoshParser.ArgContext;
 import org.hosh.antlr4.HoshParser.CommandContext;
+import org.hosh.antlr4.HoshParser.ExpansionContext;
+import org.hosh.antlr4.HoshParser.ExpressionContext;
 import org.hosh.antlr4.HoshParser.InvocationContext;
 import org.hosh.antlr4.HoshParser.PipelineContext;
 import org.hosh.antlr4.HoshParser.SequenceContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
+import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
 import org.hosh.spi.CommandWrapper;
 import org.hosh.spi.State;
@@ -143,34 +145,46 @@ public class Compiler {
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {
 		return ctx
-				.arg()
+				.expression()
 				.stream()
 				.map(this::compileArgument)
 				.collect(Collectors.toUnmodifiableList());
 	}
 
-	private Resolvable compileArgument(ArgContext ctx) {
-		if (ctx.ID() != null) {
-			Token token = ctx.ID().getSymbol();
-			String value = token.getText();
-			return new Constant(value);
-		}
-		if (ctx.VARIABLE() != null) {
-			Token token = ctx.VARIABLE().getSymbol();
-			String name = dropDeref(token.getText());
-			return new Variable(name);
-		}
-		if (ctx.VARIABLE_OR_FALLBACK() != null) {
-			Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
-			String[] nameAndFallback = dropDeref(token.getText()).split("!");
-			return new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]);
-		}
-		if (ctx.STRING() != null) {
-			Token token = ctx.STRING().getSymbol();
-			String value = dropQuotes(token);
-			return new Constant(value);
+	@Todo(description = "rename to Expression")
+	private Resolvable compileArgument(ExpressionContext ctx) {
+		if (ctx.expansion() != null) {
+			return new Composite(compileExpansion(ctx.expansion()));
 		}
 		throw new InternalBug(ctx);
+	}
+
+	@Todo(description = "test explicitly with resolvable has been created")
+	private List<Resolvable> compileExpansion(List<ExpansionContext> expansion) {
+		List<Resolvable> result = new ArrayList<>();
+		for (ExpansionContext ctx : expansion) {
+			if (ctx.ID() != null) {
+				Token token = ctx.ID().getSymbol();
+				String value = token.getText();
+				result.add(new Constant(value));
+			}
+			if (ctx.VARIABLE() != null) {
+				Token token = ctx.VARIABLE().getSymbol();
+				String name = dropDeref(token.getText());
+				result.add(new Variable(name));
+			}
+			if (ctx.VARIABLE_OR_FALLBACK() != null) {
+				Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
+				String[] nameAndFallback = dropDeref(token.getText()).split("!");
+				result.add(new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]));
+			}
+			// if (ctx.STRING() != null) {
+			// Token token = ctx.STRING().getSymbol();
+			// String value = dropQuotes(token);
+			// return new Constant(value);
+			// }
+		}
+		return result;
 	}
 
 	// "some text" -> some text
@@ -234,6 +248,24 @@ public class Compiler {
 
 		// resolve or throw
 		String resolve(State state);
+	}
+
+	public static class Composite implements Resolvable {
+
+		private final List<Resolvable> resolvables;
+
+		public Composite(List<Resolvable> resolvables) {
+			this.resolvables = resolvables;
+		}
+
+		@Override
+		public String resolve(State state) {
+			StringBuilder result = new StringBuilder();
+			for (Resolvable resolvable : resolvables) {
+				result.append(resolvable.resolve(state));
+			}
+			return result.toString();
+		}
 	}
 
 	public static class Constant implements Resolvable {
