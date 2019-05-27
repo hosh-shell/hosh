@@ -12,7 +12,7 @@ stmt
 sequence
     : pipeline terminator sequence
     | pipeline
-    ; 
+    ;
 
 pipeline
 	: command '|' stmt
@@ -21,7 +21,7 @@ pipeline
 	;
 
 command
-	: wrapped 
+	: wrapped
 	| simple
 	;
 
@@ -46,17 +46,17 @@ expression
     : ( expansion )+
     | string
     ;
-    
+
 string
     : '\'' ( expansion )+ '\''
-    | '"' ( expansion )+ '"' 
+    | '"' ( expansion )+ '"'
     ;
-    
+
 expansion
     : ID
     | VARIABLE
     | VARIABLE_OR_FALLBACK
-    ;    
+    ;
 
 terminator
 	:  ';'
@@ -66,7 +66,7 @@ NEWLINE
 	: '\r'? '\n' -> skip
 	;
 	
-// rename to LITERAL 
+// rename to LITERAL
 ID
 	: I+
 	;

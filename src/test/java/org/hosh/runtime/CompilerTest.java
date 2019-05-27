@@ -177,7 +177,31 @@ public class CompilerTest {
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).hasSize(2);
+				});
+	}
+
+	@Test
+	public void commandWithStringArgument() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+		Program program = sut.compile("git '${HOME}${BIN}'");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
 					assertThat(statement.getArguments()).hasSize(1);
+				});
+	}
+
+	@Test
+	public void commandWithStringArguments() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+		Program program = sut.compile("git '${HOME}${BIN}' ${CMD}");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).hasSize(2);
 				});
 	}
 

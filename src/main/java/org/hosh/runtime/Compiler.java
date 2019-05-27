@@ -156,6 +156,8 @@ public class Compiler {
 		if (ctx.expansion() != null) {
 			return new Composite(compileExpansion(ctx.expansion()));
 		}
+		if (ctx.string() != null) {
+		}
 		throw new InternalBug(ctx);
 	}
 
@@ -167,22 +169,21 @@ public class Compiler {
 				Token token = ctx.ID().getSymbol();
 				String value = token.getText();
 				result.add(new Constant(value));
+				continue;
 			}
 			if (ctx.VARIABLE() != null) {
 				Token token = ctx.VARIABLE().getSymbol();
 				String name = dropDeref(token.getText());
 				result.add(new Variable(name));
+				continue;
 			}
 			if (ctx.VARIABLE_OR_FALLBACK() != null) {
 				Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
 				String[] nameAndFallback = dropDeref(token.getText()).split("!");
 				result.add(new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]));
+				continue;
 			}
-			// if (ctx.STRING() != null) {
-			// Token token = ctx.STRING().getSymbol();
-			// String value = dropQuotes(token);
-			// return new Constant(value);
-			// }
+			throw new InternalBug(ctx);
 		}
 		return result;
 	}
