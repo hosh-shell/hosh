@@ -191,12 +191,6 @@ public class Compiler {
 		throw new InternalBug(ctx);
 	}
 
-	// "some text" -> some text
-	private String dropQuotes(Token token) {
-		String text = token.getText();
-		return text.substring(1, text.length() - 1);
-	}
-
 	// ${VARIABLE} -> VARIABLE
 	private String dropDeref(String variable) {
 		return variable.substring(2, variable.length() - 1);
