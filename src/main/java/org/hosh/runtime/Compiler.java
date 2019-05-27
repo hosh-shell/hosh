@@ -39,6 +39,7 @@ import org.hosh.antlr4.HoshParser.PipelineContext;
 import org.hosh.antlr4.HoshParser.SequenceContext;
 import org.hosh.antlr4.HoshParser.SimpleContext;
 import org.hosh.antlr4.HoshParser.StmtContext;
+import org.hosh.antlr4.HoshParser.StringContext;
 import org.hosh.antlr4.HoshParser.WrappedContext;
 import org.hosh.doc.Todo;
 import org.hosh.spi.Command;
@@ -154,38 +155,40 @@ public class Compiler {
 	@Todo(description = "rename to Expression")
 	private Resolvable compileArgument(ExpressionContext ctx) {
 		if (ctx.expansion() != null) {
-			return new Composite(compileExpansion(ctx.expansion()));
+			return compileExpansion(ctx.expansion());
 		}
 		if (ctx.string() != null) {
+			return new Composite(compileString(ctx.string()));
 		}
 		throw new InternalBug(ctx);
 	}
 
-	@Todo(description = "test explicitly with resolvable has been created")
-	private List<Resolvable> compileExpansion(List<ExpansionContext> expansion) {
+	private List<Resolvable> compileString(StringContext string) {
 		List<Resolvable> result = new ArrayList<>();
-		for (ExpansionContext ctx : expansion) {
-			if (ctx.ID() != null) {
-				Token token = ctx.ID().getSymbol();
-				String value = token.getText();
-				result.add(new Constant(value));
-				continue;
-			}
-			if (ctx.VARIABLE() != null) {
-				Token token = ctx.VARIABLE().getSymbol();
-				String name = dropDeref(token.getText());
-				result.add(new Variable(name));
-				continue;
-			}
-			if (ctx.VARIABLE_OR_FALLBACK() != null) {
-				Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
-				String[] nameAndFallback = dropDeref(token.getText()).split("!");
-				result.add(new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]));
-				continue;
-			}
-			throw new InternalBug(ctx);
+		for (ExpansionContext ctx : string.expansion()) {
+			result.add(compileExpansion(ctx));
 		}
 		return result;
+	}
+
+	@Todo(description = "test explicitly with resolvable has been created")
+	private Resolvable compileExpansion(ExpansionContext ctx) {
+		if (ctx.ID() != null) {
+			Token token = ctx.ID().getSymbol();
+			String value = token.getText();
+			return new Constant(value);
+		}
+		if (ctx.VARIABLE() != null) {
+			Token token = ctx.VARIABLE().getSymbol();
+			String name = dropDeref(token.getText());
+			return new Variable(name);
+		}
+		if (ctx.VARIABLE_OR_FALLBACK() != null) {
+			Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
+			String[] nameAndFallback = dropDeref(token.getText()).split("!");
+			return new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]);
+		}
+		throw new InternalBug(ctx);
 	}
 
 	// "some text" -> some text

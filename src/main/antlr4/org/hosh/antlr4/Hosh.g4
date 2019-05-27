@@ -43,7 +43,7 @@ invocation
 	;
 
 expression
-    : ( expansion )+
+    : expansion
     | string
     ;
 
@@ -79,7 +79,7 @@ VARIABLE_OR_FALLBACK
 	: '$' '{' V+ '!' I+ '}'
 	;
 
-fragment I : LETTER | DIGIT | ':' | '_' | '-' | '.' | '/' | '\\' | '~' | '+';
+fragment I : LETTER | DIGIT | ':' | '_' | '-' | '.' | '/' | '\\' | '~' | '+' | '*' | '=' | '?' | '<' | '>' | '(' | ')'; 
 
 fragment V : LETTER | '_' | '-' ;
 
