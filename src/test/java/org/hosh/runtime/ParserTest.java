@@ -114,6 +114,7 @@ public class ParserTest {
 				"regex line '\\w+'",
 				"regex line \"\\w+\"",
 				"ls ${VAR!/tmp}",
+				"echo ${HELLO}${WHO}",
 				"ls ${JAVA_HOME}/bin",
 				"ls ${JAVA_HOME}/${JVM_BINARY}",
 				"ls \"${JAVA_HOME}/${JVM_BINARY}\"");
