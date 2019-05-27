@@ -32,6 +32,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
@@ -99,7 +100,7 @@ public class FileSystemModule implements Module {
 			}
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(followSymlinksRecursively(dir))) {
 				for (Path path : stream) {
-					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 					Value size = attributes.isRegularFile() ? Values.ofHumanizedSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
 							.entry(Keys.PATH, Values.ofStyledPath(path.getFileName(), colorFor(attributes)))

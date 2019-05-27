@@ -136,13 +136,31 @@ public class FileSystemModuleTest {
 		@Test
 		public void zeroArgsWithOneFile() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			temporaryFolder.newFile("file").createNewFile();
+			temporaryFolder.newFile("file");
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("file")),
 					Keys.SIZE, Values.ofHumanizedSize(0)));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@Test
+		public void zeroArgsWithOneSymlink() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Path file = temporaryFolder.newFile("file").toPath();
+			Files.createSymbolicLink(Paths.get(state.getCwd().toString(), "link"), file);
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).should().send(RecordMatcher.of(
+					Keys.PATH, Values.ofPath(Paths.get("file")),
+					Keys.SIZE, Values.ofHumanizedSize(0)));
+			then(out).should().send(RecordMatcher.of(
+					Keys.PATH, Values.ofPath(Paths.get("link")),
+					Keys.SIZE, Values.none()));
+			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveZeroInteractions();
 		}
 

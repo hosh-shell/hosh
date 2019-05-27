@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - allowing sequence commands everywhere (fix #130)
+- fix symlink support in `ls`
 
 ## [0.0.32] - 2019-05-22
 ### Added
