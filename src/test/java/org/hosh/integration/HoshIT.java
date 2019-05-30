@@ -373,6 +373,20 @@ public class HoshIT {
 		assertThat(output).contains("a", "b");
 	}
 
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/83", description = "inference of ';'")
+	@Test
+	public void multilinePipeline() throws Exception {
+		Path scriptPath = givenScript(
+				"rand      |",
+				"  take 42 |",
+				"  count    ");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).contains("42");
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();

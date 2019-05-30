@@ -91,6 +91,6 @@ COMMENT
 	;
 
 WS
-	: [ \t]+ -> skip
+	: [ \t\n\r]+ -> skip
 	;
 	

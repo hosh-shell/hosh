@@ -139,6 +139,10 @@ public class ParserTest {
 
 	static List<String> pipelines() {
 		return List.of(
+				"env | sink",
+				"git config --list | sink",
+				"git config --list | grep -v author",
+				"git config --list |\ngrep -v author",
 				"/usr/bin/git diff | grep /regexp/",
 				"env | grep /regexp/",
 				"cat file.txt | grep /regexp/",

@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hosh.doc.Todo;
 import org.hosh.runtime.AnsiFormatter;
 import org.hosh.runtime.CancellableChannel;
 import org.hosh.runtime.CommandCompleter;
@@ -145,9 +146,12 @@ public class Hosh {
 		}
 	}
 
+	@Todo(description = "move to the right place (parser/lexer), this is just proof of concept")
 	private static String loadScript(Path path) {
 		try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-			return lines.collect(Collectors.joining(";\n"));
+			return lines
+					.map(line -> line.trim().endsWith("|") ? line : line + ";")
+					.collect(Collectors.joining("\n"));
 		} catch (IOException e) {
 			throw new UncheckedIOException("unable to load: " + path, e);
 		}
