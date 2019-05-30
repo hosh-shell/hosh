@@ -39,14 +39,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.doc.Bug;
+import org.hosh.doc.Todo;
 import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class HoshIT {
@@ -387,6 +391,50 @@ public class HoshIT {
 		assertThat(output).contains("42");
 	}
 
+	@DisabledOnOs(OS.WINDOWS)
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
+	@Test
+	public void interruptBuiltInCommand() throws Exception {
+		Path scriptPath = givenScript("rand");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		sendSigint(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@DisabledOnOs(OS.WINDOWS)
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
+	@Test
+	public void interruptExternalCommand() throws Exception {
+		Path scriptPath = givenScript("git cat-file --batch");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		sendSigint(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isNotEqualTo(0);
+	}
+
+	@DisabledOnOs(OS.WINDOWS)
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
+	@Test
+	public void interruptPipeline() throws Exception {
+		Path scriptPath = givenScript("rand | count");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		sendSigint(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@DisabledOnOs(OS.WINDOWS)
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
+	@Test
+	public void interruptBenchmark() throws Exception {
+		Path scriptPath = givenScript("benchmark 10000 { rand | take 10000 | count }");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		sendSigint(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
@@ -447,5 +495,17 @@ public class HoshIT {
 
 	private void closeInput(Process hosh) throws IOException {
 		hosh.getOutputStream().close();
+	}
+
+	@Todo(description = "use https://github.com/alirdn/windows-kill")
+	private void sendSigint(Process hosh) throws InterruptedException, IOException {
+		// wait some time to start the process and then send a SIGINT
+		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
+		assertThat(terminated).isFalse();
+		int waitFor = new ProcessBuilder()
+				.command("kill", "-INT", Long.toString(hosh.pid()))
+				.start()
+				.waitFor();
+		assertThat(waitFor).isEqualTo(0);
 	}
 }
