@@ -27,12 +27,9 @@ import static org.hosh.testsupport.ExitStatusAssert.assertThat;
 
 import java.util.concurrent.ExecutionException;
 
-import org.hosh.doc.Bug;
 import org.hosh.spi.ExitStatus;
-import org.hosh.testsupport.SneakySignal;
 import org.hosh.testsupport.WithThread;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -57,18 +54,6 @@ public class SupervisorTest {
 	public void noSubmit() throws ExecutionException {
 		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isSuccess();
-	}
-
-	@Disabled("flaky test")
-	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "flaky test")
-	@Test
-	public void handleSignals() throws ExecutionException {
-		sut.submit(() -> {
-			SneakySignal.raise("INT");
-			return ExitStatus.success();
-		});
-		ExitStatus waitForAll = sut.waitForAll();
-		assertThat(waitForAll).isError();
 	}
 
 	@Test
