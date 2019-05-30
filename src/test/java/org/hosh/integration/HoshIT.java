@@ -48,6 +48,8 @@ import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class HoshIT {
@@ -388,6 +390,7 @@ public class HoshIT {
 		assertThat(output).contains("42");
 	}
 
+	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
 	public void interruptBuiltInCommand() throws Exception {
@@ -398,6 +401,7 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
+	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
 	public void interruptExternalCommand() throws Exception {
@@ -408,6 +412,7 @@ public class HoshIT {
 		assertThat(exitCode).isNotEqualTo(0);
 	}
 
+	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
 	public void interruptPipeline() throws Exception {
@@ -418,6 +423,7 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
+	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
 	public void interruptBenchmark() throws Exception {
