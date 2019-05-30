@@ -413,10 +413,11 @@ public class HoshIT {
 	}
 
 	private void sendSigint(Process hosh) throws InterruptedException, IOException {
-		new ProcessBuilder()
+		int waitFor = new ProcessBuilder()
 				.command("kill", "-INT", Long.toString(hosh.pid()))
 				.start()
 				.waitFor();
+		assertThat(waitFor).isEqualTo(0);
 	}
 
 	// simple test infrastructure
