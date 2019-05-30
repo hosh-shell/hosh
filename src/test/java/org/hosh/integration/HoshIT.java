@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -385,6 +386,37 @@ public class HoshIT {
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).contains("42");
+	}
+
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
+	@Test
+	public void interruptBuiltin() throws Exception {
+		Path scriptPath = givenScript("rand");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
+		assertThat(terminated).isFalse();
+		sendSigint(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
+	@Test
+	public void interruptPipeline() throws Exception {
+		Path scriptPath = givenScript("rand | count");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
+		assertThat(terminated).isFalse();
+		sendSigint(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	private void sendSigint(Process hosh) throws InterruptedException, IOException {
+		new ProcessBuilder()
+				.command("kill", "-INT", Long.toString(hosh.pid()))
+				.start()
+				.waitFor();
 	}
 
 	// simple test infrastructure
