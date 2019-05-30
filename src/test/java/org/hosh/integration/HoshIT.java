@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hosh.doc.Bug;
+import org.hosh.doc.Todo;
 import org.hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -496,8 +497,9 @@ public class HoshIT {
 		hosh.getOutputStream().close();
 	}
 
-	// wait some time to start the process and then send a SIGINT
+	@Todo(description = "use https://github.com/alirdn/windows-kill")
 	private void sendSigint(Process hosh) throws InterruptedException, IOException {
+		// wait some time to start the process and then send a SIGINT
 		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
 		assertThat(terminated).isFalse();
 		int waitFor = new ProcessBuilder()
