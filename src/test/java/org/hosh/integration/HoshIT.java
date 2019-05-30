@@ -393,8 +393,6 @@ public class HoshIT {
 	public void interruptBuiltInCommand() throws Exception {
 		Path scriptPath = givenScript("rand");
 		Process hosh = givenHoshProcess(scriptPath.toString());
-		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
-		assertThat(terminated).isFalse();
 		sendSigint(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(1);
@@ -405,8 +403,6 @@ public class HoshIT {
 	public void interruptExternalCommand() throws Exception {
 		Path scriptPath = givenScript("git cat-file --batch");
 		Process hosh = givenHoshProcess(scriptPath.toString());
-		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
-		assertThat(terminated).isFalse();
 		sendSigint(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isNotEqualTo(0);
@@ -417,8 +413,6 @@ public class HoshIT {
 	public void interruptPipeline() throws Exception {
 		Path scriptPath = givenScript("rand | count");
 		Process hosh = givenHoshProcess(scriptPath.toString());
-		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
-		assertThat(terminated).isFalse();
 		sendSigint(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(1);
@@ -429,19 +423,9 @@ public class HoshIT {
 	public void interruptBenchmark() throws Exception {
 		Path scriptPath = givenScript("benchmark 10000 { rand | take 10000 | count }");
 		Process hosh = givenHoshProcess(scriptPath.toString());
-		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
-		assertThat(terminated).isFalse();
 		sendSigint(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(1);
-	}
-
-	private void sendSigint(Process hosh) throws InterruptedException, IOException {
-		int waitFor = new ProcessBuilder()
-				.command("kill", "-INT", Long.toString(hosh.pid()))
-				.start()
-				.waitFor();
-		assertThat(waitFor).isEqualTo(0);
 	}
 
 	// simple test infrastructure
@@ -504,5 +488,16 @@ public class HoshIT {
 
 	private void closeInput(Process hosh) throws IOException {
 		hosh.getOutputStream().close();
+	}
+
+	// wait some time to start the process and then send a SIGINT
+	private void sendSigint(Process hosh) throws InterruptedException, IOException {
+		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
+		assertThat(terminated).isFalse();
+		int waitFor = new ProcessBuilder()
+				.command("kill", "-INT", Long.toString(hosh.pid()))
+				.start()
+				.waitFor();
+		assertThat(waitFor).isEqualTo(0);
 	}
 }
