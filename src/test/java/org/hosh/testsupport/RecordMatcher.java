@@ -23,35 +23,30 @@
  */
 package org.hosh.testsupport;
 
-import static org.mockito.internal.progress.ThreadSafeMockingProgress.mockingProgress;
-
 import java.util.List;
 
 import org.hosh.spi.Key;
 import org.hosh.spi.Record;
 import org.hosh.spi.Value;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
 
 /**
  * Mockito's argument matcher for Record that allows to specify
  * a subset of key/value mappings.
  * 
  * This has been done to allows unit tests with files e.g. in continuous
- * integration is it possible to check for a file named XXX but not the owner of
- * the file.
+ * integration jobs such as azure pipelines is it possible to check for a
+ * file named "foo.txt" but not the owner of the file.
  */
 public class RecordMatcher implements ArgumentMatcher<Record> {
 
 	public static Record of(Key k1, Value v1) {
-		RecordMatcher matcher = new RecordMatcher(List.of(new Record.Entry(k1, v1)));
-		mockingProgress().getArgumentMatcherStorage().reportMatcher(matcher);
-		return null;
+		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1))));
 	}
 
 	public static Record of(Key k1, Value v1, Key k2, Value v2) {
-		RecordMatcher matcher = new RecordMatcher(List.of(new Record.Entry(k1, v1), new Record.Entry(k2, v2)));
-		mockingProgress().getArgumentMatcherStorage().reportMatcher(matcher);
-		return null;
+		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1), new Record.Entry(k2, v2))));
 	}
 
 	private final List<Record.Entry> entries;
