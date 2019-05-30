@@ -57,7 +57,6 @@ import org.hosh.spi.Module;
 import org.hosh.spi.Record;
 import org.hosh.spi.Record.Entry;
 import org.hosh.spi.Records;
-import org.hosh.spi.Records.Builder;
 import org.hosh.spi.Value;
 import org.hosh.spi.Values;
 
@@ -164,7 +163,7 @@ public class TextModule implements Module {
 		@Todo(description = "this method is recreating entries wastefully, " +
 				"perhaps would be possible to introduce some form of structural sharing in Builder")
 		private Record trimByKey(Record record, Key key) {
-			Builder builder = Records.builder();
+			Records.Builder builder = Records.builder();
 			List<Entry> entries = record.entries();
 			for (Entry entry : entries) {
 				if (entry.getKey().equals(key)) {

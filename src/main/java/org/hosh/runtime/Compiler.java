@@ -162,7 +162,7 @@ public class Compiler {
 		}
 		if (ctx.VARIABLE_OR_FALLBACK() != null) {
 			Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
-			String[] nameAndFallback = dropDeref(token.getText()).split("!");
+			String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
 			return new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]);
 		}
 		if (ctx.STRING() != null) {

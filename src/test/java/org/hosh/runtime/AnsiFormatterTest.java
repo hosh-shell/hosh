@@ -43,7 +43,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class AnsiFormatterTest {
 
 	@RegisterExtension
-	public WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("PST"));
+	public WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("Etc/GMT+8"));
 
 	@Mock(stubOnly = true)
 	private LogRecord logRecord;
