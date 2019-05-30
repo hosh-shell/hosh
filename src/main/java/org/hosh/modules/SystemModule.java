@@ -383,8 +383,6 @@ public class SystemModule implements Module {
 
 		@Override
 		public boolean retry(Accumulator resource, Channel in, Channel out, Channel err) {
-			// allows to check for interruptions (i.e. SIGINT)
-			Thread.yield();
 			resource.takeTime();
 			return --resource.repeat > 0;
 		}
