@@ -390,7 +390,7 @@ public class HoshIT {
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
-	public void interruptBuiltin() throws Exception {
+	public void interruptBuiltInCommand() throws Exception {
 		Path scriptPath = givenScript("rand");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
@@ -398,6 +398,18 @@ public class HoshIT {
 		sendSigint(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
+	@Test
+	public void interruptExternalCommand() throws Exception {
+		Path scriptPath = givenScript("git cat-file --batch");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
+		assertThat(terminated).isFalse();
+		sendSigint(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isNotEqualTo(0);
 	}
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
