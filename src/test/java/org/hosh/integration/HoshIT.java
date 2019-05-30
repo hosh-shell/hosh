@@ -424,6 +424,18 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
+	@Test
+	public void interruptBenchmark() throws Exception {
+		Path scriptPath = givenScript("benchmark 10000 { rand | take 10000 | count }");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
+		assertThat(terminated).isFalse();
+		sendSigint(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+	}
+
 	private void sendSigint(Process hosh) throws InterruptedException, IOException {
 		int waitFor = new ProcessBuilder()
 				.command("kill", "-INT", Long.toString(hosh.pid()))
