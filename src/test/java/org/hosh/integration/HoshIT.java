@@ -399,7 +399,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		sendSigint(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(1);
+		assertThat(exitCode).isNotEqualTo(0);
 	}
 
 	@DisabledOnOs(OS.WINDOWS)
@@ -421,7 +421,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		sendSigint(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(1);
+		assertThat(exitCode).isNotEqualTo(0);
 	}
 
 	@DisabledOnOs(OS.WINDOWS)
@@ -432,7 +432,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		sendSigint(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(1);
+		assertThat(exitCode).isNotEqualTo(0);
 	}
 
 	// simple test infrastructure
