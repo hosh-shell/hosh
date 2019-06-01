@@ -350,6 +350,13 @@ public class ValuesTest {
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("path cannot be null");
 		}
+
+		@Test
+		public void nullStyle() {
+			assertThatThrownBy(() -> Values.ofStyledPath(Paths.get("file"), null))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("style cannot be null");
+		}
 	}
 
 	@Nested
