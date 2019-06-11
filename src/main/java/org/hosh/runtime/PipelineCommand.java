@@ -125,7 +125,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 	private void runAsync(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err, Position position) {
 		supervisor.submit(() -> {
 			Command command = statement.getCommand();
-			command.downCast(ExternalCommand.class).ifPresent(cmd -> cmd.pipeline(position));
+			Downcast.of(command, ExternalCommand.class).ifPresent(cmd -> cmd.pipeline(position));
 			try {
 				return interpreter.run(statement, in, out, err);
 			} catch (ProducerPoisonPill e) {
@@ -139,17 +139,15 @@ public class PipelineCommand implements Command, InterpreterAware {
 	}
 
 	private void stopConsumer(Channel out) {
-		if (out instanceof PipelineChannel) {
-			PipelineChannel pipeOut = (PipelineChannel) out;
+		Downcast.of(out, PipelineChannel.class).ifPresent(pipeOut -> {
 			pipeOut.stopConsumer();
-		}
+		});
 	}
 
 	private void stopProducer(Channel in) {
-		if (in instanceof PipelineChannel) {
-			PipelineChannel pipeIn = (PipelineChannel) in;
+		Downcast.of(in, PipelineChannel.class).ifPresent(pipeIn -> {
 			pipeIn.stopProducer();
 			pipeIn.consumeAnyRemainingRecord();
-		}
+		});
 	}
 }

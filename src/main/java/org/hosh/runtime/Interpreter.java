@@ -136,10 +136,10 @@ public class Interpreter {
 
 	@Todo(description = "to extract Injector class here?")
 	protected void injectDeps(Command command) {
-		command.downCast(StateAware.class).ifPresent(cmd -> cmd.setState(state));
-		command.downCast(TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
-		command.downCast(LineReaderAware.class).ifPresent(cmd -> cmd.setLineReader(lineReader));
-		command.downCast(InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));
+		Downcast.of(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
+		Downcast.of(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
+		Downcast.of(command, LineReaderAware.class).ifPresent(cmd -> cmd.setLineReader(lineReader));
+		Downcast.of(command, InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));
 	}
 
 	private List<String> resolveArguments(List<Resolvable> arguments) {

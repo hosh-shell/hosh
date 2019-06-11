@@ -21,14 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.spi;
+package org.hosh.runtime;
 
-import java.util.List;
+import java.util.Optional;
 
-/**
- * Command represents a built-in (i.e. ls) or external commands (i.e. vim).
- */
-public interface Command {
+public class Downcast {
 
-	ExitStatus run(List<String> args, Channel in, Channel out, Channel err);
+	private Downcast() {
+	}
+
+	public static <T> Optional<T> of(Object object, Class<T> requiredClass) {
+		if (requiredClass.isInstance(object)) {
+			return Optional.of(requiredClass.cast(object));
+		} else {
+			return Optional.empty();
+		}
+	}
 }

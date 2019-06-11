@@ -112,7 +112,7 @@ public class Compiler {
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
 				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
-		command.downCast(CommandWrapper.class).ifPresent(cmd -> {
+		Downcast.of(command, CommandWrapper.class).ifPresent(cmd -> {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		});
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
@@ -129,7 +129,7 @@ public class Compiler {
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
 				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
-		CommandWrapper<?> commandWrapper = command.downCast(CommandWrapper.class)
+		CommandWrapper<?> commandWrapper = Downcast.of(command, CommandWrapper.class)
 				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName)));
 		if (ctx.stmt() == null) {
 			int line = ctx.start.getLine();

@@ -90,8 +90,6 @@ public class CompilerTest {
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
-					statement.getCommand().downCast(PipelineCommand.class).ifPresent(outerCmd -> {
-					});
 				});
 	}
 
@@ -187,7 +185,6 @@ public class CompilerTest {
 	@Test
 	public void wrappedCommand() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
-		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime -t -a { git push }");
 		assertThat(program.getStatements())
@@ -200,7 +197,6 @@ public class CompilerTest {
 	@Test
 	public void nestedWrappedCommands() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
-		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime { withTime { git push } }");
 		assertThat(program.getStatements())
@@ -237,7 +233,6 @@ public class CompilerTest {
 	@Test
 	public void commandWrapperUsedAsCommand() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
-		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
 		assertThatThrownBy(() -> sut.compile("withTime"))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'withTime' is a command wrapper");
@@ -246,7 +241,6 @@ public class CompilerTest {
 	@Test
 	public void emptyCommandWrapper() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
-		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
 		assertThatThrownBy(() -> sut.compile("withTime { }"))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'withTime' with empty wrapping statement");
@@ -270,7 +264,6 @@ public class CompilerTest {
 
 	@Test
 	public void commandWrapperAsProducer() {
-		doReturn(Optional.of(commandWrapper)).when(commandWrapper).downCast(CommandWrapper.class);
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("benchmark");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
