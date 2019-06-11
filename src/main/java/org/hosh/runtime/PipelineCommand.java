@@ -107,7 +107,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 			assemblePipeline(supervisor, consumer, pipeChannel, out, err);
 			return supervisor.waitForAll();
 		} catch (ExecutionException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException(e.getCause());
 		}
 	}
 

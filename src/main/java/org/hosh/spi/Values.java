@@ -110,8 +110,7 @@ public class Values {
 	}
 
 	/**
-	 * Generic text, make sure that text hasn't any number or date formatted without
-	 * the current locale.
+	 * Generic text.
 	 */
 	static final class TextValue implements Value {
 
