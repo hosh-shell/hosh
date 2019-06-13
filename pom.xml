@@ -218,7 +218,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>org.hosh.Hosh</mainClass>
+							<mainClass>hosh.Hosh</mainClass>
 						</manifest>
 					</archive>
 					<attach>false</attach>
