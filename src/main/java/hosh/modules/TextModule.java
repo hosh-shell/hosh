@@ -47,6 +47,7 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Todo;
 import hosh.spi.Ansi;
+import hosh.spi.Ansi.Style;
 import hosh.spi.Channel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
@@ -54,11 +55,10 @@ import hosh.spi.Key;
 import hosh.spi.Keys;
 import hosh.spi.Module;
 import hosh.spi.Record;
+import hosh.spi.Record.Entry;
 import hosh.spi.Records;
 import hosh.spi.Value;
 import hosh.spi.Values;
-import hosh.spi.Ansi.Style;
-import hosh.spi.Record.Entry;
 
 public class TextModule implements Module {
 
@@ -133,6 +133,44 @@ public class TextModule implements Module {
 
 		private Key makeKey(Integer i) {
 			return Keys.of(Integer.toString(i));
+		}
+	}
+
+	@BuiltIn(name = "join", description = "join record into a single-keyed text record")
+	@Examples({
+			@Example(description = "record to string", command = "lines file.tsv | split text '\\t' | join ','"),
+	})
+	public static class Join implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: join separator")));
+				return ExitStatus.error();
+			}
+			String sep = args.get(0);
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				Record record = incoming.get();
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				List<Value> values = record.values();
+				Locale locale = Locale.getDefault();
+				boolean skipSep = true;
+				for (Value value : values) {
+					if (skipSep) {
+						skipSep = false;
+					} else {
+						sw.append(sep);
+					}
+					value.print(pw, locale);
+				}
+				out.send(Records.singleton(Keys.TEXT, Values.ofText(sw.toString())));
+			}
+			return ExitStatus.success();
 		}
 	}
 
