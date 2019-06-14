@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import hosh.Hosh;
 import org.junit.jupiter.api.Test;
 
 import hosh.BootstrapBuiltins;
@@ -53,7 +54,8 @@ public class DocFitnessTest {
 		bootstrapBuiltins.registerAllBuiltins(state);
 		assertThat(state.getCommands()).isNotEmpty();
 		Compiler compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state));
-		try (ScanResult scanResult = new ClassGraph().whitelistPackages("org.hosh").scan()) {
+		try (ScanResult scanResult = new ClassGraph().whitelistPackages(Hosh.class.getPackageName()).scan()) {
+			assertThat(scanResult.getAllClasses()).isNotEmpty();
 			scanResult
 					.getClassesImplementing(Command.class.getCanonicalName())
 					.loadClasses()
@@ -76,8 +78,9 @@ public class DocFitnessTest {
 
 	@Test
 	public void displayHelpAndExamplesCoverage() {
-		ClassGraph allClasses = new ClassGraph().whitelistPackages("org.hosh");
+		ClassGraph allClasses = new ClassGraph().whitelistPackages(Hosh.class.getPackageName());
 		try (ScanResult scanResult = allClasses.scan()) {
+			assertThat(scanResult.getAllClasses()).isNotEmpty();
 			List<Class<?>> commands = scanResult
 					.getAllClasses()
 					.loadClasses()

@@ -26,7 +26,9 @@ package hosh.fitness;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import hosh.Hosh;
 import org.junit.jupiter.api.Test;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
@@ -45,11 +47,14 @@ public class ArchitectureFitnessTest {
 
 	@Test
 	public void enforceProperDependenciesBetweenPackages() {
+		String packageName = Hosh.class.getPackageName();
+
 		JavaClasses importedClasses = new ClassFileImporter()
 				.withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
 				.withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_ARCHIVES)
-				.importPackages("org.hosh");
-		slices().matching("org.hosh").should().beFreeOfCycles();
+				.importPackages(packageName);
+		assertThat(importedClasses).isNotEmpty();
+		slices().matching(packageName).should().beFreeOfCycles();
 		classes().that().resideInAPackage("..modules..")
 				.should().accessClassesThat().resideInAnyPackage("..spi..", "java..")
 				.check(importedClasses);

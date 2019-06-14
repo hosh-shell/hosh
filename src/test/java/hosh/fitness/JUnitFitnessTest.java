@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import hosh.Hosh;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,9 @@ public class JUnitFitnessTest {
 
 	@Test
 	public void enforcePresenceOfTestAnnotation() {
-		try (ScanResult scanResult = new ClassGraph().whitelistPackages("org.hosh").scan()) {
+
+		try (ScanResult scanResult = new ClassGraph().whitelistPackages(Hosh.class.getPackageName()).scan()) {
+			assertThat(scanResult.getAllClasses()).isNotEmpty();
 			List<Method> methodsMissingTestAnnotation = scanResult
 					.getAllClasses()
 					.loadClasses()
