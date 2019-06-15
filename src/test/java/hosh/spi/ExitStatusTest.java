@@ -62,14 +62,16 @@ public class ExitStatusTest {
 
 	@Test
 	public void parseValid() {
-		Optional<ExitStatus> parsed = ExitStatus.parse("1");
-		assertThat(parsed.isPresent()).isTrue();
-		assertThat(parsed.get().value()).isEqualTo(1);
+		Optional<ExitStatus> parsed = ExitStatus.parse("42");
+		assertThat(parsed)
+				.isNotEmpty()
+				.hasValue(ExitStatus.of(42));
 	}
 
 	@Test
 	public void parseInvalidText() {
 		Optional<ExitStatus> parsed = ExitStatus.parse("asd");
-		assertThat(parsed.isPresent()).isFalse();
+		assertThat(parsed)
+				.isEmpty();
 	}
 }

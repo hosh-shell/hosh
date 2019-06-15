@@ -598,10 +598,7 @@ public class FileSystemModule implements Module {
 			try {
 				Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 				RandomAccessFile resource = new RandomAccessFile(path.toFile(), "rw");
-				while (true) {
-					if (resource.getChannel().tryLock() != null) {
-						break;
-					}
+				while (resource.getChannel().tryLock() == null) {
 					Thread.sleep(200);
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("failed to acquire lock")));
 				}

@@ -90,11 +90,7 @@ public class CommandResolvers {
 			LOGGER.info(() -> String.format("resolving commandName '%s' as external command", commandName));
 			final Path absoluteCandidate = Paths.get(commandName).normalize();
 			if (absoluteCandidate.isAbsolute()) {
-				Optional<Command> command = attemptResolution(absoluteCandidate);
-				if (command.isPresent()) {
-					return command;
-				}
-				return Optional.empty();
+				return attemptResolution(absoluteCandidate);
 			}
 			List<Path> paths = new ArrayList<>(state.getPath());
 			paths.add(state.getCwd());
