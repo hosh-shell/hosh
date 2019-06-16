@@ -169,15 +169,15 @@ public class NetworkModule implements Module {
 
 		private static class HttpClientHolder {
 
-			private static HttpClient httpClient = HttpClient.newBuilder()
+			private static final HttpClient INSTANCE = HttpClient.newBuilder()
 					.version(Version.HTTP_2)
 					.followRedirects(Redirect.NORMAL)
 					.proxy(ProxySelector.getDefault())
-					.executor(runnable -> runnable.run())
+					.executor(Runnable::run)
 					.build();
 
 			public static HttpClient getInstance() {
-				return httpClient;
+				return INSTANCE;
 			}
 		}
 	}

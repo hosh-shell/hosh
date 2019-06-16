@@ -106,7 +106,7 @@ public class RecordsTest {
 	}
 
 	@Test
-	public void singletonEqualsGenericAndViceversa() {
+	public void singletonEqualsGenericAndViceVersa() {
 		Record singleton = Records.singleton(Keys.COUNT, Values.ofNumeric(1));
 		Record generic = Records.builder().entry(Keys.COUNT, Values.ofNumeric(1)).build();
 		assertThat(singleton).isEqualTo(generic);

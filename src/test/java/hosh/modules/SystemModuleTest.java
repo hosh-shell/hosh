@@ -768,7 +768,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void doesNothingWhenUnexistingBinding() {
+		public void doesNothingWhenNotExistingBinding() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();

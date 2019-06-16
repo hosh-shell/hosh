@@ -113,8 +113,7 @@ public class TextModule implements Module {
 				record.value(key)
 						.flatMap(v -> v.unwrap(String.class))
 						.ifPresent(str -> {
-							Record splitted = split(pattern, str, cachedKeys);
-							out.send(splitted);
+							out.send(split(pattern, str, cachedKeys));
 						});
 			}
 			return ExitStatus.success();

@@ -993,7 +993,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void regularaAbsolute() throws IOException {
+		public void regularAbsolute() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);

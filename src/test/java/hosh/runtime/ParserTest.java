@@ -73,7 +73,7 @@ public class ParserTest {
 				.isNotNull();
 	}
 
-	@Todo(description = "workaroud for eclipse bug", issue = "https://bugs.eclipse.org/bugs/show_bug.cgi?id=546084")
+	@Todo(description = "workaround for eclipse bug", issue = "https://bugs.eclipse.org/bugs/show_bug.cgi?id=546084")
 	static Stream<String> all() {
 		return List.of(commands(), newLines(), comments(), pipelines(), incompletePipelines())
 				.stream()

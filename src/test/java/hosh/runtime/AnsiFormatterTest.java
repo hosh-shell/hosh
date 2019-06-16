@@ -57,7 +57,7 @@ public class AnsiFormatterTest {
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
 		given(logRecord.getLevel()).willReturn(Level.SEVERE);
 		given(logRecord.getMessage()).willReturn("message");
-		given(logRecord.getThrown()).willReturn(new Stacktraceless());
+		given(logRecord.getThrown()).willReturn(new StackTraceLess());
 		String result = sut.format(logRecord);
 		assertThat(result).isEqualToNormalizingNewlines(
 				"1969-12-31T16:00:00.000 [[31mSEVERE[39m] [main] - [31mmessage[39m\nhosh.runtime.AnsiFormatterTest$Stacktraceless\n");
@@ -92,7 +92,7 @@ public class AnsiFormatterTest {
 	}
 
 	@SuppressWarnings("serial")
-	static class Stacktraceless extends RuntimeException {
+	static class StackTraceLess extends RuntimeException {
 
 		@Override
 		public synchronized Throwable fillInStackTrace() {
