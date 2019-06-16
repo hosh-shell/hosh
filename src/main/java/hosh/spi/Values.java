@@ -291,15 +291,6 @@ public class Values {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public <T> Optional<T> unwrap(Class<T> type) {
-			if (type == Long.class) {
-				return (Optional<T>) Optional.of(number);
-			}
-			return Optional.empty();
-		}
 	}
 
 	static final class None implements Value {
