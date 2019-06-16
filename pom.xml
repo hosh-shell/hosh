@@ -351,6 +351,9 @@
 						<include>**/test/java/**/*.java</include>
 					</includes>
 					<strictCheck>true</strictCheck>
+					<mapping>
+						<java>SLASHSTAR_STYLE</java>
+					</mapping>
 				</configuration>
 				<executions>
 					<execution>

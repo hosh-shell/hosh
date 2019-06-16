@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2018-2019 Davide Angelocola
@@ -60,7 +60,7 @@ public class AnsiFormatterTest {
 		given(logRecord.getThrown()).willReturn(new StackTraceLess());
 		String result = sut.format(logRecord);
 		assertThat(result).isEqualToNormalizingNewlines(
-				"1969-12-31T16:00:00.000 [[31mSEVERE[39m] [main] - [31mmessage[39m\nhosh.runtime.AnsiFormatterTest$Stacktraceless\n");
+				"1969-12-31T16:00:00.000 [[31mSEVERE[39m] [main] - [31mmessage[39m\nhosh.runtime.AnsiFormatterTest$StackTraceLess\n");
 	}
 
 	@Test
