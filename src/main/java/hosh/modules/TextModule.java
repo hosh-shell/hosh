@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import hosh.doc.BuiltIn;
 import hosh.doc.Example;
 import hosh.doc.Examples;
+import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.Ansi.Style;
@@ -596,9 +597,40 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Experimental(description = "implementation works only for 'humanized size' values (i.e. cannot be used for numeric)")
+	@BuiltIn(name = "sum", description = "calculate sum of size")
+	@Examples({
+			@Example(command = "ls /tmp | sum size", description = "calculate size of /tmp directory (non-recursively)")
+	})
+	public static class Sum implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: sum key")));
+				return ExitStatus.error();
+			}
+			Key key = Keys.of(args.get(0));
+			long sum = 0;
+			while (true) {
+				Optional<Record> incoming = in.recv();
+				if (incoming.isEmpty()) {
+					break;
+				}
+				sum += incoming
+						.get()
+						.value(key)
+						.flatMap(v -> v.unwrap(Long.class))
+						.orElse(0L);
+			}
+			out.send(Records.singleton(key, Values.ofHumanizedSize(sum)));
+			return ExitStatus.success();
+		}
+	}
+
 	@BuiltIn(name = "table", description = "create a nicely formatted table with keys a columns")
 	@Examples({
-			@Example(command = "rand | enumerate |take 3 | table", description = "output a nicely formatted table")
+			@Example(command = "rand | enumerate | take 3 | table", description = "output a nicely formatted table")
 	})
 	@Todo(description = "this is just a proof of concept")
 	public static class Table implements Command {

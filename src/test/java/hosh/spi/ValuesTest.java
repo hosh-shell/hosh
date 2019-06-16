@@ -40,11 +40,12 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.spi.Value;
-import hosh.spi.Values;
 import hosh.spi.Values.AlphaNumericStringComparator;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
@@ -261,37 +262,46 @@ public class ValuesTest {
 		@Mock
 		private PrintWriter printWriter;
 
+		@ParameterizedTest
+		@CsvSource({
+				"         0,     0,  B",
+				"        10,    10,  B",
+				"      1023, 1.023,  B",
+				"      1024,     1, KB",
+				"      2048,     2, KB",
+				"      4096,     4, KB",
+				"   1048576,     1, MB",
+		})
+		public void approximateOnPrint(ArgumentsAccessor args) {
+			long bytes = args.getLong(0);
+			String expectedValue = args.getString(1);
+			String expectedUnit = args.getString(2);
+			Values.ofHumanizedSize(bytes).print(printWriter, Locale.ITALIAN);
+			then(printWriter).should().append(expectedValue);
+			then(printWriter).should().append(expectedUnit);
+		}
+
 		@Test
 		public void appendWithUkLocale() {
-			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).print(printWriter, Locale.UK);
+			long bytes = 1024 * 2 + 1024 / 2;
+			Values.ofHumanizedSize(bytes).print(printWriter, Locale.UK);
 			then(printWriter).should().append("2.5");
 			then(printWriter).should().append("KB");
 		}
 
 		@Test
 		public void appendWithItalianLocale() {
-			Values.ofHumanizedSize(2 * Values.KIB + Values.KIB / 2).print(printWriter, Locale.ITALIAN);
+			long bytes = 1024 * 2 + 1024 / 2;
+			Values.ofHumanizedSize(bytes).print(printWriter, Locale.ITALIAN);
 			then(printWriter).should().append("2,5");
 			then(printWriter).should().append("KB");
 		}
 
 		@Test
-		public void humanizedSizeApproximation() {
-			long twoMegabytes = Values.KIB * Values.KIB * 2;
-			assertThat(Values.ofHumanizedSize(twoMegabytes - 1)).hasToString("Size[2.0MB]");
-		}
-
-		@Test
-		public void humanizedSize() {
+		public void repr() {
 			assertThat(Values.ofHumanizedSize(0L)).hasToString("Size[0B]");
 			assertThat(Values.ofHumanizedSize(512L)).hasToString("Size[512B]");
 			assertThat(Values.ofHumanizedSize(1023L)).hasToString("Size[1023B]");
-			assertThat(Values.ofHumanizedSize(1024L)).hasToString("Size[1.0KB]");
-			assertThat(Values.ofHumanizedSize(1024L * 1024)).hasToString("Size[1.0MB]");
-			assertThat(Values.ofHumanizedSize(1024L * 1024 * 1024)).hasToString("Size[1.0GB]");
-			assertThatThrownBy(() -> Values.ofHumanizedSize(-1))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("negative size");
 		}
 
 		@Test
@@ -311,6 +321,13 @@ public class ValuesTest {
 			assertThatThrownBy(() -> Values.ofHumanizedSize(1000).compareTo(Values.ofText("2")))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Size[1000B] to Text[2]");
+		}
+
+		@Test
+		public void unwrap() {
+			Value value = Values.ofHumanizedSize(10);
+			assertThat(value.unwrap(Long.class)).hasValue(10L);
+			assertThat(value.unwrap(Integer.class)).isEmpty();
 		}
 	}
 

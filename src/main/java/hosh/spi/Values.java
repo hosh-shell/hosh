@@ -76,29 +76,11 @@ public class Values {
 		return new TextValue(text, style);
 	}
 
-	public enum Unit {
-			B, KB, MB, GB, TB
-	}
-
-	/**
-	 * One kibibyte (1024 bytes), this is in contrast to the SI system (1000 bytes)
-	 */
-	public static final int KIB = 1024;
-
-	// log-indexed units table
-	private static final Unit[] UNITS = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
-
 	/**
 	 * Select the appropriate unit for measuring bytes.
 	 */
 	public static Value ofHumanizedSize(long bytes) {
-		if (bytes < KIB) {
-			return new SizeValue(BigDecimal.valueOf(bytes), Unit.B);
-		}
-		int exp = (int) (Math.log(bytes) / Math.log(KIB));
-		Unit unit = UNITS[exp - 1];
-		BigDecimal value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(KIB, exp)), 1, RoundingMode.HALF_UP);
-		return new SizeValue(value, unit);
+		return new SizeValue(bytes);
 	}
 
 	public static Value ofPath(Path path) {
@@ -184,20 +166,37 @@ public class Values {
 	 */
 	static final class SizeValue implements Value {
 
-		private final BigDecimal value;
+		private final long bytes;
 
-		private final Unit unit;
-
-		public SizeValue(BigDecimal value, Unit unit) {
-			if (value.compareTo(BigDecimal.ZERO) < 0) {
+		public SizeValue(long bytes) {
+			if (bytes < 0) {
 				throw new IllegalArgumentException("negative size");
 			}
-			this.value = value;
-			this.unit = unit;
+			this.bytes = bytes;
 		}
+
+		private enum Unit {
+				B, KB, MB, GB, TB
+		}
+
+		// One kibibyte (1024 bytes), this is in contrast to the SI system (1000 bytes)
+		private static final int KIB = 1024;
+
+		// log-indexed units table
+		private static final Unit[] UNITS = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
+			BigDecimal value;
+			Unit unit;
+			if (bytes < KIB) {
+				unit = Unit.B;
+				value = BigDecimal.valueOf(bytes);
+			} else {
+				int exp = (int) (Math.log(bytes) / Math.log(KIB));
+				unit = UNITS[exp - 1];
+				value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(KIB, exp)), 1, RoundingMode.HALF_UP);
+			}
 			NumberFormat instance = NumberFormat.getInstance(locale);
 			printWriter.append(instance.format(value));
 			printWriter.append(unit.toString());
@@ -205,14 +204,14 @@ public class Values {
 
 		@Override
 		public String toString() {
-			return String.format("Size[%s%s]", value, unit);
+			return String.format("Size[%sB]", bytes);
 		}
 
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof SizeValue) {
 				SizeValue that = (SizeValue) obj;
-				return Objects.equals(this.value, that.value) && Objects.equals(this.unit, that.unit);
+				return Objects.equals(this.bytes, that.bytes);
 			} else {
 				return false;
 			}
@@ -220,20 +219,10 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(value, unit);
+			return Objects.hash(bytes);
 		}
 
-		private static final Comparator<SizeValue> SIZE_COMPARATOR = Comparator
-				.comparing(SizeValue::getUnit)
-				.thenComparing(SizeValue::getValue);
-
-		public BigDecimal getValue() {
-			return value;
-		}
-
-		public Unit getUnit() {
-			return unit;
-		}
+		private static final Comparator<SizeValue> SIZE_COMPARATOR = Comparator.comparing(x -> x.bytes);
 
 		@Override
 		public int compareTo(Value obj) {
@@ -245,6 +234,15 @@ public class Values {
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> Optional<T> unwrap(Class<T> type) {
+			if (type == Long.class) {
+				return (Optional<T>) Optional.of(bytes);
+			}
+			return Optional.empty();
 		}
 	}
 
@@ -292,6 +290,15 @@ public class Values {
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> Optional<T> unwrap(Class<T> type) {
+			if (type == Long.class) {
+				return (Optional<T>) Optional.of(number);
+			}
+			return Optional.empty();
 		}
 	}
 

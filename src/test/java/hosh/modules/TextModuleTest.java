@@ -55,6 +55,7 @@ import hosh.modules.TextModule.Schema;
 import hosh.modules.TextModule.Select;
 import hosh.modules.TextModule.Sort;
 import hosh.modules.TextModule.Split;
+import hosh.modules.TextModule.Sum;
 import hosh.modules.TextModule.Table;
 import hosh.modules.TextModule.Take;
 import hosh.modules.TextModule.Timestamp;
@@ -65,6 +66,7 @@ import hosh.spi.Keys;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
+import hosh.testsupport.RecordMatcher;
 
 public class TextModuleTest {
 
@@ -196,6 +198,66 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1,2")));
+			then(err).shouldHaveZeroInteractions();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class SumTest {
+
+		@Mock
+		private Channel in;
+
+		@Mock
+		private Channel out;
+
+		@Mock
+		private Channel err;
+
+		@InjectMocks
+		private Sum sut;
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sum key")));
+		}
+
+		@Test
+		public void empty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofHumanizedSize(0)));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void nonMatchingKey() {
+			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofHumanizedSize(0)));
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKey() {
+			Record record = Records.builder().entry(Keys.SIZE, Values.ofNumeric(1)).build();
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofHumanizedSize(2)));
 			then(err).shouldHaveZeroInteractions();
 		}
 	}
