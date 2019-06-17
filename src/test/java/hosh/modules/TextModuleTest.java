@@ -240,7 +240,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void nonMatchingKey() {
-			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
+			Record record = Records.singleton(Keys.INDEX, Values.ofHumanizedSize(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -252,7 +252,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void matchingKey() {
-			Record record = Records.builder().entry(Keys.SIZE, Values.ofNumeric(1)).build();
+			Record record = Records.singleton(Keys.SIZE, Values.ofHumanizedSize(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
