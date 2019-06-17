@@ -276,7 +276,7 @@ public class ValuesTest {
 			long bytes = args.getLong(0);
 			String expectedValue = args.getString(1);
 			String expectedUnit = args.getString(2);
-			Values.ofHumanizedSize(bytes).print(printWriter, Locale.ITALIAN);
+			Values.ofSize(bytes).print(printWriter, Locale.ITALIAN);
 			then(printWriter).should().append(expectedValue);
 			then(printWriter).should().append(expectedUnit);
 		}
@@ -284,7 +284,7 @@ public class ValuesTest {
 		@Test
 		public void appendWithUkLocale() {
 			long bytes = 1024 * 2 + 1024 / 2;
-			Values.ofHumanizedSize(bytes).print(printWriter, Locale.UK);
+			Values.ofSize(bytes).print(printWriter, Locale.UK);
 			then(printWriter).should().append("2.5");
 			then(printWriter).should().append("KB");
 		}
@@ -292,21 +292,21 @@ public class ValuesTest {
 		@Test
 		public void appendWithItalianLocale() {
 			long bytes = 1024 * 2 + 1024 / 2;
-			Values.ofHumanizedSize(bytes).print(printWriter, Locale.ITALIAN);
+			Values.ofSize(bytes).print(printWriter, Locale.ITALIAN);
 			then(printWriter).should().append("2,5");
 			then(printWriter).should().append("KB");
 		}
 
 		@Test
 		public void repr() {
-			assertThat(Values.ofHumanizedSize(0L)).hasToString("Size[0B]");
-			assertThat(Values.ofHumanizedSize(512L)).hasToString("Size[512B]");
-			assertThat(Values.ofHumanizedSize(1023L)).hasToString("Size[1023B]");
+			assertThat(Values.ofSize(0L)).hasToString("Size[0B]");
+			assertThat(Values.ofSize(512L)).hasToString("Size[512B]");
+			assertThat(Values.ofSize(1023L)).hasToString("Size[1023B]");
 		}
 
 		@Test
 		public void size() {
-			assertThatThrownBy(() -> Values.ofHumanizedSize(-1))
+			assertThatThrownBy(() -> Values.ofSize(-1))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("negative size");
 		}
@@ -318,14 +318,14 @@ public class ValuesTest {
 
 		@Test
 		public void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.ofHumanizedSize(1000).compareTo(Values.ofText("2")))
+			assertThatThrownBy(() -> Values.ofSize(1000).compareTo(Values.ofText("2")))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Size[1000B] to Text[2]");
 		}
 
 		@Test
 		public void unwrap() {
-			Value value = Values.ofHumanizedSize(10);
+			Value value = Values.ofSize(10);
 			assertThat(value.unwrap(Long.class)).hasValue(10L);
 			assertThat(value.unwrap(Integer.class)).isEmpty();
 		}
@@ -505,19 +505,19 @@ public class ValuesTest {
 		@Test
 		public void sizeWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.ofHumanizedSize(1),
+					Values.ofSize(1),
 					Values.none(),
 					Values.none(),
-					Values.ofHumanizedSize(2),
-					Values.ofHumanizedSize(3))
+					Values.ofSize(2),
+					Values.ofSize(3))
 					.sorted()
 					.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 					Values.none(),
 					Values.none(),
-					Values.ofHumanizedSize(1),
-					Values.ofHumanizedSize(2),
-					Values.ofHumanizedSize(3));
+					Values.ofSize(1),
+					Values.ofSize(2),
+					Values.ofSize(3));
 		}
 
 		@Test

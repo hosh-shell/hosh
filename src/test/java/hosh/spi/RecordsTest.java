@@ -68,7 +68,7 @@ public class RecordsTest {
 	public void representation() {
 		Record a = Records.empty();
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
-		Record b = a.append(Keys.SIZE, Values.ofHumanizedSize(10));
+		Record b = a.append(Keys.SIZE, Values.ofSize(10));
 		assertThat(b.toString()).isEqualTo("Record[data={Key['size']=Size[10B]}]");
 		Record c = b.append(Keys.NAME, Values.ofText("foo"));
 		assertThat(c.toString()).isEqualTo("Record[data={Key['size']=Size[10B],Key['name']=Text[foo]}]");

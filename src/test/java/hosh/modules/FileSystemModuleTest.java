@@ -143,7 +143,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("file")),
-					Keys.SIZE, Values.ofHumanizedSize(0)));
+					Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveZeroInteractions();
 		}
 
@@ -157,7 +157,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("file")),
-					Keys.SIZE, Values.ofHumanizedSize(0)));
+					Keys.SIZE, Values.ofSize(0)));
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("link")),
 					Keys.SIZE, Values.none()));
@@ -208,7 +208,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
-					Keys.SIZE, Values.ofHumanizedSize(0)));
+					Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -234,7 +234,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
-					Keys.SIZE, Values.ofHumanizedSize(0)));
+					Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -247,7 +247,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
-					Keys.SIZE, Values.ofHumanizedSize(0)));
+					Keys.SIZE, Values.ofSize(0)));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}

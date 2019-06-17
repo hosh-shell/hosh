@@ -67,6 +67,9 @@ public class Values {
 		return new NumericValue(number);
 	}
 
+	/**
+	 * Generic text.
+	 */
 	public static Value ofText(String text) {
 		return new TextValue(text, Ansi.Style.NONE);
 	}
@@ -77,9 +80,9 @@ public class Values {
 	}
 
 	/**
-	 * Select the appropriate unit for measuring bytes.
+	 * Used to represent a size of a file, etc.
 	 */
-	public static Value ofHumanizedSize(long bytes) {
+	public static Value ofSize(long bytes) {
 		return new SizeValue(bytes);
 	}
 
@@ -91,9 +94,6 @@ public class Values {
 		return new PathValue(path, style);
 	}
 
-	/**
-	 * Generic text.
-	 */
 	static final class TextValue implements Value {
 
 		private final String value;
@@ -161,9 +161,6 @@ public class Values {
 		}
 	}
 
-	/**
-	 * Used to represent a size of a file, etc.
-	 */
 	static final class SizeValue implements Value {
 
 		private final long bytes;

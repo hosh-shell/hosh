@@ -623,7 +623,7 @@ public class TextModule implements Module {
 						.flatMap(v -> v.unwrap(Long.class))
 						.orElse(0L);
 			}
-			out.send(Records.singleton(key, Values.ofHumanizedSize(sum)));
+			out.send(Records.singleton(key, Values.ofSize(sum)));
 			return ExitStatus.success();
 		}
 	}

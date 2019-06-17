@@ -101,7 +101,7 @@ public class FileSystemModule implements Module {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(followSymlinksRecursively(dir))) {
 				for (Path path : stream) {
 					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
-					Value size = attributes.isRegularFile() ? Values.ofHumanizedSize(attributes.size()) : Values.none();
+					Value size = attributes.isRegularFile() ? Values.ofSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
 							.entry(Keys.PATH, Values.ofStyledPath(path.getFileName(), colorFor(attributes)))
 							.entry(Keys.SIZE, size)
@@ -367,10 +367,10 @@ public class FileSystemModule implements Module {
 							.builder()
 							.entry(Keys.of("name"), Values.ofText(store.name()))
 							.entry(Keys.of("type"), Values.ofText(store.type()))
-							.entry(Keys.of("total"), Values.ofHumanizedSize(store.getTotalSpace()))
-							.entry(Keys.of("used"), Values.ofHumanizedSize(store.getTotalSpace() - store.getUnallocatedSpace()))
-							.entry(Keys.of("free"), Values.ofHumanizedSize(store.getUsableSpace()))
-							.entry(Keys.of("blocksize"), Values.ofHumanizedSize(store.getBlockSize()))
+							.entry(Keys.of("total"), Values.ofSize(store.getTotalSpace()))
+							.entry(Keys.of("used"), Values.ofSize(store.getTotalSpace() - store.getUnallocatedSpace()))
+							.entry(Keys.of("free"), Values.ofSize(store.getUsableSpace()))
+							.entry(Keys.of("blocksize"), Values.ofSize(store.getBlockSize()))
 							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
 							.build());
 				} catch (IOException e) {
