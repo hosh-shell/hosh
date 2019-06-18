@@ -50,7 +50,7 @@ import hosh.doc.BuiltIn;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
-import hosh.doc.Todo;
+import hosh.spi.Ansi.Style;
 import hosh.spi.Channel;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
@@ -64,7 +64,6 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Values;
-import hosh.spi.Ansi.Style;
 
 public class SystemModule implements Module {
 
@@ -595,7 +594,6 @@ public class SystemModule implements Module {
 	@Examples({
 			@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
 	})
-	@Todo(description = "this could be used by compiler as implementation for syntax sugar")
 	@Experimental(description = "too low level compared to simply VARNAME=$(ls)")
 	public static class Capture implements Command, StateAware {
 

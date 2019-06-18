@@ -394,7 +394,6 @@ public class Values {
 			}
 		}
 
-		@Todo(description = "use Locale to print in a more readable manner")
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
 			printWriter.append(instant.toString());

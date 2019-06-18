@@ -36,7 +36,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import hosh.antlr4.HoshParser.ProgramContext;
 import hosh.doc.Bug;
-import hosh.doc.Todo;
 import hosh.runtime.Parser.ParseError;
 
 public class ParserTest {
@@ -73,10 +72,8 @@ public class ParserTest {
 				.isNotNull();
 	}
 
-	@Todo(description = "workaround for eclipse bug", issue = "https://bugs.eclipse.org/bugs/show_bug.cgi?id=546084")
 	static Stream<String> all() {
-		return List.of(commands(), newLines(), comments(), pipelines(), incompletePipelines())
-				.stream()
+		return Stream.of(commands(), newLines(), comments(), pipelines(), incompletePipelines())
 				.flatMap(List::stream);
 	}
 

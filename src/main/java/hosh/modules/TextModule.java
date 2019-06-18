@@ -350,7 +350,6 @@ public class TextModule implements Module {
 	@Examples({
 			@Example(command = "watch | timestamp", description = "tag each event with current timestamp"),
 	})
-	@Todo(description = "use local time?")
 	public static class Timestamp implements Command {
 
 		private Clock clock = Clock.systemUTC();
@@ -632,7 +631,7 @@ public class TextModule implements Module {
 	@Examples({
 			@Example(command = "rand | enumerate | take 3 | table", description = "output a nicely formatted table")
 	})
-	@Todo(description = "this is just a proof of concept")
+	@Experimental(description = "this is just a proof of concept", issue = "https://github.com/dfa1/hosh/issues/139")
 	public static class Table implements Command {
 
 		private int i = 0;
@@ -659,7 +658,6 @@ public class TextModule implements Module {
 			return ExitStatus.success();
 		}
 
-		@Todo(description = "try to optimize memory usage here")
 		private void sendRow(Record record, Channel out) {
 			Locale locale = Locale.getDefault();
 			StringBuilder formatter = new StringBuilder();
@@ -693,7 +691,6 @@ public class TextModule implements Module {
 			out.send(Records.singleton(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.FG_CYAN)));
 		}
 
-		@Todo(description = "be aware of width of unicode char, see https://github.com/joshuarubin/wcwidth9")
 		private final Map<Key, Integer> paddings = Map.of(
 				Keys.NAME, 30,
 				Keys.PATH, 30,
