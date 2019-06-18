@@ -437,7 +437,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "set", description = "create or update a variable binding)")
+	@BuiltIn(name = "set", description = "create or update a variable binding")
 	@Examples({
 			@Example(command = "set FILE file.txt", description = "create variable FILE"),
 			@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
@@ -468,7 +468,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "unset", description = "delete a variable binding)")
+	@BuiltIn(name = "unset", description = "delete a variable binding")
 	@Examples({
 			@Example(command = "unset FILE", description = "delete variable FILE, cannot be referenced anymore after this command"),
 	})
