@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.33] - 2019-06-18
+
 ### Added
 - introducing `withLock` wrapper
 - introducing `join` command
@@ -18,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix symlink support in `ls`
 
 ## [0.0.32] - 2019-05-22
+
 ### Added
 - variable expansion with fallback
    - `echo ${VAR!hello}` expands to `'hello'` when VAR is not defined
