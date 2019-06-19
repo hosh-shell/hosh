@@ -34,7 +34,6 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 
-import hosh.doc.Todo;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Resolvable;
 import hosh.runtime.Compiler.Statement;
@@ -135,7 +134,6 @@ public class Interpreter {
 		Thread.currentThread().setName(name);
 	}
 
-	@Todo(description = "to extract Injector class here?")
 	protected void injectDeps(Command command) {
 		Downcast.of(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		Downcast.of(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
@@ -158,7 +156,8 @@ public class Interpreter {
 		}
 	}
 
-	// enrich any record sent to the inner channel with locations
+	// enrich any record sent to the inner channel
+	// with location of the current statement
 	private static class WithLocation implements Channel {
 
 		private final Channel channel;
