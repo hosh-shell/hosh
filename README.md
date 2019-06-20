@@ -87,9 +87,15 @@ Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/) with 
 
 Project specific settings can be found under `./eclipse` directory.
 
+
+
 ## Inspired by
 - https://www.martinfowler.com/articles/collection-pipeline/
 - https://mywiki.wooledge.org/BashPitfalls
 - https://zsh.org
 - https://fishshell.com
 
+## Similar projects
+
+- scala, https://ammonite.io
+- kotlin, https://github.com/holgerbrandl/kscript
