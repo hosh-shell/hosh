@@ -436,6 +436,51 @@ public class HoshIT {
 		assertThat(exitCode).isNotEqualTo(0);
 	}
 
+	@Test
+	public void versionLongOption() throws Exception {
+		Process hosh = givenHoshProcess("--version");
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).startsWith("hosh v");
+	}
+
+	@Test
+	public void versionShortOption() throws Exception {
+		Process hosh = givenHoshProcess("-v");
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).startsWith("hosh v");
+	}
+
+	@Test
+	public void helpLongOption() throws Exception {
+		Process hosh = givenHoshProcess("--help");
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).startsWith("usage: ");
+	}
+
+	@Test
+	public void helpShortOption() throws Exception {
+		Process hosh = givenHoshProcess("-h");
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).startsWith("usage: ");
+	}
+
+	@Test
+	public void invalidOption() throws Exception {
+		Process hosh = givenHoshProcess("--blahblah");
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+		assertThat(output).startsWith("usage: ");
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();

@@ -41,6 +41,11 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.completer.AggregateCompleter;
@@ -124,15 +129,45 @@ public class Hosh {
 		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
 		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
 		Interpreter interpreter = new Interpreter(state, terminal, out, err);
-		ExitStatus exitStatus;
-		if (args.length == 0) {
-			welcome(out, version);
-			exitStatus = repl(state, terminal, compiler, interpreter, err, logger);
-		} else {
-			String filePath = args[0];
-			exitStatus = script(filePath, compiler, interpreter, err, logger);
+		String usage = "usage: hosh [-v][-h] [script]";
+		Optional<CommandLine> commandLineResult = handleOptions(args);
+		if (commandLineResult.isEmpty()) {
+			System.err.println(usage);
+			return ExitStatus.error();
 		}
-		return exitStatus;
+		CommandLine commandLine = commandLineResult.get();
+		if (commandLine.hasOption('h')) {
+			System.out.println(usage);
+			return ExitStatus.success();
+		}
+		if (commandLine.hasOption('v')) {
+			System.out.println("hosh " + version);
+			return ExitStatus.success();
+		}
+		List<String> remainingArgs = commandLine.getArgList();
+		if (remainingArgs.isEmpty()) {
+			welcome(out, version);
+			return repl(state, terminal, compiler, interpreter, err, logger);
+		}
+		if (remainingArgs.size() == 1) {
+			String filePath = args[0];
+			return script(filePath, compiler, interpreter, err, logger);
+		}
+		System.err.println(usage);
+		return ExitStatus.error();
+	}
+
+	private static Optional<CommandLine> handleOptions(String[] args) {
+		Options options = new Options();
+		options.addOption("h", "help", false, "show help and exit");
+		options.addOption("v", "version", false, "show version and exit");
+		CommandLineParser parser = new DefaultParser();
+		try {
+			CommandLine commandLine = parser.parse(options, args);
+			return Optional.of(commandLine);
+		} catch (ParseException e) {
+			return Optional.empty();
+		}
 	}
 
 	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger) {
