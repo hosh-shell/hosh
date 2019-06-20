@@ -157,7 +157,7 @@ public class Hosh {
 			String filePath = args[0];
 			return script(filePath, compiler, interpreter, err, logger);
 		}
-		System.err.println("hosh: too many args");
+		System.err.println("hosh: too many scripts");
 		return ExitStatus.error();
 	}
 

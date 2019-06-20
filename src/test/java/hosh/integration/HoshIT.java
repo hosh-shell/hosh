@@ -73,6 +73,14 @@ public class HoshIT {
 	}
 
 	@Test
+	public void interactiveScriptThenExit() throws Exception {
+		Process hosh = givenHoshProcess();
+		sendInput(hosh, "ls", "exit");
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@Test
 	public void interactiveExitSuccess() throws Exception {
 		Process hosh = givenHoshProcess();
 		sendInput(hosh, "exit");
@@ -481,6 +489,15 @@ public class HoshIT {
 		assertThat(output).startsWith("hosh: Unrecognized option: --blahblah");
 	}
 
+	@Test
+	public void tooManyArgs() throws Exception {
+		Process hosh = givenHoshProcess("aaa.hosh", "bbb.hosh");
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(1);
+		assertThat(output).startsWith("hosh: too many scripts");
+	}
+
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
@@ -531,11 +548,13 @@ public class HoshIT {
 		}
 	}
 
-	private void sendInput(Process hosh, String line) throws IOException {
+	private void sendInput(Process hosh, String... lines) throws IOException {
 		try (Writer writer = new OutputStreamWriter(hosh.getOutputStream(), StandardCharsets.UTF_8)) {
-			writer.write(line);
-			writer.write(System.lineSeparator());
-			writer.flush();
+			for (String line : lines) {
+				writer.write(line);
+				writer.write(System.lineSeparator());
+				writer.flush();
+			}
 		}
 	}
 
