@@ -478,7 +478,7 @@ public class HoshIT {
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(1);
-		assertThat(output).startsWith("usage: ");
+		assertThat(output).startsWith("hosh: Unrecognized option: --blahblah");
 	}
 
 	// simple test infrastructure

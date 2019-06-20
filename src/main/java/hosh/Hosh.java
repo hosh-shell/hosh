@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.jline.reader.LineReader;
@@ -129,15 +130,18 @@ public class Hosh {
 		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
 		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
 		Interpreter interpreter = new Interpreter(state, terminal, out, err);
-		String usage = "usage: hosh [-v][-h] [script]";
-		Optional<CommandLine> commandLineResult = handleOptions(args);
-		if (commandLineResult.isEmpty()) {
-			System.err.println(usage);
+		CommandLine commandLine = null;
+		Options options = createOptions();
+		CommandLineParser parser = new DefaultParser();
+		try {
+			commandLine = parser.parse(options, args);
+		} catch (ParseException e) {
+			System.err.println("hosh: " + e.getMessage());
 			return ExitStatus.error();
 		}
-		CommandLine commandLine = commandLineResult.get();
 		if (commandLine.hasOption('h')) {
-			System.out.println(usage);
+			HelpFormatter helpFormatter = new HelpFormatter();
+			helpFormatter.printHelp("hosh", options);
 			return ExitStatus.success();
 		}
 		if (commandLine.hasOption('v')) {
@@ -153,21 +157,15 @@ public class Hosh {
 			String filePath = args[0];
 			return script(filePath, compiler, interpreter, err, logger);
 		}
-		System.err.println(usage);
+		System.err.println("hosh: too many args");
 		return ExitStatus.error();
 	}
 
-	private static Optional<CommandLine> handleOptions(String[] args) {
+	private static Options createOptions() {
 		Options options = new Options();
 		options.addOption("h", "help", false, "show help and exit");
 		options.addOption("v", "version", false, "show version and exit");
-		CommandLineParser parser = new DefaultParser();
-		try {
-			CommandLine commandLine = parser.parse(options, args);
-			return Optional.of(commandLine);
-		} catch (ParseException e) {
-			return Optional.empty();
-		}
+		return options;
 	}
 
 	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger) {
