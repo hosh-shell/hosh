@@ -42,7 +42,7 @@ import hosh.spi.LoggerFactory;
  * {@link Supervisor#submit(Callable)}
  * while providing a synchronization point via @{see
  * {@link Supervisor#waitForAll()}.
- * 
+ *
  * SIGINT is handled as well, if requested.
  */
 public class Supervisor implements AutoCloseable {
