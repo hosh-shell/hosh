@@ -38,11 +38,12 @@ import hosh.spi.ExitStatus;
 import hosh.spi.LoggerFactory;
 
 /**
- * Manages execution of built-in commands as well as external commands.
+ * Manages execution of built-in commands as well as external commands via @{see
+ * {@link Supervisor#submit(Callable)}
+ * while providing a synchronization point via @{see
+ * {@link Supervisor#waitForAll()}.
+ * 
  * SIGINT is handled as well, if requested.
- *
- * This class implements the idea of structured concurrency presented in
- * http://250bpm.com/blog:71
  */
 public class Supervisor implements AutoCloseable {
 
