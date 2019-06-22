@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 
@@ -57,5 +58,10 @@ public class CancellableChannel implements Channel {
 			throw new CancellationException("interrupted");
 		}
 		return channel.recv();
+	}
+
+	@Override
+	public Iterator<Record> iterator() {
+		return channel.iterator();
 	}
 }

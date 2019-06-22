@@ -430,13 +430,11 @@ public class SystemModule implements Module {
 	})
 	public static class Sink implements Command {
 
+		@SuppressWarnings("unused")
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			while (true) {
-				Optional<Record> recv = in.recv();
-				if (recv.isEmpty()) {
-					break;
-				}
+			for (Record record : in) {
+				// discard record
 			}
 			return ExitStatus.success();
 		}
@@ -623,12 +621,7 @@ public class SystemModule implements Module {
 			}
 			StringWriter result = new StringWriter();
 			PrintWriter pw = new PrintWriter(result);
-			for (;;) {
-				Optional<Record> recv = in.recv();
-				if (recv.isEmpty()) {
-					break;
-				}
-				Record record = recv.get();
+			for (Record record : in) {
 				record.print(pw, locale);
 			}
 			state.getVariables().put(key, result.toString());

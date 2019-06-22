@@ -33,6 +33,7 @@ import hosh.runtime.Compiler.Program;
 import hosh.runtime.ConsoleChannel;
 import hosh.runtime.FileSystemCompleter;
 import hosh.runtime.Interpreter;
+import hosh.runtime.Iterables;
 import hosh.runtime.Prompt;
 import hosh.runtime.ReplReader;
 import hosh.runtime.VariableExpansionCompleter;
@@ -215,19 +216,15 @@ public class Hosh {
 		interpreter.setHistory(lineReader.getHistory());
 		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);
-		while (true) {
-			Optional<String> line = reader.read();
-			if (line.isEmpty()) {
-				break;
-			}
+		for (String line : Iterables.over(reader::read)) {
 			try {
-				Program program = compiler.compile(line.get());
+				Program program = compiler.compile(line);
 				ExitStatus exitStatus = interpreter.eval(program);
 				if (state.isExit()) {
 					return exitStatus;
 				}
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line.get()), e);
+				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line), e);
 				err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
 			}
 		}

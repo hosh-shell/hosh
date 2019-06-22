@@ -611,13 +611,8 @@ public class TextModule implements Module {
 			}
 			Key key = Keys.of(args.get(0));
 			long sum = 0;
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				sum += incoming
-						.get()
+			for (Record record : in) {
+				sum += record
 						.value(key)
 						.flatMap(v -> v.unwrap(Long.class))
 						.orElse(0L);

@@ -24,6 +24,8 @@
 package hosh.runtime;
 
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -52,6 +54,11 @@ public class ConsoleChannel implements Channel {
 		style.disable(printWriter);
 		printWriter.append(System.lineSeparator());
 		printWriter.flush();
+	}
+
+	@Override
+	public Iterator<Record> iterator() {
+		return Collections.emptyIterator();
 	}
 
 	@Override

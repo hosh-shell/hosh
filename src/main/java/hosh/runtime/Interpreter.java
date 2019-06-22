@@ -49,6 +49,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
@@ -192,6 +193,11 @@ public class Interpreter {
 		@Override
 		public Optional<Record> recv() {
 			return channel.recv();
+		}
+
+		@Override
+		public Iterator<Record> iterator() {
+			return channel.iterator();
 		}
 	}
 

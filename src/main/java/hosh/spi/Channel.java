@@ -28,7 +28,7 @@ import java.util.Optional;
 /**
  * Handling of input/output of records.
  */
-public interface Channel {
+public interface Channel extends Iterable<Record> {
 
 	void send(Record record);
 

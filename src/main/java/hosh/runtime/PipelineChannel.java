@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -54,6 +55,11 @@ public class PipelineChannel implements Channel {
 	public PipelineChannel() {
 		queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY, QUEUE_FAIRNESS);
 		done = false;
+	}
+
+	@Override
+	public Iterator<Record> iterator() {
+		return Iterables.of(this::recv);
 	}
 
 	@Override
