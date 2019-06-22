@@ -258,6 +258,11 @@ public class SystemModule implements Module {
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
 			out.send(Records.singleton(Keys.DURATION, Values.ofDuration(duration)));
 		}
+
+		@Override
+		public boolean retry(Long resource, Channel in, Channel out, Channel err) {
+			return false;
+		}
 	}
 
 	@BuiltIn(name = "ps", description = "process status")

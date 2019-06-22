@@ -577,7 +577,7 @@ public class FileSystemModule implements Module {
 	@Experimental(description = "still experimental because of sleep(200) and output on err")
 	@BuiltIn(name = "withLock", description = "execute code inside after successfully locking file")
 	@Examples({
-			@Example(command = "withLock file.lock { echo inside }", description = "echo only if lock has been acquired")
+			@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
 	})
 	public static class WithLock implements CommandWrapper<RandomAccessFile>, StateAware {
 
@@ -619,6 +619,11 @@ public class FileSystemModule implements Module {
 				LOGGER.log(Level.INFO, "caught exception", e);
 				err.send(Records.singleton(Keys.ERROR, Values.ofText(e.getMessage())));
 			}
+		}
+
+		@Override
+		public boolean retry(RandomAccessFile resource, Channel in, Channel out, Channel err) {
+			return false;
 		}
 	}
 
