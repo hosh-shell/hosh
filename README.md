@@ -99,3 +99,4 @@ Project specific settings can be found under `./eclipse` directory.
 
 - scala, https://ammonite.io
 - kotlin, https://github.com/holgerbrandl/kscript
+- go, https://github.com/bitfield/script
