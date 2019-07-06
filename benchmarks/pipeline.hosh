@@ -1,0 +1,4 @@
+rand |
+  drop 100 |
+  take 100 |
+  count

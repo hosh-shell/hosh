@@ -1,6 +1,7 @@
 # Human Oriented SHell
 
- [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://dev.azure.com/davideangelocola/hosh/_apis/build/status/dfa1.hosh?branchName=master)](https://dev.azure.com/davideangelocola/hosh/_build/latest?definitionId=1&branchName=master)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://dev.azure.com/davideangelocola/hosh/_apis/build/status/dfa1.hosh?branchName=master)](https://dev.azure.com/davideangelocola/hosh/_build/latest?definitionId=1&branchName=master) [![DepShield Badge](https://depshield.sonatype.org/badges/dfa1/hosh/depshield.svg)](https://depshield.github.io)
+
 
 ## Main features
 - written in Java 11
@@ -86,9 +87,16 @@ Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/) with 
 
 Project specific settings can be found under `./eclipse` directory.
 
+
+
 ## Inspired by
 - https://www.martinfowler.com/articles/collection-pipeline/
 - https://mywiki.wooledge.org/BashPitfalls
 - https://zsh.org
 - https://fishshell.com
 
+## Similar projects
+
+- scala, https://ammonite.io
+- kotlin, https://github.com/holgerbrandl/kscript
+- go, https://github.com/bitfield/script

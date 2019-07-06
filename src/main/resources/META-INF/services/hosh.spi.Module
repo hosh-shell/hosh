@@ -1,0 +1,5 @@
+hosh.modules.FileSystemModule
+hosh.modules.TerminalModule
+hosh.modules.SystemModule
+hosh.modules.TextModule
+hosh.modules.NetworkModule
