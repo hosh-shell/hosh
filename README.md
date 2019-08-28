@@ -4,27 +4,26 @@
 
 
 ## Main features
-- written in Java 11
-    - distributed as uber-jar or docker image
 - portable
+    - written in Java 11, distributed as uber-jar
     - works out-of-the-box in Windows, MacOS and Linux
-    - **it is not intended** to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
-- robust scripts by default
-    - like running bash scripts with `set -euo pipefail` (see [unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/))
+    - NB: it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
 - usability features (although much more work is needed in this area)
-    - ANSI colors
+    - sorting with [alphanum](http://davekoelle.com/alphanum.html)
+    - ANSI colors by default
     - stderr always colored in red
-    - sorting using http://davekoelle.com/alphanum.html
-    - file sizes reported by default using KB, MB, etc
+    - file sizes reported by default using KB, MB, GB, ...
     - by default history works like bash with `HISTCONTROL=ignoredups`
 - pipelines built around schema-less records
     - built-in commands produce records with well defined keys
-    - interoperability is achieved by using single-key records with "line" as value
+    - interoperability is achieved by using single-key records
     - `lines pom.xml | enumerate | take 10`
 - wrappers
     - grouping commands, with before/after behavior
     - `withTime { lines pom.xml | sink }`
     - `withLock file.lock { ... }`
+- robust scripts by default
+    - like running bash scripts with `set -euo pipefail` (see [unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/))
 
 ## Examples
 
@@ -40,20 +39,38 @@ user.name                     Davide Angelocola
 user.email                    davide.angelocola@gmail.com
 ```
 
-
 ### HTTP
 
-Stream line by line a TSV file via HTTPS, take first 10 lines, split each line by tab yielding a 1-indexed record and finally show a subset of keys:
+Stream line by line a TSV file via HTTPS, take first 10 lines, split each line by tab yielding a 1-indexed record and finally show a subset of keys.
+
+Bash + wget + awk:
+
+```
+bash$ wget -q -O - -- https://git.io/v9MjZ | head -n 10 | awk -v OFS='\t' '{print $10, $1, $12}'
+```
+
+Hosh (no external commands):
 
 ```
 hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
 ```
 
-that could be translated to the following UNIX pipeline:
 
-```
-bash$ wget -q -O - -- https://git.io/v9MjZ | head -n 10 | awk -v OFS='\t' '{print $10, $1, $12}'
-```
+## Inspired by
+
+- https://www.martinfowler.com/articles/collection-pipeline/
+- https://mywiki.wooledge.org/BashPitfalls
+- https://zsh.org
+- https://fishshell.com
+
+## Similar projects
+
+- rust, https://github.com/nushell/nushell
+- scala, https://ammonite.io
+- kotlin, https://github.com/holgerbrandl/kscript
+- go, https://github.com/bitfield/script
+
+# Development
 
 ## Requirements
 
@@ -75,6 +92,10 @@ Java 11
 
 `$ HOSH_LOG_LEVEL=debug java -jar target/dist/hosh.jar`
 
+## Eclipse support
+
+Project specific settings can be found under `./eclipse` directory.
+
 ## Docker support
 
 Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/) with [alpine-jre](https://hub.docker.com/r/adoptopenjdk/openjdk11):
@@ -83,20 +104,4 @@ Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/) with 
 
 `$ docker run -it $(docker image ls hosh --quiet  | head -n 1)`
 
-## Eclipse support
 
-Project specific settings can be found under `./eclipse` directory.
-
-
-
-## Inspired by
-- https://www.martinfowler.com/articles/collection-pipeline/
-- https://mywiki.wooledge.org/BashPitfalls
-- https://zsh.org
-- https://fishshell.com
-
-## Similar projects
-
-- scala, https://ammonite.io
-- kotlin, https://github.com/holgerbrandl/kscript
-- go, https://github.com/bitfield/script
