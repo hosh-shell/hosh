@@ -357,7 +357,7 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: partitions")));
 				return ExitStatus.error();
 			}

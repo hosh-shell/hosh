@@ -507,7 +507,7 @@ public class FileSystemModuleTest {
 		private Copy sut;
 
 		@Test
-		public void zeroArgs() throws IOException {
+		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -516,7 +516,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() throws IOException {
+		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -577,7 +577,7 @@ public class FileSystemModuleTest {
 		private Move sut;
 
 		@Test
-		public void zeroArgs() throws IOException {
+		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -586,7 +586,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() throws IOException {
+		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -647,7 +647,7 @@ public class FileSystemModuleTest {
 		private Remove sut;
 
 		@Test
-		public void zeroArgs() throws IOException {
+		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -696,7 +696,7 @@ public class FileSystemModuleTest {
 		private Partitions sut;
 
 		@Test
-		public void listAllPartitions() throws IOException {
+		public void listAllPartitions() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -705,7 +705,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void tooManyArgs() throws IOException {
+		public void tooManyArgs() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -1049,7 +1049,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void wrongFile() throws IOException {
+		public void wrongFile() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			assertThatThrownBy(() -> sut.before(List.of("../missing_directory/file.txt"), in, out, err))
 					.isInstanceOf(UncheckedIOException.class);

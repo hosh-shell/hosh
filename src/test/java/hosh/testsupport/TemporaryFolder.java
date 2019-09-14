@@ -53,7 +53,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	}
 
 	@Override
-	public void afterEach(ExtensionContext context) throws Exception {
+	public void afterEach(ExtensionContext context) {
 		if (folder == null) {
 			throw new IllegalStateException("folder is still null?");
 		}

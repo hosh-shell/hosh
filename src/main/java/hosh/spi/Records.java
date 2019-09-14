@@ -223,9 +223,6 @@ public class Records {
 		private final Entry[] entries;
 
 		private Generic(Entry[] entries) {
-			if (entries == null) {
-				throw new IllegalArgumentException("data cannot be null");
-			}
 			this.entries = entries;
 		}
 

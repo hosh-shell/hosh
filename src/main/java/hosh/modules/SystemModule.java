@@ -67,7 +67,7 @@ import hosh.spi.Values;
 
 public class SystemModule implements Module {
 
-	// this must keep in sync with Hosh.g4
+	// keep in sync with Hosh.g4
 	private static final Pattern VARIABLE = Pattern.compile("[A-Za-z_\\-]+");
 
 	@BuiltIn(name = "echo", description = "write arguments to output")
@@ -171,7 +171,7 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
-			if (args.size() == 0) {
+			if (args.isEmpty()) {
 				for (var command : state.getCommands().entrySet()) {
 					BuiltIn builtIn = command.getValue().getAnnotation(BuiltIn.class);
 					String name = builtIn.name();

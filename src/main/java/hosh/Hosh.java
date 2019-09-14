@@ -89,7 +89,7 @@ public class Hosh {
 		Logger logger = LoggerFactory.forEnclosingClass();
 		String version = VersionLoader.loadVersion();
 		logger.info(() -> String.format("starting hosh v.%s", version));
-		ExitStatus exitStatus = ExitStatus.error();
+		ExitStatus exitStatus;
 		try (Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build()) {
 			exitStatus = run(terminal, version, logger, args);
 		}
@@ -130,7 +130,7 @@ public class Hosh {
 		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
 		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
 		Interpreter interpreter = new Interpreter(state, terminal, out, err);
-		CommandLine commandLine = null;
+		CommandLine commandLine;
 		Options options = createOptions();
 		CommandLineParser parser = new DefaultParser();
 		try {

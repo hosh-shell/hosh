@@ -37,18 +37,17 @@ public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatu
 		super(actual, ExitStatusAssert.class);
 	}
 
-	public ExitStatusAssert isSuccess() {
-		return isNotNull()
-				.matches(ExitStatus::isSuccess, "isSuccess()");
+	public void isSuccess() {
+		isNotNull().matches(ExitStatus::isSuccess, "isSuccess()");
 	}
 
-	public ExitStatusAssert isError() {
-		return isNotNull()
+	public void isError() {
+		isNotNull()
 				.matches(ExitStatus::isError, "isError()");
 	}
 
-	public ExitStatusAssert hasExitCode(int expectedCode) {
-		return isNotNull()
+	public void hasExitCode(int expectedCode) {
+		isNotNull()
 				.matches(exitStatus -> exitStatus.value() == expectedCode, "expecting exitCode " + expectedCode);
 	}
 }

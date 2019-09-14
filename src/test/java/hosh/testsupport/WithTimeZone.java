@@ -41,13 +41,13 @@ public class WithTimeZone implements Extension, BeforeTestExecutionCallback, Aft
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) throws Exception {
+	public void beforeTestExecution(ExtensionContext context) {
 		backup = TimeZone.getDefault();
 		TimeZone.setDefault(wanted);
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) throws Exception {
+	public void afterTestExecution(ExtensionContext context) {
 		TimeZone.setDefault(backup);
 	}
 }

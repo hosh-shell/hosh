@@ -75,7 +75,7 @@ public class ValuesTest {
 		}
 
 		@Test
-		public void unwrap() throws Exception {
+		public void unwrap() {
 			assertThat(Values.none().unwrap(Object.class)).isEmpty();
 		}
 	}

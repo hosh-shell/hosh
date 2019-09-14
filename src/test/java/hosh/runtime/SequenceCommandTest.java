@@ -36,8 +36,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.Interpreter;
-import hosh.runtime.SequenceCommand;
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Channel;
 import hosh.spi.ExitStatus;
@@ -84,6 +82,6 @@ public class SequenceCommandTest {
 		doReturn(ExitStatus.of(42)).when(interpreter).run(first, in, out, err);
 		ExitStatus result = sut.run(List.of(), in, out, err);
 		then(interpreter).should(Mockito.never()).run(second, in, out, err);
-		assertThat(result).isError().hasExitCode(42);
+		assertThat(result).hasExitCode(42);
 	}
 }

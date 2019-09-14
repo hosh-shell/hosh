@@ -36,13 +36,13 @@ public class WithThread implements Extension, BeforeTestExecutionCallback, After
 	private String backup;
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) throws Exception {
+	public void afterTestExecution(ExtensionContext context) {
 		Thread.currentThread().setName(backup);
 		Thread.interrupted();
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) throws Exception {
+	public void beforeTestExecution(ExtensionContext context) {
 		backup = Thread.currentThread().getName();
 	}
 }
