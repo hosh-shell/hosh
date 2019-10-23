@@ -54,7 +54,6 @@ import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-import hosh.doc.Todo;
 import hosh.runtime.AnsiFormatter;
 import hosh.runtime.CancellableChannel;
 import hosh.runtime.CommandCompleter;
@@ -183,7 +182,6 @@ public class Hosh {
 		}
 	}
 
-	@Todo(description = "move to the right place (parser/lexer), this is just proof of concept")
 	private static String loadScript(Path path) {
 		try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
 			return lines
