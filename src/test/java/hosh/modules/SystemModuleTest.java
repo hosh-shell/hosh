@@ -238,7 +238,7 @@ public class SystemModuleTest {
 					.containsExactly(
 							Records.singleton(Keys.TEXT, Values.ofText("true - /bin/true replacement")),
 							Records.singleton(Keys.TEXT, Values.ofText("Examples")),
-							Records.singleton(Keys.TEXT, Values.ofText("true - returns exit success")));
+							Records.singleton(Keys.TEXT, Values.ofText("true # returns exit success")));
 		}
 
 		@Test

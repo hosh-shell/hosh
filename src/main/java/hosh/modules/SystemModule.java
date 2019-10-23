@@ -200,7 +200,7 @@ public class SystemModule implements Module {
 				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
 				if (examples != null) {
 					for (Example ex : examples.value()) {
-						out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(ex.command() + " - " + ex.description(), Style.ITALIC)));
+						out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(ex.command() + " # " + ex.description(), Style.ITALIC)));
 					}
 				} else {
 					out.send(Records.singleton(Keys.TEXT, Values.ofStyledText("N/A", Style.FG_RED)));
