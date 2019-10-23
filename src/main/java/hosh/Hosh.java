@@ -100,14 +100,17 @@ public class Hosh {
 	// if and only if HOSH_LOG_LEVEL is defined
 	// by default logging is disabled
 	private static void configureLogging() throws IOException {
-		String homeDir = System.getProperty("user.home", "");
-		String logLevel = Objects.toString(System.getenv("HOSH_LOG_LEVEL"), "OFF");
-		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
-		AnsiFormatter formatter = new AnsiFormatter();
-		FileHandler fileHandler = new FileHandler(logFilePath);
-		fileHandler.setFormatter(formatter);
 		LogManager logManager = LogManager.getLogManager();
 		logManager.reset();
+		String logLevel = System.getenv("HOSH_LOG_LEVEL");
+		if (logLevel == null) {
+			return;
+		}
+		AnsiFormatter formatter = new AnsiFormatter();
+		String homeDir = System.getProperty("user.home", "");
+		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
+		FileHandler fileHandler = new FileHandler(logFilePath);
+		fileHandler.setFormatter(formatter);
 		String rootLoggerName = "";
 		Logger logger = logManager.getLogger(rootLoggerName);
 		logger.addHandler(fileHandler);
