@@ -62,13 +62,14 @@ hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
 - https://mywiki.wooledge.org/BashPitfalls
 - https://zsh.org
 - https://fishshell.com
+- https://github.com/johnkerl/miller
 
-## Similar projects
+## Similar projects 
 
-- rust, https://github.com/nushell/nushell
-- scala, https://ammonite.io
-- kotlin, https://github.com/holgerbrandl/kscript
-- go, https://github.com/bitfield/script
+- rust https://github.com/nushell/nushell
+- scala https://ammonite.io
+- kotlin https://github.com/holgerbrandl/kscript
+- go https://github.com/bitfield/script
 
 # Development
 
