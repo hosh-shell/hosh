@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -77,7 +78,9 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
 
-/** Main class */
+/**
+ * Main class
+ */
 public class Hosh {
 
 	private Hosh() {
@@ -117,14 +120,10 @@ public class Hosh {
 	}
 
 	private static ExitStatus run(Terminal terminal, String version, Logger logger, String[] args) {
-		List<Path> path = Stream
-				.of(System.getenv("PATH").split(File.pathSeparator))
-				.map(Paths::get)
-				.collect(Collectors.toList());
 		State state = new State();
 		state.setCwd(Paths.get("."));
 		state.getVariables().putAll(System.getenv());
-		state.setPath(path);
+		state.setPath(initializePath());
 		BootstrapBuiltins bootstrap = new BootstrapBuiltins();
 		bootstrap.registerAllBuiltins(state);
 		CommandResolver commandResolver = CommandResolvers.builtinsThenExternal(state);
@@ -161,6 +160,15 @@ public class Hosh {
 		}
 		System.err.println("hosh: too many scripts");
 		return ExitStatus.error();
+	}
+
+	private static List<Path> initializePath() {
+		return Optional.ofNullable(System.getenv("PATH"))
+			       .stream()
+			       .map(s -> s.split(File.pathSeparator))
+			       .flatMap(Arrays::stream)
+			       .map(Paths::get)
+			       .collect(Collectors.toList());
 	}
 
 	private static Options createOptions() {
