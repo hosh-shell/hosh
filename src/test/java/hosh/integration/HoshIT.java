@@ -65,6 +65,15 @@ public class HoshIT {
 	}
 
 	@Test
+	public void initializeWithoutSystemEnv() throws Exception {
+		ProcessBuilder hoshBuilder = givenHoshProcessBuilder();
+		hoshBuilder.environment().clear();
+		Process hosh = hoshBuilder.start();
+		closeInput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+	}
+	@Test
 	public void interactiveEndOfFile() throws Exception {
 		Process hosh = givenHoshProcess();
 		closeInput(hosh);
@@ -510,16 +519,20 @@ public class HoshIT {
 	}
 
 	private Process givenHoshProcess(Map<String, String> additionalEnv, String... args) throws IOException {
+		ProcessBuilder pb = givenHoshProcessBuilder(args);
+		pb.environment().putAll(additionalEnv);
+		return pb.start();
+	}
+
+	private ProcessBuilder givenHoshProcessBuilder(String... args) {
 		List<String> cmd = new ArrayList<>();
 		cmd.add(absoluteJavaBinary());
 		cmd.addAll(propagateJacocoAgentInvocation());
 		cmd.addAll(List.of("-jar", "target/dist/hosh.jar"));
 		cmd.addAll(List.of(args));
-		ProcessBuilder pb = new ProcessBuilder()
+		return new ProcessBuilder()
 				.command(cmd)
 				.redirectErrorStream(true);
-		pb.environment().putAll(additionalEnv);
-		return pb.start();
 	}
 
 	private String absoluteJavaBinary() {
