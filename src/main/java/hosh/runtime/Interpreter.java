@@ -131,7 +131,6 @@ public class Interpreter {
 		return run(statement, new NullChannel(), out, err);
 	}
 
-	@Todo(description = "compiler create new instances of command and here they are injected")
 	protected ExitStatus run(Statement statement, Channel in, Channel out, Channel err) {
 		Command command = statement.getCommand();
 		injectDeps(command);
@@ -148,6 +147,7 @@ public class Interpreter {
 		Thread.currentThread().setName(name);
 	}
 
+	@Todo(description = "extract and unit test in a custom class (e.g. Injector?)")
 	protected void injectDeps(Command command) {
 		Downcast.of(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		Downcast.of(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
