@@ -206,7 +206,6 @@ public class Hosh {
 				.appName("hosh")
 				.history(new DefaultHistory())
 				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
-				.variable(LineReader.HISTORY_FILE_SIZE, "1000")
 				.completer(new AggregateCompleter(
 						new CommandCompleter(state),
 						new FileSystemCompleter(state),
