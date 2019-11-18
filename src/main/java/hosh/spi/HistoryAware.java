@@ -25,6 +25,9 @@ package hosh.spi;
 
 import org.jline.reader.History;
 
+/**
+ * Marker interface to inject @{see History} in commands.
+ */
 public interface HistoryAware {
 
 	void setHistory(History history);
