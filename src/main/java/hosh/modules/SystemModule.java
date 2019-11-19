@@ -433,11 +433,8 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			while (true) {
-				Optional<Record> recv = in.recv();
-				if (recv.isEmpty()) {
-					break;
-				}
+			for (@SuppressWarnings("unused") Record record : in) {
+				// consume
 			}
 			return ExitStatus.success();
 		}

@@ -24,7 +24,9 @@
 package hosh.runtime;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -76,6 +78,11 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 	}
 
 	@Override
+	public Iterator<Record> iterator() {
+		return new InputChannelIterator(this);
+	}
+
+	@Override
 	public void send(Record record) {
 		if (done) {
 			throw new ProducerPoisonPill();
@@ -116,5 +123,38 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 	public static class ProducerPoisonPill extends RuntimeException {
 
 		private static final long serialVersionUID = 1L;
+	}
+
+	private static class InputChannelIterator implements Iterator<Record> {
+
+		private final InputChannel in;
+		private Record next;
+
+		public InputChannelIterator(InputChannel in) {
+			this.in = in;
+		}
+
+		@Override
+		public boolean hasNext() {
+			if (next != null) {
+				return true;
+			}
+			Optional<Record> maybeNext = in.recv();
+			if (maybeNext.isPresent()) {
+				next = maybeNext.get();
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public Record next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			Record result = next;
+			next = null;
+			return result;
+		}
 	}
 }

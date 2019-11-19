@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.PipelineChannel;
 import hosh.spi.Record;
 import hosh.testsupport.WithThread;
 
@@ -80,6 +79,13 @@ public class PipelineChannelTest {
 		Thread.currentThread().interrupt();
 		Optional<Record> recv = sut.recv();
 		assertThat(recv).isEmpty();
+	}
+
+	@Test
+	public void iterator() {
+		PipelineChannel sut = new PipelineChannel();
+		sut.send(record);
+		assertThat(sut.iterator()).hasNext();
 	}
 
 	@Test

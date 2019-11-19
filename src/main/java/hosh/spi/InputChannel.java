@@ -25,6 +25,8 @@ package hosh.spi;
 
 import java.util.Optional;
 
-public interface InputChannel {
+public interface InputChannel extends Iterable<Record> {
+
 	Optional<Record> recv();
+
 }
