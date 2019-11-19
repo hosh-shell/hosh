@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- improved history support (fix #147)
 - command line options --help and --version
 
 ### Fixed

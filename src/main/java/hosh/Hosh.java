@@ -23,38 +23,6 @@
  */
 package hosh;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.impl.completer.AggregateCompleter;
-import org.jline.reader.impl.history.DefaultHistory;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
-
 import hosh.runtime.AnsiFormatter;
 import hosh.runtime.CancellableChannel;
 import hosh.runtime.CommandCompleter;
@@ -77,6 +45,37 @@ import hosh.spi.LoggerFactory;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.completer.AggregateCompleter;
+import org.jline.reader.impl.history.DefaultHistory;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Main class
@@ -207,13 +206,13 @@ public class Hosh {
 				.appName("hosh")
 				.history(new DefaultHistory())
 				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
-				.variable(LineReader.HISTORY_FILE_SIZE, "1000")
 				.completer(new AggregateCompleter(
 						new CommandCompleter(state),
 						new FileSystemCompleter(state),
 						new VariableExpansionCompleter(state)))
 				.terminal(terminal)
 				.build();
+		interpreter.setHistory(lineReader.getHistory());
 		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);
 		while (true) {
