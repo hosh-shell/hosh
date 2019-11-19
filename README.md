@@ -13,7 +13,12 @@
     - ANSI colors by default
     - stderr always colored in red
     - file sizes reported by default using KB, MB, GB, ...
-    - by default history works like bash with `HISTCONTROL=ignoredups`
+    - [better history by default](https://sanctum.geek.nz/arabesque/better-bash-history/)
+       - record timestamps for each command (see `history` command)
+       - `HISTCONTROL=ignoredups`
+       - no limits
+       - append to history is incremental and shared between all sessions
+       - ctrl-R works as expected
 - pipelines built around schema-less records
     - built-in commands produce records with well defined keys
     - interoperability is achieved by using single-key records
@@ -64,7 +69,7 @@ hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
 - https://fishshell.com
 - https://github.com/johnkerl/miller
 
-## Similar projects 
+## Similar projects
 
 - rust https://github.com/nushell/nushell
 - scala https://ammonite.io
