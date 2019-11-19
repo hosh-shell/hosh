@@ -32,6 +32,23 @@
 
 ## Examples
 
+### Sorting
+
+Sorting is always performed against a well defined key:
+```
+hosh> ls
+# unsorted, following local filesystem
+...
+hosh> ls | schema
+path size
+hosh> ls | sort size
+# files sorted by size
+...
+hosh> ls | sort path
+# files sorted by alphanum algorithm
+...
+```
+
 ### Parsing
 
 It is possible to create records from text by using `regex` built-in:
