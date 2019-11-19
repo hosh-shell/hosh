@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import hosh.spi.InputChannel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,10 +50,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.ExternalCommand;
 import hosh.runtime.ExternalCommand.ProcessFactory;
 import hosh.runtime.PipelineCommand.Position;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.Records;
@@ -77,13 +77,13 @@ public class ExternalCommandTest {
 	private Process process;
 
 	@Mock
-	private Channel in;
+	private InputChannel in;
 
 	@Mock
-	private Channel out;
+	private OutputChannel out;
 
 	@Mock
-	private Channel err;
+	private OutputChannel err;
 
 	@Mock
 	private ProcessFactory processFactory;

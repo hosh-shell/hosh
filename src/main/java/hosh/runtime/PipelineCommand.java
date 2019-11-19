@@ -25,9 +25,10 @@ package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
 import hosh.runtime.PipelineChannel.ProducerPoisonPill;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 import hosh.spi.LoggerFactory;
 
 import java.util.List;
@@ -100,10 +101,10 @@ public class PipelineCommand implements Command, InterpreterAware {
 	}
 
 	@Override
-	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		try (Supervisor supervisor = new Supervisor()) {
 			supervisor.setHandleSignals(false);
-			Channel pipeChannel = new PipelineChannel();
+			PipelineChannel pipeChannel = new PipelineChannel();
 			runAsync(supervisor, producer, in, pipeChannel, err, Position.FIRST);
 			assemblePipeline(supervisor, consumer, pipeChannel, out, err);
 			return supervisor.waitForAll();
@@ -112,10 +113,10 @@ public class PipelineCommand implements Command, InterpreterAware {
 		}
 	}
 
-	private void assemblePipeline(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err) {
+	private void assemblePipeline(Supervisor supervisor, Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
 		if (statement.getCommand() instanceof PipelineCommand) {
 			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
-			Channel pipelineChannel = new PipelineChannel();
+			PipelineChannel pipelineChannel = new PipelineChannel();
 			runAsync(supervisor, pipelineCommand.producer, in, pipelineChannel, err, Position.MIDDLE);
 			assemblePipeline(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
 		} else {
@@ -123,7 +124,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 		}
 	}
 
-	private void runAsync(Supervisor supervisor, Statement statement, Channel in, Channel out, Channel err, Position position) {
+	private void runAsync(Supervisor supervisor, Statement statement, InputChannel in, OutputChannel out, OutputChannel err, Position position) {
 		supervisor.submit(() -> {
 			Command command = statement.getCommand();
 			Downcast.of(command, ExternalCommand.class).ifPresent(cmd -> cmd.pipeline(position));
@@ -139,13 +140,13 @@ public class PipelineCommand implements Command, InterpreterAware {
 		});
 	}
 
-	private void stopConsumer(Channel out) {
+	private void stopConsumer(OutputChannel out) {
 		Downcast.of(out, PipelineChannel.class).ifPresent(pipeOut -> {
 			pipeOut.stopConsumer();
 		});
 	}
 
-	private void stopProducer(Channel in) {
+	private void stopProducer(InputChannel in) {
 		Downcast.of(in, PipelineChannel.class).ifPresent(pipeIn -> {
 			pipeIn.stopProducer();
 			pipeIn.consumeAnyRemainingRecord();

@@ -44,9 +44,10 @@ import hosh.doc.BuiltIn;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Todo;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.Module;
 import hosh.spi.Record;
@@ -62,7 +63,7 @@ public class NetworkModule implements Module {
 	public static class Network implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
@@ -126,7 +127,7 @@ public class NetworkModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: http URL")));
 				return ExitStatus.error();

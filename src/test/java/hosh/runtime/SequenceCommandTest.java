@@ -29,6 +29,7 @@ import static org.mockito.Mockito.doReturn;
 
 import java.util.List;
 
+import hosh.spi.InputChannel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,20 +38,20 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import hosh.runtime.Compiler.Statement;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
 
 @ExtendWith(MockitoExtension.class)
 public class SequenceCommandTest {
 
 	@Mock(stubOnly = true)
-	private Channel in;
+	private InputChannel in;
 
 	@Mock(stubOnly = true)
-	private Channel out;
+	private OutputChannel out;
 
 	@Mock(stubOnly = true)
-	private Channel err;
+	private OutputChannel err;
 
 	@Mock(stubOnly = true)
 	private Statement first;

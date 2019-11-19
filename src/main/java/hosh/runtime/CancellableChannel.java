@@ -23,10 +23,9 @@
  */
 package hosh.runtime;
 
-import java.util.Optional;
 import java.util.concurrent.CancellationException;
 
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 
 /**
@@ -35,11 +34,11 @@ import hosh.spi.Record;
  * This is needed to avoid handling interruptions in several classes
  * (i.e. commands and other channels).
  */
-public class CancellableChannel implements Channel {
+public class CancellableChannel implements OutputChannel {
 
-	private final Channel channel;
+	private final OutputChannel channel;
 
-	public CancellableChannel(Channel channel) {
+	public CancellableChannel(OutputChannel channel) {
 		this.channel = channel;
 	}
 
@@ -51,11 +50,4 @@ public class CancellableChannel implements Channel {
 		channel.send(record);
 	}
 
-	@Override
-	public Optional<Record> recv() {
-		if (Thread.interrupted()) {
-			throw new CancellationException("interrupted");
-		}
-		return channel.recv();
-	}
 }

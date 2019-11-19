@@ -24,22 +24,14 @@
 package hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.then;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.runtime.NullChannel;
-import hosh.spi.Record;
 
 @ExtendWith(MockitoExtension.class)
 public class NullChannelTest {
-
-	@Mock
-	private Record record;
 
 	@InjectMocks
 	private NullChannel sut;
@@ -47,12 +39,6 @@ public class NullChannelTest {
 	@Test
 	public void recv() {
 		assertThat(sut.recv()).isEmpty();
-	}
-
-	@Test
-	public void send() {
-		sut.send(record);
-		then(record).shouldHaveZeroInteractions();
 	}
 
 	@Test

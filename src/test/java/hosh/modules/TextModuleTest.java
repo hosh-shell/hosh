@@ -33,6 +33,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import hosh.spi.InputChannel;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +61,7 @@ import hosh.modules.TextModule.Table;
 import hosh.modules.TextModule.Take;
 import hosh.modules.TextModule.Timestamp;
 import hosh.modules.TextModule.Trim;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.Record;
@@ -75,13 +76,13 @@ public class TextModuleTest {
 	public class TrimTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Trim sut;
@@ -147,13 +148,13 @@ public class TextModuleTest {
 	public class JoinTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Join sut;
@@ -207,13 +208,13 @@ public class TextModuleTest {
 	public class SumTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Sum sut;
@@ -267,13 +268,13 @@ public class TextModuleTest {
 	public class SelectTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Select sut;
@@ -329,13 +330,13 @@ public class TextModuleTest {
 	public class SplitTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Split sut;
@@ -390,13 +391,13 @@ public class TextModuleTest {
 	public class RegexTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Regex sut;
@@ -471,13 +472,13 @@ public class TextModuleTest {
 	public class SchemaTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Schema sut;
@@ -510,13 +511,13 @@ public class TextModuleTest {
 	public class CountTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Count sut;
@@ -571,13 +572,13 @@ public class TextModuleTest {
 	public class EnumerateTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Enumerate sut;
@@ -611,13 +612,13 @@ public class TextModuleTest {
 	public class TimestampTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Mock
 		private Clock clock;
@@ -658,13 +659,13 @@ public class TextModuleTest {
 	public class DropTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Drop sut;
@@ -718,13 +719,13 @@ public class TextModuleTest {
 	public class TakeTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Take sut;
@@ -802,13 +803,13 @@ public class TextModuleTest {
 	public class FilterTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Filter sut;
@@ -863,13 +864,13 @@ public class TextModuleTest {
 	public class SortTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Sort sut;
@@ -920,13 +921,13 @@ public class TextModuleTest {
 	public class DistinctTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Distinct sut;
@@ -992,13 +993,13 @@ public class TextModuleTest {
 	public class DuplicatedTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Duplicated sut;
@@ -1064,13 +1065,13 @@ public class TextModuleTest {
 	public class TableTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Table sut;

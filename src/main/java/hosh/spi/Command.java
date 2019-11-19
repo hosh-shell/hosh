@@ -30,5 +30,5 @@ import java.util.List;
  */
 public interface Command {
 
-	ExitStatus run(List<String> args, Channel in, Channel out, Channel err);
+	ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err);
 }

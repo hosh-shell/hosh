@@ -53,10 +53,11 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Ansi;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
 import hosh.spi.Module;
@@ -86,7 +87,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() > 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected at most 1 argument")));
 				return ExitStatus.error();
@@ -148,7 +149,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
@@ -173,7 +174,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 				return ExitStatus.error();
@@ -202,7 +203,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one path argument")));
 				return ExitStatus.error();
@@ -236,7 +237,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
@@ -272,7 +273,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 				return ExitStatus.error();
@@ -303,7 +304,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 				return ExitStatus.error();
@@ -334,7 +335,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: rm target")));
 				return ExitStatus.error();
@@ -356,7 +357,7 @@ public class FileSystemModule implements Module {
 	public static class Partitions implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: partitions")));
 				return ExitStatus.error();
@@ -396,7 +397,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: probe file")));
 				return ExitStatus.error();
@@ -430,7 +431,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: symlink source target")));
 				return ExitStatus.error();
@@ -460,7 +461,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: hardlink source target")));
 				return ExitStatus.error();
@@ -490,7 +491,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: resolve file")));
 				return ExitStatus.error();
@@ -524,7 +525,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
@@ -547,7 +548,7 @@ public class FileSystemModule implements Module {
 			}
 		}
 
-		private void withService(WatchService watchService, Channel out) throws InterruptedException {
+		private void withService(WatchService watchService, OutputChannel out) throws InterruptedException {
 			for (;;) {
 				LOGGER.info("waiting for events");
 				WatchKey key = watchService.take();
@@ -558,7 +559,7 @@ public class FileSystemModule implements Module {
 			}
 		}
 
-		private void handle(Channel out, WatchKey key) {
+		private void handle(OutputChannel out, WatchKey key) {
 			for (var event : key.pollEvents()) {
 				if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
 					LOGGER.warning("got overflow");
@@ -591,7 +592,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public RandomAccessFile before(List<String> args, Channel in, Channel out, Channel err) {
+		public RandomAccessFile before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				throw new IllegalArgumentException("expecting file name");
 			}
@@ -612,7 +613,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public void after(RandomAccessFile resource, Channel in, Channel out, Channel err) {
+		public void after(RandomAccessFile resource, InputChannel in, OutputChannel out, OutputChannel err) {
 			try {
 				resource.close();
 			} catch (IOException e) {
@@ -622,7 +623,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public boolean retry(RandomAccessFile resource, Channel in, Channel out, Channel err) {
+		public boolean retry(RandomAccessFile resource, InputChannel in, OutputChannel out, OutputChannel err) {
 			return false;
 		}
 	}

@@ -31,6 +31,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Stream;
 
+import hosh.spi.InputChannel;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +45,7 @@ import hosh.doc.Todo;
 import hosh.modules.NetworkModule.Http;
 import hosh.modules.NetworkModule.Network;
 import hosh.modules.NetworkModule.Http.Requestor;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.Record;
@@ -59,13 +60,13 @@ public class NetworkModuleTest {
 	public class NetworkTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Network sut;
@@ -98,13 +99,13 @@ public class NetworkModuleTest {
 		public final WithThread withThread = new WithThread();
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Mock(stubOnly = true)
 		private Requestor requestor;

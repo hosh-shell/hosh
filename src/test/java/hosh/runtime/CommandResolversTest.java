@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import hosh.spi.InputChannel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,10 +47,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.CommandResolver;
-import hosh.runtime.CommandResolvers;
 import hosh.runtime.CommandResolvers.WindowsCommandResolver;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.State;
@@ -199,7 +198,7 @@ public class CommandResolversTest {
 			}
 
 			@Override
-			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 				return ExitStatus.success();
 			}
 		}

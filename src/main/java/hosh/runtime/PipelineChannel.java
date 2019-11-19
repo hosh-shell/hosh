@@ -30,14 +30,15 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Logger;
 
-import hosh.spi.Channel;
+import hosh.spi.InputChannel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 
-public class PipelineChannel implements Channel {
+public class PipelineChannel implements InputChannel, OutputChannel {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 

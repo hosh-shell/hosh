@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- improved history support (fix #147)
 - command line options --help and --version
+- improved history support (fix #147)
+- split `Channel` interface (fix #152)
 
 ### Fixed
 - NPE when starting without PATH (fix #147)

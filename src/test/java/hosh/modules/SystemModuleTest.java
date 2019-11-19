@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import hosh.spi.InputChannel;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.junit.jupiter.api.Nested;
@@ -76,7 +77,7 @@ import hosh.modules.SystemModule.UnsetVariable;
 import hosh.modules.SystemModule.WithTime;
 import hosh.modules.SystemModule.Benchmark.Accumulator;
 import hosh.modules.SystemModule.KillProcess.ProcessLookup;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
@@ -98,13 +99,13 @@ public class SystemModuleTest {
 		private State state = new State();
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Exit sut;
@@ -158,13 +159,13 @@ public class SystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Captor
 		private ArgumentCaptor<Record> records;
@@ -209,13 +210,13 @@ public class SystemModuleTest {
 	public class HelpTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Mock(stubOnly = true)
 		private State state;
@@ -312,7 +313,7 @@ public class SystemModuleTest {
 		private class True implements Command {
 
 			@Override
-			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 				return ExitStatus.success();
 			}
 		}
@@ -321,7 +322,7 @@ public class SystemModuleTest {
 		private class False implements Command {
 
 			@Override
-			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 				return ExitStatus.error();
 			}
 		}
@@ -330,7 +331,7 @@ public class SystemModuleTest {
 		private class Star implements Command {
 
 			@Override
-			public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 				return ExitStatus.of(42);
 			}
 		}
@@ -341,13 +342,13 @@ public class SystemModuleTest {
 	public class EchoTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Echo sut;
@@ -388,13 +389,13 @@ public class SystemModuleTest {
 		public final WithThread withThread = new WithThread();
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Sleep sut;
@@ -451,13 +452,13 @@ public class SystemModuleTest {
 	public class ProcessListTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private ProcessList sut;
@@ -486,13 +487,13 @@ public class SystemModuleTest {
 	public class ErrTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Err sut;
@@ -513,13 +514,13 @@ public class SystemModuleTest {
 		private Record record;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Sink sut;
@@ -541,13 +542,13 @@ public class SystemModuleTest {
 	public class BenchmarkTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Benchmark sut;
@@ -626,13 +627,13 @@ public class SystemModuleTest {
 	public class WithTimeTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private WithTime sut;
@@ -664,13 +665,13 @@ public class SystemModuleTest {
 	public class SetVariableTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Spy
 		private State state = new State();
@@ -733,13 +734,13 @@ public class SystemModuleTest {
 	public class UnsetVariableTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Spy
 		private State state = new State();
@@ -789,13 +790,13 @@ public class SystemModuleTest {
 		private ProcessLookup processLookup;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private KillProcess sut;
@@ -859,13 +860,13 @@ public class SystemModuleTest {
 		private State state = new State();
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Capture sut;
@@ -940,13 +941,13 @@ public class SystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Open sut;
@@ -1045,13 +1046,13 @@ public class SystemModuleTest {
 		private State state = new State();
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Input sut;
@@ -1108,13 +1109,13 @@ public class SystemModuleTest {
 		private State state = new State();
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Secret sut;

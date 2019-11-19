@@ -25,6 +25,7 @@ package hosh.modules;
 
 import java.util.List;
 
+import hosh.spi.InputChannel;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
@@ -32,7 +33,7 @@ import org.jline.utils.InfoCmp;
 import hosh.doc.BuiltIn;
 import hosh.doc.Example;
 import hosh.doc.Examples;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
@@ -57,7 +58,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			Attributes attributes = terminal.getAttributes();
 			out.send(Records
 					.builder()
@@ -86,7 +87,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();
@@ -111,7 +112,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();

@@ -21,45 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.spi;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.then;
+import java.util.Optional;
 
-import java.util.concurrent.CancellationException;
-
-import hosh.spi.OutputChannel;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.spi.Record;
-
-@ExtendWith(MockitoExtension.class)
-public class CancellableChannelTest {
-
-	@Mock(stubOnly = true)
-	private Record record;
-
-	@Mock
-	private OutputChannel channel;
-
-	@InjectMocks
-	private CancellableChannel sut;
-
-	@Test
-	public void send() {
-		sut.send(record);
-		then(channel).should().send(record);
-	}
-
-	@Test
-	public void sendInterrupted() {
-		Thread.currentThread().interrupt();
-		assertThatThrownBy(() -> sut.send(record))
-				.hasMessage("interrupted")
-				.isInstanceOf(CancellationException.class);
-	}
+public interface InputChannel {
+	Optional<Record> recv();
 }

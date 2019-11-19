@@ -25,15 +25,14 @@ package hosh.runtime;
 
 import java.io.PrintWriter;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.jline.terminal.Terminal;
 
 import hosh.spi.Ansi;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 
-public class ConsoleChannel implements Channel {
+public class ConsoleChannel implements OutputChannel {
 
 	private final PrintWriter printWriter;
 
@@ -52,11 +51,6 @@ public class ConsoleChannel implements Channel {
 		style.disable(printWriter);
 		printWriter.append(System.lineSeparator());
 		printWriter.flush();
-	}
-
-	@Override
-	public Optional<Record> recv() {
-		return Optional.empty();
 	}
 
 	@Override

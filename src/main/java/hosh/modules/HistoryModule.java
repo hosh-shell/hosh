@@ -26,10 +26,11 @@ package hosh.modules;
 import hosh.doc.BuiltIn;
 import hosh.doc.Example;
 import hosh.doc.Examples;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.HistoryAware;
+import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.Module;
 import hosh.spi.Record;
@@ -55,7 +56,7 @@ public class HistoryModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();

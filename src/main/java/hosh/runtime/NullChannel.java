@@ -25,18 +25,13 @@ package hosh.runtime;
 
 import java.util.Optional;
 
-import hosh.spi.Channel;
+import hosh.spi.InputChannel;
 import hosh.spi.Record;
 
 /**
  * This is a special-case channel used in the REPL.
  */
-public class NullChannel implements Channel {
-
-	@Override
-	public void send(Record record) {
-		// no-op
-	}
+public class NullChannel implements InputChannel {
 
 	@Override
 	public Optional<Record> recv() {

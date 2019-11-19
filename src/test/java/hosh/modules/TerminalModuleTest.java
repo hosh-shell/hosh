@@ -29,6 +29,7 @@ import static org.mockito.BDDMockito.then;
 
 import java.util.List;
 
+import hosh.spi.InputChannel;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.Nested;
@@ -43,7 +44,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import hosh.modules.TerminalModule.Bell;
 import hosh.modules.TerminalModule.Clear;
 import hosh.modules.TerminalModule.Dump;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.Records;
@@ -56,13 +57,13 @@ public class TerminalModuleTest {
 	public class ClearTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Mock
 		private Terminal terminal;
@@ -99,13 +100,13 @@ public class TerminalModuleTest {
 	public class BellTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Mock
 		private Terminal terminal;
@@ -142,13 +143,13 @@ public class TerminalModuleTest {
 	public class DumpTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@Mock(stubOnly = true)
 		private Terminal terminal;

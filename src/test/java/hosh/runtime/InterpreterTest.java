@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 
+import hosh.spi.InputChannel;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,12 +45,10 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.Compiler;
-import hosh.runtime.Interpreter;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Resolvable;
 import hosh.runtime.Compiler.Statement;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
@@ -74,13 +73,13 @@ public class InterpreterTest {
 	private Terminal terminal;
 
 	@Mock
-	private Channel in;
+	private InputChannel in;
 
 	@Mock
-	private Channel out;
+	private OutputChannel out;
 
 	@Mock
-	private Channel err;
+	private OutputChannel err;
 
 	@Mock(stubOnly = true)
 	private Program program;

@@ -31,14 +31,14 @@ import java.util.List;
  */
 public interface CommandWrapper<T> extends Command {
 
-	T before(List<String> args, Channel in, Channel out, Channel err);
+	T before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err);
 
-	void after(T resource, Channel in, Channel out, Channel err);
+	void after(T resource, InputChannel in, OutputChannel out, OutputChannel err);
 
-	boolean retry(T resource, Channel in, Channel out, Channel err);
+	boolean retry(T resource, InputChannel in, OutputChannel out, OutputChannel err);
 
 	@Override
-	default ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+	default ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		throw new UnsupportedOperationException("a suitable implementation will be provided by the compiler");
 	}
 }

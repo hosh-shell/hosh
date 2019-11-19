@@ -30,6 +30,7 @@ import static org.mockito.BDDMockito.then;
 
 import java.util.List;
 
+import hosh.spi.InputChannel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,10 +39,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.DefaultCommandWrapper;
-import hosh.runtime.Interpreter;
 import hosh.runtime.Compiler.Statement;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
 
@@ -49,13 +48,13 @@ import hosh.spi.ExitStatus;
 public class DefaultCommandWrapperTest {
 
 	@Mock(stubOnly = true)
-	private Channel in;
+	private InputChannel in;
 
 	@Mock(stubOnly = true)
-	private Channel out;
+	private OutputChannel out;
 
 	@Mock(stubOnly = true)
-	private Channel err;
+	private OutputChannel err;
 
 	@Mock(stubOnly = true)
 	private Statement statement;

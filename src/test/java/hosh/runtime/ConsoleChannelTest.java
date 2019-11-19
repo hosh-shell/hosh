@@ -36,7 +36,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.ConsoleChannel;
 import hosh.spi.Ansi;
 import hosh.spi.Keys;
 import hosh.spi.Records;
@@ -79,11 +78,6 @@ public class ConsoleChannelTest {
 		then(printWriter).should().append(" ");
 		then(printWriter).should().append("bar");
 		then(printWriter).should().append(System.lineSeparator());
-	}
-
-	@Test
-	public void recvIsEmpty() {
-		assertThat(sut.recv()).isEmpty();
 	}
 
 	@Test

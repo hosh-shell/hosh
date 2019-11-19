@@ -38,7 +38,7 @@ import hosh.runtime.ReplReader;
 import hosh.runtime.VariableExpansionCompleter;
 import hosh.runtime.VersionLoader;
 import hosh.spi.Ansi;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
@@ -127,8 +127,8 @@ public class Hosh {
 		bootstrap.registerAllBuiltins(state);
 		CommandResolver commandResolver = CommandResolvers.builtinsThenExternal(state);
 		Compiler compiler = new Compiler(commandResolver);
-		Channel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
-		Channel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
+		OutputChannel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
+		OutputChannel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
 		Interpreter interpreter = new Interpreter(state, terminal, out, err);
 		CommandLine commandLine;
 		Options options = createOptions();
@@ -177,7 +177,7 @@ public class Hosh {
 		return options;
 	}
 
-	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Channel err, Logger logger) {
+	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, OutputChannel err, Logger logger) {
 		try {
 			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);
@@ -200,7 +200,7 @@ public class Hosh {
 	}
 
 	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter,
-			Channel err, Logger logger) {
+	                               OutputChannel err, Logger logger) {
 		LineReader lineReader = LineReaderBuilder
 				.builder()
 				.appName("hosh")
@@ -234,7 +234,7 @@ public class Hosh {
 		return ExitStatus.success();
 	}
 
-	private static void welcome(Channel out, String version) {
+	private static void welcome(OutputChannel out, String version) {
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("hosh " + version)));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Running on Java " + System.getProperty("java.version"))));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));

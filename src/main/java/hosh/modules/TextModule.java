@@ -49,9 +49,10 @@ import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.Ansi.Style;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 import hosh.spi.Key;
 import hosh.spi.Keys;
 import hosh.spi.Module;
@@ -70,7 +71,7 @@ public class TextModule implements Module {
 	public static class Select implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			List<Key> keys = args.stream().map(Keys::of).collect(Collectors.toUnmodifiableList());
 			while (true) {
 				Optional<Record> incoming = in.recv();
@@ -97,7 +98,7 @@ public class TextModule implements Module {
 	public static class Split implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
 				return ExitStatus.error();
@@ -143,7 +144,7 @@ public class TextModule implements Module {
 	public static class Join implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: join separator")));
 				return ExitStatus.error();
@@ -181,7 +182,7 @@ public class TextModule implements Module {
 	public static class Trim implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 argument")));
 				return ExitStatus.error();
@@ -223,7 +224,7 @@ public class TextModule implements Module {
 	public static class Regex implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
 				return ExitStatus.error();
@@ -273,7 +274,7 @@ public class TextModule implements Module {
 	public static class Schema implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
@@ -297,7 +298,7 @@ public class TextModule implements Module {
 	public static class Filter implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
 				return ExitStatus.error();
@@ -328,7 +329,7 @@ public class TextModule implements Module {
 	public static class Enumerate implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
@@ -359,7 +360,7 @@ public class TextModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
@@ -383,7 +384,7 @@ public class TextModule implements Module {
 	public static class Distinct implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
@@ -414,7 +415,7 @@ public class TextModule implements Module {
 	public static class Duplicated implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
@@ -445,7 +446,7 @@ public class TextModule implements Module {
 	public static class Sort implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
 				return ExitStatus.error();
@@ -458,7 +459,7 @@ public class TextModule implements Module {
 			return ExitStatus.success();
 		}
 
-		private void accumulate(Channel in, List<Record> records) {
+		private void accumulate(InputChannel in, List<Record> records) {
 			while (true) {
 				Optional<Record> incoming = in.recv();
 				if (incoming.isEmpty()) {
@@ -475,7 +476,7 @@ public class TextModule implements Module {
 			records.sort(comparator);
 		}
 
-		private void output(Channel out, List<Record> records) {
+		private void output(OutputChannel out, List<Record> records) {
 			for (Record record : records) {
 				out.send(record);
 			}
@@ -489,7 +490,7 @@ public class TextModule implements Module {
 	public static class Take implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
@@ -522,7 +523,7 @@ public class TextModule implements Module {
 	public static class Drop implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
@@ -557,7 +558,7 @@ public class TextModule implements Module {
 
 		@SuppressWarnings("squid:S2189")
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
@@ -578,7 +579,7 @@ public class TextModule implements Module {
 	public static class Count implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
@@ -604,7 +605,7 @@ public class TextModule implements Module {
 	public static class Sum implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: sum key")));
 				return ExitStatus.error();
@@ -637,7 +638,7 @@ public class TextModule implements Module {
 		private int i = 0;
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
@@ -658,7 +659,7 @@ public class TextModule implements Module {
 			return ExitStatus.success();
 		}
 
-		private void sendRow(Record record, Channel out) {
+		private void sendRow(Record record, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			StringBuilder formatter = new StringBuilder();
 			Collection<Record.Entry> entries = record.entries();
@@ -682,7 +683,7 @@ public class TextModule implements Module {
 			return String.format("%%-%ds", paddings.getOrDefault(key, 10));
 		}
 
-		private void sendHeader(Collection<Key> keys, Channel out) {
+		private void sendHeader(Collection<Key> keys, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			String format = keys.stream()
 					.map(this::formatterFor)

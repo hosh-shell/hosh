@@ -27,10 +27,11 @@ import hosh.doc.Todo;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Resolvable;
 import hosh.runtime.Compiler.Statement;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.HistoryAware;
+import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.LineReaderAware;
 import hosh.spi.Record;
@@ -52,7 +53,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -66,13 +66,13 @@ public class Interpreter {
 	// and no auto-complete
 	private final LineReader lineReader;
 
-	private final Channel out;
+	private final OutputChannel out;
 
-	private final Channel err;
+	private final OutputChannel err;
 
 	private History history = new NoHistory();
 
-	public Interpreter(State state, Terminal terminal, Channel out, Channel err) {
+	public Interpreter(State state, Terminal terminal, OutputChannel out, OutputChannel err) {
 		this.state = state;
 		this.terminal = terminal;
 		this.lineReader = LineReaderBuilder.builder().terminal(terminal).build();
@@ -131,7 +131,7 @@ public class Interpreter {
 		return run(statement, new NullChannel(), out, err);
 	}
 
-	protected ExitStatus run(Statement statement, Channel in, Channel out, Channel err) {
+	protected ExitStatus run(Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
 		Command command = statement.getCommand();
 		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
@@ -173,13 +173,13 @@ public class Interpreter {
 
 	// enrich any record sent to the inner channel
 	// with location of the current statement
-	private static class WithLocation implements Channel {
+	private static class WithLocation implements OutputChannel {
 
-		private final Channel channel;
+		private final OutputChannel channel;
 
 		private final String location;
 
-		public WithLocation(Channel channel, String location) {
+		public WithLocation(OutputChannel channel, String location) {
 			this.channel = channel;
 			this.location = location;
 		}
@@ -189,10 +189,6 @@ public class Interpreter {
 			channel.send(record.prepend(Keys.LOCATION, Values.ofText(location)));
 		}
 
-		@Override
-		public Optional<Record> recv() {
-			return channel.recv();
-		}
 	}
 
 	/** Fake implementation of history, used for non-interactive sessions (i.e. scripts) */

@@ -23,14 +23,8 @@
  */
 package hosh.spi;
 
-import java.util.Optional;
-
-/**
- * Handling of input/output of records.
- */
-public interface Channel {
+public interface OutputChannel {
 
 	void send(Record record);
 
-	Optional<Record> recv();
 }

@@ -24,10 +24,11 @@
 package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class DefaultCommandWrapper<T> implements Command, InterpreterAware {
 	}
 
 	@Override
-	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		interpreter.injectDeps(commandWrapper);
 		T resource = commandWrapper.before(args, in, out, err);
 		try {

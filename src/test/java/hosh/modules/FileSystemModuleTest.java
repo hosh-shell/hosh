@@ -41,6 +41,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import hosh.spi.InputChannel;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -68,7 +69,7 @@ import hosh.modules.FileSystemModule.Remove;
 import hosh.modules.FileSystemModule.Resolve;
 import hosh.modules.FileSystemModule.Symlink;
 import hosh.modules.FileSystemModule.WithLock;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.Records;
@@ -90,13 +91,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private ListFiles sut;
@@ -295,13 +296,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private ChangeDirectory sut;
@@ -371,13 +372,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private CurrentWorkingDirectory sut;
@@ -413,13 +414,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Lines sut;
@@ -495,13 +496,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Copy sut;
@@ -565,13 +566,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Move sut;
@@ -635,13 +636,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Remove sut;
@@ -684,13 +685,13 @@ public class FileSystemModuleTest {
 	public class PartitionsTest {
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Partitions sut;
@@ -725,13 +726,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Find sut;
@@ -817,13 +818,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Probe sut;
@@ -871,13 +872,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Symlink sut;
@@ -916,13 +917,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Hardlink sut;
@@ -961,13 +962,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private Resolve sut;
@@ -1027,13 +1028,13 @@ public class FileSystemModuleTest {
 		private State state;
 
 		@Mock
-		private Channel in;
+		private InputChannel in;
 
 		@Mock
-		private Channel out;
+		private OutputChannel out;
 
 		@Mock
-		private Channel err;
+		private OutputChannel err;
 
 		@InjectMocks
 		private WithLock sut;

@@ -42,9 +42,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hosh.runtime.PipelineCommand.Position;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
 import hosh.spi.Record;
@@ -79,7 +80,7 @@ public class ExternalCommand implements Command, StateAware {
 	}
 
 	@Override
-	public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);
 		processArgs.add(path.toAbsolutePath().toString());
 		processArgs.addAll(args);
@@ -105,11 +106,11 @@ public class ExternalCommand implements Command, StateAware {
 		}
 	}
 
-	private void writeStdin(Channel in, Process process) {
+	private void writeStdin(InputChannel in, Process process) {
 		pipeChannelToOutputStream(in, process.getOutputStream());
 	}
 
-	private void pipeChannelToOutputStream(Channel in, OutputStream outputStream) {
+	private void pipeChannelToOutputStream(InputChannel in, OutputStream outputStream) {
 		Locale locale = Locale.getDefault();
 		try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), true)) {
 			while (true) {
@@ -124,15 +125,15 @@ public class ExternalCommand implements Command, StateAware {
 		}
 	}
 
-	private void readStdout(Channel out, Process process) throws IOException {
+	private void readStdout(OutputChannel out, Process process) throws IOException {
 		pipeInputStreamToChannel(out, process.getInputStream());
 	}
 
-	private void readStderr(Channel err, Process process) throws IOException {
+	private void readStderr(OutputChannel err, Process process) throws IOException {
 		pipeInputStreamToChannel(err, process.getErrorStream());
 	}
 
-	private void pipeInputStreamToChannel(Channel channel, InputStream inputStream) throws IOException {
+	private void pipeInputStreamToChannel(OutputChannel channel, InputStream inputStream) throws IOException {
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 			while (true) {
 				String readLine = reader.readLine();

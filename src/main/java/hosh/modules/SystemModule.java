@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import hosh.spi.InputChannel;
 import org.jline.reader.LineReader;
 
 import hosh.doc.BuiltIn;
@@ -51,7 +52,7 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.spi.Ansi.Style;
-import hosh.spi.Channel;
+import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
@@ -79,7 +80,7 @@ public class SystemModule implements Module {
 	public static class Echo implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			Record record = Records.singleton(Keys.VALUE, Values.ofText(String.join(" ", args)));
 			out.send(record);
 			return ExitStatus.success();
@@ -100,7 +101,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 				return ExitStatus.error();
@@ -133,7 +134,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			switch (args.size()) {
 				case 0:
 					state.setExit(true);
@@ -170,7 +171,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.isEmpty()) {
 				for (var command : state.getCommands().entrySet()) {
 					BuiltIn builtIn = command.getValue().getAnnotation(BuiltIn.class);
@@ -220,7 +221,7 @@ public class SystemModule implements Module {
 	public static class Sleep implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting just one argument millis")));
 				return ExitStatus.error();
@@ -248,19 +249,19 @@ public class SystemModule implements Module {
 	public static class WithTime implements CommandWrapper<Long> {
 
 		@Override
-		public Long before(List<String> args, Channel in, Channel out, Channel err) {
+		public Long before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			return System.nanoTime();
 		}
 
 		@Override
-		public void after(Long startNanos, Channel in, Channel out, Channel err) {
+		public void after(Long startNanos, InputChannel in, OutputChannel out, OutputChannel err) {
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
 			out.send(Records.singleton(Keys.DURATION, Values.ofDuration(duration)));
 		}
 
 		@Override
-		public boolean retry(Long resource, Channel in, Channel out, Channel err) {
+		public boolean retry(Long resource, InputChannel in, OutputChannel out, OutputChannel err) {
 			return false;
 		}
 	}
@@ -272,7 +273,7 @@ public class SystemModule implements Module {
 	public static class ProcessList implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting zero arguments")));
 				return ExitStatus.error();
@@ -313,7 +314,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
@@ -344,7 +345,7 @@ public class SystemModule implements Module {
 	public static class Err implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			throw new NullPointerException("injected error: please do not report");
 		}
 	}
@@ -362,7 +363,7 @@ public class SystemModule implements Module {
 		public static final Key AVERAGE = Keys.of("average");
 
 		@Override
-		public Accumulator before(List<String> args, Channel in, Channel out, Channel err) {
+		public Accumulator before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				throw new IllegalArgumentException("requires one integer arg");
 			}
@@ -373,7 +374,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public void after(Accumulator resource, Channel in, Channel out, Channel err) {
+		public void after(Accumulator resource, InputChannel in, OutputChannel out, OutputChannel err) {
 			Duration best = resource.results.stream().min(Comparator.naturalOrder()).orElse(Duration.ZERO);
 			Duration worst = resource.results.stream().max(Comparator.naturalOrder()).orElse(Duration.ZERO);
 			int runs = resource.results.size();
@@ -387,7 +388,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public boolean retry(Accumulator resource, Channel in, Channel out, Channel err) {
+		public boolean retry(Accumulator resource, InputChannel in, OutputChannel out, OutputChannel err) {
 			resource.takeTime();
 			return --resource.repeat > 0;
 		}
@@ -431,7 +432,7 @@ public class SystemModule implements Module {
 	public static class Sink implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			while (true) {
 				Optional<Record> recv = in.recv();
 				if (recv.isEmpty()) {
@@ -457,7 +458,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
 				return ExitStatus.error();
@@ -487,7 +488,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("requires 1 argument: key")));
 				return ExitStatus.error();
@@ -519,7 +520,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: input VARIABLE")));
 				return ExitStatus.error();
@@ -568,7 +569,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret VARIABLE")));
 				return ExitStatus.error();
@@ -610,7 +611,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
 				return ExitStatus.error();
@@ -651,7 +652,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() <= 2) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
 				return ExitStatus.error();
