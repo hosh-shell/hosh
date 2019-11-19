@@ -111,7 +111,11 @@ public class ParserTest {
 				"cd C:\\Users\\VSSADM~1\\AppData\\Local\\Temp\\junit16864313966026428034",
 				"regex line '\\w+'",
 				"regex line \"\\w+\"",
-				"ls ${VAR!/tmp}");
+				"ls ${VAR!/tmp}",
+				"echo ${HELLO}${WHO}",
+				"ls ${JAVA_HOME}/bin",
+				"ls ${JAVA_HOME}/${JVM_BINARY}",
+				"ls \"${JAVA_HOME}/${JVM_BINARY}\"");
 	}
 
 	static List<String> newLines() {
@@ -150,7 +154,7 @@ public class ParserTest {
 				"withTime { cat file.txt | grep /regexp/ } | schema");
 	}
 
-	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")
+	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "accepted by parser but rejected by the compiler")
 	static List<String> incompletePipelines() {
 		return List.of(
 				"ls | ",

@@ -123,8 +123,7 @@ public class CompilerTest {
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
 					assertThat(statement.getArguments())
-							.hasSize(1)
-							.first().isInstanceOf(Constant.class);
+							.hasSize(1);
 				});
 	}
 
@@ -137,8 +136,7 @@ public class CompilerTest {
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
 					assertThat(statement.getArguments())
-							.hasSize(1)
-							.first().isInstanceOf(Variable.class);
+							.hasSize(1);
 				});
 	}
 
@@ -151,8 +149,7 @@ public class CompilerTest {
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
 					assertThat(statement.getArguments())
-							.hasSize(1)
-							.first().isInstanceOf(VariableOrFallback.class);
+							.hasSize(1);
 				});
 	}
 
@@ -169,7 +166,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWithArguments() {
+	public void commandWithArgument() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
 		Program program = sut.compile("env --system");
 		assertThat(program.getStatements())
@@ -177,6 +174,42 @@ public class CompilerTest {
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
 					assertThat(statement.getArguments()).hasSize(1);
+				});
+	}
+
+	@Test
+	public void commandWithArguments() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+		Program program = sut.compile("git commit --amend");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).hasSize(2);
+				});
+	}
+
+	@Test
+	public void commandWithStringArgument() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+		Program program = sut.compile("git '${HOME}${BIN}'");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).hasSize(1);
+				});
+	}
+
+	@Test
+	public void commandWithStringArguments() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+		Program program = sut.compile("git '${HOME}${BIN}' ${CMD}");
+		assertThat(program.getStatements())
+				.hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getCommand()).isSameAs(command);
+					assertThat(statement.getArguments()).hasSize(2);
 				});
 	}
 
@@ -286,14 +319,19 @@ public class CompilerTest {
 	}
 
 	@Disabled
+	@Bug(description = "command cannot be dynamic", issue = "https://github.com/dfa1/hosh/issues/63")
 	@Test
-	@Bug(description = "this is a known bug", issue = "https://github.com/dfa1/hosh/issues/63")
 	public void commandAsVariableExpansion() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
 		Program program = sut.compile("${JAVA_HOME}/bin/java");
-		assertThat(program.getStatements()).hasSize(0); // should be 1
+		assertThat(program.getStatements()).hasSize(1)
+				.first().satisfies(statement -> {
+					assertThat(statement.getArguments())
+							.hasSize(0);
+				});
 	}
 
-	@Bug(description = "this is a known bug", issue = "https://github.com/dfa1/hosh/issues/63")
+	@Bug(description = "composite", issue = "https://github.com/dfa1/hosh/issues/63")
 	@Test
 	public void variableExpansionInArgument() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
@@ -301,7 +339,8 @@ public class CompilerTest {
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
-					assertThat(statement.getArguments()).hasSize(3); // should be 1
+					assertThat(statement.getArguments())
+							.hasSize(3); // this is expected as 1
 				});
 	}
 

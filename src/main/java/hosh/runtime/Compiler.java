@@ -32,14 +32,17 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import hosh.antlr4.HoshParser;
-import hosh.antlr4.HoshParser.ArgContext;
 import hosh.antlr4.HoshParser.CommandContext;
+import hosh.antlr4.HoshParser.ExpansionContext;
+import hosh.antlr4.HoshParser.ExpressionContext;
 import hosh.antlr4.HoshParser.InvocationContext;
 import hosh.antlr4.HoshParser.PipelineContext;
 import hosh.antlr4.HoshParser.SequenceContext;
 import hosh.antlr4.HoshParser.SimpleContext;
 import hosh.antlr4.HoshParser.StmtContext;
+import hosh.antlr4.HoshParser.StringContext;
 import hosh.antlr4.HoshParser.WrappedContext;
+import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
@@ -144,13 +147,33 @@ public class Compiler {
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {
 		return ctx
-				.arg()
+				.expression()
 				.stream()
 				.map(this::compileArgument)
 				.collect(Collectors.toUnmodifiableList());
 	}
 
-	private Resolvable compileArgument(ArgContext ctx) {
+	@Todo(description = "rename to Expression")
+	private Resolvable compileArgument(ExpressionContext ctx) {
+		if (ctx.expansion() != null) {
+			return compileExpansion(ctx.expansion());
+		}
+		if (ctx.string() != null) {
+			return new Composite(compileString(ctx.string()));
+		}
+		throw new InternalBug(ctx);
+	}
+
+	private List<Resolvable> compileString(StringContext string) {
+		List<Resolvable> result = new ArrayList<>();
+		for (ExpansionContext ctx : string.expansion()) {
+			result.add(compileExpansion(ctx));
+		}
+		return result;
+	}
+
+	@Todo(description = "test explicitly with resolvable has been created")
+	private Resolvable compileExpansion(ExpansionContext ctx) {
 		if (ctx.ID() != null) {
 			Token token = ctx.ID().getSymbol();
 			String value = token.getText();
@@ -166,18 +189,7 @@ public class Compiler {
 			String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
 			return new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]);
 		}
-		if (ctx.STRING() != null) {
-			Token token = ctx.STRING().getSymbol();
-			String value = dropQuotes(token);
-			return new Constant(value);
-		}
 		throw new InternalBug(ctx);
-	}
-
-	// "some text" -> some text
-	private String dropQuotes(Token token) {
-		String text = token.getText();
-		return text.substring(1, text.length() - 1);
 	}
 
 	// ${VARIABLE} -> VARIABLE
@@ -235,6 +247,24 @@ public class Compiler {
 
 		// resolve or throw
 		String resolve(State state);
+	}
+
+	public static class Composite implements Resolvable {
+
+		private final List<Resolvable> resolvables;
+
+		public Composite(List<Resolvable> resolvables) {
+			this.resolvables = resolvables;
+		}
+
+		@Override
+		public String resolve(State state) {
+			StringBuilder result = new StringBuilder();
+			for (Resolvable resolvable : resolvables) {
+				result.append(resolvable.resolve(state));
+			}
+			return result.toString();
+		}
 	}
 
 	public static class Constant implements Resolvable {
