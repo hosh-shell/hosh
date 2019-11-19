@@ -41,7 +41,6 @@ import java.util.List;
 
 public class HistoryModule implements Module {
 
-
 	@BuiltIn(name = "history", description = "display the history with timestamp, index and text")
 	@Examples({
 		@Example(command = "history", description = "show all history")
@@ -58,7 +57,7 @@ public class HistoryModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, Channel in, Channel out, Channel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: history")));
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();
 			}
 
