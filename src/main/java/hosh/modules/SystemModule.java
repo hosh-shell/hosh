@@ -433,10 +433,14 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			for (@SuppressWarnings("unused") Record record : in) {
-				// consume
+			for (Record record : InputChannel.iterate(in)) {
+				drop(record);
 			}
 			return ExitStatus.success();
+		}
+
+		private void drop(@SuppressWarnings("unused") Record record) {
+			// no-op
 		}
 	}
 
@@ -621,13 +625,8 @@ public class SystemModule implements Module {
 			}
 			StringWriter result = new StringWriter();
 			PrintWriter pw = new PrintWriter(result);
-			for (;;) {
-				Optional<Record> recv = in.recv();
-				if (recv.isEmpty()) {
-					break;
-				}
-				Record record = recv.get();
-				record.print(pw, locale);
+			for (Record incoming : InputChannel.iterate(in)) {
+				incoming.print(pw, locale);
 			}
 			state.getVariables().put(key, result.toString());
 			return ExitStatus.success();
@@ -657,13 +656,8 @@ public class SystemModule implements Module {
 			Locale locale = Locale.getDefault();
 			Path path = state.getCwd().resolve(Paths.get(args.get(0)));
 			try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
-				for (;;) {
-					Optional<Record> recv = in.recv();
-					if (recv.isEmpty()) {
-						break;
-					}
-					Record record = recv.get();
-					record.print(pw, locale);
+				for (Record incoming : InputChannel.iterate(in)) {
+					incoming.print(pw, locale);
 					pw.append(System.lineSeparator());
 				}
 				return ExitStatus.success();
