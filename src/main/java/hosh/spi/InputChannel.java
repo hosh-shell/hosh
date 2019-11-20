@@ -23,8 +23,6 @@
  */
 package hosh.spi;
 
-import hosh.doc.Experimental;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -39,12 +37,7 @@ public interface InputChannel {
 
 	/** Allow to use for-each statement. Consumes the input channel. */
 	static Iterable<Record> iterate(InputChannel in) {
-		return new Iterable<Record>() {
-			@Override
-			public Iterator<Record> iterator() {
-				return new InputChannelIterator(in);
-			}
-		};
+		return () -> new InputChannelIterator(in);
 	}
 
 	class InputChannelIterator implements Iterator<Record> {
