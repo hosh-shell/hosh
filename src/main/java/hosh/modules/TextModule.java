@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -73,12 +72,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			List<Key> keys = args.stream().map(Keys::of).collect(Collectors.toUnmodifiableList());
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				Records.Builder builder = Records.builder();
 				keys.forEach(k -> {
 					record.value(k).ifPresent(v -> {
@@ -106,12 +100,7 @@ public class TextModule implements Module {
 			Key key = Keys.of(args.get(0));
 			Pattern pattern = Pattern.compile(args.get(1));
 			Map<Integer, Key> cachedKeys = new HashMap<>();
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				record.value(key)
 						.flatMap(v -> v.unwrap(String.class))
 						.ifPresent(str -> {
@@ -150,12 +139,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			String sep = args.get(0);
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				List<Value> values = record.values();
@@ -188,12 +172,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)){
 				out.send(trimByKey(record, key));
 			}
 			return ExitStatus.success();
@@ -232,12 +211,7 @@ public class TextModule implements Module {
 			Key key = Keys.of(args.get(0));
 			Pattern pattern = Pattern.compile(args.get(1));
 			List<String> groupNames = extractNamedGroups(args.get(1));
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
 					StringWriter sw = new StringWriter();
 					PrintWriter pw = new PrintWriter(sw);
@@ -279,15 +253,11 @@ public class TextModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					return ExitStatus.success();
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				String schema = record.keys().stream().map(Key::name).collect(Collectors.joining(" "));
 				out.send(Records.singleton(Keys.of("schema"), Values.ofText(schema)));
 			}
+			return ExitStatus.success();
 		}
 	}
 
@@ -303,22 +273,18 @@ public class TextModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
 				return ExitStatus.error();
 			}
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					return ExitStatus.success();
-				}
-				Key key = Keys.of(args.get(0));
-				Pattern pattern = Pattern.compile(args.get(1));
-				Record record = incoming.get();
+			Key key = Keys.of(args.get(0));
+			Pattern pattern = Pattern.compile(args.get(1));
+			for (Record record : InputChannel.iterate(in)) {
 				// this could be allocation intensive but let's see
 				record.value(key)
-						.flatMap(v -> v.unwrap(String.class))
-						.filter(s -> pattern.matcher(s).matches())
-						.ifPresent(v -> {
-							out.send(record);
-						});
+					.flatMap(v -> v.unwrap(String.class))
+					.filter(s -> pattern.matcher(s).matches())
+					.ifPresent(v -> {
+						out.send(record);
+					});
 			}
+			return ExitStatus.success();
 		}
 	}
 
@@ -334,14 +300,10 @@ public class TextModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
-			long i = 1;
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
-				out.send(record.prepend(Keys.INDEX, Values.ofNumeric(i++)));
+			long index = 1;
+			for (Record record : InputChannel.iterate(in)) {
+				out.send(record.prepend(Keys.INDEX, Values.ofNumeric(index)));
+				index += 1;
 			}
 			return ExitStatus.success();
 		}
@@ -365,12 +327,7 @@ public class TextModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 				return ExitStatus.error();
 			}
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				out.send(record.prepend(Keys.TIMESTAMP, Values.ofInstant(clock.instant())));
 			}
 			return ExitStatus.success();
@@ -391,12 +348,7 @@ public class TextModule implements Module {
 			}
 			Set<Value> seen = new HashSet<>();
 			Key key = Keys.of(args.get(0));
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
 					boolean neverSeenBefore = seen.add(v);
 					if (neverSeenBefore) {
@@ -422,12 +374,7 @@ public class TextModule implements Module {
 			}
 			Set<Value> seen = new HashSet<>();
 			Key key = Keys.of(args.get(0));
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
 					boolean seenBefore = !seen.add(v);
 					if (seenBefore) {
@@ -460,12 +407,7 @@ public class TextModule implements Module {
 		}
 
 		private void accumulate(InputChannel in, List<Record> records) {
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				records.add(record);
 			}
 		}
@@ -495,20 +437,15 @@ public class TextModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
 			}
-			int take = Integer.parseInt(args.get(0));
+			long take = Long.parseLong(args.get(0));
 			if (take < 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 				return ExitStatus.error();
 			}
-			while (true) {
+			for (Record record : InputChannel.iterate(in)) {
 				if (take == 0) {
 					break;
 				}
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
 				out.send(record);
 				take--;
 			}
@@ -528,17 +465,12 @@ public class TextModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
 				return ExitStatus.error();
 			}
-			int drop = Integer.parseInt(args.get(0));
+			long drop = Long.parseLong(args.get(0));
 			if (drop < 0) {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 				return ExitStatus.error();
 			}
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				if (drop > 0) {
 					drop--;
 				} else {
@@ -585,15 +517,11 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			long count = 0;
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					out.send(Records.singleton(Keys.COUNT, Values.ofNumeric(count)));
-					return ExitStatus.success();
-				} else {
-					count++;
-				}
+			for (Record record : InputChannel.iterate(in)) {
+				count += 1;
 			}
+			out.send(Records.singleton(Keys.COUNT, Values.ofNumeric(count)));
+			return ExitStatus.success();
 		}
 	}
 
@@ -612,13 +540,8 @@ public class TextModule implements Module {
 			}
 			Key key = Keys.of(args.get(0));
 			long sum = 0;
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				sum += incoming
-						.get()
+			for (Record record : InputChannel.iterate(in)) {
+				sum += record
 						.value(key)
 						.flatMap(v -> v.unwrap(Long.class))
 						.orElse(0L);
@@ -644,12 +567,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			boolean headerSent = false;
-			while (true) {
-				Optional<Record> incoming = in.recv();
-				if (incoming.isEmpty()) {
-					break;
-				}
-				Record record = incoming.get();
+			for (Record record : InputChannel.iterate(in)) {
 				if (!headerSent) {
 					sendHeader(record.keys(), out);
 					headerSent = true;

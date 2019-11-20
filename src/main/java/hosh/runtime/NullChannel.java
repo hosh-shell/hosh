@@ -42,4 +42,5 @@ public class NullChannel implements InputChannel {
 	public String toString() {
 		return "NullChannel[]";
 	}
+
 }

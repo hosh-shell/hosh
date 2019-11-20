@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - command line options --help and --version
 - improved history support (fix #147)
 - split `Channel` interface (fix #152)
+- `InputChannel.iterate()` API (fix #116)
 
 ### Fixed
 - NPE when starting without PATH (fix #147)

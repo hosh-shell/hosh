@@ -47,6 +47,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -527,8 +528,19 @@ public class SystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void canBeInterrupted() {
-			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+		public void consumeEmpty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void consumeAll() {
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();

@@ -33,7 +33,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.PipelineChannel;
 import hosh.spi.Record;
 import hosh.testsupport.WithThread;
 

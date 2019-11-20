@@ -23,60 +23,38 @@
  */
 package hosh.spi;
 
-import hosh.doc.Experimental;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-/**
- * A possibly infinite stream of @{{@link Record}.
- */
-public interface InputChannel {
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
-	/** Yield next record in this channel, yields {@link Optional#empty()} to signal end. */
-	Optional<Record> recv();
+@ExtendWith(MockitoExtension.class)
+public class InputChannelTest {
 
-	/** Allow to use for-each statement. Consumes the input channel. */
-	static Iterable<Record> iterate(InputChannel in) {
-		return new Iterable<Record>() {
-			@Override
-			public Iterator<Record> iterator() {
-				return new InputChannelIterator(in);
-			}
-		};
+	@Mock(stubOnly = true)
+	private InputChannel in;
+
+	@Mock(stubOnly = true)
+	private Record record;
+
+	@Test
+	public void empty() {
+		given(in.recv()).willReturn(Optional.empty());
+		Iterable<Record> iterable = InputChannel.iterate(in);
+		assertThat(iterable).isEmpty();
 	}
 
-	class InputChannelIterator implements Iterator<Record> {
-
-		private final InputChannel in;
-		private Record next;
-
-		public InputChannelIterator(InputChannel in) {
-			this.in = in;
-		}
-
-		@Override
-		public boolean hasNext() {
-			if (next != null) {
-				return true;
-			}
-			Optional<Record> maybeNext = in.recv();
-			if (maybeNext.isPresent()) {
-				next = maybeNext.get();
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public Record next() {
-			if (!hasNext()) {
-				throw new NoSuchElementException();
-			}
-			Record result = next;
-			next = null;
-			return result;
-		}
+	@SuppressWarnings("unchecked")
+	@Test
+	public void oneRecord() {
+		given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+		Iterable<Record> iterable = InputChannel.iterate(in);
+		assertThat(iterable).containsExactly(record);
 	}
+
 }

@@ -117,4 +117,5 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 
 		private static final long serialVersionUID = 1L;
 	}
+
 }
