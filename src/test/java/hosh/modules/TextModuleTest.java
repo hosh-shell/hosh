@@ -732,6 +732,7 @@ public class TextModuleTest {
 
 		@Test
 		public void takeZero() {
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
