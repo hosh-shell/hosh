@@ -5,14 +5,13 @@
 
 ## Main features
 - portable
-    - written in Java 11, distributed as uber-jar
-    - works out-of-the-box in Windows, MacOS and Linux
-    - NB: it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
+    - written in Java 11, distributed as [Uber-JAR](https://imagej.net/Uber-JAR)
+    - works out-of-the-box in Windows, MacOS and Linux¹
 - usability features (although much more work is needed in this area)
     - sorting with [alphanum](http://davekoelle.com/alphanum.html)
     - ANSI colors by default
     - stderr always colored in red
-    - file sizes reported by default using KB, MB, GB, ...
+    - file sizes reported by default as KB, MB, GB, ...
     - [better history by default](https://sanctum.geek.nz/arabesque/better-bash-history/)
        - record timestamps for each command (see `history` command)
        - `HISTCONTROL=ignoredups`
@@ -29,6 +28,8 @@
     - `withLock file.lock { ... }`
 - robust scripts by default
     - like running bash scripts with `set -euo pipefail` (see [unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/))
+
+¹ it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
 
 ## Examples
 
@@ -80,11 +81,10 @@ hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
 
 ## Inspired by
 
+- PowerShell https://docs.microsoft.com/en-us/powershell/
+- Zsh https://zsh.org
 - https://www.martinfowler.com/articles/collection-pipeline/
 - https://mywiki.wooledge.org/BashPitfalls
-- https://zsh.org
-- https://fishshell.com
-- https://github.com/johnkerl/miller
 
 ## Similar projects
 
@@ -113,7 +113,12 @@ Java 11
 
 ## Logging
 
-`$ HOSH_LOG_LEVEL=debug java -jar target/dist/hosh.jar`
+Hosh uses `java.util.logging` (to not require additional dependencies). `HOSH_LOG_LEVEL` controls
+logging behaviour according to [Level](https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/Level.html). By default logging is disabled, to enable it:
+
+`$ HOSH_LOG_LEVEL=FINE java -jar target/dist/hosh.jar`
+
+Logging events will be persisted in `$HOME/.hosh.log`.
 
 ## Eclipse support
 
