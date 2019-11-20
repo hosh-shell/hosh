@@ -23,8 +23,6 @@
  */
 package hosh.runtime;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Optional;
 
 import hosh.spi.InputChannel;
@@ -38,11 +36,6 @@ public class NullChannel implements InputChannel {
 	@Override
 	public Optional<Record> recv() {
 		return Optional.empty();
-	}
-
-	@Override
-	public Iterator<Record> iterator() {
-		return Collections.emptyIterator();
 	}
 
 	@Override
