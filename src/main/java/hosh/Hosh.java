@@ -89,7 +89,7 @@ public class Hosh {
 		configureLogging();
 		Logger logger = LoggerFactory.forEnclosingClass();
 		String version = VersionLoader.loadVersion();
-		logger.info(() -> String.format("starting hosh v.%s", version));
+		logger.info(() -> String.format("starting hosh %s", version));
 		ExitStatus exitStatus;
 		try (Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build()) {
 			exitStatus = run(terminal, version, logger, args);
