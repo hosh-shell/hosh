@@ -199,27 +199,27 @@ public class Interpreter {
 		}
 
 		@Override
-		public void load() throws IOException {
+		public void load() {
 		}
 
 		@Override
-		public void save() throws IOException {
+		public void save() {
 		}
 
 		@Override
-		public void write(Path file, boolean incremental) throws IOException {
+		public void write(Path file, boolean incremental) {
 		}
 
 		@Override
-		public void append(Path file, boolean incremental) throws IOException {
+		public void append(Path file, boolean incremental) {
 		}
 
 		@Override
-		public void read(Path file, boolean incremental) throws IOException {
+		public void read(Path file, boolean incremental) {
 		}
 
 		@Override
-		public void purge() throws IOException {
+		public void purge() {
 		}
 
 		@Override

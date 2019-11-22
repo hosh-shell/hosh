@@ -44,11 +44,8 @@ import hosh.runtime.DefaultCommandWrapper;
 import hosh.runtime.PipelineCommand;
 import hosh.runtime.SequenceCommand;
 import hosh.runtime.Compiler.CompileError;
-import hosh.runtime.Compiler.Constant;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Statement;
-import hosh.runtime.Compiler.Variable;
-import hosh.runtime.Compiler.VariableOrFallback;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 

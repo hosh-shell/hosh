@@ -279,7 +279,7 @@ public class Records {
 
 		@Override
 		public final int hashCode() {
-			return Objects.hash((Object[]) entries);
+			return Objects.hash(entries);
 		}
 
 		@Override

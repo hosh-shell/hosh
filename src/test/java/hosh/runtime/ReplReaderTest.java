@@ -36,9 +36,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.runtime.Prompt;
-import hosh.runtime.ReplReader;
-
 @ExtendWith(MockitoExtension.class)
 public class ReplReaderTest {
 

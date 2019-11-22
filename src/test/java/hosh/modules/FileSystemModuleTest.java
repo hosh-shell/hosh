@@ -200,7 +200,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArgWithIsRelativizedToCwd() throws IOException {
+		public void oneArgReferringToCwd() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Files.createFile(new File(newFolder, "aaa").toPath());
 			given(state.getCwd()).willReturn(newFolder.toPath());
