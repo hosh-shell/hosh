@@ -44,10 +44,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import hosh.spi.CommandRegistry;
 import hosh.spi.InputChannel;
 import org.jline.reader.LineReader;
 
-import hosh.doc.BuiltIn;
+import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
@@ -71,7 +72,28 @@ public class SystemModule implements Module {
 	// keep in sync with Hosh.g4
 	private static final Pattern VARIABLE = Pattern.compile("[A-Za-z_\\-]+");
 
-	@BuiltIn(name = "echo", description = "write arguments to output")
+	@Override
+	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("echo", Echo.class);
+		registry.registerCommand("env", Env.class);
+		registry.registerCommand("exit", Exit.class);
+		registry.registerCommand("help", Help.class);
+		registry.registerCommand("sleep", Sleep.class);
+		registry.registerCommand("withTime", WithTime.class);
+		registry.registerCommand("ps", ProcessList.class);
+		registry.registerCommand("kill", KillProcess.class);
+		registry.registerCommand("err", Err.class);
+		registry.registerCommand("benchmark", Benchmark.class);
+		registry.registerCommand("sink", Sink.class);
+		registry.registerCommand("set", SetVariable.class);
+		registry.registerCommand("unset", UnsetVariable.class);
+		registry.registerCommand("input", Input.class);
+		registry.registerCommand("secret", Secret.class);
+		registry.registerCommand("capture", Capture.class);
+		registry.registerCommand("open", Open.class);
+	}
+
+	@Description("write arguments to output")
 	@Examples({
 			@Example(command = "echo", description = "write empty line"),
 			@Example(command = "echo hello", description = "write 'hello'"),
@@ -87,7 +109,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "env", description = "display all variables")
+	@Description("display all variables")
 	@Examples({
 			@Example(command = "env", description = "display all environment variables"),
 	})
@@ -118,7 +140,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "exit", description = "exit current interactive session or script")
+	@Description("exit current interactive session or script")
 	@Examples({
 			@Example(command = "exit", description = "exit with status 0 (success)"),
 			@Example(command = "exit 1", description = "exit with status 1 (error)"),
@@ -156,7 +178,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "help", description = "built-in help system")
+	@Description("built-in help system")
 	@Examples({
 			@Example(command = "help", description = "print all built-in commands"),
 			@Example(command = "help command", description = "print help for specified command")
@@ -173,13 +195,12 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.isEmpty()) {
-				for (var command : state.getCommands().entrySet()) {
-					BuiltIn builtIn = command.getValue().getAnnotation(BuiltIn.class);
-					String name = builtIn.name();
-					String description = builtIn.description();
+				for (var entry : state.getCommands().entrySet()) {
+					Description description = entry.getValue().getAnnotation(Description.class);
+					String name = entry.getKey();
 					Record record = Records.builder()
 							.entry(Keys.NAME, Values.ofText(name))
-							.entry(Keys.DESCRIPTION, Values.ofText(description))
+							.entry(Keys.DESCRIPTION, Values.ofText(description.value()))
 							.build();
 					out.send(record);
 				}
@@ -191,12 +212,12 @@ public class SystemModule implements Module {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("command not found: " + commandName)));
 					return ExitStatus.error();
 				}
-				BuiltIn builtIn = commandClass.getAnnotation(BuiltIn.class);
+				Description builtIn = commandClass.getAnnotation(Description.class);
 				if (builtIn == null) {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
 					return ExitStatus.error();
 				}
-				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(commandName + " - " + builtIn.description(), Style.BOLD)));
+				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(commandName + " - " + builtIn.value(), Style.BOLD)));
 				Examples examples = commandClass.getAnnotation(Examples.class);
 				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
 				if (examples != null) {
@@ -214,7 +235,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "sleep", description = "suspend execution for given duration, measured in millis")
+	@Description("suspend execution for given duration, measured in millis")
 	@Examples({
 			@Example(command = "sleep 1000", description = "suspend execution for 1000 millis (1s)"),
 	})
@@ -241,7 +262,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "withTime", description = "measure execution time of command or pipeline")
+	@Description("measure execution time of command or pipeline")
 	@Examples({
 			@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
 			@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
@@ -266,7 +287,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "ps", description = "process status")
+	@Description("process status")
 	@Examples({
 			@Example(command = "ps", description = "list all running process in the system as the current user"),
 	})
@@ -293,7 +314,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "kill", description = "kill process")
+	@Description("kill process")
 	@Examples({
 			@Example(command = "kill 38878", description = "kill process with PID 38878"),
 	})
@@ -338,7 +359,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "err", description = "create a runtime error, mostly for testing purposes")
+	@Description("create a runtime error, mostly for testing purposes")
 	@Examples({
 			@Example(command = "lines file.txt | err", description = "inject an error in this pipeline")
 	})
@@ -350,7 +371,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "benchmark", description = "measure execution time (best, worst, average) of inner command")
+	@Description("measure execution time (best, worst, average) of inner command")
 	@Examples({
 			@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
 	})
@@ -425,7 +446,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "sink", description = "consume any record (e.g. like /dev/null)")
+	@Description("consume any record (e.g. like /dev/null)")
 	@Examples({
 			@Example(command = "ls | sink", description = "consume any record produced by ls")
 	})
@@ -444,7 +465,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "set", description = "create or update a variable binding")
+	@Description("create or update a variable binding")
 	@Examples({
 			@Example(command = "set FILE file.txt", description = "create variable FILE"),
 			@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
@@ -475,7 +496,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "unset", description = "delete a variable binding")
+	@Description("delete a variable binding")
 	@Examples({
 			@Example(command = "unset FILE", description = "delete variable FILE, cannot be referenced anymore after this command"),
 	})
@@ -500,7 +521,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "input", description = "Read a string from standard input and assign result to variable. The trailing newline is stripped.")
+	@Description("Read a string from standard input and assign result to variable. The trailing newline is stripped.")
 	@Examples({
 			@Example(command = "input FOO", description = "save string read to variable 'FOO'"),
 	})
@@ -549,7 +570,7 @@ public class SystemModule implements Module {
 	}
 
 	@Experimental(description = "probably should be merged with input? not sure about name")
-	@BuiltIn(name = "secret", description = "Read a string from standard input in a secure way and assign result to variable. The trailing newline is stripped.")
+	@Description("Read a string from standard input in a secure way and assign result to variable. The trailing newline is stripped.")
 	@Examples({
 			@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
 	})
@@ -597,7 +618,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "capture", description = "capture output of a command into a variable")
+	@Description("capture output of a command into a variable")
 	@Examples({
 			@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
 	})
@@ -633,7 +654,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "open", description = "send output of a command into a file")
+	@Description("send output of a command into a file")
 	@Examples({
 			@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
 	})

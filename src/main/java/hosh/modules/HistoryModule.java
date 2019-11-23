@@ -23,9 +23,10 @@
  */
 package hosh.modules;
 
-import hosh.doc.BuiltIn;
+import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
+import hosh.spi.CommandRegistry;
 import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
@@ -42,7 +43,12 @@ import java.util.List;
 
 public class HistoryModule implements Module {
 
-	@BuiltIn(name = "history", description = "display the history with timestamp, index and text")
+	@Override
+	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("history", ListHistory.class);
+	}
+
+	@Description("display the history with timestamp, index and text")
 	@Examples({
 		@Example(command = "history", description = "show all history")
 	})

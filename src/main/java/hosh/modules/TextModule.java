@@ -41,11 +41,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import hosh.doc.BuiltIn;
+import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
+import hosh.spi.CommandRegistry;
 import hosh.spi.Ansi;
 import hosh.spi.Ansi.Style;
 import hosh.spi.OutputChannel;
@@ -63,7 +64,29 @@ import hosh.spi.Values;
 
 public class TextModule implements Module {
 
-	@BuiltIn(name = "select", description = "select a subset of keys from a record")
+	@Override
+	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("select", Select.class);
+		registry.registerCommand("split", Split.class);
+		registry.registerCommand("join", Join.class);
+		registry.registerCommand("trim", Trim.class);
+		registry.registerCommand("regex", Regex.class);
+		registry.registerCommand("schema", Schema.class);
+		registry.registerCommand("filter", Filter.class);
+		registry.registerCommand("enumerate", Enumerate.class);
+		registry.registerCommand("timestamp", Timestamp.class);
+		registry.registerCommand("distinct", Distinct.class);
+		registry.registerCommand("duplicated", Duplicated.class);
+		registry.registerCommand("sort", Sort.class);
+		registry.registerCommand("take", Take.class);
+		registry.registerCommand("drop", Drop.class);
+		registry.registerCommand("rand", Rand.class);
+		registry.registerCommand("count", Count.class);
+		registry.registerCommand("sum", Sum.class);
+		registry.registerCommand("table", Table.class);
+	}
+
+	@Description("select a subset of keys from a record")
 	@Examples({
 			@Example(description = "select some keys from TSV file", command = "lines file.tsv | split text '\\t' | select 1 2 3"),
 	})
@@ -85,7 +108,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "split", description = "convert a line to record with numerical keys by splitting")
+	@Description("convert a line to record with numerical keys by splitting")
 	@Examples({
 			@Example(description = "tab separated file to records", command = "lines file.tsv | split text '\\t'"),
 	})
@@ -126,7 +149,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "join", description = "join record into a single-keyed text record")
+	@Description("join record into a single-keyed text record")
 	@Examples({
 			@Example(description = "record to string", command = "lines file.tsv | split text '\\t' | join ','"),
 	})
@@ -159,7 +182,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "trim", description = "trim strings")
+	@Description("trim strings")
 	@Examples({
 			@Example(command = "lines pom.xml | trim text", description = "trim")
 	})
@@ -196,7 +219,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "regex", description = "convert a line to a record using a regex with named groups")
+	@Description("convert a line to a record using a regex with named groups")
 	@Examples({
 			@Example(description = "parse k=v format into record", command = "echo \"aaa=bbb\" | regex value '(?<name>.+)=(?<value>.+)' | schema"),
 	})
@@ -240,7 +263,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "schema", description = "output keys of incoming records")
+	@Description("output keys of incoming records")
 	@Examples({
 			@Example(command = "ls | schema", description = "output 'path size'"),
 			@Example(command = "ls | count | schema", description = "output 'count'"),
@@ -261,7 +284,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "filter", description = "copy incoming records to the output only if they match a regex")
+	@Description("copy incoming records to the output only if they match a regex")
 	@Examples({
 			@Example(command = "lines file.txt | filter text '.*The.*' ", description = "output only lines containing 'The' somewhere"),
 	})
@@ -288,7 +311,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "enumerate", description = "prepend 'index' key to all incoming records")
+	@Description("prepend 'index' key to all incoming records")
 	@Examples({
 			@Example(command = "lines file.txt | enumerate", description = "similar to 'cat -n'"),
 	})
@@ -309,7 +332,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "timestamp", description = "prepend 'timestamp' key to all incoming records")
+	@Description("prepend 'timestamp' key to all incoming records")
 	@Examples({
 			@Example(command = "watch | timestamp", description = "tag each event with current timestamp"),
 	})
@@ -334,7 +357,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "distinct", description = "only output records that are not repeated in the input according to the specified key")
+	@Description("only output records that are not repeated in the input according to the specified key")
 	@Examples({
 			@Example(command = "lines file.txt | distinct text", description = "output all unique lines in 'file.txt'")
 	})
@@ -360,7 +383,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "duplicated", description = "only output records that are repeated in the input, according to the specified key")
+	@Description("only output records that are repeated in the input, according to the specified key")
 	@Examples({
 			@Example(command = "lines file.txt | duplicated text", description = "output all non-unique lines in 'file.txt'")
 	})
@@ -386,7 +409,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "sort", description = "sort records according to the specified key")
+	@Description("sort records according to the specified key")
 	@Examples({
 			@Example(command = "lines file.txt | sort text", description = "sort lines in 'file.txt'")
 	})
@@ -425,7 +448,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "take", description = "take first n records, discarding everything else")
+	@Description("take first n records, discarding everything else")
 	@Examples({
 			@Example(command = "lines file.txt | take 1", description = "output first line of 'file.txt'")
 	})
@@ -453,7 +476,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "drop", description = "drop first n records, then keep everything else")
+	@Description("drop first n records, then keep everything else")
 	@Examples({
 			@Example(command = "lines file.txt | drop 1", description = "output 'file.txt', except the first line")
 	})
@@ -481,7 +504,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "rand", description = "create an infinite sequence of random numbers, remember to always limit it with '| take n'")
+	@Description("create an infinite sequence of random numbers, remember to always limit it with '| take n'")
 	@Examples({
 			@Example(command = "rand | enumerate | take 3", description = "create 3 random records")
 	})
@@ -504,7 +527,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "count", description = "count incoming records")
+	@Description("count incoming records")
 	@Examples({
 			@Example(command = "rand | take 3 | count", description = "output 3")
 	})
@@ -526,7 +549,7 @@ public class TextModule implements Module {
 	}
 
 	@Experimental(description = "implementation works only for 'humanized size' values (i.e. cannot be used for numeric)")
-	@BuiltIn(name = "sum", description = "calculate sum of size")
+	@Description("calculate sum of size")
 	@Examples({
 			@Example(command = "ls /tmp | sum size", description = "calculate size of /tmp directory (non-recursively)")
 	})
@@ -551,7 +574,7 @@ public class TextModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "table", description = "create a nicely formatted table with keys a columns")
+	@Description("create a nicely formatted table with keys a columns")
 	@Examples({
 			@Example(command = "rand | enumerate | take 3 | table", description = "output a nicely formatted table")
 	})

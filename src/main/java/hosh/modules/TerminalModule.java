@@ -25,12 +25,13 @@ package hosh.modules;
 
 import java.util.List;
 
+import hosh.spi.CommandRegistry;
 import hosh.spi.InputChannel;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
 
-import hosh.doc.BuiltIn;
+import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.spi.OutputChannel;
@@ -44,7 +45,14 @@ import hosh.spi.Values;
 
 public class TerminalModule implements Module {
 
-	@BuiltIn(name = "dump", description = "dump terminal info")
+	@Override
+	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("dump", Dump.class);
+		registry.registerCommand("clear", Clear.class);
+		registry.registerCommand("bell", Bell.class);
+	}
+
+	@Description("dump terminal info")
 	@Examples({
 			@Example(command = "dump", description = "output current terminal information (similar to stty -a)"),
 	})
@@ -73,7 +81,7 @@ public class TerminalModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "clear", description = "clear the terminal screen")
+	@Description("clear the terminal screen")
 	@Examples({
 			@Example(command = "clear", description = "clear terminal screen"),
 	})
@@ -98,7 +106,7 @@ public class TerminalModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "bell", description = "ring/bell the terminal screen")
+	@Description("ring/bell the terminal screen")
 	@Examples({
 			@Example(command = "bell", description = "send 'bell' command to the terminal"),
 	})

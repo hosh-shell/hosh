@@ -40,10 +40,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import hosh.doc.BuiltIn;
+import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Todo;
+import hosh.spi.CommandRegistry;
 import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
@@ -56,7 +57,13 @@ import hosh.spi.Values;
 
 public class NetworkModule implements Module {
 
-	@BuiltIn(name = "network", description = "list network interfaces")
+	@Override
+	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("network", Network.class);
+		registry.registerCommand("http", Http.class);
+	}
+
+	@Description("list network interfaces")
 	@Examples({
 			@Example(command = "network", description = "list all network interfaces")
 	})
@@ -113,7 +120,7 @@ public class NetworkModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "http", description = "http client (supports HTTP 1.1/2.0, HTTPS, system proxy)")
+	@Description("http client (supports HTTP 1.1/2.0, HTTPS, system proxy)")
 	@Examples({
 			@Example(command = "http https://git.io/v9MjZ | take 10", description = "take first 10 lines of https://git.io/v9MjZ ")
 	})

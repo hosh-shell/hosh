@@ -30,4 +30,7 @@ import java.util.ServiceLoader;
  * {@link Command} will be automatically registered.
  */
 public interface Module {
+
+	void initialize(CommandRegistry registry);
+
 }

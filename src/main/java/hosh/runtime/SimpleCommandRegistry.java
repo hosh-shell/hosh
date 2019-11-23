@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
 import hosh.spi.State;
 
 public class SimpleCommandRegistry implements CommandRegistry {

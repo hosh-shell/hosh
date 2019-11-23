@@ -23,32 +23,23 @@
  */
 package hosh;
 
-import java.util.ServiceLoader;
-
-import hosh.doc.BuiltIn;
-import hosh.runtime.CommandRegistry;
 import hosh.runtime.SimpleCommandRegistry;
-import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
 import hosh.spi.Module;
 import hosh.spi.State;
+
+import java.util.ServiceLoader;
 
 /**
  * Registers all built-in command, used in both production and test.
  */
 public class BootstrapBuiltins {
 
-	@SuppressWarnings("unchecked")
 	public void registerAllBuiltins(State state) {
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {
-			Class<?>[] declaredClasses = module.getClass().getDeclaredClasses();
-			for (Class<?> declaredClass : declaredClasses) {
-				if (Command.class.isAssignableFrom(declaredClass)) {
-					BuiltIn builtIn = declaredClass.getAnnotation(BuiltIn.class);
-					commandRegistry.registerCommand(builtIn.name(), (Class<? extends Command>) declaredClass);
-				}
-			}
+			module.initialize(commandRegistry);
 		}
 	}
 }

@@ -21,22 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.doc;
+package hosh.spi;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import hosh.doc.Todo;
 
-/**
- * Register a built-in command and allows to
- * automatically generate user-facing documentation via 'help' command.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
-public @interface BuiltIn {
+public interface CommandRegistry {
 
-	String name();
+	@Todo(description = "remove usage of class (since it implies reflection")
+	void registerCommand(String name, Class<? extends Command> command);
 
-	String description();
 }

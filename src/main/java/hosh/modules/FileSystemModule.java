@@ -47,11 +47,12 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import hosh.doc.Bug;
-import hosh.doc.BuiltIn;
+import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
+import hosh.spi.CommandRegistry;
 import hosh.spi.Ansi;
 import hosh.spi.OutputChannel;
 import hosh.spi.Command;
@@ -70,7 +71,26 @@ import hosh.spi.Values;
 
 public class FileSystemModule implements Module {
 
-	@BuiltIn(name = "ls", description = "list files")
+	@Override
+	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("ls", ListFiles.class);
+		registry.registerCommand("cwd", CurrentWorkingDirectory.class);
+		registry.registerCommand("cd", ChangeDirectory.class);
+		registry.registerCommand("lines", Lines.class);
+		registry.registerCommand("find", Find.class);
+		registry.registerCommand("cp", Copy.class);
+		registry.registerCommand("mv", Move.class);
+		registry.registerCommand("rm", Remove.class);
+		registry.registerCommand("partitions", Partitions.class);
+		registry.registerCommand("probe", Probe.class);
+		registry.registerCommand("symlink", Symlink.class);
+		registry.registerCommand("hardlink", Hardlink.class);
+		registry.registerCommand("resolve", Resolve.class);
+		registry.registerCommand("watch", Watch.class);
+		registry.registerCommand("withLock", WithLock.class);
+	}
+
+	@Description("list files")
 	@Examples({
 			@Example(command = "ls", description = "list current directory"),
 			@Example(command = "ls /tmp", description = "list specified absolute directory"),
@@ -135,7 +155,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "cwd", description = "output current working directory")
+	@Description("output current working directory")
 	@Examples({
 			@Example(command = "cwd", description = "current working directory"),
 	})
@@ -159,7 +179,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "cd", description = "set new current working directory")
+	@Description("set new current working directory")
 	@Examples({
 			@Example(command = "cd dir", description = "change current working directory to 'dir'"),
 			@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
@@ -189,7 +209,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "lines", description = "output file line by line")
+	@Description("output file line by line")
 	@Examples({
 			@Example(command = "lines file.txt", description = "output all lines of 'file.txt'"),
 	})
@@ -222,7 +242,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "find", description = "walk directory recursively")
+	@Description("walk directory recursively")
 	@Examples({
 			@Example(command = "find .", description = "recursively output all paths in '.'"),
 			@Example(command = "find /tmp", description = "recursively output all paths in '/tmp'"),
@@ -258,7 +278,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "cp", description = "copy file")
+	@Description("copy file")
 	@Examples({
 			@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
 			@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"),
@@ -289,7 +309,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "mv", description = "move file")
+	@Description("move file")
 	@Examples({
 			@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
 			@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"),
@@ -320,7 +340,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "rm", description = "remove file")
+	@Description("remove file")
 	@Examples({
 			@Example(command = "rm target.txt", description = "remove file using current working directory"),
 			@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"),
@@ -350,7 +370,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "partitions", description = "show partitions information like df -h")
+	@Description("show partitions information like df -h")
 	@Examples({
 			@Example(command = "partitions", description = "show all partitions"),
 	})
@@ -383,7 +403,7 @@ public class FileSystemModule implements Module {
 	}
 
 	@Experimental(description = "usefulness of this command is quite limited right now")
-	@BuiltIn(name = "probe", description = "detect content type of a file")
+	@Description("detect content type of a file")
 	@Examples({
 			@Example(command = "probe file", description = "attempt to detect content type"),
 	})
@@ -417,7 +437,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "symlink", description = "create symlink")
+	@Description("create symlink")
 	@Examples({
 			@Example(command = "symlink source target", description = "create symlink"),
 	})
@@ -447,7 +467,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "hardlink", description = "create hardlink")
+	@Description("create hardlink")
 	@Examples({
 			@Example(command = "hardlink source target", description = "create hardlink"),
 	})
@@ -477,7 +497,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "resolve", description = "resolve to canonical absolute path")
+	@Description("resolve to canonical absolute path")
 	@Examples({
 			@Example(command = "resolve ./symlink", description = "resolve symlink to the absolute path"),
 	})
@@ -508,7 +528,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@BuiltIn(name = "watch", description = "watch for filesystem change in the given path")
+	@Description("watch for filesystem change in the given path")
 	@Examples({
 			@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
 	})
@@ -576,7 +596,7 @@ public class FileSystemModule implements Module {
 	}
 
 	@Experimental(description = "still experimental because of sleep(200) and output on err")
-	@BuiltIn(name = "withLock", description = "execute code inside after successfully locking file")
+	@Description("execute inner block after successfully locking file")
 	@Examples({
 			@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
 	})

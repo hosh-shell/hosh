@@ -55,7 +55,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.doc.BuiltIn;
+import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.modules.SystemModule.Benchmark;
@@ -306,7 +306,7 @@ public class SystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 		}
 
-		@BuiltIn(name = "true", description = "/bin/true replacement")
+		@Description("/bin/true replacement")
 		@Examples({
 				@Example(command = "true", description = "returns exit success")
 		})
@@ -318,7 +318,7 @@ public class SystemModuleTest {
 			}
 		}
 
-		@BuiltIn(name = "false", description = "/bin/false replacement")
+		@Description("/bin/false replacement")
 		private class False implements Command {
 
 			@Override

@@ -33,7 +33,7 @@ import hosh.Hosh;
 import org.junit.jupiter.api.Test;
 
 import hosh.BootstrapBuiltins;
-import hosh.doc.BuiltIn;
+import hosh.doc.Description;
 import hosh.doc.Examples;
 import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
@@ -68,9 +68,9 @@ public class DocFitnessTest {
 							Program program = compiler.compile(example.command());
 							assertThat(program).isNotNull();
 						} catch (CompileError e) {
-							throw new AssertionError("cannot compile " + example.command(), e);
+							throw new AssertionError("cannot compile '" + example.command() + "'", e);
 						} catch (ParseError e) {
-							throw new AssertionError("cannot parse " + example.command(), e);
+							throw new AssertionError("cannot parse '" + example.command() + "'", e);
 						}
 					});
 		}
@@ -87,7 +87,7 @@ public class DocFitnessTest {
 					.stream()
 					.filter(c -> c.getEnclosingClass() != null && c.getEnclosingClass().getSimpleName().endsWith("Module"))
 					.collect(Collectors.toList());
-			List<Class<?>> withHelp = commands.stream().filter(c -> c.isAnnotationPresent(BuiltIn.class)).collect(Collectors.toList());
+			List<Class<?>> withHelp = commands.stream().filter(c -> c.isAnnotationPresent(Description.class)).collect(Collectors.toList());
 			List<Class<?>> withExamples = commands.stream().filter(c -> c.isAnnotationPresent(Examples.class))
 					.collect(Collectors.toList());
 			assertThat(withHelp).as("@Help").containsExactlyInAnyOrderElementsOf(commands);
