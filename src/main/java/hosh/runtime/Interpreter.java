@@ -41,12 +41,8 @@ import hosh.spi.StateAware;
 import hosh.spi.TerminalAware;
 import hosh.spi.Values;
 
-import java.nio.file.Path;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -70,7 +66,7 @@ public class Interpreter {
 
 	private final OutputChannel err;
 
-	private History history = new NoHistory();
+	private History history = new DisabledHistory();
 
 	public Interpreter(State state, Terminal terminal, OutputChannel out, OutputChannel err) {
 		this.state = state;
@@ -187,109 +183,6 @@ public class Interpreter {
 		@Override
 		public void send(Record record) {
 			channel.send(record.prepend(Keys.LOCATION, Values.ofText(location)));
-		}
-	}
-
-	/**
-	 * Fake implementation of history, used for non-interactive sessions (i.e.
-	 * scripts)
-	 */
-	private static class NoHistory implements History {
-
-		@Override
-		public void attach(LineReader reader) {
-		}
-
-		@Override
-		public void load() {
-		}
-
-		@Override
-		public void save() {
-		}
-
-		@Override
-		public void write(Path file, boolean incremental) {
-		}
-
-		@Override
-		public void append(Path file, boolean incremental) {
-		}
-
-		@Override
-		public void read(Path file, boolean incremental) {
-		}
-
-		@Override
-		public void purge() {
-		}
-
-		@Override
-		public int size() {
-			return 0;
-		}
-
-		@Override
-		public int index() {
-			return 0;
-		}
-
-		@Override
-		public int first() {
-			return 0;
-		}
-
-		@Override
-		public int last() {
-			return 0;
-		}
-
-		@Override
-		public String get(int index) {
-			return null;
-		}
-
-		@Override
-		public void add(Instant time, String line) {
-		}
-
-		@Override
-		public ListIterator<Entry> iterator(int index) {
-			return Collections.emptyListIterator();
-		}
-
-		@Override
-		public String current() {
-			return null;
-		}
-
-		@Override
-		public boolean previous() {
-			return false;
-		}
-
-		@Override
-		public boolean next() {
-			return false;
-		}
-
-		@Override
-		public boolean moveToFirst() {
-			return false;
-		}
-
-		@Override
-		public boolean moveToLast() {
-			return false;
-		}
-
-		@Override
-		public boolean moveTo(int index) {
-			return false;
-		}
-
-		@Override
-		public void moveToEnd() {
 		}
 	}
 }
