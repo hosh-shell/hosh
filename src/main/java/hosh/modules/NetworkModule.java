@@ -23,6 +23,21 @@
  */
 package hosh.modules;
 
+import hosh.doc.Description;
+import hosh.doc.Example;
+import hosh.doc.Examples;
+import hosh.doc.Todo;
+import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.Module;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.Values;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.NetworkInterface;
@@ -39,21 +54,6 @@ import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
-
-import hosh.doc.Description;
-import hosh.doc.Example;
-import hosh.doc.Examples;
-import hosh.doc.Todo;
-import hosh.spi.CommandRegistry;
-import hosh.spi.OutputChannel;
-import hosh.spi.Command;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.Module;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.Values;
 
 public class NetworkModule implements Module {
 

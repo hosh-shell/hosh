@@ -27,8 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-import hosh.spi.State;
-
 public class StateTest {
 
 	@Test

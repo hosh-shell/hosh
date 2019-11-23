@@ -23,10 +23,10 @@
  */
 package hosh.spi;
 
+import hosh.doc.Todo;
+
 import java.io.PrintWriter;
 import java.util.Locale;
-
-import hosh.doc.Todo;
 
 @Todo(description = "add record_separator (hardcoded to ' ') and boolean newline, perhaps in a nice fluent interface")
 public interface Printable {

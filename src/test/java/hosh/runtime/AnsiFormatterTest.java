@@ -26,6 +26,8 @@ package hosh.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import hosh.testsupport.WithTimeZone;
+
 import java.time.Instant;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -37,8 +39,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.testsupport.WithTimeZone;
 
 @ExtendWith(MockitoExtension.class)
 public class AnsiFormatterTest {

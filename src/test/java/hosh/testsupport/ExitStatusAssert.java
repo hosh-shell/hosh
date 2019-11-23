@@ -23,9 +23,9 @@
  */
 package hosh.testsupport;
 
-import org.assertj.core.api.AbstractAssert;
-
 import hosh.spi.ExitStatus;
+
+import org.assertj.core.api.AbstractAssert;
 
 public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatus> {
 

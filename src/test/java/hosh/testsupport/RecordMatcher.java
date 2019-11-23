@@ -23,14 +23,14 @@
  */
 package hosh.testsupport;
 
+import hosh.spi.Key;
+import hosh.spi.Record;
+import hosh.spi.Value;
+
 import java.util.List;
 
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
-
-import hosh.spi.Key;
-import hosh.spi.Record;
-import hosh.spi.Value;
 
 /**
  * Mockito's argument matcher for Record that allows to specify

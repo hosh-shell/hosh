@@ -29,8 +29,6 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import hosh.runtime.VersionLoader;
-
 public class VersionLoaderTest {
 
 	@Test

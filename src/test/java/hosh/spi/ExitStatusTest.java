@@ -29,7 +29,6 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import hosh.spi.ExitStatus;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class ExitStatusTest {

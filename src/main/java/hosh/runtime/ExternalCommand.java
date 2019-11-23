@@ -23,6 +23,19 @@
  */
 package hosh.runtime;
 
+import hosh.runtime.PipelineCommand.Position;
+import hosh.spi.Command;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.spi.StateAware;
+import hosh.spi.Values;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,19 +52,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import hosh.runtime.PipelineCommand.Position;
-import hosh.spi.OutputChannel;
-import hosh.spi.Command;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.LoggerFactory;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.Values;
 
 public class ExternalCommand implements Command, StateAware {
 

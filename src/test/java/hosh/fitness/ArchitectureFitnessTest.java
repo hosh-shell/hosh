@@ -29,6 +29,7 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 import static org.assertj.core.api.Assertions.assertThat;
 
 import hosh.Hosh;
+
 import org.junit.jupiter.api.Test;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
@@ -48,7 +49,6 @@ public class ArchitectureFitnessTest {
 	@Test
 	public void enforceProperDependenciesBetweenPackages() {
 		String packageName = Hosh.class.getPackageName();
-
 		JavaClasses importedClasses = new ClassFileImporter()
 				.withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
 				.withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_ARCHIVES)

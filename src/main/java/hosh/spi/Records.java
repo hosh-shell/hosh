@@ -23,6 +23,8 @@
  */
 package hosh.spi;
 
+import hosh.spi.Record.Entry;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +35,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import hosh.spi.Record.Entry;
 
 public class Records {
 

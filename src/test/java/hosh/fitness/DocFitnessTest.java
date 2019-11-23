@@ -25,14 +25,8 @@ package hosh.fitness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import hosh.Hosh;
-import org.junit.jupiter.api.Test;
-
 import hosh.BootstrapBuiltins;
+import hosh.Hosh;
 import hosh.doc.Description;
 import hosh.doc.Examples;
 import hosh.runtime.CommandResolvers;
@@ -42,6 +36,13 @@ import hosh.runtime.Compiler.Program;
 import hosh.runtime.Parser.ParseError;
 import hosh.spi.Command;
 import hosh.spi.State;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.Test;
+
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 

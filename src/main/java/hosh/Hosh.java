@@ -38,25 +38,13 @@ import hosh.runtime.ReplReader;
 import hosh.runtime.VariableExpansionCompleter;
 import hosh.runtime.VersionLoader;
 import hosh.spi.Ansi;
-import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
+import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.impl.completer.AggregateCompleter;
-import org.jline.reader.impl.history.DefaultHistory;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +64,19 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.completer.AggregateCompleter;
+import org.jline.reader.impl.history.DefaultHistory;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 /**
  * Main class
@@ -163,11 +164,11 @@ public class Hosh {
 
 	private static List<Path> initializePath() {
 		return Optional.ofNullable(System.getenv("PATH"))
-			       .stream()
-			       .map(s -> s.split(File.pathSeparator))
-			       .flatMap(Arrays::stream)
-			       .map(Paths::get)
-			       .collect(Collectors.toList());
+				.stream()
+				.map(s -> s.split(File.pathSeparator))
+				.flatMap(Arrays::stream)
+				.map(Paths::get)
+				.collect(Collectors.toList());
 	}
 
 	private static Options createOptions() {
@@ -200,7 +201,7 @@ public class Hosh {
 	}
 
 	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter,
-	                               OutputChannel err, Logger logger) {
+			OutputChannel err, Logger logger) {
 		LineReader lineReader = LineReaderBuilder
 				.builder()
 				.appName("hosh")

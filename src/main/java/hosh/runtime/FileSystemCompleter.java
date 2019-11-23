@@ -23,6 +23,8 @@
  */
 package hosh.runtime;
 
+import hosh.spi.State;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -37,8 +39,6 @@ import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
-
-import hosh.spi.State;
 
 public class FileSystemCompleter implements Completer {
 

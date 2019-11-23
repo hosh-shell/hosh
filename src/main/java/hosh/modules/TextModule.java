@@ -23,6 +23,27 @@
  */
 package hosh.modules;
 
+import hosh.doc.Description;
+import hosh.doc.Example;
+import hosh.doc.Examples;
+import hosh.doc.Experimental;
+import hosh.doc.Todo;
+import hosh.spi.Ansi;
+import hosh.spi.Ansi.Style;
+import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Key;
+import hosh.spi.Keys;
+import hosh.spi.Module;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Record.Entry;
+import hosh.spi.Records;
+import hosh.spi.Value;
+import hosh.spi.Values;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Clock;
@@ -40,27 +61,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import hosh.doc.Description;
-import hosh.doc.Example;
-import hosh.doc.Examples;
-import hosh.doc.Experimental;
-import hosh.doc.Todo;
-import hosh.spi.CommandRegistry;
-import hosh.spi.Ansi;
-import hosh.spi.Ansi.Style;
-import hosh.spi.OutputChannel;
-import hosh.spi.Command;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Key;
-import hosh.spi.Keys;
-import hosh.spi.Module;
-import hosh.spi.Record;
-import hosh.spi.Record.Entry;
-import hosh.spi.Records;
-import hosh.spi.Value;
-import hosh.spi.Values;
 
 public class TextModule implements Module {
 
@@ -195,7 +195,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
-			for (Record record : InputChannel.iterate(in)){
+			for (Record record : InputChannel.iterate(in)) {
 				out.send(trimByKey(record, key));
 			}
 			return ExitStatus.success();
@@ -301,11 +301,11 @@ public class TextModule implements Module {
 			for (Record record : InputChannel.iterate(in)) {
 				// this could be allocation intensive but let's see
 				record.value(key)
-					.flatMap(v -> v.unwrap(String.class))
-					.filter(s -> pattern.matcher(s).matches())
-					.ifPresent(v -> {
-						out.send(record);
-					});
+						.flatMap(v -> v.unwrap(String.class))
+						.filter(s -> pattern.matcher(s).matches())
+						.ifPresent(v -> {
+							out.send(record);
+						});
 			}
 			return ExitStatus.success();
 		}

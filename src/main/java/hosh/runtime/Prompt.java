@@ -23,11 +23,11 @@
  */
 package hosh.runtime;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import hosh.doc.Todo;
 import hosh.spi.Ansi;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class Prompt {
 

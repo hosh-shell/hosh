@@ -30,8 +30,6 @@ import java.io.StringWriter;
 
 import org.junit.jupiter.api.Test;
 
-import hosh.spi.Ansi;
-
 public class AnsiTest {
 
 	@Test

@@ -30,6 +30,18 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
+import hosh.runtime.ExternalCommand.ProcessFactory;
+import hosh.runtime.PipelineCommand.Position;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.spi.Values;
+import hosh.testsupport.TemporaryFolder;
+import hosh.testsupport.WithThread;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,24 +54,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import hosh.spi.InputChannel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.runtime.ExternalCommand.ProcessFactory;
-import hosh.runtime.PipelineCommand.Position;
-import hosh.spi.OutputChannel;
-import hosh.spi.ExitStatus;
-import hosh.spi.Keys;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.Values;
-import hosh.testsupport.TemporaryFolder;
-import hosh.testsupport.WithThread;
 
 @ExtendWith(MockitoExtension.class)
 public class ExternalCommandTest {

@@ -28,13 +28,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import hosh.runtime.Compiler.Program;
+import hosh.runtime.Compiler.Resolvable;
+import hosh.runtime.Compiler.Statement;
+import hosh.spi.Command;
+import hosh.spi.CommandWrapper;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.State;
+import hosh.spi.StateAware;
+import hosh.spi.TerminalAware;
+import hosh.spi.Values;
+import hosh.testsupport.RecordMatcher;
+import hosh.testsupport.WithThread;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 
-import hosh.spi.InputChannel;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,21 +59,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.runtime.Compiler.Program;
-import hosh.runtime.Compiler.Resolvable;
-import hosh.runtime.Compiler.Statement;
-import hosh.spi.OutputChannel;
-import hosh.spi.Command;
-import hosh.spi.CommandWrapper;
-import hosh.spi.ExitStatus;
-import hosh.spi.Keys;
-import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.TerminalAware;
-import hosh.spi.Values;
-import hosh.testsupport.RecordMatcher;
-import hosh.testsupport.WithThread;
 
 @ExtendWith(MockitoExtension.class)
 public class InterpreterTest {

@@ -27,11 +27,23 @@ import static hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import hosh.doc.Todo;
+import hosh.modules.NetworkModule.Http;
+import hosh.modules.NetworkModule.Http.Requestor;
+import hosh.modules.NetworkModule.Network;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.Values;
+import hosh.testsupport.WithThread;
+
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Stream;
 
-import hosh.spi.InputChannel;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,18 +52,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.doc.Todo;
-import hosh.modules.NetworkModule.Http;
-import hosh.modules.NetworkModule.Network;
-import hosh.modules.NetworkModule.Http.Requestor;
-import hosh.spi.OutputChannel;
-import hosh.spi.ExitStatus;
-import hosh.spi.Keys;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.Values;
-import hosh.testsupport.WithThread;
 
 public class NetworkModuleTest {
 

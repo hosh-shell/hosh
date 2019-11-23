@@ -23,10 +23,10 @@
  */
 package hosh.runtime;
 
-import java.util.concurrent.CancellationException;
-
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
+
+import java.util.concurrent.CancellationException;
 
 /**
  * A decorator that makes any channel implementation cancellable.
@@ -49,5 +49,4 @@ public class CancellableChannel implements OutputChannel {
 		}
 		channel.send(record);
 	}
-
 }

@@ -26,6 +26,10 @@ package hosh.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import hosh.spi.Command;
+import hosh.spi.State;
+import hosh.testsupport.TemporaryFolder;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,11 +45,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.runtime.CommandCompleter;
-import hosh.spi.Command;
-import hosh.spi.State;
-import hosh.testsupport.TemporaryFolder;
 
 @ExtendWith(MockitoExtension.class)
 public class CommandCompleterTest {

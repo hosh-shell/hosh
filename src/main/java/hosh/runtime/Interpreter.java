@@ -27,23 +27,19 @@ import hosh.doc.Todo;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Resolvable;
 import hosh.runtime.Compiler.Statement;
-import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.HistoryAware;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.LineReaderAware;
+import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.TerminalAware;
 import hosh.spi.Values;
-import org.jline.reader.History;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.terminal.Terminal;
 
 import java.nio.file.Path;
 import java.time.Instant;
@@ -54,6 +50,11 @@ import java.util.ListIterator;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
+import org.jline.reader.History;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
 
 public class Interpreter {
 
@@ -187,10 +188,12 @@ public class Interpreter {
 		public void send(Record record) {
 			channel.send(record.prepend(Keys.LOCATION, Values.ofText(location)));
 		}
-
 	}
 
-	/** Fake implementation of history, used for non-interactive sessions (i.e. scripts) */
+	/**
+	 * Fake implementation of history, used for non-interactive sessions (i.e.
+	 * scripts)
+	 */
 	private static class NoHistory implements History {
 
 		@Override

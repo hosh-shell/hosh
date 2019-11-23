@@ -23,6 +23,27 @@
  */
 package hosh.modules;
 
+import hosh.doc.Description;
+import hosh.doc.Example;
+import hosh.doc.Examples;
+import hosh.doc.Experimental;
+import hosh.spi.Ansi.Style;
+import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
+import hosh.spi.CommandWrapper;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Key;
+import hosh.spi.Keys;
+import hosh.spi.LineReaderAware;
+import hosh.spi.Module;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.spi.StateAware;
+import hosh.spi.Values;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -44,28 +65,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import hosh.spi.CommandRegistry;
-import hosh.spi.InputChannel;
 import org.jline.reader.LineReader;
-
-import hosh.doc.Description;
-import hosh.doc.Example;
-import hosh.doc.Examples;
-import hosh.doc.Experimental;
-import hosh.spi.Ansi.Style;
-import hosh.spi.OutputChannel;
-import hosh.spi.Command;
-import hosh.spi.CommandWrapper;
-import hosh.spi.ExitStatus;
-import hosh.spi.Key;
-import hosh.spi.Keys;
-import hosh.spi.LineReaderAware;
-import hosh.spi.Module;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.Values;
 
 public class SystemModule implements Module {
 

@@ -27,6 +27,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import hosh.runtime.CommandResolvers.WindowsCommandResolver;
+import hosh.spi.Command;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.OutputChannel;
+import hosh.spi.State;
+import hosh.testsupport.TemporaryFolder;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -35,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import hosh.spi.InputChannel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,13 +53,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.runtime.CommandResolvers.WindowsCommandResolver;
-import hosh.spi.OutputChannel;
-import hosh.spi.Command;
-import hosh.spi.ExitStatus;
-import hosh.spi.State;
-import hosh.testsupport.TemporaryFolder;
 
 public class CommandResolversTest {
 

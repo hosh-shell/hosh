@@ -23,20 +23,20 @@
  */
 package hosh.runtime;
 
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.Values;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Logger;
-
-import hosh.spi.InputChannel;
-import hosh.spi.OutputChannel;
-import hosh.spi.Keys;
-import hosh.spi.LoggerFactory;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.Values;
 
 public class PipelineChannel implements InputChannel, OutputChannel {
 
@@ -117,5 +117,4 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 
 		private static final long serialVersionUID = 1L;
 	}
-
 }

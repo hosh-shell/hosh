@@ -28,8 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.jline.reader.Candidate;
 import org.junit.jupiter.api.Test;
 
-import hosh.runtime.Candidates;
-
 public class CandidatesTest {
 
 	@Test

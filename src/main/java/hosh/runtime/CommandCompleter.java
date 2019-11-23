@@ -23,6 +23,9 @@
  */
 package hosh.runtime;
 
+import hosh.spi.LoggerFactory;
+import hosh.spi.State;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,9 +40,6 @@ import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
-
-import hosh.spi.LoggerFactory;
-import hosh.spi.State;
 
 public class CommandCompleter implements Completer {
 

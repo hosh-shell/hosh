@@ -23,6 +23,8 @@
  */
 package hosh.runtime;
 
+import hosh.spi.Ansi;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.ZoneId;
@@ -32,8 +34,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-
-import hosh.spi.Ansi;
 
 public class AnsiFormatter extends Formatter {
 

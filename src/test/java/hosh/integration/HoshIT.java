@@ -25,6 +25,10 @@ package hosh.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hosh.doc.Bug;
+import hosh.doc.Todo;
+import hosh.testsupport.TemporaryFolder;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -50,10 +54,6 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import hosh.doc.Bug;
-import hosh.doc.Todo;
-import hosh.testsupport.TemporaryFolder;
-
 public class HoshIT {
 
 	@RegisterExtension
@@ -73,6 +73,7 @@ public class HoshIT {
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
 	}
+
 	@Test
 	public void interactiveEndOfFile() throws Exception {
 		Process hosh = givenHoshProcess();

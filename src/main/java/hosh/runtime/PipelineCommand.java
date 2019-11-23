@@ -25,11 +25,11 @@ package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
 import hosh.runtime.PipelineChannel.ProducerPoisonPill;
-import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.LoggerFactory;
+import hosh.spi.OutputChannel;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

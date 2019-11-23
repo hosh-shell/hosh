@@ -23,6 +23,10 @@
  */
 package hosh.runtime;
 
+import hosh.spi.Command;
+import hosh.spi.LoggerFactory;
+import hosh.spi.State;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,10 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-
-import hosh.spi.Command;
-import hosh.spi.LoggerFactory;
-import hosh.spi.State;
 
 /**
  * Various strategies to resolve a string

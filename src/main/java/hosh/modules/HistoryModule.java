@@ -26,20 +26,21 @@ package hosh.modules;
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
-import hosh.spi.CommandRegistry;
-import hosh.spi.OutputChannel;
 import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
 import hosh.spi.ExitStatus;
 import hosh.spi.HistoryAware;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.Module;
+import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
-import org.jline.reader.History;
 
 import java.util.List;
+
+import org.jline.reader.History;
 
 public class HistoryModule implements Module {
 
@@ -50,7 +51,7 @@ public class HistoryModule implements Module {
 
 	@Description("display the history with timestamp, index and text")
 	@Examples({
-		@Example(command = "history", description = "show all history")
+			@Example(command = "history", description = "show all history")
 	})
 	public static class ListHistory implements Command, HistoryAware {
 
@@ -67,16 +68,14 @@ public class HistoryModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 				return ExitStatus.error();
 			}
-
 			for (var entry : history) {
 				Record record = Records.builder()
-					                .entry(Keys.TIMESTAMP, Values.ofInstant(entry.time()))
-					                .entry(Keys.INDEX, Values.ofNumeric(entry.index()))
-					                .entry(Keys.TEXT, Values.ofText(entry.line()))
-					                .build();
+						.entry(Keys.TIMESTAMP, Values.ofInstant(entry.time()))
+						.entry(Keys.INDEX, Values.ofNumeric(entry.index()))
+						.entry(Keys.TEXT, Values.ofText(entry.line()))
+						.build();
 				out.send(record);
 			}
-
 			return ExitStatus.success();
 		}
 	}

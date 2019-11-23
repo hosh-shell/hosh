@@ -26,6 +26,10 @@ package hosh.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import hosh.antlr4.HoshParser.ProgramContext;
+import hosh.doc.Bug;
+import hosh.runtime.Parser.ParseError;
+
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -33,10 +37,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import hosh.antlr4.HoshParser.ProgramContext;
-import hosh.doc.Bug;
-import hosh.runtime.Parser.ParseError;
 
 public class ParserTest {
 

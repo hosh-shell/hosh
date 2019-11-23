@@ -23,13 +23,13 @@
  */
 package hosh.spi;
 
+import hosh.doc.Todo;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import hosh.doc.Todo;
 
 /**
  * The state of the shell: it has been modeled as explicit state,

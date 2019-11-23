@@ -25,14 +25,10 @@ package hosh.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hosh.spi.Record.Entry;
+
 import org.junit.jupiter.api.Test;
 
-import hosh.spi.Keys;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.Value;
-import hosh.spi.Values;
-import hosh.spi.Record.Entry;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class RecordsTest {

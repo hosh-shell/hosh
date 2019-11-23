@@ -29,31 +29,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.UncheckedIOException;
-import java.nio.channels.OverlappingFileLockException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import hosh.spi.InputChannel;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import hosh.doc.Bug;
 import hosh.modules.FileSystemModule.ChangeDirectory;
 import hosh.modules.FileSystemModule.Copy;
@@ -69,14 +44,39 @@ import hosh.modules.FileSystemModule.Remove;
 import hosh.modules.FileSystemModule.Resolve;
 import hosh.modules.FileSystemModule.Symlink;
 import hosh.modules.FileSystemModule.WithLock;
-import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
 import hosh.testsupport.RecordMatcher;
 import hosh.testsupport.TemporaryFolder;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.UncheckedIOException;
+import java.nio.channels.OverlappingFileLockException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 public class FileSystemModuleTest {
 

@@ -23,9 +23,9 @@
  */
 package hosh.runtime;
 
-import java.util.Optional;
-
 import hosh.spi.Command;
+
+import java.util.Optional;
 
 public interface CommandResolver {
 

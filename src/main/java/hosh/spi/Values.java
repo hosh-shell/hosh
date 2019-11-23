@@ -23,6 +23,8 @@
  */
 package hosh.spi;
 
+import hosh.doc.Todo;
+
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,8 +38,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import hosh.doc.Todo;
 
 /**
  * Built-in value objects to be used in @{see Record}.

@@ -32,5 +32,4 @@ import java.util.ServiceLoader;
 public interface Module {
 
 	void initialize(CommandRegistry registry);
-
 }

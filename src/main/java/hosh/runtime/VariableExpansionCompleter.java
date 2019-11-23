@@ -23,14 +23,14 @@
  */
 package hosh.runtime;
 
+import hosh.spi.State;
+
 import java.util.List;
 
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
-
-import hosh.spi.State;
 
 public class VariableExpansionCompleter implements Completer {
 

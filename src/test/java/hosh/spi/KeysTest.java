@@ -26,11 +26,10 @@ package hosh.spi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import hosh.spi.Keys.StringKey;
+
 import org.junit.jupiter.api.Test;
 
-import hosh.spi.Key;
-import hosh.spi.Keys;
-import hosh.spi.Keys.StringKey;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class KeysTest {

@@ -27,6 +27,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import hosh.spi.Ansi;
+import hosh.spi.Keys;
+import hosh.spi.Records;
+import hosh.spi.Values;
+
 import java.io.PrintWriter;
 
 import org.jline.terminal.Terminal;
@@ -35,11 +40,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.spi.Ansi;
-import hosh.spi.Keys;
-import hosh.spi.Records;
-import hosh.spi.Values;
 
 @ExtendWith(MockitoExtension.class)
 public class ConsoleChannelTest {

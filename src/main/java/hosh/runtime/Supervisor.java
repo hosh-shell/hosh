@@ -23,6 +23,9 @@
  */
 package hosh.runtime;
 
+import hosh.spi.ExitStatus;
+import hosh.spi.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,9 +36,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import hosh.spi.ExitStatus;
-import hosh.spi.LoggerFactory;
 
 /**
  * Manages execution of built-in commands as well as external commands via @{see

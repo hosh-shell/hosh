@@ -23,25 +23,25 @@
  */
 package hosh.modules;
 
-import java.util.List;
-
-import hosh.spi.CommandRegistry;
-import hosh.spi.InputChannel;
-import org.jline.terminal.Attributes;
-import org.jline.terminal.Terminal;
-import org.jline.utils.InfoCmp;
-
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
-import hosh.spi.OutputChannel;
 import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.Module;
+import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.TerminalAware;
 import hosh.spi.Values;
+
+import java.util.List;
+
+import org.jline.terminal.Attributes;
+import org.jline.terminal.Terminal;
+import org.jline.utils.InfoCmp;
 
 public class TerminalModule implements Module {
 

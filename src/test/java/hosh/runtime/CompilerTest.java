@@ -27,6 +27,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
+import hosh.doc.Bug;
+import hosh.runtime.Compiler.CompileError;
+import hosh.runtime.Compiler.Program;
+import hosh.runtime.Compiler.Statement;
+import hosh.spi.Command;
+import hosh.spi.CommandWrapper;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -36,18 +43,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.doc.Bug;
-import hosh.runtime.CommandResolver;
-import hosh.runtime.Compiler;
-import hosh.runtime.DefaultCommandWrapper;
-import hosh.runtime.PipelineCommand;
-import hosh.runtime.SequenceCommand;
-import hosh.runtime.Compiler.CompileError;
-import hosh.runtime.Compiler.Program;
-import hosh.runtime.Compiler.Statement;
-import hosh.spi.Command;
-import hosh.spi.CommandWrapper;
 
 @ExtendWith(MockitoExtension.class)
 public class CompilerTest {

@@ -23,6 +23,29 @@
  */
 package hosh.modules;
 
+import hosh.doc.Bug;
+import hosh.doc.Description;
+import hosh.doc.Example;
+import hosh.doc.Examples;
+import hosh.doc.Experimental;
+import hosh.doc.Todo;
+import hosh.spi.Ansi;
+import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
+import hosh.spi.CommandWrapper;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
+import hosh.spi.Module;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.spi.StateAware;
+import hosh.spi.Value;
+import hosh.spi.Values;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UncheckedIOException;
@@ -45,29 +68,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
-import hosh.doc.Bug;
-import hosh.doc.Description;
-import hosh.doc.Example;
-import hosh.doc.Examples;
-import hosh.doc.Experimental;
-import hosh.doc.Todo;
-import hosh.spi.CommandRegistry;
-import hosh.spi.Ansi;
-import hosh.spi.OutputChannel;
-import hosh.spi.Command;
-import hosh.spi.CommandWrapper;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.LoggerFactory;
-import hosh.spi.Module;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.Value;
-import hosh.spi.Values;
 
 public class FileSystemModule implements Module {
 

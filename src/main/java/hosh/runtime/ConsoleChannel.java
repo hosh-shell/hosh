@@ -23,14 +23,14 @@
  */
 package hosh.runtime;
 
+import hosh.spi.Ansi;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+
 import java.io.PrintWriter;
 import java.util.Locale;
 
 import org.jline.terminal.Terminal;
-
-import hosh.spi.Ansi;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
 
 public class ConsoleChannel implements OutputChannel {
 

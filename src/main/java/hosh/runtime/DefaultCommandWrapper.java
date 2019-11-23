@@ -24,11 +24,11 @@
 package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
-import hosh.spi.OutputChannel;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
+import hosh.spi.OutputChannel;
 
 import java.util.List;
 

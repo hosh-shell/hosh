@@ -23,14 +23,6 @@
  */
 package hosh.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTree;
-
 import hosh.antlr4.HoshParser;
 import hosh.antlr4.HoshParser.CommandContext;
 import hosh.antlr4.HoshParser.ExpansionContext;
@@ -46,6 +38,14 @@ import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Compiler {
 

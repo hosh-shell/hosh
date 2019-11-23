@@ -27,6 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.then;
 
+import hosh.spi.Values.AlphaNumericStringComparator;
+
 import java.io.PrintWriter;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -46,7 +48,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import hosh.spi.Values.AlphaNumericStringComparator;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class ValuesTest {

@@ -26,6 +26,8 @@ package hosh.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import hosh.spi.State;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +41,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hosh.runtime.VariableExpansionCompleter;
-import hosh.spi.State;
 
 @ExtendWith(MockitoExtension.class)
 public class VariableExpansionCompleterTest {

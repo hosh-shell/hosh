@@ -26,5 +26,4 @@ package hosh.spi;
 public interface OutputChannel {
 
 	void send(Record record);
-
 }

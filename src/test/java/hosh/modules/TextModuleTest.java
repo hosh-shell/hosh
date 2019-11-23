@@ -28,22 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
-import hosh.spi.InputChannel;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import hosh.modules.TextModule.Count;
 import hosh.modules.TextModule.Distinct;
 import hosh.modules.TextModule.Drop;
@@ -61,13 +45,29 @@ import hosh.modules.TextModule.Table;
 import hosh.modules.TextModule.Take;
 import hosh.modules.TextModule.Timestamp;
 import hosh.modules.TextModule.Trim;
-import hosh.spi.OutputChannel;
 import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
 import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 import hosh.testsupport.RecordMatcher;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 public class TextModuleTest {
 

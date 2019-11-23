@@ -32,7 +32,10 @@ import java.util.Optional;
  */
 public interface InputChannel {
 
-	/** Yield next record in this channel, yields {@link Optional#empty()} to signal end. */
+	/**
+	 * Yield next record in this channel, yields {@link Optional#empty()} to signal
+	 * end.
+	 */
 	Optional<Record> recv();
 
 	/** Allow to use for-each statement. Consumes the input channel. */
@@ -43,6 +46,7 @@ public interface InputChannel {
 	class InputChannelIterator implements Iterator<Record> {
 
 		private final InputChannel in;
+
 		private Record next;
 
 		public InputChannelIterator(InputChannel in) {

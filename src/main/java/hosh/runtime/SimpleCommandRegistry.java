@@ -23,12 +23,12 @@
  */
 package hosh.runtime;
 
-import java.util.Map;
-import java.util.Objects;
-
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
 import hosh.spi.State;
+
+import java.util.Map;
+import java.util.Objects;
 
 public class SimpleCommandRegistry implements CommandRegistry {
 
