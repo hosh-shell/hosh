@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * The state of the shell: it has been modeled as explicit state,
@@ -44,7 +45,7 @@ public class State {
 	private final Map<String, String> variables = new LinkedHashMap<>();
 
 	// registered commands
-	private final Map<String, Class<? extends Command>> commands = new LinkedHashMap<>();
+	private final Map<String, Supplier<Command>> commands = new LinkedHashMap<>();
 
 	// current working directory
 	private Path cwd;
@@ -63,7 +64,7 @@ public class State {
 		return cwd;
 	}
 
-	public Map<String, Class<? extends Command>> getCommands() {
+	public Map<String, Supplier<Command>> getCommands() {
 		return commands;
 	}
 

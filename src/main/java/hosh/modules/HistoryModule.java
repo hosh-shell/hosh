@@ -46,7 +46,7 @@ public class HistoryModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("history", ListHistory.class);
+		registry.registerCommand("history", ListHistory::new);
 	}
 
 	@Description("display the history with timestamp, index and text")

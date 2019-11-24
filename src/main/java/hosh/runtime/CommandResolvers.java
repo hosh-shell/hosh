@@ -33,6 +33,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 /**
@@ -133,21 +134,14 @@ public class CommandResolvers {
 		@Override
 		public Optional<Command> tryResolve(String commandName) {
 			LOGGER.info(() -> String.format("resolving commandName '%s' as built-in", commandName));
-			Class<? extends Command> commandClass = state.getCommands().get(commandName);
-			if (commandClass == null) {
+			Supplier<Command> commandSupplier = state.getCommands().get(commandName);
+			if (commandSupplier == null) {
 				LOGGER.info("  not found");
 				return Optional.empty();
 			} else {
-				LOGGER.info(() -> String.format("  found '%s'", commandClass));
-				return Optional.of(createInstance(commandClass));
-			}
-		}
-
-		private Command createInstance(Class<? extends Command> commandClass) {
-			try {
-				return commandClass.getConstructor().newInstance();
-			} catch (ReflectiveOperationException e) {
-				throw new IllegalArgumentException("cannot create instance of " + commandClass, e);
+				Command command = commandSupplier.get();
+				LOGGER.info(() -> String.format("  found '%s'", command));
+				return Optional.of(command);
 			}
 		}
 	}

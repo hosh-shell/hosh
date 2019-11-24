@@ -73,21 +73,21 @@ public class FileSystemModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("ls", ListFiles.class);
-		registry.registerCommand("cwd", CurrentWorkingDirectory.class);
-		registry.registerCommand("cd", ChangeDirectory.class);
-		registry.registerCommand("lines", Lines.class);
-		registry.registerCommand("find", Find.class);
-		registry.registerCommand("cp", Copy.class);
-		registry.registerCommand("mv", Move.class);
-		registry.registerCommand("rm", Remove.class);
-		registry.registerCommand("partitions", Partitions.class);
-		registry.registerCommand("probe", Probe.class);
-		registry.registerCommand("symlink", Symlink.class);
-		registry.registerCommand("hardlink", Hardlink.class);
-		registry.registerCommand("resolve", Resolve.class);
-		registry.registerCommand("watch", Watch.class);
-		registry.registerCommand("withLock", WithLock.class);
+		registry.registerCommand("ls", ListFiles::new);
+		registry.registerCommand("cwd", CurrentWorkingDirectory::new);
+		registry.registerCommand("cd", ChangeDirectory::new);
+		registry.registerCommand("lines", Lines::new);
+		registry.registerCommand("find", Find::new);
+		registry.registerCommand("cp", Copy::new);
+		registry.registerCommand("mv", Move::new);
+		registry.registerCommand("rm", Remove::new);
+		registry.registerCommand("partitions", Partitions::new);
+		registry.registerCommand("probe", Probe::new);
+		registry.registerCommand("symlink", Symlink::new);
+		registry.registerCommand("hardlink", Hardlink::new);
+		registry.registerCommand("resolve", Resolve::new);
+		registry.registerCommand("watch", Watch::new);
+		registry.registerCommand("withLock", WithLock::new);
 	}
 
 	@Description("list files")

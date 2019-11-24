@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import org.jline.reader.LineReader;
@@ -74,23 +75,23 @@ public class SystemModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("echo", Echo.class);
-		registry.registerCommand("env", Env.class);
-		registry.registerCommand("exit", Exit.class);
-		registry.registerCommand("help", Help.class);
-		registry.registerCommand("sleep", Sleep.class);
-		registry.registerCommand("withTime", WithTime.class);
-		registry.registerCommand("ps", ProcessList.class);
-		registry.registerCommand("kill", KillProcess.class);
-		registry.registerCommand("err", Err.class);
-		registry.registerCommand("benchmark", Benchmark.class);
-		registry.registerCommand("sink", Sink.class);
-		registry.registerCommand("set", SetVariable.class);
-		registry.registerCommand("unset", UnsetVariable.class);
-		registry.registerCommand("input", Input.class);
-		registry.registerCommand("secret", Secret.class);
-		registry.registerCommand("capture", Capture.class);
-		registry.registerCommand("open", Open.class);
+		registry.registerCommand("echo", Echo::new);
+		registry.registerCommand("env", Env::new);
+		registry.registerCommand("exit", Exit::new);
+		registry.registerCommand("help", Help::new);
+		registry.registerCommand("sleep", Sleep::new);
+		registry.registerCommand("withTime", WithTime::new);
+		registry.registerCommand("ps", ProcessList::new);
+		registry.registerCommand("kill", KillProcess::new);
+		registry.registerCommand("err", Err::new);
+		registry.registerCommand("benchmark", Benchmark::new);
+		registry.registerCommand("sink", Sink::new);
+		registry.registerCommand("set", SetVariable::new);
+		registry.registerCommand("unset", UnsetVariable::new);
+		registry.registerCommand("input", Input::new);
+		registry.registerCommand("secret", Secret::new);
+		registry.registerCommand("capture", Capture::new);
+		registry.registerCommand("open", Open::new);
 	}
 
 	@Description("write arguments to output")
@@ -196,7 +197,7 @@ public class SystemModule implements Module {
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.isEmpty()) {
 				for (var entry : state.getCommands().entrySet()) {
-					Description description = entry.getValue().getAnnotation(Description.class);
+					Description description = entry.getValue().get().getClass().getAnnotation(Description.class);
 					String name = entry.getKey();
 					Record record = Records.builder()
 							.entry(Keys.NAME, Values.ofText(name))
@@ -207,11 +208,12 @@ public class SystemModule implements Module {
 				return ExitStatus.success();
 			} else if (args.size() == 1) {
 				String commandName = args.get(0);
-				Class<? extends Command> commandClass = state.getCommands().get(commandName);
-				if (commandClass == null) {
+				Supplier<Command> commandSupplier = state.getCommands().get(commandName);
+				if (commandSupplier == null) {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("command not found: " + commandName)));
 					return ExitStatus.error();
 				}
+				Class<? extends Command> commandClass = commandSupplier.get().getClass();
 				Description builtIn = commandClass.getAnnotation(Description.class);
 				if (builtIn == null) {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: " + commandName)));

@@ -29,6 +29,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import hosh.spi.Command;
 import hosh.spi.State;
 
+import java.util.function.Supplier;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -53,37 +55,33 @@ public class SimpleCommandRegistryTest {
 
 	@Test
 	public void oneCommand() {
-		sut.registerCommand("foo", command.getClass());
-		assertThat(state.getCommands())
-				.containsEntry("foo", command.getClass());
+		sut.registerCommand("foo", () -> command);
+		assertThat(state.getCommands()).containsKey("foo");
 	}
 
 	@Test
-	public void sameCommandTwice() {
-		sut.registerCommand("foo", command.getClass());
-		sut.registerCommand("bar", command.getClass());
-		assertThat(state.getCommands())
-				.containsEntry("foo", command.getClass())
-				.containsEntry("bar", command.getClass());
+	public void oneCommandWithAlias() {
+		sut.registerCommand("foo", () -> command);
+		sut.registerCommand("bar", () -> command);
+		assertThat(state.getCommands()).containsKeys("foo", "bar");
 	}
 
 	@Test
 	public void twoDifferentCommands() {
-		sut.registerCommand("foo", command.getClass());
-		sut.registerCommand("bar", anotherCommand.getClass());
-		assertThat(state.getCommands())
-				.containsEntry("foo", command.getClass())
-				.containsEntry("bar", anotherCommand.getClass());
+		sut.registerCommand("foo", () -> command);
+		sut.registerCommand("bar", () -> anotherCommand);
+		assertThat(state.getCommands()).containsKeys("foo", "bar");
 	}
 
 	@Test
 	public void twoTimesSameCommand() {
+		Supplier<Command> supplier = () -> command;
 		assertThatThrownBy(() -> {
-			sut.registerCommand("foo", command.getClass());
-			sut.registerCommand("foo", anotherCommand.getClass());
+			sut.registerCommand("foo", supplier);
+			sut.registerCommand("foo", () -> anotherCommand);
 		}).hasMessage("command with same name already registered: foo")
 				.isInstanceOf(IllegalArgumentException.class);
 		// make sure first mapping is still in place
-		assertThat(state.getCommands()).containsEntry("foo", command.getClass());
+		assertThat(state.getCommands()).containsEntry("foo", supplier);
 	}
 }

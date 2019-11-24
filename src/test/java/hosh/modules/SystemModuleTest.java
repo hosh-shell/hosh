@@ -229,7 +229,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void specificCommandWithExamples() {
-			given(state.getCommands()).willReturn(Map.of("true", True.class));
+			given(state.getCommands()).willReturn(Map.of("true", True::new));
 			ExitStatus exitStatus = sut.run(List.of("true"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -244,7 +244,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void specificCommandWithoutExamples() {
-			given(state.getCommands()).willReturn(Map.of("false", False.class));
+			given(state.getCommands()).willReturn(Map.of("false", False::new));
 			ExitStatus exitStatus = sut.run(List.of("false"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();
@@ -268,7 +268,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void commandWithoutHelpAnnotation() {
-			given(state.getCommands()).willReturn(Map.of("*", Star.class));
+			given(state.getCommands()).willReturn(Map.of("*", Star::new));
 			ExitStatus exitStatus = sut.run(List.of("*"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
@@ -278,7 +278,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void listAllCommands() {
-			given(state.getCommands()).willReturn(Map.of("true", True.class));
+			given(state.getCommands()).willReturn(Map.of("true", True::new));
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveZeroInteractions();

@@ -66,24 +66,24 @@ public class TextModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("select", Select.class);
-		registry.registerCommand("split", Split.class);
-		registry.registerCommand("join", Join.class);
-		registry.registerCommand("trim", Trim.class);
-		registry.registerCommand("regex", Regex.class);
-		registry.registerCommand("schema", Schema.class);
-		registry.registerCommand("filter", Filter.class);
-		registry.registerCommand("enumerate", Enumerate.class);
-		registry.registerCommand("timestamp", Timestamp.class);
-		registry.registerCommand("distinct", Distinct.class);
-		registry.registerCommand("duplicated", Duplicated.class);
-		registry.registerCommand("sort", Sort.class);
-		registry.registerCommand("take", Take.class);
-		registry.registerCommand("drop", Drop.class);
-		registry.registerCommand("rand", Rand.class);
-		registry.registerCommand("count", Count.class);
-		registry.registerCommand("sum", Sum.class);
-		registry.registerCommand("table", Table.class);
+		registry.registerCommand("select", Select::new);
+		registry.registerCommand("split", Split::new);
+		registry.registerCommand("join", Join::new);
+		registry.registerCommand("trim", Trim::new);
+		registry.registerCommand("regex", Regex::new);
+		registry.registerCommand("schema", Schema::new);
+		registry.registerCommand("filter", Filter::new);
+		registry.registerCommand("enumerate", Enumerate::new);
+		registry.registerCommand("timestamp", Timestamp::new);
+		registry.registerCommand("distinct", Distinct::new);
+		registry.registerCommand("duplicated", Duplicated::new);
+		registry.registerCommand("sort", Sort::new);
+		registry.registerCommand("take", Take::new);
+		registry.registerCommand("drop", Drop::new);
+		registry.registerCommand("rand", Rand::new);
+		registry.registerCommand("count", Count::new);
+		registry.registerCommand("sum", Sum::new);
+		registry.registerCommand("table", Table::new);
 	}
 
 	@Description("select a subset of keys from a record")

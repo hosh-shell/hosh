@@ -59,8 +59,8 @@ public class NetworkModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("network", Network.class);
-		registry.registerCommand("http", Http.class);
+		registry.registerCommand("network", Network::new);
+		registry.registerCommand("http", Http::new);
 	}
 
 	@Description("list network interfaces")

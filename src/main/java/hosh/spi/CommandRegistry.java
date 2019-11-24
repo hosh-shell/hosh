@@ -23,10 +23,9 @@
  */
 package hosh.spi;
 
-import hosh.doc.Todo;
+import java.util.function.Supplier;
 
 public interface CommandRegistry {
 
-	@Todo(description = "remove usage of class (since it implies reflection")
-	void registerCommand(String name, Class<? extends Command> command);
+	void registerCommand(String name, Supplier<Command> command);
 }

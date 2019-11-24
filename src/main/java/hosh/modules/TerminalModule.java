@@ -47,9 +47,9 @@ public class TerminalModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("dump", Dump.class);
-		registry.registerCommand("clear", Clear.class);
-		registry.registerCommand("bell", Bell.class);
+		registry.registerCommand("dump", Dump::new);
+		registry.registerCommand("clear", Clear::new);
+		registry.registerCommand("bell", Bell::new);
 	}
 
 	@Description("dump terminal info")

@@ -24,14 +24,10 @@
 package hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import hosh.runtime.CommandResolvers.WindowsCommandResolver;
 import hosh.spi.Command;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.OutputChannel;
 import hosh.spi.State;
 import hosh.testsupport.TemporaryFolder;
 
@@ -87,9 +83,9 @@ public class CommandResolversTest {
 
 		@Test
 		public void builtin() {
-			given(state.getCommands()).willReturn(Map.of("test", command.getClass()));
+			given(state.getCommands()).willReturn(Map.of("test", () -> command));
 			Optional<Command> result = sut.tryResolve("test");
-			assertThat(result).isPresent();
+			assertThat(result).isPresent().hasValue(command);
 		}
 
 		@Test
@@ -110,7 +106,7 @@ public class CommandResolversTest {
 		}
 
 		@Test
-		public void invalidSkipDirectory() throws IOException {
+		public void invalidDirectory() throws IOException {
 			folder.newFolder("test");
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -120,7 +116,7 @@ public class CommandResolversTest {
 		}
 
 		@Test
-		@DisabledOnOs(OS.WINDOWS) // in Windows this file is marked as executable!?
+		@DisabledOnOs(OS.WINDOWS)
 		public void foundNonExecutableInPath() throws IOException {
 			assert folder.newFile("test").setExecutable(false);
 			given(state.getCommands()).willReturn(Collections.emptyMap());
@@ -181,26 +177,6 @@ public class CommandResolversTest {
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isEmpty();
-		}
-
-		@Test
-		public void builtinClassWithoutNoArgsConstructor() {
-			given(state.getCommands()).willReturn(Map.of("test", InvalidCommand.class));
-			assertThatThrownBy(() -> sut.tryResolve("test"))
-					.hasMessageStartingWith("cannot create instance of class")
-					.isInstanceOf(IllegalArgumentException.class);
-		}
-
-		private class InvalidCommand implements Command {
-
-			@SuppressWarnings("unused")
-			public InvalidCommand(String arg) {
-			}
-
-			@Override
-			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-				return ExitStatus.success();
-			}
 		}
 	}
 

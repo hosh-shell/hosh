@@ -77,7 +77,7 @@ public class CommandCompleterTest {
 
 	@Test
 	public void builtin() {
-		given(state.getCommands()).willReturn(Map.of("cmd", command.getClass()));
+		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
@@ -93,7 +93,7 @@ public class CommandCompleterTest {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		File file = temporaryFolder.newFile("cmd");
 		assert file.setExecutable(true, true);
-		given(state.getCommands()).willReturn(Map.of("cmd", command.getClass()));
+		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
