@@ -34,11 +34,13 @@ public interface InputChannel {
 
 	/**
 	 * Yield next record in this channel, yields {@link Optional#empty()} to signal
-	 * end.
+	 * end of channel.
 	 */
 	Optional<Record> recv();
 
-	/** Allow to use for-each statement. Consumes the input channel. */
+	/**
+	 * Allow to use for-each statement. Consumes the input channel.
+	 */
 	static Iterable<Record> iterate(InputChannel in) {
 		return () -> new InputChannelIterator(in);
 	}

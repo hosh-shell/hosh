@@ -24,8 +24,10 @@
 package hosh.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -55,5 +57,14 @@ public class InputChannelTest {
 		given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		assertThat(iterable).containsExactly(record);
+	}
+
+	@Test
+	public void throwsNoSuchElementsWhenConsumed() {
+		given(in.recv()).willReturn(Optional.empty());
+		Iterable<Record> iterable = InputChannel.iterate(in);
+		assertThatThrownBy(() -> {
+			iterable.iterator().next();
+		}).isInstanceOf(NoSuchElementException.class);
 	}
 }
