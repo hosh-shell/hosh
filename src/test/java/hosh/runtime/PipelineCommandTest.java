@@ -84,8 +84,8 @@ public class PipelineCommandTest {
 
 	@Test
 	public void producerAndConsumerSuccess() {
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
 		then(in).shouldHaveZeroInteractions();
@@ -95,8 +95,8 @@ public class PipelineCommandTest {
 
 	@Test
 	public void producerError() {
-		willReturn(ExitStatus.error()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.error()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		then(err).shouldHaveZeroInteractions();
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
@@ -104,8 +104,8 @@ public class PipelineCommandTest {
 
 	@Test
 	public void consumerError() {
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
-		willReturn(ExitStatus.error()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.error()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 		then(in).shouldHaveZeroInteractions();
@@ -115,9 +115,8 @@ public class PipelineCommandTest {
 
 	@Test
 	public void producerPoisonPill() {
-		willThrow(new ProducerPoisonPill()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(),
-				Mockito.any());
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willThrow(new ProducerPoisonPill()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
 		then(in).shouldHaveZeroInteractions();
@@ -127,9 +126,8 @@ public class PipelineCommandTest {
 
 	@Test
 	public void consumerPoisonPill() {
-		willThrow(new ProducerPoisonPill()).given(interpreter).run(Mockito.eq(consumer), Mockito.any(), Mockito.any(),
-				Mockito.any());
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willThrow(new ProducerPoisonPill()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
 		then(in).shouldHaveZeroInteractions();
@@ -144,7 +142,7 @@ public class PipelineCommandTest {
 		willReturn(downStream).given(consumerProducer).getCommand();
 		PipelineCommand pipeline = new PipelineCommand(producer, consumerProducer);
 		pipeline.setInterpreter(interpreter);
-		willReturn(ExitStatus.success()).given(interpreter).run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = pipeline.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
 		then(in).shouldHaveZeroInteractions();

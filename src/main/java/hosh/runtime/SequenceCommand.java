@@ -52,11 +52,11 @@ public class SequenceCommand implements Command, InterpreterAware {
 
 	@Override
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-		ExitStatus exitStatus = interpreter.run(first, in, out, err);
+		ExitStatus exitStatus = interpreter.eval(first, in, out, err);
 		if (exitStatus.isError()) {
 			return exitStatus;
 		}
-		return interpreter.run(second, in, out, err);
+		return interpreter.eval(second, in, out, err);
 	}
 
 	public Statement getFirst() {

@@ -72,17 +72,17 @@ public class SequenceCommandTest {
 
 	@Test
 	public void happyPath() {
-		doReturn(ExitStatus.success()).when(interpreter).run(first, in, out, err);
-		doReturn(ExitStatus.success()).when(interpreter).run(second, in, out, err);
+		doReturn(ExitStatus.success()).when(interpreter).eval(first, in, out, err);
+		doReturn(ExitStatus.success()).when(interpreter).eval(second, in, out, err);
 		ExitStatus result = sut.run(List.of(), in, out, err);
 		assertThat(result).isSuccess();
 	}
 
 	@Test
 	public void haltOnFirstError() {
-		doReturn(ExitStatus.of(42)).when(interpreter).run(first, in, out, err);
+		doReturn(ExitStatus.of(42)).when(interpreter).eval(first, in, out, err);
 		ExitStatus result = sut.run(List.of(), in, out, err);
-		then(interpreter).should(Mockito.never()).run(second, in, out, err);
+		then(interpreter).should(Mockito.never()).eval(second, in, out, err);
 		assertThat(result).hasExitCode(42);
 	}
 }

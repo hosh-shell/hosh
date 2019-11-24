@@ -62,28 +62,22 @@ public class Interpreter {
 	// and no auto-complete
 	private final LineReader lineReader;
 
-	private final OutputChannel out;
-
-	private final OutputChannel err;
-
 	private History history = new DisabledHistory();
 
-	public Interpreter(State state, Terminal terminal, OutputChannel out, OutputChannel err) {
+	public Interpreter(State state, Terminal terminal) {
 		this.state = state;
 		this.terminal = terminal;
 		this.lineReader = LineReaderBuilder.builder().terminal(terminal).build();
-		this.out = out;
-		this.err = err;
 	}
 
 	public void setHistory(History history) {
 		this.history = history;
 	}
 
-	public ExitStatus eval(Program program) {
+	public ExitStatus eval(Program program, OutputChannel out, OutputChannel err) {
 		ExitStatus exitStatus = ExitStatus.success();
 		for (Statement statement : program.getStatements()) {
-			exitStatus = execute(statement);
+			exitStatus = evalUnderSupervision(statement, out, err);
 			store(exitStatus);
 			if (userRequestedExit() || lastCommandFailed(exitStatus)) {
 				break;
@@ -105,9 +99,9 @@ public class Interpreter {
 		state.getVariables().put("EXIT_STATUS", String.valueOf(exitStatus.value()));
 	}
 
-	private ExitStatus execute(Statement statement) {
+	private ExitStatus evalUnderSupervision(Statement statement, OutputChannel out, OutputChannel err) {
 		try (Supervisor supervisor = new Supervisor()) {
-			runSupervised(statement, supervisor);
+			supervisor.submit(() -> eval(statement, new NullChannel(), out, err));
 			return supervisor.waitForAll();
 		} catch (ExecutionException e) {
 			Record record = Records.builder()
@@ -119,15 +113,7 @@ public class Interpreter {
 		}
 	}
 
-	private void runSupervised(Statement statement, Supervisor supervisor) {
-		supervisor.submit(() -> run(statement));
-	}
-
-	private ExitStatus run(Statement statement) {
-		return run(statement, new NullChannel(), out, err);
-	}
-
-	protected ExitStatus run(Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
+	protected ExitStatus eval(Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
 		Command command = statement.getCommand();
 		injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());

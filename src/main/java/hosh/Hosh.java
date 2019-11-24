@@ -129,7 +129,7 @@ public class Hosh {
 		Compiler compiler = new Compiler(commandResolver);
 		OutputChannel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
 		OutputChannel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
-		Interpreter interpreter = new Interpreter(state, terminal, out, err);
+		Interpreter interpreter = new Interpreter(state, terminal);
 		CommandLine commandLine;
 		Options options = createOptions();
 		CommandLineParser parser = new DefaultParser();
@@ -151,11 +151,11 @@ public class Hosh {
 		List<String> remainingArgs = commandLine.getArgList();
 		if (remainingArgs.isEmpty()) {
 			welcome(out, version);
-			return repl(state, terminal, compiler, interpreter, err, logger);
+			return repl(state, terminal, compiler, interpreter, out, err, logger);
 		}
 		if (remainingArgs.size() == 1) {
 			String filePath = args[0];
-			return script(filePath, compiler, interpreter, err, logger);
+			return script(filePath, compiler, interpreter, out, err, logger);
 		}
 		System.err.println("hosh: too many scripts");
 		return ExitStatus.error();
@@ -168,11 +168,11 @@ public class Hosh {
 		return options;
 	}
 
-	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, OutputChannel err, Logger logger) {
+	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, OutputChannel out, OutputChannel err, Logger logger) {
 		try {
 			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);
-			return interpreter.eval(program);
+			return interpreter.eval(program, out, err);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "caught exception", e);
 			err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
@@ -191,7 +191,7 @@ public class Hosh {
 	}
 
 	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter,
-			OutputChannel err, Logger logger) {
+			OutputChannel out, OutputChannel err, Logger logger) {
 		LineReader lineReader = LineReaderBuilder
 				.builder()
 				.appName("hosh")
@@ -213,7 +213,7 @@ public class Hosh {
 			}
 			try {
 				Program program = compiler.compile(line.get());
-				ExitStatus exitStatus = interpreter.eval(program);
+				ExitStatus exitStatus = interpreter.eval(program, out, err);
 				if (state.isExit()) {
 					return exitStatus;
 				}

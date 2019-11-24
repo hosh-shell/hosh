@@ -107,7 +107,7 @@ public class InterpreterTest {
 
 	@BeforeEach
 	public void setup() {
-		sut = new Interpreter(state, terminal, out, err);
+		sut = new Interpreter(state, terminal);
 	}
 
 	@Test
@@ -117,7 +117,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		ExitStatus exitStatus = sut.eval(program);
+		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 		assertThat(variables).containsEntry("EXIT_STATUS", "1");
 	}
@@ -129,7 +129,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(stateAwareCommand);
 		given(statement.getArguments()).willReturn(args);
-		sut.eval(program);
+		sut.eval(program, out, err);
 		then(stateAwareCommand).should().setState(state);
 	}
 
@@ -139,7 +139,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(terminalAwareCommand);
 		given(statement.getArguments()).willReturn(args);
-		sut.eval(program);
+		sut.eval(program, out, err);
 		then(terminalAwareCommand).should().setTerminal(terminal);
 	}
 
@@ -149,7 +149,7 @@ public class InterpreterTest {
 		given(statement.getCommand()).willReturn(stateAwareCommandWrapper);
 		given(statement.getArguments()).willReturn(args);
 		given(statement.getLocation()).willReturn("cmd:");
-		sut.eval(program);
+		sut.eval(program, out, err);
 		then(stateAwareCommandWrapper).should().setState(state);
 	}
 
@@ -161,7 +161,7 @@ public class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		given(statement.getLocation()).willReturn("cmd");
-		ExitStatus exitStatus = sut.eval(program);
+		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 	}
 
@@ -173,7 +173,7 @@ public class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		given(statement.getLocation()).willReturn("cmd");
-		ExitStatus exitStatus = sut.eval(program);
+		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("(no message provided)")));
 	}
@@ -186,7 +186,7 @@ public class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		given(statement.getLocation()).willReturn("cmd");
-		ExitStatus exitStatus = sut.eval(program);
+		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("simulated error")));
 	}
@@ -199,7 +199,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		sut.eval(program);
+		sut.eval(program, out, err);
 		then(command).should().run(Mockito.eq(List.of("file")), Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
@@ -212,7 +212,7 @@ public class InterpreterTest {
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
-		ExitStatus exitStatus = sut.eval(program);
+		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
@@ -229,7 +229,7 @@ public class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		given(statement.getLocation()).willReturn("cmd");
-		ExitStatus exitStatus = sut.eval(program);
+		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveZeroInteractions();
 		then(out).shouldHaveZeroInteractions();
@@ -242,7 +242,7 @@ public class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Constant("-jar"), new Compiler.Constant("hosh.jar")));
 		given(statement.getLocation()).willReturn("java");
-		sut.run(statement, in, out, err);
+		sut.eval(statement, in, out, err);
 		assertThat(Thread.currentThread().getName()).isEqualTo("command='java -jar hosh.jar'");
 		then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
 	}
@@ -253,7 +253,7 @@ public class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("java");
-		sut.run(statement, in, out, err);
+		sut.eval(statement, in, out, err);
 		assertThat(Thread.currentThread().getName()).isEqualTo("command='java'");
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
 	}
