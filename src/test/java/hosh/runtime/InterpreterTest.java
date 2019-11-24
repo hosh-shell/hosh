@@ -32,14 +32,11 @@ import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Resolvable;
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
-import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.TerminalAware;
 import hosh.spi.Values;
 import hosh.testsupport.RecordMatcher;
 import hosh.testsupport.WithThread;
@@ -50,14 +47,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 
-import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,8 +64,8 @@ public class InterpreterTest {
 	@Mock(stubOnly = true)
 	private State state;
 
-	@Mock(stubOnly = true)
-	private Terminal terminal;
+	@Mock
+	private Injector injector;
 
 	@Mock
 	private InputChannel in;
@@ -90,15 +85,6 @@ public class InterpreterTest {
 	@Mock
 	private Command command;
 
-	@Spy
-	private StateAwareCommand stateAwareCommand;
-
-	@Spy
-	private StateAwareCommandWrapper stateAwareCommandWrapper;
-
-	@Spy
-	private TerminalAwareCommand terminalAwareCommand;
-
 	private final Map<String, String> variables = new HashMap<>();
 
 	private final List<Resolvable> args = new ArrayList<>();
@@ -107,7 +93,17 @@ public class InterpreterTest {
 
 	@BeforeEach
 	public void setup() {
-		sut = new Interpreter(state, terminal);
+		sut = new Interpreter(state, injector);
+	}
+
+	@Test
+	public void injectBeforeRun() {
+		given(program.getStatements()).willReturn(List.of(statement));
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		given(statement.getCommand()).willReturn(command);
+		given(statement.getArguments()).willReturn(args);
+		sut.eval(program, out, err);
+		then(injector).should().injectDeps(command);
 	}
 
 	@Test
@@ -120,37 +116,6 @@ public class InterpreterTest {
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isEqualTo(ExitStatus.error());
 		assertThat(variables).containsEntry("EXIT_STATUS", "1");
-	}
-
-	@Test
-	public void injectState() {
-		given(state.getVariables()).willReturn(variables);
-		given(stateAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(program.getStatements()).willReturn(List.of(statement));
-		given(statement.getCommand()).willReturn(stateAwareCommand);
-		given(statement.getArguments()).willReturn(args);
-		sut.eval(program, out, err);
-		then(stateAwareCommand).should().setState(state);
-	}
-
-	@Test
-	public void injectTerminal() {
-		given(terminalAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(program.getStatements()).willReturn(List.of(statement));
-		given(statement.getCommand()).willReturn(terminalAwareCommand);
-		given(statement.getArguments()).willReturn(args);
-		sut.eval(program, out, err);
-		then(terminalAwareCommand).should().setTerminal(terminal);
-	}
-
-	@Test
-	public void injectStateInCommandWrapper() {
-		given(program.getStatements()).willReturn(List.of(statement));
-		given(statement.getCommand()).willReturn(stateAwareCommandWrapper);
-		given(statement.getArguments()).willReturn(args);
-		given(statement.getLocation()).willReturn("cmd:");
-		sut.eval(program, out, err);
-		then(stateAwareCommandWrapper).should().setState(state);
 	}
 
 	@Test
@@ -256,14 +221,5 @@ public class InterpreterTest {
 		sut.eval(statement, in, out, err);
 		assertThat(Thread.currentThread().getName()).isEqualTo("command='java'");
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
-	}
-
-	public interface StateAwareCommand extends Command, StateAware {
-	}
-
-	public interface StateAwareCommandWrapper extends CommandWrapper<Object>, StateAware {
-	}
-
-	public interface TerminalAwareCommand extends Command, TerminalAware {
 	}
 }

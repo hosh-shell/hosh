@@ -23,22 +23,17 @@
  */
 package hosh.runtime;
 
-import hosh.doc.Todo;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Resolvable;
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
-import hosh.spi.HistoryAware;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
-import hosh.spi.LineReaderAware;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.TerminalAware;
 import hosh.spi.Values;
 
 import java.util.ArrayList;
@@ -47,31 +42,15 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import org.jline.reader.History;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.terminal.Terminal;
-
 public class Interpreter {
 
 	private final State state;
 
-	private final Terminal terminal;
+	private final Injector injector;
 
-	// this is a "private" LineReader to be injected in commands: it has no history
-	// and no auto-complete
-	private final LineReader lineReader;
-
-	private History history = new DisabledHistory();
-
-	public Interpreter(State state, Terminal terminal) {
+	public Interpreter(State state, Injector injector) {
 		this.state = state;
-		this.terminal = terminal;
-		this.lineReader = LineReaderBuilder.builder().terminal(terminal).build();
-	}
-
-	public void setHistory(History history) {
-		this.history = history;
+		this.injector = injector;
 	}
 
 	public ExitStatus eval(Program program, OutputChannel out, OutputChannel err) {
@@ -115,7 +94,7 @@ public class Interpreter {
 
 	protected ExitStatus eval(Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
 		Command command = statement.getCommand();
-		injectDeps(command);
+		injector.injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
 		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
@@ -127,15 +106,6 @@ public class Interpreter {
 		commandWithArguments.addAll(resolvedArguments);
 		String name = String.format("command='%s'", String.join(" ", commandWithArguments));
 		Thread.currentThread().setName(name);
-	}
-
-	@Todo(description = "extract and unit test in a custom class (e.g. Injector?)")
-	protected void injectDeps(Command command) {
-		Downcast.of(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
-		Downcast.of(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
-		Downcast.of(command, LineReaderAware.class).ifPresent(cmd -> cmd.setLineReader(lineReader));
-		Downcast.of(command, HistoryAware.class).ifPresent(cmd -> cmd.setHistory(history));
-		Downcast.of(command, InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));
 	}
 
 	private List<String> resolveArguments(List<Resolvable> arguments) {
