@@ -23,7 +23,7 @@
  */
 package hosh;
 
-import hosh.runtime.AnsiFormatter;
+import hosh.runtime.HoshFormatter;
 import hosh.runtime.CancellableChannel;
 import hosh.runtime.CommandCompleter;
 import hosh.runtime.CommandResolver;
@@ -109,7 +109,7 @@ public class Hosh {
 		if (logLevel == null) {
 			return;
 		}
-		AnsiFormatter formatter = new AnsiFormatter();
+		HoshFormatter formatter = new HoshFormatter();
 		String homeDir = System.getProperty("user.home", "");
 		String logFilePath = new File(homeDir, ".hosh.log").getAbsolutePath();
 		FileHandler fileHandler = new FileHandler(logFilePath);

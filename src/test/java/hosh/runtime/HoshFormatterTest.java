@@ -41,7 +41,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class AnsiFormatterTest {
+public class HoshFormatterTest {
 
 	@RegisterExtension
 	public WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("Etc/GMT+8"));
@@ -50,7 +50,7 @@ public class AnsiFormatterTest {
 	private LogRecord logRecord;
 
 	@InjectMocks
-	private AnsiFormatter sut;
+	private HoshFormatter sut;
 
 	@Test
 	public void severeWithStacktrace() {
@@ -59,17 +59,8 @@ public class AnsiFormatterTest {
 		given(logRecord.getMessage()).willReturn("message");
 		given(logRecord.getThrown()).willReturn(new StackTraceLess());
 		String result = sut.format(logRecord);
-		assertThat(result).isEqualToNormalizingNewlines(
-				"1969-12-31T16:00:00.000 [[31mSEVERE[39m] [main] - [31mmessage[39m\nhosh.runtime.AnsiFormatterTest$StackTraceLess\n");
-	}
-
-	@Test
-	public void warning() {
-		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
-		given(logRecord.getLevel()).willReturn(Level.WARNING);
-		given(logRecord.getMessage()).willReturn("message");
-		String result = sut.format(logRecord);
-		assertThat(result).isEqualToNormalizingNewlines("1969-12-31T16:00:00.000 [[33mWARNING[39m] [main] - [33mmessage[39m\n");
+		String expected = "1969-12-31T16:00:00.000 [SEVERE] [main] - message\nhosh.runtime.HoshFormatterTest$StackTraceLess\n";
+		assertThat(result).isEqualToNormalizingNewlines(expected);
 	}
 
 	@Test

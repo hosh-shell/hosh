@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - ensuring that `withLock` removes lock file
 
+### Removed
+- ANSI colors in log file
+
 ## [0.0.34] - 2019-11-23
 
 ### Added

@@ -23,19 +23,17 @@
  */
 package hosh.runtime;
 
-import hosh.spi.Ansi;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.logging.Formatter;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-public class AnsiFormatter extends Formatter {
+public class HoshFormatter extends Formatter {
 
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS");
 
@@ -43,14 +41,10 @@ public class AnsiFormatter extends Formatter {
 	public String format(LogRecord logRecord) {
 		StringWriter sw = new StringWriter();
 		try (PrintWriter pw = new PrintWriter(sw)) {
-			ZonedDateTime zdt = ZonedDateTime.ofInstant(logRecord.getInstant().truncatedTo(ChronoUnit.MILLIS), ZoneId.systemDefault());
-			Ansi.Style style = colorize(logRecord.getLevel());
-			pw.append(FORMATTER.format(zdt));
+			pw.append(formatInstant(logRecord.getInstant()));
 			pw.append(' ');
 			pw.append('[');
-			style.enable(pw);
 			pw.append(logRecord.getLevel().toString());
-			style.disable(pw);
 			pw.append(']');
 			if (logThreadName(logRecord)) {
 				pw.append(' ');
@@ -61,9 +55,7 @@ public class AnsiFormatter extends Formatter {
 			pw.append(' ');
 			pw.append('-');
 			pw.append(' ');
-			style.enable(pw);
 			pw.append(logRecord.getMessage());
-			style.disable(pw);
 			pw.println();
 			if (logRecord.getThrown() != null) {
 				logRecord.getThrown().printStackTrace(pw);
@@ -72,19 +64,14 @@ public class AnsiFormatter extends Formatter {
 		}
 	}
 
+	private String formatInstant(Instant instant) {
+		ZonedDateTime zdt = ZonedDateTime.ofInstant(instant.truncatedTo(ChronoUnit.MILLIS), ZoneId.systemDefault());
+		return FORMATTER.format(zdt);
+	}
+
 	private boolean logThreadName(LogRecord logRecord) {
 		// HttpClient message already contains [threadName]
 		String loggerName = logRecord.getLoggerName();
 		return loggerName == null || !loggerName.startsWith("jdk.internal.httpclient");
-	}
-
-	private Ansi.Style colorize(Level level) {
-		if (Level.SEVERE.equals(level)) {
-			return Ansi.Style.FG_RED;
-		}
-		if (Level.WARNING.equals(level)) {
-			return Ansi.Style.FG_YELLOW;
-		}
-		return Ansi.Style.NONE;
 	}
 }
