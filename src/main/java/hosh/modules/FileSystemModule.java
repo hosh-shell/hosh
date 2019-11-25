@@ -595,7 +595,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Experimental(description = "tentative of sleep(200) and output on err")
+	@Experimental(description = "naive and ugly implementation (e.g. sleep(200) and output on err)")
 	@Description("execute inner block after successfully locking file")
 	@Examples({
 			@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")

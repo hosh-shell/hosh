@@ -1059,6 +1059,7 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveZeroInteractions();
 		}
 
+		@DisabledOnOs(OS.WINDOWS) // cannot delete an opened lock file
 		@Test
 		public void lock() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
