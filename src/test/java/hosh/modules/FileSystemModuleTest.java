@@ -57,7 +57,6 @@ import hosh.testsupport.TemporaryFolder;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.io.UncheckedIOException;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
@@ -1059,15 +1058,14 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveZeroInteractions();
 		}
 
-		@DisabledOnOs(OS.WINDOWS) // cannot delete an opened lock file
 		@Test
 		public void lock() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File lockFile = temporaryFolder.newFile("file.txt");
-			RandomAccessFile resource = sut.before(List.of("file.txt"), in, out, err);
+			WithLock.LockResource resource = sut.before(List.of("file.txt"), in, out, err);
 			assertThat(resource).isNotNull();
 			// under same JVM tryLock throws exception
-			assertThatThrownBy(() -> resource.getChannel().tryLock())
+			assertThatThrownBy(() -> resource.getRandomAccessFile().getChannel().tryLock())
 					.isInstanceOf(OverlappingFileLockException.class);
 			sut.after(resource, in, out, err);
 			then(in).shouldHaveZeroInteractions();

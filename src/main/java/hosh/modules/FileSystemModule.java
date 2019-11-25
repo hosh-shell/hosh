@@ -600,7 +600,7 @@ public class FileSystemModule implements Module {
 	@Examples({
 			@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
 	})
-	public static class WithLock implements CommandWrapper<RandomAccessFile>, StateAware {
+	public static class WithLock implements CommandWrapper<WithLock.LockResource>, StateAware {
 
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
@@ -612,19 +612,18 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public RandomAccessFile before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public LockResource before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				throw new IllegalArgumentException("expecting file name");
 			}
 			try {
 				Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
-				RandomAccessFile resource = new RandomAccessFile(path.toFile(), "rw");
-				Files.delete(path);
-				while (resource.getChannel().tryLock() == null) {
+				RandomAccessFile randomAccessFile = new RandomAccessFile(path.toFile(), "rw");
+				while (randomAccessFile.getChannel().tryLock() == null) {
 					Thread.sleep(200);
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("failed to acquire lock")));
 				}
-				return resource;
+				return new LockResource(randomAccessFile, path);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			} catch (InterruptedException e) {
@@ -634,9 +633,10 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public void after(RandomAccessFile resource, InputChannel in, OutputChannel out, OutputChannel err) {
+		public void after(LockResource resource, InputChannel in, OutputChannel out, OutputChannel err) {
 			try {
-				resource.close();
+				resource.randomAccessFile.close();
+				Files.delete(resource.path);
 			} catch (IOException e) {
 				LOGGER.log(Level.INFO, "caught exception", e);
 				err.send(Records.singleton(Keys.ERROR, Values.ofText(e.getMessage())));
@@ -644,8 +644,28 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public boolean retry(RandomAccessFile resource, InputChannel in, OutputChannel out, OutputChannel err) {
+		public boolean retry(LockResource resource, InputChannel in, OutputChannel out, OutputChannel err) {
 			return false;
+		}
+
+		public static class LockResource {
+
+			private final RandomAccessFile randomAccessFile;
+
+			private final Path path;
+
+			public LockResource(RandomAccessFile randomAccessFile, Path path) {
+				this.randomAccessFile = randomAccessFile;
+				this.path = path;
+			}
+
+			public Path getPath() {
+				return path;
+			}
+
+			public RandomAccessFile getRandomAccessFile() {
+				return randomAccessFile;
+			}
 		}
 	}
 
