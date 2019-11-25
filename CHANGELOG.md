@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Fixed
+- ensuring that `withLock` removes lock file
+
 ## [0.0.34] - 2019-11-23
 
 ### Added

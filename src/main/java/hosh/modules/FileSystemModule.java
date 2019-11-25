@@ -595,7 +595,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Experimental(description = "still experimental because of sleep(200) and output on err")
+	@Experimental(description = "tentative of sleep(200) and output on err")
 	@Description("execute inner block after successfully locking file")
 	@Examples({
 			@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
@@ -619,6 +619,7 @@ public class FileSystemModule implements Module {
 			try {
 				Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 				RandomAccessFile resource = new RandomAccessFile(path.toFile(), "rw");
+				Files.delete(path);
 				while (resource.getChannel().tryLock() == null) {
 					Thread.sleep(200);
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("failed to acquire lock")));

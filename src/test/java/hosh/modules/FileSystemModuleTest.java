@@ -1062,7 +1062,7 @@ public class FileSystemModuleTest {
 		@Test
 		public void lock() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			temporaryFolder.newFile("file.txt");
+			File lockFile = temporaryFolder.newFile("file.txt");
 			RandomAccessFile resource = sut.before(List.of("file.txt"), in, out, err);
 			assertThat(resource).isNotNull();
 			// under same JVM tryLock throws exception
@@ -1072,6 +1072,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
 			then(err).shouldHaveZeroInteractions();
+			assertThat(lockFile).doesNotExist();
 		}
 	}
 }
