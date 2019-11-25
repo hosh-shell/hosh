@@ -25,6 +25,7 @@ package hosh.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 import hosh.runtime.CommandResolvers.WindowsCommandResolver;
 import hosh.spi.Command;
@@ -65,11 +66,14 @@ public class CommandResolversTest {
 		@Mock(stubOnly = true)
 		private State state;
 
+		@Mock
+		private Injector injector;
+
 		private CommandResolver sut;
 
 		@BeforeEach
 		public void setup() {
-			sut = CommandResolvers.builtinsThenExternal(state);
+			sut = CommandResolvers.builtinsThenExternal(state, injector);
 		}
 
 		@Test
@@ -86,6 +90,7 @@ public class CommandResolversTest {
 			given(state.getCommands()).willReturn(Map.of("test", () -> command));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent().hasValue(command);
+			then(injector).should().injectDeps(command);
 		}
 
 		@Test
@@ -193,11 +198,14 @@ public class CommandResolversTest {
 		@Mock(stubOnly = true)
 		private State state;
 
+		@Mock(stubOnly = true)
+		private Injector injector;
+
 		private WindowsCommandResolver sut;
 
 		@BeforeEach
 		public void setup() {
-			sut = new WindowsCommandResolver(state);
+			sut = new WindowsCommandResolver(state, injector);
 		}
 
 		@Test

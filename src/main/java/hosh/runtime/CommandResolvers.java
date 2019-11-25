@@ -45,13 +45,13 @@ public class CommandResolvers {
 	private CommandResolvers() {
 	}
 
-	public static CommandResolver builtinsThenExternal(State state) {
+	public static CommandResolver builtinsThenExternal(State state, Injector injector) {
 		boolean isWindows = System.getProperty("os.name").startsWith("Windows");
 		List<CommandResolver> order = new ArrayList<>();
-		order.add(new BuiltinCommandResolver(state));
-		order.add(new ExternalCommandResolver(state));
+		order.add(new BuiltinCommandResolver(state, injector));
+		order.add(new ExternalCommandResolver(state, injector));
 		if (isWindows) {
-			order.add(new WindowsCommandResolver(state));
+			order.add(new WindowsCommandResolver(state, injector));
 		}
 		return new AggregateCommandResolver(order);
 	}
@@ -82,8 +82,11 @@ public class CommandResolvers {
 
 		private final State state;
 
-		public ExternalCommandResolver(State state) {
+		private final Injector injector;
+
+		public ExternalCommandResolver(State state, Injector injector) {
 			this.state = state;
+			this.injector = injector;
 		}
 
 		@Override
@@ -110,7 +113,9 @@ public class CommandResolvers {
 			LOGGER.info(() -> String.format("  trying %s", candidate));
 			if (isExecutable(candidate)) {
 				LOGGER.info(() -> String.format("  found in %s", candidate));
-				return Optional.of(new ExternalCommand(candidate));
+				ExternalCommand command = new ExternalCommand(candidate);
+				injector.injectDeps(command);
+				return Optional.of(command);
 			} else {
 				return Optional.empty();
 			}
@@ -127,8 +132,11 @@ public class CommandResolvers {
 
 		private final State state;
 
-		public BuiltinCommandResolver(State state) {
+		private final Injector injector;
+
+		public BuiltinCommandResolver(State state, Injector injector) {
 			this.state = state;
+			this.injector = injector;
 		}
 
 		@Override
@@ -140,7 +148,8 @@ public class CommandResolvers {
 				return Optional.empty();
 			} else {
 				Command command = commandSupplier.get();
-				LOGGER.info(() -> String.format("  found '%s'", command));
+				injector.injectDeps(command);
+				LOGGER.info(() -> String.format("  found '%s'", command.getClass()));
 				return Optional.of(command);
 			}
 		}
@@ -152,9 +161,9 @@ public class CommandResolvers {
 
 		private final ExternalCommandResolver resolver;
 
-		public WindowsCommandResolver(State state) {
+		public WindowsCommandResolver(State state, Injector injector) {
 			this.state = state;
-			resolver = new ExternalCommandResolver(state);
+			resolver = new ExternalCommandResolver(state, injector);
 		}
 
 		@Override

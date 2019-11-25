@@ -344,6 +344,18 @@ public class HoshIT {
 		assertThat(output).contains("'FOOBAR' unknown command");
 	}
 
+	@Test
+	public void commandWrapperThatUsedStateInBefore() throws Exception {
+		Path scriptPath = givenScript(
+				"withLock file.lock { echo inside critical section } "//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).contains("inside critical section");
+	}
+
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/71")
 	@Test
 	public void commandWrapperCapturesOutput() throws Exception {
@@ -446,7 +458,7 @@ public class HoshIT {
 	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
-	public void interruptBenchmark() throws Exception {
+	public void interruptCommandWrapperWithPipeline() throws Exception {
 		Path scriptPath = givenScript("benchmark 10000 { rand | take 10000 | count }");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		sendSigint(hosh);
@@ -500,7 +512,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void tooManyArgs() throws Exception {
+	public void tooManyScripts() throws Exception {
 		Process hosh = givenHoshProcess("aaa.hosh", "bbb.hosh");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();

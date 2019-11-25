@@ -49,9 +49,6 @@ public class InjectorTest {
 	private History history;
 
 	@Mock(stubOnly = true)
-	private Interpreter interpreter;
-
-	@Mock(stubOnly = true)
 	private LineReader lineReader;
 
 	@Mock(stubOnly = true)
@@ -66,7 +63,6 @@ public class InjectorTest {
 	public void setup() {
 		sut = new Injector();
 		sut.setHistory(history);
-		sut.setInterpreter(interpreter);
 		sut.setLineReader(lineReader);
 		sut.setState(state);
 		sut.setTerminal(terminal);
@@ -84,13 +80,6 @@ public class InjectorTest {
 		HistoryAwareCommand command = Mockito.mock(HistoryAwareCommand.class);
 		sut.injectDeps(command);
 		then(command).should().setHistory(history);
-	}
-
-	@Test
-	public void injectInterpreter() {
-		InterpreterAwareCommand command = Mockito.mock(InterpreterAwareCommand.class);
-		sut.injectDeps(command);
-		then(command).should().setInterpreter(interpreter);
 	}
 
 	@Test
@@ -115,9 +104,6 @@ public class InjectorTest {
 	}
 
 	public static interface HistoryAwareCommand extends Command, HistoryAware {
-	}
-
-	public static interface InterpreterAwareCommand extends Command, InterpreterAware {
 	}
 
 	public static interface LineReaderAwareCommand extends Command, LineReaderAware {

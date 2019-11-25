@@ -30,6 +30,7 @@ import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
@@ -40,17 +41,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Interpreter {
 
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 	private final State state;
 
-	private final Injector injector;
-
-	public Interpreter(State state, Injector injector) {
+	public Interpreter(State state) {
 		this.state = state;
-		this.injector = injector;
 	}
 
 	public ExitStatus eval(Program program, OutputChannel out, OutputChannel err) {
@@ -83,6 +85,7 @@ public class Interpreter {
 			supervisor.submit(() -> eval(statement, new NullChannel(), out, err));
 			return supervisor.waitForAll();
 		} catch (ExecutionException e) {
+			LOGGER.log(Level.SEVERE, "caught exception", e);
 			Record record = Records.builder()
 					.entry(Keys.LOCATION, Values.ofText(statement.getLocation()))
 					.entry(Keys.ERROR, Values.ofText(messageFor(e)))
@@ -94,10 +97,14 @@ public class Interpreter {
 
 	protected ExitStatus eval(Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
 		Command command = statement.getCommand();
-		injector.injectDeps(command);
+		injectInterpreter(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
 		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
+	}
+
+	private void injectInterpreter(Command command) {
+		Downcast.of(command, InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));
 	}
 
 	private void changeCurrentThreadName(String commandName, List<String> resolvedArguments) {

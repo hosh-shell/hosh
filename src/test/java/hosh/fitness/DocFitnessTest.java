@@ -33,6 +33,7 @@ import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
 import hosh.runtime.Compiler.CompileError;
 import hosh.runtime.Compiler.Program;
+import hosh.runtime.Injector;
 import hosh.runtime.Parser.ParseError;
 import hosh.spi.Command;
 import hosh.spi.State;
@@ -54,7 +55,7 @@ public class DocFitnessTest {
 		BootstrapBuiltins bootstrapBuiltins = new BootstrapBuiltins();
 		bootstrapBuiltins.registerAllBuiltins(state);
 		assertThat(state.getCommands()).isNotEmpty();
-		Compiler compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state));
+		Compiler compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state, new Injector()));
 		try (ScanResult scanResult = new ClassGraph().whitelistPackages(Hosh.class.getPackageName()).scan()) {
 			assertThat(scanResult.getAllClasses()).isNotEmpty();
 			scanResult

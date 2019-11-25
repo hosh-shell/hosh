@@ -34,13 +34,11 @@ import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.terminal.Terminal;
 
-// inject notable and important stateful objects into a command instance
-// beware: cannot use constructor injection because of circular dependency with Interpreter
+// Inject notable and important stateful objects defined in public API into a command instance.
+// NB: Interpreter is not injected here to avoid circular dependencies.
 public class Injector {
 
 	private History history;
-
-	private Interpreter interpreter;
 
 	// this is a "private" LineReader to be injected in commands: it has no history
 	// and no auto-complete
@@ -52,7 +50,6 @@ public class Injector {
 
 	public void injectDeps(Command command) {
 		Downcast.of(command, HistoryAware.class).ifPresent(cmd -> cmd.setHistory(history));
-		Downcast.of(command, InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(interpreter));
 		Downcast.of(command, LineReaderAware.class).ifPresent(cmd -> cmd.setLineReader(lineReader));
 		Downcast.of(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
 		Downcast.of(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
@@ -60,10 +57,6 @@ public class Injector {
 
 	public void setHistory(History history) {
 		this.history = history;
-	}
-
-	public void setInterpreter(Interpreter interpreter) {
-		this.interpreter = interpreter;
 	}
 
 	public void setLineReader(LineReader lineReader) {

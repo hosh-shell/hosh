@@ -65,9 +65,6 @@ public class InterpreterTest {
 	private State state;
 
 	@Mock
-	private Injector injector;
-
-	@Mock
 	private InputChannel in;
 
 	@Mock
@@ -93,17 +90,7 @@ public class InterpreterTest {
 
 	@BeforeEach
 	public void setup() {
-		sut = new Interpreter(state, injector);
-	}
-
-	@Test
-	public void injectBeforeRun() {
-		given(program.getStatements()).willReturn(List.of(statement));
-		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
-		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
-		sut.eval(program, out, err);
-		then(injector).should().injectDeps(command);
+		sut = new Interpreter(state);
 	}
 
 	@Test
