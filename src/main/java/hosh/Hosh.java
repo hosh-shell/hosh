@@ -23,7 +23,6 @@
  */
 package hosh;
 
-import hosh.runtime.HoshFormatter;
 import hosh.runtime.CancellableChannel;
 import hosh.runtime.CommandCompleter;
 import hosh.runtime.CommandResolver;
@@ -33,6 +32,7 @@ import hosh.runtime.Compiler.Program;
 import hosh.runtime.ConsoleChannel;
 import hosh.runtime.DisabledHistory;
 import hosh.runtime.FileSystemCompleter;
+import hosh.runtime.HoshFormatter;
 import hosh.runtime.Injector;
 import hosh.runtime.Interpreter;
 import hosh.runtime.Prompt;
@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -238,6 +239,8 @@ public class Hosh {
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Running on Java " + System.getProperty("java.version"))));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Locale is " + Locale.getDefault().toString())));
+		out.send(Records.singleton(Keys.TEXT, Values.ofText("Timezone is " + TimeZone.getDefault().getID())));
+		out.send(Records.singleton(Keys.TEXT, Values.ofText("Encoding is " + System.getProperty("file.encoding"))));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
 	}
 }
