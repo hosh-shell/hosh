@@ -37,7 +37,7 @@ import javax.script.ScriptEngineFactory;
 @Experimental(description = "preliminary support for JSR-223", issue = "https://github.com/dfa1/hosh/issues/105")
 public class HoshScriptEngineFactory implements ScriptEngineFactory {
 
-	private static final String SCRIPT = "hosh";
+	private static final String NAME = "hosh";
 
 	private static final String VERSION = version();
 
@@ -50,11 +50,12 @@ public class HoshScriptEngineFactory implements ScriptEngineFactory {
 	}
 
 	private final Map<String, String> properties = Map.ofEntries(
-			Map.entry(ScriptEngine.ENGINE, SCRIPT),
+			Map.entry(ScriptEngine.ENGINE, NAME),
 			Map.entry(ScriptEngine.ENGINE_VERSION, VERSION),
-			Map.entry(ScriptEngine.NAME, SCRIPT),
-			Map.entry(ScriptEngine.LANGUAGE, SCRIPT),
-			Map.entry(ScriptEngine.LANGUAGE_VERSION, VERSION));
+			Map.entry(ScriptEngine.NAME, NAME),
+			Map.entry(ScriptEngine.LANGUAGE, NAME),
+			Map.entry(ScriptEngine.LANGUAGE_VERSION, VERSION),
+			Map.entry("THREADING", null)); // reserved for threading behavior, right now is null meaning "thread unsafe"
 
 	@Override
 	public Object getParameter(String key) {
