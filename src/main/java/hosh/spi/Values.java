@@ -116,7 +116,6 @@ public class Values {
 			style.enable(printWriter);
 			printWriter.append(value);
 			style.disable(printWriter);
-			printWriter.flush();
 		}
 
 		@Override
@@ -442,7 +441,6 @@ public class Values {
 			style.enable(printWriter);
 			printWriter.append(path.toString());
 			style.disable(printWriter);
-			printWriter.flush();
 		}
 
 		@Override

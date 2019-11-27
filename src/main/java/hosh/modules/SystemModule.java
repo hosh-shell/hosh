@@ -681,7 +681,7 @@ public class SystemModule implements Module {
 			try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
 				for (Record incoming : InputChannel.iterate(in)) {
 					incoming.print(pw, locale);
-					pw.append(System.lineSeparator());
+					pw.println();
 				}
 				return ExitStatus.success();
 			} catch (IOException e) {

@@ -35,7 +35,7 @@ public class AnsiTest {
 	@Test
 	public void none() {
 		StringWriter out = new StringWriter();
-		PrintWriter pw = new PrintWriter(out, true);
+		PrintWriter pw = new PrintWriter(out);
 		Ansi.Style.NONE.enable(pw);
 		Ansi.Style.NONE.disable(pw);
 		assertThat(out).hasToString("");
@@ -44,7 +44,7 @@ public class AnsiTest {
 	@Test
 	public void redForeground() {
 		StringWriter out = new StringWriter();
-		PrintWriter pw = new PrintWriter(out, true);
+		PrintWriter pw = new PrintWriter(out);
 		Ansi.Style.FG_RED.enable(pw);
 		Ansi.Style.FG_RED.disable(pw);
 		assertThat(out).hasToString("\u001b[31m\u001b[39m");
