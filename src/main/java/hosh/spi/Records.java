@@ -63,6 +63,12 @@ public class Records {
 		private Builder() {
 		}
 
+		// reuse existing entry (can be shared because it is immutable)
+		public Builder entry(Entry entry) {
+			data.add(entry);
+			return this;
+		}
+
 		public Builder entry(Key key, Value value) {
 			data.add(new Entry(key, value));
 			return this;

@@ -162,11 +162,11 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			String sep = args.get(0);
+			Locale locale = Locale.getDefault();
 			for (Record record : InputChannel.iterate(in)) {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
 				List<Value> values = record.values();
-				Locale locale = Locale.getDefault();
 				boolean skipSep = true;
 				for (Value value : values) {
 					if (skipSep) {
@@ -201,21 +201,24 @@ public class TextModule implements Module {
 			return ExitStatus.success();
 		}
 
-		@Todo(description = "this method is recreating entries wastefully, " +
-				"perhaps would be possible to introduce some form of structural sharing in Builder")
 		private Record trimByKey(Record record, Key key) {
 			Records.Builder builder = Records.builder();
 			List<Entry> entries = record.entries();
 			for (Entry entry : entries) {
 				if (entry.getKey().equals(key)) {
-					Value value = entry.getValue();
-					Value trimmed = value.unwrap(String.class).map(s -> s.trim()).map(s -> Values.ofText(s)).orElse(value);
-					builder.entry(key, trimmed);
+					builder.entry(key, trim(entry.getValue()));
 				} else {
-					builder.entry(entry.getKey(), entry.getValue());
+					builder.entry(entry);
 				}
 			}
 			return builder.build();
+		}
+
+		private Value trim(Value value) {
+			return value.unwrap(String.class)
+					.map(String::trim)
+					.map(Values::ofText)
+					.orElse(value);
 		}
 	}
 
