@@ -97,7 +97,7 @@ public class HoshScriptEngineFactory implements ScriptEngineFactory {
 	}
 
 	@Override
-	public ScriptEngine getScriptEngine() {
+	public HoshScriptEngine getScriptEngine() {
 		try {
 			return new HoshScriptEngine(this);
 		} catch (IOException e) {

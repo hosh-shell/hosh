@@ -25,18 +25,27 @@ package hosh.script;
 
 import hosh.BootstrapBuiltins;
 import hosh.PathInitializer;
+import hosh.doc.Todo;
+import hosh.runtime.CommandCompleter;
 import hosh.runtime.CommandResolver;
 import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.ConsoleChannel;
 import hosh.runtime.DisabledHistory;
+import hosh.runtime.FileSystemCompleter;
 import hosh.runtime.Injector;
 import hosh.runtime.Interpreter;
+import hosh.runtime.VariableExpansionCompleter;
+import hosh.runtime.VersionLoader;
 import hosh.spi.Ansi;
 import hosh.spi.ExitStatus;
+import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
+import hosh.spi.Records;
 import hosh.spi.State;
+import hosh.spi.Values;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -44,15 +53,25 @@ import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 
+import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.completer.AggregateCompleter;
+import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 public class HoshScriptContext implements ScriptContext {
+
+	private final Logger logger = LoggerFactory.forEnclosingClass();
+
+	private final Terminal terminal;
 
 	private final Compiler compiler;
 
@@ -64,8 +83,11 @@ public class HoshScriptContext implements ScriptContext {
 
 	private final OutputChannel err;
 
+	@Todo(description = "find a way to disable history")
 	public HoshScriptContext() throws IOException {
-		Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build();
+		String version = VersionLoader.loadVersion();
+		logger.info(() -> String.format("starting hosh %s", version));
+		terminal = TerminalBuilder.builder().exec(false).jna(true).build();
 		state = new State();
 		state.setCwd(Paths.get("."));
 		state.getVariables().putAll(System.getenv());
@@ -84,8 +106,32 @@ public class HoshScriptContext implements ScriptContext {
 	}
 
 	public ExitStatus eval(String script) {
-		Program program = compiler.compile(script);
-		return interpreter.eval(program, out, err);
+		try {
+			Program program = compiler.compile(script);
+			return interpreter.eval(program, out, err);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "caught exception", e);
+			err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+			return ExitStatus.error();
+		}
+	}
+
+	public LineReader createLineReader() {
+		return LineReaderBuilder
+				.builder()
+				.appName("hosh")
+				.history(new DefaultHistory())
+				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
+				.completer(new AggregateCompleter(
+						new CommandCompleter(state),
+						new FileSystemCompleter(state),
+						new VariableExpansionCompleter(state)))
+				.terminal(terminal)
+				.build();
+	}
+
+	public boolean isExit() {
+		return state.isExit();
 	}
 
 	@Override

@@ -23,30 +23,13 @@
  */
 package hosh;
 
-import hosh.runtime.CancellableChannel;
-import hosh.runtime.CommandCompleter;
-import hosh.runtime.CommandResolver;
-import hosh.runtime.CommandResolvers;
-import hosh.runtime.Compiler;
-import hosh.runtime.Compiler.Program;
-import hosh.runtime.ConsoleChannel;
-import hosh.runtime.DisabledHistory;
-import hosh.runtime.FileSystemCompleter;
+import hosh.doc.Todo;
 import hosh.runtime.HoshFormatter;
-import hosh.runtime.Injector;
-import hosh.runtime.Interpreter;
 import hosh.runtime.Prompt;
 import hosh.runtime.ReplReader;
-import hosh.runtime.VariableExpansionCompleter;
 import hosh.runtime.VersionLoader;
-import hosh.spi.Ansi;
+import hosh.script.HoshScriptEngine;
 import hosh.spi.ExitStatus;
-import hosh.spi.Keys;
-import hosh.spi.LoggerFactory;
-import hosh.spi.OutputChannel;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.Values;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +40,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.logging.FileHandler;
@@ -67,6 +49,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -74,11 +59,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.impl.completer.AggregateCompleter;
-import org.jline.reader.impl.history.DefaultHistory;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 
 /**
  * Main class
@@ -90,13 +70,7 @@ public class Hosh {
 
 	public static void main(String[] args) throws Exception {
 		configureLogging();
-		Logger logger = LoggerFactory.forEnclosingClass();
-		String version = VersionLoader.loadVersion();
-		logger.info(() -> String.format("starting hosh %s", version));
-		ExitStatus exitStatus;
-		try (Terminal terminal = TerminalBuilder.builder().exec(false).jna(true).build()) {
-			exitStatus = run(terminal, version, logger, args);
-		}
+		ExitStatus exitStatus = run(args);
 		System.exit(exitStatus.value());
 	}
 
@@ -121,25 +95,11 @@ public class Hosh {
 		logger.setLevel(Level.parse(logLevel));
 	}
 
-	private static ExitStatus run(Terminal terminal, String version, Logger logger, String[] args) {
-		State state = new State();
-		state.setCwd(Paths.get("."));
-		state.getVariables().putAll(System.getenv());
-		state.setPath(new PathInitializer().initializePath(System.getenv("PATH")));
-		BootstrapBuiltins bootstrap = new BootstrapBuiltins();
-		Injector injector = new Injector();
-		injector.setLineReader(LineReaderBuilder.builder().terminal(terminal).build());
-		injector.setState(state);
-		injector.setTerminal(terminal);
-		bootstrap.registerAllBuiltins(state);
-		CommandResolver commandResolver = CommandResolvers.builtinsThenExternal(state, injector);
-		Compiler compiler = new Compiler(commandResolver);
-		OutputChannel out = new CancellableChannel(new ConsoleChannel(terminal.writer(), Ansi.Style.NONE));
-		OutputChannel err = new CancellableChannel(new ConsoleChannel(terminal.writer(), Ansi.Style.FG_RED));
-		Interpreter interpreter = new Interpreter(state);
-		CommandLine commandLine;
+	private static ExitStatus run(String[] args) throws IOException, ScriptException {
+		String version = VersionLoader.loadVersion();
 		Options options = createOptions();
 		CommandLineParser parser = new DefaultParser();
+		CommandLine commandLine;
 		try {
 			commandLine = parser.parse(options, args);
 		} catch (ParseException e) {
@@ -155,17 +115,23 @@ public class Hosh {
 			System.out.println("hosh " + version);
 			return ExitStatus.success();
 		}
+		HoshScriptEngine hoshScriptEngine = (HoshScriptEngine) new ScriptEngineManager().getEngineByName("hosh");
 		List<String> remainingArgs = commandLine.getArgList();
 		if (remainingArgs.isEmpty()) {
-			welcome(out, version);
-			return repl(state, terminal, compiler, interpreter, injector, out, err, logger);
+			welcome(version);
+			return repl(hoshScriptEngine);
 		}
 		if (remainingArgs.size() == 1) {
 			String filePath = args[0];
-			return script(filePath, compiler, interpreter, injector, out, err, logger);
+			return script(hoshScriptEngine, filePath);
 		}
 		System.err.println("hosh: too many scripts");
 		return ExitStatus.error();
+	}
+
+	private static ExitStatus script(HoshScriptEngine hoshScriptEngine, String filePath) throws ScriptException {
+		String script = loadScript(Paths.get(filePath));
+		return (ExitStatus) hoshScriptEngine.eval(script);
 	}
 
 	private static Options createOptions() {
@@ -173,20 +139,6 @@ public class Hosh {
 		options.addOption("h", "help", false, "show help and exit");
 		options.addOption("v", "version", false, "show version and exit");
 		return options;
-	}
-
-	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Injector injector, OutputChannel out, OutputChannel err,
-			Logger logger) {
-		try {
-			String script = loadScript(Paths.get(path));
-			Program program = compiler.compile(script);
-			injector.setHistory(new DisabledHistory());
-			return interpreter.eval(program, out, err);
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "caught exception", e);
-			err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
-			return ExitStatus.error();
-		}
 	}
 
 	private static String loadScript(Path path) {
@@ -199,20 +151,9 @@ public class Hosh {
 		}
 	}
 
-	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter, Injector injector,
-			OutputChannel out, OutputChannel err, Logger logger) {
-		LineReader lineReader = LineReaderBuilder
-				.builder()
-				.appName("hosh")
-				.history(new DefaultHistory())
-				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh.history"))
-				.completer(new AggregateCompleter(
-						new CommandCompleter(state),
-						new FileSystemCompleter(state),
-						new VariableExpansionCompleter(state)))
-				.terminal(terminal)
-				.build();
-		injector.setHistory(lineReader.getHistory());
+	@Todo(description = "no history")
+	private static ExitStatus repl(HoshScriptEngine hoshScriptEngine) throws ScriptException {
+		LineReader lineReader = hoshScriptEngine.getContext().createLineReader();
 		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);
 		while (true) {
@@ -220,27 +161,21 @@ public class Hosh {
 			if (line.isEmpty()) {
 				break;
 			}
-			try {
-				Program program = compiler.compile(line.get());
-				ExitStatus exitStatus = interpreter.eval(program, out, err);
-				if (state.isExit()) {
-					return exitStatus;
-				}
-			} catch (Exception e) {
-				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line.get()), e);
-				err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+			ExitStatus exitStatus = (ExitStatus) hoshScriptEngine.eval(line.get());
+			if (hoshScriptEngine.getContext().isExit()) {
+				return exitStatus;
 			}
 		}
 		return ExitStatus.success();
 	}
 
-	private static void welcome(OutputChannel out, String version) {
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("hosh " + version)));
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("Running on Java " + System.getProperty("java.version"))));
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("Locale is " + Locale.getDefault().toString())));
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("Timezone is " + TimeZone.getDefault().getID())));
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("Encoding is " + System.getProperty("file.encoding"))));
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
+	private static void welcome(String version) {
+		System.out.println("hosh " + version);
+		System.out.println("Running on Java " + System.getProperty("java.version"));
+		System.out.println("PID is " + ProcessHandle.current().pid());
+		System.out.println("Locale is " + Locale.getDefault().toString());
+		System.out.println("Timezone is " + TimeZone.getDefault().getID());
+		System.out.println("Encoding is " + System.getProperty("file.encoding"));
+		System.out.println("Use 'exit' or Ctrl-D (i.e. EOF) to exit");
 	}
 }

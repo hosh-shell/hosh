@@ -42,7 +42,7 @@ public class HoshScriptEngine implements ScriptEngine {
 
 	private final HoshScriptEngineFactory scriptEngineFactory;
 
-	private ScriptContext scriptContext;
+	private HoshScriptContext scriptContext;
 
 	public HoshScriptEngine(HoshScriptEngineFactory scriptEngineFactory) throws IOException {
 		this.scriptEngineFactory = scriptEngineFactory;
@@ -125,12 +125,12 @@ public class HoshScriptEngine implements ScriptEngine {
 	}
 
 	@Override
-	public ScriptContext getContext() {
+	public HoshScriptContext getContext() {
 		return scriptContext;
 	}
 
 	@Override
 	public void setContext(ScriptContext context) {
-		this.scriptContext = context;
+		this.scriptContext = (HoshScriptContext) context;
 	}
 }
