@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.script;
+package hosh.script;
 
 import hosh.doc.Experimental;
 import hosh.doc.Todo;

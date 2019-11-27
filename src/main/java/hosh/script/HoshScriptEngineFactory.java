@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.script;
+package hosh.script;
 
 import hosh.doc.Experimental;
 import hosh.runtime.VersionLoader;
@@ -54,8 +54,7 @@ public class HoshScriptEngineFactory implements ScriptEngineFactory {
 			Map.entry(ScriptEngine.ENGINE_VERSION, VERSION),
 			Map.entry(ScriptEngine.NAME, NAME),
 			Map.entry(ScriptEngine.LANGUAGE, NAME),
-			Map.entry(ScriptEngine.LANGUAGE_VERSION, VERSION),
-			Map.entry("THREADING", null)); // reserved for threading behavior, right now is null meaning "thread unsafe"
+			Map.entry(ScriptEngine.LANGUAGE_VERSION, VERSION));
 
 	@Override
 	public Object getParameter(String key) {

@@ -21,30 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.hosh.script;
+package hosh.script;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hosh.spi.ExitStatus;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import org.junit.jupiter.api.Test;
 
-public class HoshScriptEngineFactoryTest {
+public class HoshScriptEngineTest {
 
 	@Test
-	public void getEngineByName() throws Exception {
-		ScriptEngineManager scriptManager = new ScriptEngineManager();
-		ScriptEngine scriptEngine = scriptManager.getEngineByName("hosh");
-		assertThat(scriptEngine)
-				.isInstanceOf(HoshScriptEngine.class);
-	}
-
-	@Test
-	public void getEngineByExtension() throws Exception {
-		ScriptEngineManager scriptManager = new ScriptEngineManager();
-		ScriptEngine scriptEngine = scriptManager.getEngineByExtension("hosh");
-		assertThat(scriptEngine)
-				.isInstanceOf(HoshScriptEngine.class);
+	public void helloWorld() throws ScriptException {
+		ScriptEngine hosh = new ScriptEngineManager().getEngineByName("hosh");
+		Object result = hosh.eval("echo hello world");
+		// TODO: assert that something happened on out channel
+		assertThat(result)
+				.isInstanceOf(ExitStatus.class)
+				.isEqualTo(ExitStatus.success());
 	}
 }
