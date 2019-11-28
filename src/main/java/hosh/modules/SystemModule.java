@@ -257,19 +257,8 @@ public class SystemModule implements Module {
 			Optional<ChronoUnit> unit;
 			if (args.size() == 1) {
 				String arg = args.get(0);
-				if (arg.startsWith("P")) {
-					try {
-						Duration parsed = Duration.parse(arg);
-						amount = OptionalLong.of(parsed.toMillis());
-						unit = parseUnit("millis");
-					} catch (DateTimeParseException e) {
-						amount = OptionalLong.empty();
-						unit = Optional.empty();
-					}
-				} else {
-					amount = parseLong(arg);
-					unit = parseUnit("millis");
-				}
+				amount = parse(arg);
+				unit = parseUnit("millis");
 			} else if (args.size() == 2) {
 				String arg = args.get(0);
 				amount = parseLong(arg);
@@ -297,6 +286,22 @@ public class SystemModule implements Module {
 			}
 		}
 
+		private OptionalLong parse(String s) {
+			if (s.startsWith("P")) {
+				return parseIso8601(s);
+			} else {
+				return parseLong(s);
+			}
+		}
+
+		private OptionalLong parseIso8601(String s) {
+			try {
+				Duration parsed = Duration.parse(s);
+				return OptionalLong.of(parsed.toMillis());
+			} catch (DateTimeParseException e) {
+				return OptionalLong.empty();
+			}
+		}
 
 		private OptionalLong parseLong(String s) {
 			try {
