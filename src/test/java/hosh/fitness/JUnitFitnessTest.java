@@ -40,6 +40,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
+import net.jqwik.api.Property;
 
 public class JUnitFitnessTest {
 
@@ -55,6 +56,7 @@ public class JUnitFitnessTest {
 					.flatMap(c -> Stream.of(c.getDeclaredMethods()))
 					.filter(m -> Modifier.isPublic(m.getModifiers()))
 					.filter(m -> !Modifier.isStatic(m.getModifiers()))
+					.filter(m -> m.getDeclaredAnnotation(Property.class) == null)
 					.filter(m -> m.getDeclaredAnnotation(Test.class) == null)
 					.filter(m -> m.getDeclaredAnnotation(ParameterizedTest.class) == null)
 					.filter(m -> m.getDeclaredAnnotation(BeforeEach.class) == null)

@@ -6,3 +6,4 @@ target
 .settings
 .checkstyle
 .vagrant
+.jqwik-database

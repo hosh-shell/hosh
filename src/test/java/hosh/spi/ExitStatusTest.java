@@ -29,6 +29,9 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.CharRange;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class ExitStatusTest {
@@ -44,12 +47,6 @@ public class ExitStatusTest {
 	}
 
 	@Test
-	public void of() {
-		// Tautological test, but it is important to preserve this contract
-		assertThat(ExitStatus.of(42).value()).isEqualTo(42);
-	}
-
-	@Test
 	public void success() {
 		assertThat(ExitStatus.success().value()).isEqualTo(0);
 	}
@@ -59,18 +56,15 @@ public class ExitStatusTest {
 		assertThat(ExitStatus.error().value()).isEqualTo(1);
 	}
 
-	@Test
-	public void parseValid() {
-		Optional<ExitStatus> parsed = ExitStatus.parse("42");
-		assertThat(parsed)
-				.isNotEmpty()
-				.hasValue(ExitStatus.of(42));
+	@Property
+	public boolean validLiteral(@ForAll int value) {
+		Optional<ExitStatus> parsed = ExitStatus.parse(String.valueOf(value));
+		return parsed.isPresent() && parsed.get().value() == value;
 	}
 
-	@Test
-	public void parseInvalidText() {
-		Optional<ExitStatus> parsed = ExitStatus.parse("asd");
-		assertThat(parsed)
-				.isEmpty();
+	@Property
+	public boolean invalidLiteral(@ForAll @CharRange(from = 'a', to = 'z') String value) {
+		Optional<ExitStatus> parsed = ExitStatus.parse(value);
+		return parsed.isEmpty();
 	}
 }
