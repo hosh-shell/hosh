@@ -57,12 +57,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -237,30 +240,88 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Description("suspend execution for given duration, measured in millis")
+	@Description("suspend execution for given duration, by default measured in millis")
 	@Examples({
-			@Example(command = "sleep 1000", description = "suspend execution for 1000 millis (1s)"),
+			@Example(command = "sleep 1 second", description = "suspend execution for 1 second"),
+			@Example(command = "sleep 1000", description = "suspend execution for 1000 millis"),
 	})
 	public static class Sleep implements Command {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting just one argument millis")));
+			if (args.isEmpty()) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("missing duration")));
 				return ExitStatus.error();
 			}
-			String arg = args.get(0);
-			try {
-				Thread.sleep(Long.parseLong(arg));
-				return ExitStatus.success();
-			} catch (NumberFormatException e) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("not millis: " + arg)));
+			OptionalLong amount;
+			Optional<ChronoUnit> unit;
+			if (args.size() == 1) {
+				String arg = args.get(0);
+				amount = parse(arg);
+				unit = parseUnit("millis");
+			} else if (args.size() == 2) {
+				String arg = args.get(0);
+				amount = parseLong(arg);
+				unit = parseUnit(args.get(1).toLowerCase());
+			} else {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 				return ExitStatus.error();
+			}
+			if (amount.isEmpty()) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: " + args.get(0))));
+				return ExitStatus.error();
+			}
+			if (unit.isEmpty()) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid unit: " + args.get(1))));
+				return ExitStatus.error();
+			}
+			try {
+				Duration duration = Duration.of(amount.getAsLong(), unit.get());
+				Thread.sleep(duration.toMillis());
+				return ExitStatus.success();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 				return ExitStatus.error();
 			}
+		}
+
+		private OptionalLong parse(String s) {
+			if (s.startsWith("P")) {
+				return parseIso8601(s);
+			} else {
+				return parseLong(s);
+			}
+		}
+
+		private OptionalLong parseIso8601(String s) {
+			try {
+				Duration parsed = Duration.parse(s);
+				return OptionalLong.of(parsed.toMillis());
+			} catch (DateTimeParseException e) {
+				return OptionalLong.empty();
+			}
+		}
+
+		private OptionalLong parseLong(String s) {
+			try {
+				return OptionalLong.of(Long.parseLong(s));
+			} catch (NumberFormatException e) {
+				return OptionalLong.empty();
+			}
+		}
+
+		private final Map<String, ChronoUnit> validUnits = Map.ofEntries(
+			Map.entry("nanos", ChronoUnit.NANOS),
+			Map.entry("micros", ChronoUnit.MICROS),
+			Map.entry("millis", ChronoUnit.MILLIS),
+			Map.entry("seconds", ChronoUnit.SECONDS),
+			Map.entry("minutes", ChronoUnit.MINUTES),
+			Map.entry("hours", ChronoUnit.HOURS)
+			);
+
+		private Optional<ChronoUnit> parseUnit(String value) {
+			return Optional.ofNullable(validUnits.get(value));
 		}
 	}
 

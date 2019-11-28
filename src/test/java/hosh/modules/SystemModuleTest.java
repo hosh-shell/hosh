@@ -81,6 +81,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -416,7 +418,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting just one argument millis")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("missing duration")));
 		}
 
 		@Test
@@ -434,16 +436,45 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not millis: a")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: a")));
 		}
 
 		@Test
-		public void twoArgs() {
+		public void twoArgsAmountNotValid() {
 			ExitStatus exitStatus = sut.run(List.of("a", "b"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveZeroInteractions();
 			then(out).shouldHaveZeroInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting just one argument millis")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: a")));
+		}
+
+		@Test
+		public void twoArgsUnitNotValid() {
+			ExitStatus exitStatus = sut.run(List.of("1", "asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid unit: asd")));
+		}
+
+		@ValueSource(strings = { "nanos", "micros", "millis", "seconds", "minutes", "hours" })
+		@ParameterizedTest
+		public void sleepWithValidUnitDuration(String unit) {
+			ExitStatus exitStatus = sut.run(List.of("0", unit), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
+
+		@ValueSource(strings = {"PT0M", "PT0S"})
+		@ParameterizedTest
+		public void sleepWithIso8601(String iso8601Spec) {
+			ExitStatus exitStatus = sut.run(List.of(iso8601Spec), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
 		}
 	}
 
