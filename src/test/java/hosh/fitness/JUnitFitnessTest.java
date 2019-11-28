@@ -45,10 +45,10 @@ import net.jqwik.api.Property;
 public class JUnitFitnessTest {
 
 	@Test
-	public void enforcePresenceOfTestAnnotation() {
+	public void enforcePresenceOfTestAnnotations() {
 		try (ScanResult scanResult = new ClassGraph().whitelistPackages(Hosh.class.getPackageName()).scan()) {
 			assertThat(scanResult.getAllClasses()).isNotEmpty();
-			List<Method> methodsMissingTestAnnotation = scanResult
+			List<Method> suspiciousMethods = scanResult
 					.getAllClasses()
 					.loadClasses()
 					.stream()
@@ -62,8 +62,8 @@ public class JUnitFitnessTest {
 					.filter(m -> m.getDeclaredAnnotation(BeforeEach.class) == null)
 					.filter(m -> m.getDeclaredAnnotation(AfterEach.class) == null)
 					.collect(Collectors.toList());
-			assertThat(methodsMissingTestAnnotation)
-					.overridingErrorMessage("please add @Test to the following methods: %n%s", methodsMissingTestAnnotation)
+			assertThat(suspiciousMethods)
+					.overridingErrorMessage("please review the following methods: %n%s", suspiciousMethods)
 					.isEmpty();
 		}
 	}
