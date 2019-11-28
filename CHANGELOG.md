@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - improved `sleep` with additional "unit" e.g.:
   - `sleep 15 minutes` now it is valid
-
+  - `sleep PT15M` now it is valid too (https://en.wikipedia.org/wiki/ISO_8601#Durations)
 ### Fixed
 - ensuring that `withLock` removes lock file
 

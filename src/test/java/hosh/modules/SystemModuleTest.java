@@ -70,7 +70,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +82,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -459,7 +457,7 @@ public class SystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid unit: asd")));
 		}
 
-		@ValueSource(strings = {"nanos", "micros", "millis", "seconds", "minutes", "hours"})
+		@ValueSource(strings = { "nanos", "micros", "millis", "seconds", "minutes", "hours" })
 		@ParameterizedTest
 		public void sleepWithValidUnitDuration(String unit) {
 			ExitStatus exitStatus = sut.run(List.of("0", unit), in, out, err);
@@ -469,6 +467,15 @@ public class SystemModuleTest {
 			then(err).shouldHaveZeroInteractions();
 		}
 
+		@ValueSource(strings = {"PT0M", "PT0S"})
+		@ParameterizedTest
+		public void sleepWithIso8601(String iso8601Spec) {
+			ExitStatus exitStatus = sut.run(List.of(iso8601Spec), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveZeroInteractions();
+			then(err).shouldHaveZeroInteractions();
+		}
 	}
 
 	@Nested

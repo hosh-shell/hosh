@@ -57,6 +57,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -256,8 +257,19 @@ public class SystemModule implements Module {
 			Optional<ChronoUnit> unit;
 			if (args.size() == 1) {
 				String arg = args.get(0);
-				amount = parseLong(arg);
-				unit = parseUnit("millis");
+				if (arg.startsWith("P")) {
+					try {
+						Duration parsed = Duration.parse(arg);
+						amount = OptionalLong.of(parsed.toMillis());
+						unit = parseUnit("millis");
+					} catch (DateTimeParseException e) {
+						amount = OptionalLong.empty();
+						unit = Optional.empty();
+					}
+				} else {
+					amount = parseLong(arg);
+					unit = parseUnit("millis");
+				}
 			} else if (args.size() == 2) {
 				String arg = args.get(0);
 				amount = parseLong(arg);
