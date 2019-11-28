@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- improved `sleep` with additional "unit" e.g.:
+  - `sleep 15 minutes` now it is valid
 
 ### Fixed
 - ensuring that `withLock` removes lock file
