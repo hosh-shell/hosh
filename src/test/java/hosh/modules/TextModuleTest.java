@@ -27,6 +27,7 @@ import static hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import hosh.modules.TextModule.Count;
 import hosh.modules.TextModule.Distinct;
@@ -93,8 +94,8 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -102,7 +103,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 argument")));
 		}
 
@@ -115,7 +116,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -127,7 +128,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("abc")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -139,7 +140,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -164,7 +165,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: join separator")));
 		}
 
@@ -174,8 +175,8 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -187,7 +188,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -199,7 +200,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1,2")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -224,7 +225,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sum key")));
 		}
 
@@ -235,7 +236,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(0)));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -247,7 +248,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(0)));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -259,7 +260,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(2)));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -285,8 +286,8 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -297,7 +298,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.empty());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -307,9 +308,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.NAME.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).should(times(2)).recv();
 			then(out).should().send(record);
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -319,9 +320,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.NAME.name(), Keys.COUNT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).should(times(2)).recv();
 			then(out).should().send(record);
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -345,8 +346,8 @@ public class TextModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
 		}
 
@@ -354,8 +355,8 @@ public class TextModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
 		}
 
@@ -365,8 +366,8 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), " "), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -376,13 +377,13 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), " "), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).should(times(2)).recv();
 			then(out).should().send(Records.builder()
 					.entry(Keys.of("1"), Values.ofText("a"))
 					.entry(Keys.of("2"), Values.ofText("b"))
 					.entry(Keys.of("3"), Values.ofText("c"))
 					.build());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -406,8 +407,8 @@ public class TextModuleTest {
 		public void zeroArg() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
 		}
 
@@ -415,8 +416,8 @@ public class TextModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
 		}
 
@@ -426,8 +427,8 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -438,8 +439,8 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -449,9 +450,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).should(times(2)).recv();
 			then(out).should().send(Records.singleton(Keys.of("id"), Values.ofText("1")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -461,9 +462,9 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name(), "(?<id>\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).should(times(2)).recv();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -499,7 +500,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -560,7 +561,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -600,7 +601,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -647,7 +648,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -698,7 +699,7 @@ public class TextModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -708,8 +709,8 @@ public class TextModuleTest {
 		public void negativeArg() {
 			ExitStatus exitStatus = sut.run(List.of("-1"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 		}
 	}
@@ -735,8 +736,8 @@ public class TextModuleTest {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).should().recv();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -776,15 +777,15 @@ public class TextModuleTest {
 			then(out).should().send(record);
 			then(out).should().send(record2);
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void negativeArg() {
 			ExitStatus exitStatus = sut.run(List.of("-1"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 		}
 
@@ -792,8 +793,8 @@ public class TextModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(out).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -835,7 +836,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("key", ".*number.*"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -843,8 +844,8 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -853,7 +854,7 @@ public class TextModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("key"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
 			then(err).shouldHaveNoMoreInteractions();

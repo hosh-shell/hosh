@@ -88,9 +88,9 @@ public class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class PipelineCommandTest {
 		willReturn(ExitStatus.error()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-		then(err).shouldHaveZeroInteractions();
+		then(err).shouldHaveNoInteractions();
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
 	}
 
@@ -108,9 +108,9 @@ public class PipelineCommandTest {
 		willReturn(ExitStatus.error()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(false);
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -119,9 +119,9 @@ public class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -130,9 +130,9 @@ public class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -145,8 +145,8 @@ public class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = pipeline.run(List.of(), in, out, err);
 		assertThat(exitStatus.isSuccess()).isEqualTo(true);
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 }

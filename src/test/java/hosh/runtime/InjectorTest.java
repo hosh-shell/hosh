@@ -72,7 +72,7 @@ public class InjectorTest {
 	public void injectNothing() {
 		Command command = Mockito.mock(Command.class);
 		sut.injectDeps(command);
-		then(command).shouldHaveZeroInteractions();
+		then(command).shouldHaveNoInteractions();
 	}
 
 	@Test

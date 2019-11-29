@@ -75,9 +75,9 @@ public class HistoryModuleTest {
 			given(history.iterator()).willReturn(Collections.emptyListIterator());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -88,18 +88,18 @@ public class HistoryModuleTest {
 			given(entry.line()).willReturn("cmd");
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.builder().entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH)).entry(Keys.INDEX, Values.ofNumeric(42))
 					.entry(Keys.TEXT, Values.ofText("cmd")).build());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 		}
 	}

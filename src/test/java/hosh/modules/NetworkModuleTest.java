@@ -76,17 +76,17 @@ public class NetworkModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(Mockito.any(Record.class));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 		}
 	}
@@ -120,8 +120,8 @@ public class NetworkModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: http URL")));
 		}
 
@@ -131,9 +131,9 @@ public class NetworkModuleTest {
 			given(response.body()).willReturn(Stream.of("line1"));
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -141,8 +141,8 @@ public class NetworkModuleTest {
 			given(requestor.send(Mockito.any())).willThrow(new InterruptedException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 		}
 	}

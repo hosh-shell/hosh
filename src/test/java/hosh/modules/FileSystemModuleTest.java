@@ -105,8 +105,8 @@ public class FileSystemModuleTest {
 		public void errorTwoOrMoreArgs() {
 			ExitStatus exitStatus = sut.run(List.of("dir1", "dir2"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected at most 1 argument")));
 		}
 
@@ -115,9 +115,9 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -126,12 +126,12 @@ public class FileSystemModuleTest {
 			temporaryFolder.newFolder("dir").mkdir();
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
 					RecordMatcher.of(
 							Keys.PATH, Values.ofPath(Paths.get("dir")),
 							Keys.SIZE, Values.none()));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -140,11 +140,11 @@ public class FileSystemModuleTest {
 			temporaryFolder.newFile("file");
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("file")),
 					Keys.SIZE, Values.ofSize(0)));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -154,7 +154,7 @@ public class FileSystemModuleTest {
 			Files.createSymbolicLink(Paths.get(state.getCwd().toString(), "link"), file);
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("file")),
 					Keys.SIZE, Values.ofSize(0)));
@@ -162,7 +162,7 @@ public class FileSystemModuleTest {
 					Keys.PATH, Values.ofPath(Paths.get("link")),
 					Keys.SIZE, Values.none()));
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -171,8 +171,8 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of(file.getFileName().toString()), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory: " + file.toAbsolutePath().toString())));
 		}
 
@@ -181,7 +181,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.newFolder().toPath());
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 		}
@@ -193,7 +193,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of(newFolder.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(ArgumentMatchers.any());
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -205,7 +205,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(newFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
 					Keys.SIZE, Values.ofSize(0)));
@@ -219,7 +219,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(List.of(path.toString()), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory: " + path)));
 		}
@@ -231,7 +231,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(List.of(newFolder.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
 					Keys.SIZE, Values.ofSize(0)));
@@ -244,7 +244,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
 					Keys.SIZE, Values.ofSize(0)));
@@ -258,7 +258,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(cwd.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(List.of(".."), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
 					RecordMatcher.of(
 							Keys.PATH, Values.ofPath(Path.of("aaa")),
@@ -278,8 +278,8 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + cwd.toString())));
 		}
 	}
@@ -310,8 +310,8 @@ public class FileSystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 		}
 
@@ -319,8 +319,8 @@ public class FileSystemModuleTest {
 		public void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("asd", "asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
 		}
 
@@ -331,9 +331,9 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("dir"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(state).should().setCwd(newFolder.toPath().toAbsolutePath());
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -342,9 +342,9 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(newFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(state).should().setCwd(newFolder.toPath());
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -354,8 +354,8 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(state).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
 		}
 	}
@@ -387,18 +387,18 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(temporaryFolder.toPath())));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 		}
 	}
 
@@ -429,9 +429,9 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("data.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -443,11 +443,11 @@ public class FileSystemModuleTest {
 			}
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("a 1")));
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("b 2")));
 			then(err).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -459,18 +459,18 @@ public class FileSystemModuleTest {
 			}
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("a 1")));
 			then(err).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void directory() {
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not readable file")));
 		}
 
@@ -478,9 +478,9 @@ public class FileSystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one path argument")));
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 		}
 	}
 
@@ -510,8 +510,8 @@ public class FileSystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 		}
 
@@ -519,8 +519,8 @@ public class FileSystemModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 		}
 
@@ -534,9 +534,9 @@ public class FileSystemModuleTest {
 			assertThat(source.exists()).isTrue();
 			assertThat(target.exists()).isTrue();
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -548,9 +548,9 @@ public class FileSystemModuleTest {
 			assertThat(source.exists()).isTrue();
 			assertThat(target.exists()).isTrue();
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -580,8 +580,8 @@ public class FileSystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 		}
 
@@ -589,8 +589,8 @@ public class FileSystemModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
 		}
 
@@ -604,9 +604,9 @@ public class FileSystemModuleTest {
 			assertThat(source.exists()).isFalse();
 			assertThat(target.exists()).isTrue();
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -618,9 +618,9 @@ public class FileSystemModuleTest {
 			assertThat(source.exists()).isFalse();
 			assertThat(target.exists()).isTrue();
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -650,8 +650,8 @@ public class FileSystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: rm target")));
 		}
 
@@ -662,9 +662,9 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(target.getName()), in, out, err);
 			assertThat(target.exists()).isFalse();
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -673,9 +673,9 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(target.getAbsolutePath()), in, out, err);
 			assertThat(target.exists()).isFalse();
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -699,17 +699,17 @@ public class FileSystemModuleTest {
 		public void listAllPartitions() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(Mockito.any());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void tooManyArgs() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: partitions")));
 		}
 	}
@@ -740,9 +740,9 @@ public class FileSystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -752,8 +752,8 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
-			then(err).shouldHaveZeroInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -764,8 +764,8 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
-			then(out).shouldHaveZeroInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(in).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -774,8 +774,8 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
-			then(err).shouldHaveZeroInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -785,8 +785,8 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
-			then(out).shouldHaveZeroInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(in).shouldHaveNoInteractions();
 		}
 
 		// on Windows a special permission is needed to create symlinks, see
@@ -800,9 +800,9 @@ public class FileSystemModuleTest {
 			Files.createSymbolicLink(symlink.toPath(), newFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("symlink"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFolder.toPath())));
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 		}
 	}
 
@@ -832,8 +832,8 @@ public class FileSystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: probe file")));
 		}
 
@@ -843,9 +843,9 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.of("contenttype"), Values.ofText("text/plain")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -854,8 +854,8 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.hosh");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
 		}
 	}
@@ -886,8 +886,8 @@ public class FileSystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: symlink source target")));
 		}
 
@@ -899,9 +899,9 @@ public class FileSystemModuleTest {
 			Path link = temporaryFolder.toPath().resolve("link");
 			assertThat(link).isSymbolicLink();
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -931,8 +931,8 @@ public class FileSystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: hardlink source target")));
 		}
 
@@ -944,9 +944,9 @@ public class FileSystemModuleTest {
 			Path link = temporaryFolder.toPath().resolve("link");
 			assertThat(link).exists();
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -976,8 +976,8 @@ public class FileSystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: resolve file")));
 		}
 
@@ -987,9 +987,9 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of("file.txt"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath().toRealPath())));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -998,9 +998,9 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath().toRealPath())));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -1010,9 +1010,9 @@ public class FileSystemModuleTest {
 			Files.createSymbolicLink(Path.of(temporaryFolder.toFile().getAbsolutePath(), "link"), newFile.toPath());
 			ExitStatus exitStatus = sut.run(List.of("link"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath().toRealPath())));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -1043,9 +1043,9 @@ public class FileSystemModuleTest {
 			assertThatThrownBy(() -> sut.before(List.of(), in, out, err))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("expecting file name");
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -1053,9 +1053,9 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			assertThatThrownBy(() -> sut.before(List.of("../missing_directory/file.txt"), in, out, err))
 					.isInstanceOf(UncheckedIOException.class);
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -1068,9 +1068,9 @@ public class FileSystemModuleTest {
 			assertThatThrownBy(() -> resource.getRandomAccessFile().getChannel().tryLock())
 					.isInstanceOf(OverlappingFileLockException.class);
 			sut.after(resource, in, out, err);
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(lockFile).doesNotExist();
 		}
 	}

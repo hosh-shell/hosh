@@ -117,8 +117,8 @@ public class ExternalCommandTest {
 				Collections.emptyMap(),
 				Position.SOLE);
 		then(in).should().recv();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -138,8 +138,8 @@ public class ExternalCommandTest {
 				Collections.emptyMap(),
 				Position.SOLE);
 		then(in).should().recv();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -159,8 +159,8 @@ public class ExternalCommandTest {
 				Collections.emptyMap(),
 				Position.SOLE);
 		then(in).should(times(1)).recv();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public class ExternalCommandTest {
 				Collections.emptyMap(),
 				Position.SOLE);
 		then(in).should(times(1)).recv();
-		then(out).shouldHaveZeroInteractions();
+		then(out).shouldHaveNoInteractions();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 	}
 
@@ -197,7 +197,7 @@ public class ExternalCommandTest {
 		assertThat(exitStatus).isSuccess();
 		then(in).should(times(1)).recv();
 		then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("test")));
-		then(err).shouldHaveZeroInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -212,7 +212,7 @@ public class ExternalCommandTest {
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(in).should(times(1)).recv();
-		then(out).shouldHaveZeroInteractions();
+		then(out).shouldHaveNoInteractions();
 		then(err).should().send(Records.singleton(Keys.TEXT, Values.ofText("test")));
 	}
 
@@ -234,8 +234,8 @@ public class ExternalCommandTest {
 		assertThat(exitStatus).isSuccess();
 		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualToNormalizingNewlines("aaa 10\n");
 		then(in).should(times(2)).recv();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@Test
@@ -245,8 +245,8 @@ public class ExternalCommandTest {
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isError();
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated error")));
 	}
 }

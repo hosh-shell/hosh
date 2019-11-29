@@ -166,9 +166,9 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isSuccess();
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
-		then(err).shouldHaveZeroInteractions();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 		then(command).should().run(Mockito.eq(List.of("1")), Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
@@ -183,8 +183,8 @@ public class InterpreterTest {
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
-		then(in).shouldHaveZeroInteractions();
-		then(out).shouldHaveZeroInteractions();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("cannot resolve variable: VARIABLE")));
 	}
 
@@ -196,7 +196,7 @@ public class InterpreterTest {
 		given(statement.getLocation()).willReturn("java");
 		sut.eval(statement, in, out, err);
 		assertThat(Thread.currentThread().getName()).isEqualTo("command='java -jar hosh.jar'");
-		then(err).shouldHaveZeroInteractions(); // checking no assertion failures happened
+		then(err).shouldHaveNoInteractions(); // checking no assertion failures happened
 	}
 
 	@Test

@@ -117,9 +117,9 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).hasExitCode(0);
 			assertThat(state.isExit()).isTrue();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -127,29 +127,29 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("21"), in, out, err);
 			assertThat(exitStatus).hasExitCode(21);
 			assertThat(state.isExit()).isTrue();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneInvalidArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
-			then(state).shouldHaveZeroInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(state).shouldHaveNoInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a valid exit status: asd")));
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("1", "2"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
-			then(state).shouldHaveZeroInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(state).shouldHaveNoInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 		}
 	}
 
@@ -180,9 +180,9 @@ public class SystemModuleTest {
 			given(state.getVariables()).willReturn(Collections.emptyMap());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -190,9 +190,9 @@ public class SystemModuleTest {
 			given(state.getVariables()).willReturn(Map.of("HOSH_VERSION", "1.0"));
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 			Record record = Records.builder().entry(Keys.NAME, Values.ofText("HOSH_VERSION")).entry(Keys.VALUE, Values.ofText("1.0")).build();
 			assertThat(records.getAllValues()).contains(record);
 		}
@@ -201,8 +201,8 @@ public class SystemModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
 		}
 	}
@@ -234,9 +234,9 @@ public class SystemModuleTest {
 			given(state.getCommands()).willReturn(Map.of("true", True::new));
 			ExitStatus exitStatus = sut.run(List.of("true"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(records.getAllValues())
 					.containsExactly(
 							Records.singleton(Keys.TEXT, Values.ofText("true - /bin/true replacement")),
@@ -249,9 +249,9 @@ public class SystemModuleTest {
 			given(state.getCommands()).willReturn(Map.of("false", False::new));
 			ExitStatus exitStatus = sut.run(List.of("false"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(records.getAllValues())
 					.containsExactly(
 							Records.singleton(Keys.TEXT, Values.ofText("false - /bin/false replacement")),
@@ -263,8 +263,8 @@ public class SystemModuleTest {
 		public void commandNotFound() {
 			ExitStatus exitStatus = sut.run(List.of("test"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("command not found: test")));
 		}
 
@@ -273,8 +273,8 @@ public class SystemModuleTest {
 			given(state.getCommands()).willReturn(Map.of("*", Star::new));
 			ExitStatus exitStatus = sut.run(List.of("*"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: *")));
 		}
 
@@ -283,10 +283,10 @@ public class SystemModuleTest {
 			given(state.getCommands()).willReturn(Map.of("true", True::new));
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(
 					RecordMatcher.of(Keys.NAME, Values.ofText("true"), Keys.DESCRIPTION, Values.ofText("/bin/true replacement")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -294,17 +294,17 @@ public class SystemModuleTest {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("test", "aaa"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
 		}
 
@@ -359,27 +359,27 @@ public class SystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("a")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("a", "b"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("a b")));
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -407,8 +407,8 @@ public class SystemModuleTest {
 			Thread.currentThread().interrupt();
 			ExitStatus exitStatus = sut.run(List.of("1000"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 		}
 
@@ -416,8 +416,8 @@ public class SystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("missing duration")));
 		}
 
@@ -425,17 +425,17 @@ public class SystemModuleTest {
 		public void oneArgNumber() {
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneArgNotNumber() {
 			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: a")));
 		}
 
@@ -443,8 +443,8 @@ public class SystemModuleTest {
 		public void twoArgsAmountNotValid() {
 			ExitStatus exitStatus = sut.run(List.of("a", "b"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: a")));
 		}
 
@@ -452,8 +452,8 @@ public class SystemModuleTest {
 		public void twoArgsUnitNotValid() {
 			ExitStatus exitStatus = sut.run(List.of("1", "asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid unit: asd")));
 		}
 
@@ -462,9 +462,9 @@ public class SystemModuleTest {
 		public void sleepWithValidUnitDuration(String unit) {
 			ExitStatus exitStatus = sut.run(List.of("0", unit), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@ValueSource(strings = {"PT0M", "PT0S"})
@@ -472,9 +472,9 @@ public class SystemModuleTest {
 		public void sleepWithIso8601(String iso8601Spec) {
 			ExitStatus exitStatus = sut.run(List.of(iso8601Spec), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -498,17 +498,17 @@ public class SystemModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(Mockito.any());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneArgNumber() {
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting zero arguments")));
 		}
 	}
@@ -562,8 +562,8 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -573,8 +573,8 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -601,7 +601,7 @@ public class SystemModuleTest {
 			accumulator.getResults().add(Duration.ofMillis(20));
 			accumulator.getResults().add(Duration.ofMillis(10));
 			sut.after(accumulator, in, out, err);
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
 					Records.builder()
 							.entry(Keys.COUNT, Values.ofNumeric(2))
@@ -609,7 +609,7 @@ public class SystemModuleTest {
 							.entry(Benchmark.WORST, Values.ofDuration(Duration.ofMillis(20)))
 							.entry(Benchmark.AVERAGE, Values.ofDuration(Duration.ofMillis(15)))
 							.build());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -617,7 +617,7 @@ public class SystemModuleTest {
 			List<String> args = List.of("1");
 			Accumulator accumulator = sut.before(args, in, out, err);
 			sut.after(accumulator, in, out, err);
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
 					Records.builder()
 							.entry(Keys.COUNT, Values.ofNumeric(0))
@@ -625,7 +625,7 @@ public class SystemModuleTest {
 							.entry(Benchmark.WORST, Values.ofDuration(Duration.ZERO))
 							.entry(Benchmark.AVERAGE, Values.ofDuration(Duration.ZERO))
 							.build());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -635,9 +635,9 @@ public class SystemModuleTest {
 			boolean retry = sut.retry(accumulator, in, out, err);
 			assertThat(retry).isFalse();
 			sut.after(accumulator, in, out, err);
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Mockito.any());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -683,9 +683,9 @@ public class SystemModuleTest {
 		public void usage() {
 			Long resource = sut.before(Collections.emptyList(), in, out, err);
 			sut.after(resource, in, out, err);
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Mockito.any());
-			then(err).shouldHaveZeroInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -724,8 +724,8 @@ public class SystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
 		}
 
@@ -733,8 +733,8 @@ public class SystemModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
 		}
 
@@ -742,9 +742,9 @@ public class SystemModuleTest {
 		public void createNewVariable() {
 			ExitStatus exitStatus = sut.run(List.of("FOO", "bar"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).containsEntry("FOO", "bar");
 		}
 
@@ -753,9 +753,9 @@ public class SystemModuleTest {
 			state.getVariables().put("FOO", "baz");
 			ExitStatus exitStatus = sut.run(List.of("FOO", "baz"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).containsEntry("FOO", "baz");
 		}
 
@@ -763,8 +763,8 @@ public class SystemModuleTest {
 		public void invalidVariableName() {
 			ExitStatus exitStatus = sut.run(List.of("${", "baz"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 			assertThat(state.getVariables()).isEmpty();
 		}
@@ -793,8 +793,8 @@ public class SystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("requires 1 argument: key")));
 		}
 
@@ -803,9 +803,9 @@ public class SystemModuleTest {
 			state.getVariables().put("FOO", "BAR");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).doesNotContainKey("FOO");
 		}
 
@@ -813,9 +813,9 @@ public class SystemModuleTest {
 		public void doesNothingWhenNotExistingBinding() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).doesNotContainKey("FOO");
 		}
 	}
@@ -846,8 +846,8 @@ public class SystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 		}
 
@@ -855,8 +855,8 @@ public class SystemModuleTest {
 		public void nonNumericPid() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a valid pid: FOO")));
 		}
 
@@ -865,8 +865,8 @@ public class SystemModuleTest {
 			given(processLookup.of(42L)).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("cannot find pid: 42")));
 		}
 
@@ -876,8 +876,8 @@ public class SystemModuleTest {
 			given(processHandle.destroy()).willReturn(false);
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("cannot destroy pid: 42")));
 		}
 
@@ -887,9 +887,9 @@ public class SystemModuleTest {
 			given(processHandle.destroy()).willReturn(true);
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -916,8 +916,8 @@ public class SystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
 		}
 
@@ -925,8 +925,8 @@ public class SystemModuleTest {
 		public void invalidVariableName() {
 			ExitStatus exitStatus = sut.run(List.of("$AAA"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 		}
 
@@ -936,7 +936,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			assertThat(state.getVariables()).containsEntry("FOO", "");
 		}
@@ -950,7 +950,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			assertThat(state.getVariables()).containsEntry("FOO", "1");
 		}
@@ -965,7 +965,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			assertThat(state.getVariables()).containsEntry("FOO", "12");
 		}
@@ -997,8 +997,8 @@ public class SystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
 		}
 
@@ -1006,8 +1006,8 @@ public class SystemModuleTest {
 		public void oneArgs() {
 			ExitStatus exitStatus = sut.run(List.of("filename"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
 		}
 
@@ -1018,7 +1018,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			List<String> result = Files.readAllLines(Paths.get(temporaryFolder.toPath().toString(), "filename"));
 			assertThat(result).isEmpty();
@@ -1034,7 +1034,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			List<String> result = Files.readAllLines(Paths.get(temporaryFolder.toPath().toString(), "filename"));
 			assertThat(result).containsExactly("1");
@@ -1051,7 +1051,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			List<String> result = Files.readAllLines(Paths.get(temporaryFolder.toPath().toString(), "filename"));
 			assertThat(result).containsExactly("1", "2");
@@ -1069,7 +1069,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "APPEND"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			List<String> result = Files.readAllLines(Paths.get(temporaryFolder.toPath().toString(), "filename"));
 			assertThat(result).containsExactly("existing line", "1");
@@ -1102,8 +1102,8 @@ public class SystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: input VARIABLE")));
 		}
 
@@ -1111,8 +1111,8 @@ public class SystemModuleTest {
 		public void invalidVariableName() {
 			ExitStatus exitStatus = sut.run(List.of("$"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 		}
 
@@ -1121,9 +1121,9 @@ public class SystemModuleTest {
 			given(lineReader.readLine(Mockito.eq("input> "))).willReturn("1");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).containsEntry("FOO", "1");
 		}
 
@@ -1132,9 +1132,9 @@ public class SystemModuleTest {
 			given(lineReader.readLine(Mockito.eq("input> "))).willThrow(new EndOfFileException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).isEmpty();
 		}
 	}
@@ -1165,8 +1165,8 @@ public class SystemModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret VARIABLE")));
 		}
 
@@ -1174,8 +1174,8 @@ public class SystemModuleTest {
 		public void invalidVariableName() {
 			ExitStatus exitStatus = sut.run(List.of("$"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
 		}
 
@@ -1184,9 +1184,9 @@ public class SystemModuleTest {
 			given(lineReader.readLine(Mockito.eq('\0'))).willReturn("1");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).containsEntry("FOO", "1");
 		}
 
@@ -1195,9 +1195,9 @@ public class SystemModuleTest {
 			given(lineReader.readLine(Mockito.eq("input> "))).willThrow(new EndOfFileException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(in).shouldHaveZeroInteractions();
-			then(out).shouldHaveZeroInteractions();
-			then(err).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).isEmpty();
 		}
 	}

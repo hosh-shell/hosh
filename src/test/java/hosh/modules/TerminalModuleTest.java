@@ -78,7 +78,7 @@ public class TerminalModuleTest {
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -88,7 +88,7 @@ public class TerminalModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -121,7 +121,7 @@ public class TerminalModuleTest {
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -131,7 +131,7 @@ public class TerminalModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -163,7 +163,7 @@ public class TerminalModuleTest {
 			given(terminal.getAttributes()).willReturn(new Attributes());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveZeroInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Mockito.any());
 			then(err).shouldHaveNoMoreInteractions();
 		}
