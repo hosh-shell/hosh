@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal-jna</artifactId>
-			<version>3.11.0</version>
+			<version>3.13.2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
