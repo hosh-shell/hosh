@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org</groupId>
 	<artifactId>hosh</artifactId>
-	<version>0.0.35-SNAPSHOT</version>
+	<version>0.0.35</version>
 	<url>https://github.com/dfa1/hosh</url>
 	<name>hosh</name>
 	<description>The Human Oriented SHell</description>
@@ -26,7 +26,7 @@
 	</developers>
 	<scm>
 		<developerConnection>scm:git:.</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v0.0.35</tag>
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
