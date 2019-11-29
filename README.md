@@ -4,30 +4,29 @@
 
 
 ## Main features
-- portable
+
+- **portable**¹
+    - works out-of-the-box in Windows, MacOS and Linux
     - written in Java 11, distributed as [Uber-JAR](https://imagej.net/Uber-JAR)
-    - works out-of-the-box in Windows, MacOS and Linux¹
-- usability features (although much more work is needed in this area)
+- **usability as first class citizen** (much more work and effort is needed in this area)
     - sorting with [alphanum](http://davekoelle.com/alphanum.html)
     - ANSI colors by default
-    - stderr always colored in red
+    - errors always colored in red
     - file sizes reported by default as KB, MB, GB, ...
     - [better history by default](https://sanctum.geek.nz/arabesque/better-bash-history/)
        - record timestamps for each command (see `history` command)
        - `HISTCONTROL=ignoredups`
        - no limits
        - append to history is incremental and shared between all sessions
-       - ctrl-R works as expected
-- pipelines built around schema-less records
+- **pipelines** built around schema-less records
     - built-in commands produce records with well defined keys
-    - interoperability is achieved by using single-key records
+    - interoperability with external commands is achieved by using single-key records
     - `lines pom.xml | enumerate | take 10`
-- wrappers
-    - grouping commands, with before/after behavior
+- **grouping commands**, with before/after behavior
     - `withTime { lines pom.xml | sink }`
     - `withLock file.lock { ... }`
-- robust scripts by default
-    - like running bash scripts with `set -euo pipefail` (see [unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/))
+- **robust scripts by default**
+    - as if running bash scripts with `set -euo pipefail` as described in [unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
 
 ¹ it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
 

@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.35] - 2019-11-29
+
 ### Added
 - improved `sleep` with additional "unit" e.g.:
   - `sleep 15 minutes` now it is valid
