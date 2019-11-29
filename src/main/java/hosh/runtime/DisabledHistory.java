@@ -143,4 +143,9 @@ public class DisabledHistory implements History {
 	public void moveToEnd() {
 		throw unsupportedOperation();
 	}
+
+	@Override
+	public void resetIndex() {
+		throw unsupportedOperation();
+	}
 }
