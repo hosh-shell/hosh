@@ -103,15 +103,15 @@ public class InjectorTest {
 		then(command).should().setTerminal(terminal);
 	}
 
-	public static interface HistoryAwareCommand extends Command, HistoryAware {
+	public interface HistoryAwareCommand extends Command, HistoryAware {
 	}
 
-	public static interface LineReaderAwareCommand extends Command, LineReaderAware {
+	public interface LineReaderAwareCommand extends Command, LineReaderAware {
 	}
 
-	public static interface StateAwareCommand extends Command, StateAware {
+	public interface StateAwareCommand extends Command, StateAware {
 	}
 
-	public static interface TerminalAwareCommand extends Command, TerminalAware {
+	public interface TerminalAwareCommand extends Command, TerminalAware {
 	}
 }
