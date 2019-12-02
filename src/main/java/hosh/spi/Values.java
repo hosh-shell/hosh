@@ -23,8 +23,6 @@
  */
 package hosh.spi;
 
-import hosh.doc.Todo;
-
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -95,12 +93,11 @@ public class Values {
 	 * Generic text.
 	 */
 	public static Value ofText(String text) {
-		return new TextValue(text, Ansi.Style.NONE);
+		return new TextValue(text);
 	}
 
-	@Todo(description = "create a StyledValue decorator? be careful around equals/hashCode")
 	public static Value ofStyledText(String text, Ansi.Style style) {
-		return new TextValue(text, style);
+		return new StyledValue(new TextValue(text), style);
 	}
 
 	/**
@@ -111,35 +108,27 @@ public class Values {
 	}
 
 	public static Value ofPath(Path path) {
-		return new PathValue(path, Ansi.Style.NONE);
+		return new PathValue(path);
 	}
 
 	public static Value ofStyledPath(Path path, Ansi.Style style) {
-		return new PathValue(path, style);
+		return new StyledValue(new PathValue(path), style);
 	}
 
 	static final class TextValue implements Value {
 
 		private final String value;
 
-		private final Ansi.Style style;
-
-		public TextValue(String value, Ansi.Style style) {
+		public TextValue(String value) {
 			if (value == null) {
 				throw new IllegalArgumentException("text cannot be null");
 			}
-			if (style == null) {
-				throw new IllegalArgumentException("style cannot be null");
-			}
-			this.style = style;
 			this.value = value;
 		}
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			style.enable(printWriter);
 			printWriter.append(value);
-			style.disable(printWriter);
 		}
 
 		@Override
@@ -435,24 +424,16 @@ public class Values {
 
 		private final Path path;
 
-		private final Ansi.Style style;
-
-		public PathValue(Path path, Ansi.Style style) {
+		public PathValue(Path path) {
 			if (path == null) {
 				throw new IllegalArgumentException("path cannot be null");
 			}
-			if (style == null) {
-				throw new IllegalArgumentException("style cannot be null");
-			}
 			this.path = path;
-			this.style = style;
 		}
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			style.enable(printWriter);
 			printWriter.append(path.toString());
-			style.disable(printWriter);
 		}
 
 		@Override
@@ -535,6 +516,64 @@ public class Values {
 				}
 			}
 			return compareValue;
+		}
+	}
+
+	// generic decorator to provide ansi style while delegating equals/hashCode to the decorated value
+	// i.e. style is used only in print()
+	static class StyledValue implements Value {
+
+		private final Value value;
+		private final Ansi.Style style;
+
+		public StyledValue(Value value, Ansi.Style style) {
+			if (value == null) {
+				throw new IllegalArgumentException("value cannot be null");
+			}
+			if (style == null) {
+				throw new IllegalArgumentException("style cannot be null");
+			}
+			this.value = value;
+			this.style = style;
+		}
+
+		@Override
+		public void print(PrintWriter printWriter, Locale locale) {
+			style.enable(printWriter);
+			value.print(printWriter, locale);
+			style.disable(printWriter);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof StyledValue) {
+				StyledValue that = (StyledValue) obj;
+				return Objects.equals(this.value, that.value);
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return value.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return String.format("StyledValue[value=%s,style='%s']", value, style);
+		}
+
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof StyledValue) {
+				StyledValue that = (StyledValue) obj;
+				return this.compareTo(that);
+			} else if (obj instanceof None) {
+				return 1;
+			} else {
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+			}
 		}
 	}
 }
