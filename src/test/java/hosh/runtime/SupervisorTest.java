@@ -28,6 +28,7 @@ import static hosh.testsupport.ExitStatusAssert.assertThat;
 import hosh.spi.ExitStatus;
 import hosh.testsupport.WithThread;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sun.misc.Signal;
 
 @ExtendWith(MockitoExtension.class)
 public class SupervisorTest {
@@ -64,6 +66,21 @@ public class SupervisorTest {
 			return ExitStatus.success();
 		});
 		Thread.currentThread().interrupt(); // next call to Future.get() will throw InterruptedException
+		ExitStatus waitForAll = sut.waitForAll();
+		assertThat(waitForAll).isError();
+	}
+
+	@Test
+	public void handleCancellations() throws ExecutionException {
+		sut.submit(() -> {
+			Thread.sleep(10_000);
+			return ExitStatus.success();
+		});
+		sut.submit(() -> {
+			Thread.sleep(500);
+			Signal.raise(new Signal("INT"));
+			return ExitStatus.success();
+		});
 		ExitStatus waitForAll = sut.waitForAll();
 		assertThat(waitForAll).isError();
 	}
