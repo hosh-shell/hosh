@@ -653,7 +653,7 @@ public class TextModule implements Module {
 				formattedValues.add(writer.toString());
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
-			out.send(Records.singleton(Keys.of("row"), Values.ofStyledText(row, alternateColor())));
+			out.send(Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText(row), alternateColor())));
 		}
 
 		private Style alternateColor() {
@@ -670,7 +670,7 @@ public class TextModule implements Module {
 				                .map(this::formatterFor)
 				                .collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
-			out.send(Records.singleton(Keys.of("header"), Values.ofStyledText(header, Ansi.Style.FG_CYAN)));
+			out.send(Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText(header), Ansi.Style.FG_CYAN)));
 		}
 
 		private final Map<Key, Integer> paddings = Map.of(

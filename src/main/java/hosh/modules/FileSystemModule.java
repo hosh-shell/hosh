@@ -127,9 +127,9 @@ public class FileSystemModule implements Module {
 					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 					Value size = attributes.isRegularFile() ? Values.ofSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
-						               .entry(Keys.PATH, Values.ofStyledPath(path.getFileName(), colorFor(attributes)))
-						               .entry(Keys.SIZE, size)
-						               .build();
+							.entry(Keys.PATH, Values.withStyle(Values.ofPath(path.getFileName()), colorFor(attributes)))
+							.entry(Keys.SIZE, size)
+							.build();
 					out.send(entry);
 				}
 				return ExitStatus.success();

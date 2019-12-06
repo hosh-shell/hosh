@@ -96,10 +96,6 @@ public class Values {
 		return new TextValue(text);
 	}
 
-	public static Value ofStyledText(String text, Ansi.Style style) {
-		return new StyledValue(new TextValue(text), style);
-	}
-
 	/**
 	 * Used to represent a size of a file, etc.
 	 */
@@ -111,8 +107,8 @@ public class Values {
 		return new PathValue(path);
 	}
 
-	public static Value ofStyledPath(Path path, Ansi.Style style) {
-		return new StyledValue(new PathValue(path), style);
+	public static Value withStyle(Value value, Ansi.Style style) {
+		return new StyledValue(value, style);
 	}
 
 	static final class TextValue implements Value {

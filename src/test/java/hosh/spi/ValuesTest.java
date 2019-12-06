@@ -217,13 +217,6 @@ public class ValuesTest {
 		}
 
 		@Test
-		public void nullStyles() {
-			assertThatThrownBy(() -> Values.ofStyledText("asd", null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("style cannot be null");
-		}
-
-		@Test
 		public void unwrap() {
 			Value value = Values.ofText("aaa");
 			assertThat(value.unwrap(int.class)).isEmpty();
@@ -383,11 +376,13 @@ public class ValuesTest {
 				.hasMessage("path cannot be null");
 		}
 
+	}
+
+	@Nested
+	public class WithStyleTest {
 		@Test
-		public void nullStyle() {
-			assertThatThrownBy(() -> Values.ofStyledPath(Paths.get("file"), null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("style cannot be null");
+		public void placeholder() {
+			throw new UnsupportedOperationException("TODO");
 		}
 
 		@Test
