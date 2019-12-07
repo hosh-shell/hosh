@@ -28,7 +28,6 @@ import static hosh.testsupport.ExitStatusAssert.assertThat;
 import hosh.spi.ExitStatus;
 import hosh.testsupport.WithThread;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.AfterEach;
@@ -37,7 +36,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sun.misc.Signal;
 
 @ExtendWith(MockitoExtension.class)
 public class SupervisorTest {
@@ -77,8 +75,8 @@ public class SupervisorTest {
 			return ExitStatus.success();
 		});
 		sut.submit(() -> {
-			Thread.sleep(500);
-			Signal.raise(new Signal("INT"));
+			Thread.sleep(10);
+			raise("INT");
 			return ExitStatus.success();
 		});
 		ExitStatus waitForAll = sut.waitForAll();
@@ -100,4 +98,12 @@ public class SupervisorTest {
 		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isError();
 	}
+
+	// sun.misc.Signal is internal API without any replacement by now
+	private static void raise(String signalName) throws ReflectiveOperationException {
+		Class<?> signalClass = Class.forName("sun.misc.Signal");
+		Object signal = signalClass.getConstructor(String.class).newInstance(signalName);
+		signalClass.getMethod("raise", signalClass).invoke(null, signal);
+	}
+
 }
