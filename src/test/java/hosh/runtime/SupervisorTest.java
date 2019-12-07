@@ -69,6 +69,21 @@ public class SupervisorTest {
 	}
 
 	@Test
+	public void handleCancellations() throws ExecutionException {
+		sut.submit(() -> {
+			Thread.sleep(10_000);
+			return ExitStatus.success();
+		});
+		sut.submit(() -> {
+			Thread.sleep(10);
+			raise("INT");
+			return ExitStatus.success();
+		});
+		ExitStatus waitForAll = sut.waitForAll();
+		assertThat(waitForAll).isError();
+	}
+
+	@Test
 	public void allSubmitInSuccess() throws ExecutionException {
 		sut.submit(() -> ExitStatus.success());
 		sut.submit(() -> ExitStatus.success());
@@ -83,4 +98,12 @@ public class SupervisorTest {
 		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isError();
 	}
+
+	// sun.misc.Signal is internal API without any replacement by now
+	private static void raise(String signalName) throws ReflectiveOperationException {
+		Class<?> signalClass = Class.forName("sun.misc.Signal");
+		Object signal = signalClass.getConstructor(String.class).newInstance(signalName);
+		signalClass.getMethod("raise", signalClass).invoke(null, signal);
+	}
+
 }
