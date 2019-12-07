@@ -371,13 +371,18 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.6.1.1688</version>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
 		<profile>
 			<id>sonar</id>
 			<properties>
-				<sonar.junit.reportPaths>target/surefire-reports/,target/failsafe-reports/</sonar.junit.reportPaths>
+				<sonar.coverage.jacoco.xmlReportPaths>target/surefire-reports/,target/failsafe-reports/</sonar.coverage.jacoco.xmlReportPaths>
 				<sonar.exclusions>target/generated-sources/**</sonar.exclusions>
 			</properties>
 			<build>
