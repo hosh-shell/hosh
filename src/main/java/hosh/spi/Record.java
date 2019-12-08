@@ -29,7 +29,7 @@ import java.util.Optional;
 
 /**
  * An immutable value object representing a collection of key/value pairs.
- *
+ * <p>
  * Iteration order is well defined.
  */
 public interface Record extends Printable {

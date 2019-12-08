@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * Automatically generate user-facing documentation via 'help' command.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 public @interface Description {
 
 	String value();

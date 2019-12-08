@@ -24,7 +24,6 @@
 package hosh.testsupport;
 
 import hosh.spi.ExitStatus;
-
 import org.assertj.core.api.AbstractAssert;
 
 public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatus> {
@@ -43,11 +42,11 @@ public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatu
 
 	public void isError() {
 		isNotNull()
-				.matches(ExitStatus::isError, "isError()");
+			.matches(ExitStatus::isError, "isError()");
 	}
 
 	public void hasExitCode(int expectedCode) {
 		isNotNull()
-				.matches(exitStatus -> exitStatus.value() == expectedCode, "expecting exitCode " + expectedCode);
+			.matches(exitStatus -> exitStatus.value() == expectedCode, "expecting exitCode " + expectedCode);
 	}
 }

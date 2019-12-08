@@ -23,13 +23,6 @@
  */
 package hosh.runtime;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-
 import hosh.runtime.ExternalCommand.ProcessFactory;
 import hosh.runtime.PipelineCommand.Position;
 import hosh.spi.ExitStatus;
@@ -41,6 +34,12 @@ import hosh.spi.State;
 import hosh.spi.Values;
 import hosh.testsupport.TemporaryFolder;
 import hosh.testsupport.WithThread;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -54,12 +53,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class ExternalCommandTest {
@@ -112,10 +111,10 @@ public class ExternalCommandTest {
 		ExitStatus exitStatus = sut.run(Collections.emptyList(), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(processFactory).should().create(
-				List.of(executable.toString()),
-				Paths.get("."),
-				Collections.emptyMap(),
-				Position.SOLE);
+			List.of(executable.toString()),
+			Paths.get("."),
+			Collections.emptyMap(),
+			Position.SOLE);
 		then(in).should().recv();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -133,10 +132,10 @@ public class ExternalCommandTest {
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(processFactory).should().create(
-				List.of(executable.toString(), "file.hosh"),
-				Paths.get("."),
-				Collections.emptyMap(),
-				Position.SOLE);
+			List.of(executable.toString(), "file.hosh"),
+			Paths.get("."),
+			Collections.emptyMap(),
+			Position.SOLE);
 		then(in).should().recv();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -154,10 +153,10 @@ public class ExternalCommandTest {
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isError();
 		then(processFactory).should().create(
-				List.of(executable.toString(), "file.hosh"),
-				Paths.get("."),
-				Collections.emptyMap(),
-				Position.SOLE);
+			List.of(executable.toString(), "file.hosh"),
+			Paths.get("."),
+			Collections.emptyMap(),
+			Position.SOLE);
 		then(in).should(times(1)).recv();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -175,10 +174,10 @@ public class ExternalCommandTest {
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isError();
 		then(processFactory).should().create(
-				List.of(executable.toString(), "file.hosh"),
-				Paths.get("."),
-				Collections.emptyMap(),
-				Position.SOLE);
+			List.of(executable.toString(), "file.hosh"),
+			Paths.get("."),
+			Collections.emptyMap(),
+			Position.SOLE);
 		then(in).should(times(1)).recv();
 		then(out).shouldHaveNoInteractions();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
@@ -221,8 +220,8 @@ public class ExternalCommandTest {
 	public void processRecordsFromIn() throws Exception {
 		ByteArrayOutputStream value = new ByteArrayOutputStream();
 		given(in.recv()).willReturn(
-				Optional.of(Records.builder().entry(Keys.PATH, Values.ofText("aaa")).entry(Keys.SIZE, Values.ofNumeric(10)).build()),
-				Optional.empty());
+			Optional.of(Records.builder().entry(Keys.PATH, Values.ofText("aaa")).entry(Keys.SIZE, Values.ofNumeric(10)).build()),
+			Optional.empty());
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(value);

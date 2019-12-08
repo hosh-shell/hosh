@@ -37,10 +37,9 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
+import org.jline.reader.History;
 
 import java.util.List;
-
-import org.jline.reader.History;
 
 public class HistoryModule implements Module {
 
@@ -51,7 +50,7 @@ public class HistoryModule implements Module {
 
 	@Description("display the history with timestamp, index and text")
 	@Examples({
-			@Example(command = "history", description = "show all history")
+		@Example(command = "history", description = "show all history")
 	})
 	public static class ListHistory implements Command, HistoryAware {
 
@@ -70,10 +69,10 @@ public class HistoryModule implements Module {
 			}
 			for (var entry : history) {
 				Record record = Records.builder()
-						.entry(Keys.TIMESTAMP, Values.ofInstant(entry.time()))
-						.entry(Keys.INDEX, Values.ofNumeric(entry.index()))
-						.entry(Keys.TEXT, Values.ofText(entry.line()))
-						.build();
+					                .entry(Keys.TIMESTAMP, Values.ofInstant(entry.time()))
+					                .entry(Keys.INDEX, Values.ofNumeric(entry.index()))
+					                .entry(Keys.TEXT, Values.ofText(entry.line()))
+					                .build();
 				out.send(record);
 			}
 			return ExitStatus.success();

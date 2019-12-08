@@ -23,16 +23,15 @@
  */
 package hosh.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.CharRange;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExitStatusTest {
 

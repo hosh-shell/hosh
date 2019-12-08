@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 /**
  * The state of the shell: it has been modeled as explicit state,
  * in practice this is a global variable.
- *
+ * <p>
  * Not thread-safe.
  */
 @Todo(description = "must be thread-safe sooner or later")

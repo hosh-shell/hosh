@@ -23,7 +23,7 @@
  */
 /**
  * Architecture tests.
- *
+ * <p>
  * Fitness functions (see Evolutionary Architecture ISBN-13: 978-1491986363).
  */
 package hosh.fitness;

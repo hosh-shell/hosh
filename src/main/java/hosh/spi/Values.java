@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 
 /**
  * Built-in value objects to be used in @{see Record}.
- *
+ * <p>
  * NB: concrete types are not exposed by design.
  */
 public class Values {
@@ -172,14 +172,14 @@ public class Values {
 		}
 
 		private enum Unit {
-				B, KB, MB, GB, TB
+			B, KB, MB, GB, TB
 		}
 
 		// One kibibyte (1024 bytes), this is in contrast to the SI system (1000 bytes)
 		private static final int KIB = 1024;
 
 		// log-indexed units table
-		private static final Unit[] UNITS = { Unit.KB, Unit.MB, Unit.GB, Unit.TB };
+		private static final Unit[] UNITS = {Unit.KB, Unit.MB, Unit.GB, Unit.TB};
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
@@ -464,7 +464,7 @@ public class Values {
 		}
 
 		private static final Comparator<Path> PATH_COMPARATOR = Comparator
-				.comparing(Path::toString, new AlphaNumericStringComparator());
+			                                                        .comparing(Path::toString, new AlphaNumericStringComparator());
 
 		@Override
 		public int compareTo(Value obj) {
@@ -483,7 +483,7 @@ public class Values {
 	 * The Alphanum Algorithm is an improved sorting algorithm for strings
 	 * containing numbers. Instead of sorting numbers in ASCII order like
 	 * a standard sort, this algorithm sorts numbers in numeric order.
-	 *
+	 * <p>
 	 * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
 	 */
 	static class AlphaNumericStringComparator implements Comparator<String> {

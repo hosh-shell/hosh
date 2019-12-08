@@ -23,7 +23,7 @@
  */
 /**
  * Integration tests.
- *
+ * <p>
  * These tests could take advantage of the whole package hosh.jar.
  */
 package hosh.integration;

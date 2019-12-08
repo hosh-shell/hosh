@@ -23,15 +23,12 @@
  */
 package hosh.runtime;
 
-import static org.mockito.BDDMockito.then;
-
 import hosh.spi.Command;
 import hosh.spi.HistoryAware;
 import hosh.spi.LineReaderAware;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.TerminalAware;
-
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.terminal.Terminal;
@@ -41,6 +38,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 public class InjectorTest {

@@ -23,9 +23,14 @@
  */
 package hosh.fitness;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import hosh.Hosh;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
+import net.jqwik.api.Property;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,14 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
-import net.jqwik.api.Property;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class JUnitFitnessTest {
 
@@ -49,22 +47,22 @@ public class JUnitFitnessTest {
 		try (ScanResult scanResult = new ClassGraph().whitelistPackages(Hosh.class.getPackageName()).scan()) {
 			assertThat(scanResult.getAllClasses()).isNotEmpty();
 			List<Method> suspiciousMethods = scanResult
-					.getAllClasses()
-					.loadClasses()
-					.stream()
-					.filter(c -> c.getName().endsWith("Test") || c.getName().endsWith("IT"))
-					.flatMap(c -> Stream.of(c.getDeclaredMethods()))
-					.filter(m -> Modifier.isPublic(m.getModifiers()))
-					.filter(m -> !Modifier.isStatic(m.getModifiers()))
-					.filter(m -> m.getDeclaredAnnotation(Property.class) == null)
-					.filter(m -> m.getDeclaredAnnotation(Test.class) == null)
-					.filter(m -> m.getDeclaredAnnotation(ParameterizedTest.class) == null)
-					.filter(m -> m.getDeclaredAnnotation(BeforeEach.class) == null)
-					.filter(m -> m.getDeclaredAnnotation(AfterEach.class) == null)
-					.collect(Collectors.toList());
+				                                 .getAllClasses()
+				                                 .loadClasses()
+				                                 .stream()
+				                                 .filter(c -> c.getName().endsWith("Test") || c.getName().endsWith("IT"))
+				                                 .flatMap(c -> Stream.of(c.getDeclaredMethods()))
+				                                 .filter(m -> Modifier.isPublic(m.getModifiers()))
+				                                 .filter(m -> !Modifier.isStatic(m.getModifiers()))
+				                                 .filter(m -> m.getDeclaredAnnotation(Property.class) == null)
+				                                 .filter(m -> m.getDeclaredAnnotation(Test.class) == null)
+				                                 .filter(m -> m.getDeclaredAnnotation(ParameterizedTest.class) == null)
+				                                 .filter(m -> m.getDeclaredAnnotation(BeforeEach.class) == null)
+				                                 .filter(m -> m.getDeclaredAnnotation(AfterEach.class) == null)
+				                                 .collect(Collectors.toList());
 			assertThat(suspiciousMethods)
-					.overridingErrorMessage("please review the following methods: %n%s", suspiciousMethods)
-					.isEmpty();
+				.overridingErrorMessage("please review the following methods: %n%s", suspiciousMethods)
+				.isEmpty();
 		}
 	}
 }

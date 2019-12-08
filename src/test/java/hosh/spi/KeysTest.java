@@ -23,42 +23,40 @@
  */
 package hosh.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import hosh.spi.Keys.StringKey;
-
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class KeysTest {
 
 	@Test
 	public void nullKey() {
 		assertThatThrownBy(() -> Keys.of(null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("name must be not null");
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("name must be not null");
 	}
 
 	@Test
 	public void emptyKey() {
 		assertThatThrownBy(() -> Keys.of(""))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("name must be not blank");
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("name must be not blank");
 	}
 
 	@Test
 	public void representation() {
 		assertThat(Keys.of("name"))
-				.hasToString("Key['name']");
+			.hasToString("Key['name']");
 	}
 
 	@Test
 	public void equalContract() {
 		EqualsVerifier.configure()
-				.forClass(StringKey.class)
-				.verify();
+			.forClass(StringKey.class)
+			.verify();
 	}
 
 	@Test

@@ -65,7 +65,7 @@ public class NetworkModule implements Module {
 
 	@Description("list network interfaces")
 	@Examples({
-			@Example(command = "network", description = "list all network interfaces")
+		@Example(command = "network", description = "list all network interfaces")
 	})
 	public static class Network implements Command {
 
@@ -80,15 +80,15 @@ public class NetworkModule implements Module {
 				while (iterator.hasNext()) {
 					NetworkInterface ni = iterator.next();
 					Record record = Records
-							.builder()
-							.entry(Keys.of("alias"), Values.ofText(ni.getDisplayName()))
-							.entry(Keys.of("up"), Values.ofText(ni.isUp() ? "yes" : "no"))
-							.entry(Keys.of("loopback"), Values.ofText(ni.isLoopback() ? "yes" : "no"))
-							.entry(Keys.of("virtual"), Values.ofText(ni.isVirtual() ? "yes" : "no"))
-							.entry(Keys.of("mtu"), Values.ofNumeric(ni.getMTU()))
-							.entry(Keys.of("hwaddress"), Values.ofText(formatHex(ni.getHardwareAddress())))
-							.entry(Keys.of("address"), Values.ofText(formatInterfaceAddress(ni)))
-							.build();
+						                .builder()
+						                .entry(Keys.of("alias"), Values.ofText(ni.getDisplayName()))
+						                .entry(Keys.of("up"), Values.ofText(ni.isUp() ? "yes" : "no"))
+						                .entry(Keys.of("loopback"), Values.ofText(ni.isLoopback() ? "yes" : "no"))
+						                .entry(Keys.of("virtual"), Values.ofText(ni.isVirtual() ? "yes" : "no"))
+						                .entry(Keys.of("mtu"), Values.ofNumeric(ni.getMTU()))
+						                .entry(Keys.of("hwaddress"), Values.ofText(formatHex(ni.getHardwareAddress())))
+						                .entry(Keys.of("address"), Values.ofText(formatInterfaceAddress(ni)))
+						                .build();
 					out.send(record);
 				}
 				return ExitStatus.success();
@@ -122,7 +122,7 @@ public class NetworkModule implements Module {
 
 	@Description("http client (supports HTTP 1.1/2.0, HTTPS, system proxy)")
 	@Examples({
-			@Example(command = "http https://git.io/v9MjZ | take 10", description = "take first 10 lines of https://git.io/v9MjZ ")
+		@Example(command = "http https://git.io/v9MjZ | take 10", description = "take first 10 lines of https://git.io/v9MjZ ")
 	})
 	@Todo(description = "support additional methods (e.g. POST, DELETE), set headers, inspect response headers, integration tests (httpbin?)")
 	public static class Http implements Command {
@@ -140,9 +140,9 @@ public class NetworkModule implements Module {
 				return ExitStatus.error();
 			}
 			HttpRequest request = HttpRequest.newBuilder()
-					.uri(URI.create(args.get(0)))
-					.GET()
-					.build();
+				                      .uri(URI.create(args.get(0)))
+				                      .GET()
+				                      .build();
 			try {
 				HttpResponse<Stream<String>> response = requestor.send(request);
 				try (Stream<String> body = response.body()) {
@@ -178,11 +178,11 @@ public class NetworkModule implements Module {
 		private static class HttpClientHolder {
 
 			private static final HttpClient INSTANCE = HttpClient.newBuilder()
-					.version(Version.HTTP_2)
-					.followRedirects(Redirect.NORMAL)
-					.proxy(ProxySelector.getDefault())
-					.executor(Runnable::run)
-					.build();
+				                                           .version(Version.HTTP_2)
+				                                           .followRedirects(Redirect.NORMAL)
+				                                           .proxy(ProxySelector.getDefault())
+				                                           .executor(Runnable::run)
+				                                           .build();
 
 			public static HttpClient getInstance() {
 				return INSTANCE;

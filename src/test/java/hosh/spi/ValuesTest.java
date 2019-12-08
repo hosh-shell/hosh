@@ -23,11 +23,16 @@
  */
 package hosh.spi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.then;
-
 import hosh.spi.Values.AlphaNumericStringComparator;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.PrintWriter;
 import java.nio.file.Paths;
@@ -39,16 +44,9 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.then;
 
 public class ValuesTest {
 
@@ -107,15 +105,15 @@ public class ValuesTest {
 		@Test
 		public void nullDuration() {
 			assertThatThrownBy(() -> Values.ofDuration(null))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("duration cannot be null");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("duration cannot be null");
 		}
 
 		@Test
 		public void compareToAnotherValueType() {
 			assertThatThrownBy(() -> Values.ofDuration(Duration.ofHours(1)).compareTo(Values.ofText("2")))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("cannot compare Duration[PT1H] to Text[2]");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare Duration[PT1H] to Text[2]");
 		}
 	}
 
@@ -145,15 +143,15 @@ public class ValuesTest {
 		@Test
 		public void nullDuration() {
 			assertThatThrownBy(() -> Values.ofInstant(null))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("instant cannot be null");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("instant cannot be null");
 		}
 
 		@Test
 		public void compareToAnotherValueType() {
 			assertThatThrownBy(() -> Values.ofInstant(Instant.EPOCH).compareTo(Values.ofText("2")))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("cannot compare Instant[1970-01-01T00:00:00Z] to Text[2]");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare Instant[1970-01-01T00:00:00Z] to Text[2]");
 		}
 	}
 
@@ -167,8 +165,8 @@ public class ValuesTest {
 		@Test
 		public void nullIsReject() {
 			assertThatThrownBy(() -> Values.ofText(null))
-					.hasMessage("text cannot be null")
-					.isInstanceOf(IllegalArgumentException.class);
+				.hasMessage("text cannot be null")
+				.isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test
@@ -180,8 +178,8 @@ public class ValuesTest {
 		@Test
 		public void equalsContract() {
 			EqualsVerifier.forClass(Values.TextValue.class)
-					.withIgnoredFields("style")
-					.verify();
+				.withIgnoredFields("style")
+				.verify();
 		}
 
 		@Test
@@ -192,22 +190,22 @@ public class ValuesTest {
 		@Test
 		public void compareToAnotherValueType() {
 			assertThatThrownBy(() -> Values.ofText("2").compareTo(Values.ofDuration(Duration.ofHours(1))))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("cannot compare Text[2] to Duration[PT1H]");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare Text[2] to Duration[PT1H]");
 		}
 
 		@Test
 		public void nullText() {
 			assertThatThrownBy(() -> Values.ofText(null))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("text cannot be null");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("text cannot be null");
 		}
 
 		@Test
 		public void nullStyles() {
 			assertThatThrownBy(() -> Values.ofStyledText("asd", null))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("style cannot be null");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("style cannot be null");
 		}
 
 		@Test
@@ -251,8 +249,8 @@ public class ValuesTest {
 		@Test
 		public void compareToAnotherValueType() {
 			assertThatThrownBy(() -> Values.ofNumeric(42).compareTo(Values.ofText("2")))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("cannot compare Numeric[42] to Text[2]");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare Numeric[42] to Text[2]");
 		}
 	}
 
@@ -265,13 +263,13 @@ public class ValuesTest {
 
 		@ParameterizedTest
 		@CsvSource({
-				"         0,     0,  B",
-				"        10,    10,  B",
-				"      1023, 1.023,  B",
-				"      1024,     1, KB",
-				"      2048,     2, KB",
-				"      4096,     4, KB",
-				"   1048576,     1, MB",
+			"         0,     0,  B",
+			"        10,    10,  B",
+			"      1023, 1.023,  B",
+			"      1024,     1, KB",
+			"      2048,     2, KB",
+			"      4096,     4, KB",
+			"   1048576,     1, MB",
 		})
 		public void approximateOnPrint(ArgumentsAccessor args) {
 			long bytes = args.getLong(0);
@@ -308,8 +306,8 @@ public class ValuesTest {
 		@Test
 		public void size() {
 			assertThatThrownBy(() -> Values.ofSize(-1))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("negative size");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("negative size");
 		}
 
 		@Test
@@ -320,8 +318,8 @@ public class ValuesTest {
 		@Test
 		public void compareToAnotherValueType() {
 			assertThatThrownBy(() -> Values.ofSize(1000).compareTo(Values.ofText("2")))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("cannot compare Size[1000B] to Text[2]");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare Size[1000B] to Text[2]");
 		}
 
 		@Test
@@ -348,8 +346,8 @@ public class ValuesTest {
 		@Test
 		public void equalsContract() {
 			EqualsVerifier.forClass(Values.PathValue.class)
-					.withIgnoredFields("style")
-					.verify();
+				.withIgnoredFields("style")
+				.verify();
 		}
 
 		@Test
@@ -360,22 +358,22 @@ public class ValuesTest {
 		@Test
 		public void compareToAnotherValueType() {
 			assertThatThrownBy(() -> Values.ofPath(Paths.get("file")).compareTo(Values.ofText("2")))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("cannot compare Path[file] to Text[2]");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare Path[file] to Text[2]");
 		}
 
 		@Test
 		public void nullPath() {
 			assertThatThrownBy(() -> Values.ofPath(null))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("path cannot be null");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("path cannot be null");
 		}
 
 		@Test
 		public void nullStyle() {
 			assertThatThrownBy(() -> Values.ofStyledPath(Paths.get("file"), null))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("style cannot be null");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("style cannot be null");
 		}
 	}
 
@@ -452,107 +450,107 @@ public class ValuesTest {
 		@Test
 		public void instantWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.ofInstant(Instant.ofEpochMilli(100)),
-					Values.none(),
-					Values.none(),
-					Values.ofInstant(Instant.ofEpochMilli(-100)),
-					Values.ofInstant(Instant.ofEpochMilli(0)))
-					.sorted()
-					.collect(Collectors.toList());
+				Values.ofInstant(Instant.ofEpochMilli(100)),
+				Values.none(),
+				Values.none(),
+				Values.ofInstant(Instant.ofEpochMilli(-100)),
+				Values.ofInstant(Instant.ofEpochMilli(0)))
+				                     .sorted()
+				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-					Values.none(),
-					Values.none(),
-					Values.ofInstant(Instant.ofEpochMilli(-100)),
-					Values.ofInstant(Instant.ofEpochMilli(0)),
-					Values.ofInstant(Instant.ofEpochMilli(100)));
+				Values.none(),
+				Values.none(),
+				Values.ofInstant(Instant.ofEpochMilli(-100)),
+				Values.ofInstant(Instant.ofEpochMilli(0)),
+				Values.ofInstant(Instant.ofEpochMilli(100)));
 		}
 
 		@Test
 		public void numericWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.ofNumeric(1),
-					Values.none(),
-					Values.none(),
-					Values.ofNumeric(-1),
-					Values.ofNumeric(0))
-					.sorted()
-					.collect(Collectors.toList());
+				Values.ofNumeric(1),
+				Values.none(),
+				Values.none(),
+				Values.ofNumeric(-1),
+				Values.ofNumeric(0))
+				                     .sorted()
+				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-					Values.none(),
-					Values.none(),
-					Values.ofNumeric(-1),
-					Values.ofNumeric(0),
-					Values.ofNumeric(1));
+				Values.none(),
+				Values.none(),
+				Values.ofNumeric(-1),
+				Values.ofNumeric(0),
+				Values.ofNumeric(1));
 		}
 
 		@Test
 		public void textWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.ofText("a"),
-					Values.none(),
-					Values.none(),
-					Values.ofText("z"),
-					Values.ofText("b"))
-					.sorted()
-					.collect(Collectors.toList());
+				Values.ofText("a"),
+				Values.none(),
+				Values.none(),
+				Values.ofText("z"),
+				Values.ofText("b"))
+				                     .sorted()
+				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-					Values.none(),
-					Values.none(),
-					Values.ofText("a"),
-					Values.ofText("b"),
-					Values.ofText("z"));
+				Values.none(),
+				Values.none(),
+				Values.ofText("a"),
+				Values.ofText("b"),
+				Values.ofText("z"));
 		}
 
 		@Test
 		public void sizeWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.ofSize(1),
-					Values.none(),
-					Values.none(),
-					Values.ofSize(2),
-					Values.ofSize(3))
-					.sorted()
-					.collect(Collectors.toList());
+				Values.ofSize(1),
+				Values.none(),
+				Values.none(),
+				Values.ofSize(2),
+				Values.ofSize(3))
+				                     .sorted()
+				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-					Values.none(),
-					Values.none(),
-					Values.ofSize(1),
-					Values.ofSize(2),
-					Values.ofSize(3));
+				Values.none(),
+				Values.none(),
+				Values.ofSize(1),
+				Values.ofSize(2),
+				Values.ofSize(3));
 		}
 
 		@Test
 		public void pathWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.ofPath(Paths.get("bbb")),
-					Values.none(),
-					Values.none(),
-					Values.ofPath(Paths.get("aaa")),
-					Values.ofPath(Paths.get("ccc")))
-					.sorted()
-					.collect(Collectors.toList());
+				Values.ofPath(Paths.get("bbb")),
+				Values.none(),
+				Values.none(),
+				Values.ofPath(Paths.get("aaa")),
+				Values.ofPath(Paths.get("ccc")))
+				                     .sorted()
+				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-					Values.none(),
-					Values.none(),
-					Values.ofPath(Paths.get("aaa")),
-					Values.ofPath(Paths.get("bbb")),
-					Values.ofPath(Paths.get("ccc")));
+				Values.none(),
+				Values.none(),
+				Values.ofPath(Paths.get("aaa")),
+				Values.ofPath(Paths.get("bbb")),
+				Values.ofPath(Paths.get("ccc")));
 		}
 
 		@Test
 		public void durationWithNone() {
 			List<Value> sorted = Stream.of(
-					Values.none(),
-					Values.ofDuration(Duration.ofMillis(1)),
-					Values.none(),
-					Values.ofDuration(Duration.ofMillis(2)))
-					.sorted()
-					.collect(Collectors.toList());
+				Values.none(),
+				Values.ofDuration(Duration.ofMillis(1)),
+				Values.none(),
+				Values.ofDuration(Duration.ofMillis(2)))
+				                     .sorted()
+				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-					Values.none(),
-					Values.none(),
-					Values.ofDuration(Duration.ofMillis(1)),
-					Values.ofDuration(Duration.ofMillis(2)));
+				Values.none(),
+				Values.none(),
+				Values.ofDuration(Duration.ofMillis(1)),
+				Values.ofDuration(Duration.ofMillis(2)));
 		}
 	}
 }

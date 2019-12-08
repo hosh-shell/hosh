@@ -38,14 +38,13 @@ import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 public class Compiler {
 
@@ -89,7 +88,7 @@ public class Compiler {
 		}
 		if (ctx.getChildCount() == 2) { // unfinished pipeline such as "command | "
 			throw new CompileError(String.format("line %d:%d: incomplete pipeline near '%s'", ctx.getStart().getLine(),
-					ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
+				ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
 		}
 		if (ctx.getChildCount() == 3) { // pipeline
 			Statement producer = compileCommand(ctx.command());
@@ -115,7 +114,7 @@ public class Compiler {
 		String commandName = token.getText();
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
-				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
+			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
 		Downcast.of(command, CommandWrapper.class).ifPresent(cmd -> {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		});
@@ -132,9 +131,9 @@ public class Compiler {
 		String commandName = token.getText();
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
-				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
+			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
 		CommandWrapper<?> commandWrapper = Downcast.of(command, CommandWrapper.class)
-				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName)));
+			                                   .orElseThrow(() -> new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName)));
 		if (ctx.stmt() == null) {
 			int line = ctx.start.getLine();
 			throw new CompileError(String.format("line %d: '%s' with empty wrapping statement", line, commandName));
@@ -147,10 +146,10 @@ public class Compiler {
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {
 		return ctx
-				.expression()
-				.stream()
-				.map(this::compileArgument)
-				.collect(Collectors.toUnmodifiableList());
+			       .expression()
+			       .stream()
+			       .map(this::compileArgument)
+			       .collect(Collectors.toUnmodifiableList());
 	}
 
 	private Resolvable compileArgument(ExpressionContext ctx) {
@@ -235,7 +234,7 @@ public class Compiler {
 		 * Describe command in a human readable form.
 		 *
 		 * @return a human readable description of the command
-		 *         (e.g. 'ls' or '/usr/bin/cat')
+		 * (e.g. 'ls' or '/usr/bin/cat')
 		 */
 		public String getLocation() {
 			return location;

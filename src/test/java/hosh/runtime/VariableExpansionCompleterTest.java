@@ -23,15 +23,7 @@
  */
 package hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-
 import hosh.spi.State;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
@@ -41,6 +33,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 public class VariableExpansionCompleterTest {
@@ -72,11 +71,11 @@ public class VariableExpansionCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates)
-				.hasSize(1)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo("${FOO}");
-					assertThat(candidate.descr()).isNull();
-				});
+			.hasSize(1)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isEqualTo("${FOO}");
+				assertThat(candidate.descr()).isNull();
+			});
 	}
 
 	@Test
@@ -86,10 +85,10 @@ public class VariableExpansionCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates)
-				.hasSize(2)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).matches("\\Q${FOO}\\E|\\Q${BAR}\\E");
-					assertThat(candidate.descr()).isNull();
-				});
+			.hasSize(2)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).matches("\\Q${FOO}\\E|\\Q${BAR}\\E");
+				assertThat(candidate.descr()).isNull();
+			});
 	}
 }

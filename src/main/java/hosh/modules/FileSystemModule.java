@@ -92,9 +92,9 @@ public class FileSystemModule implements Module {
 
 	@Description("list files")
 	@Examples({
-			@Example(command = "ls", description = "list current directory"),
-			@Example(command = "ls /tmp", description = "list specified absolute directory"),
-			@Example(command = "ls directory", description = "list relative directory")
+		@Example(command = "ls", description = "list current directory"),
+		@Example(command = "ls /tmp", description = "list specified absolute directory"),
+		@Example(command = "ls directory", description = "list relative directory")
 	})
 	@Todo(description = "add support for mtime, atime, ctime, uid, gid, etc")
 	public static class ListFiles implements Command, StateAware {
@@ -124,9 +124,9 @@ public class FileSystemModule implements Module {
 					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 					Value size = attributes.isRegularFile() ? Values.ofSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
-							.entry(Keys.PATH, Values.ofStyledPath(path.getFileName(), colorFor(attributes)))
-							.entry(Keys.SIZE, size)
-							.build();
+						               .entry(Keys.PATH, Values.ofStyledPath(path.getFileName(), colorFor(attributes)))
+						               .entry(Keys.SIZE, size)
+						               .build();
 					out.send(entry);
 				}
 				return ExitStatus.success();
@@ -157,7 +157,7 @@ public class FileSystemModule implements Module {
 
 	@Description("output current working directory")
 	@Examples({
-			@Example(command = "cwd", description = "current working directory"),
+		@Example(command = "cwd", description = "current working directory"),
 	})
 	public static class CurrentWorkingDirectory implements Command, StateAware {
 
@@ -181,8 +181,8 @@ public class FileSystemModule implements Module {
 
 	@Description("set new current working directory")
 	@Examples({
-			@Example(command = "cd dir", description = "change current working directory to 'dir'"),
-			@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
+		@Example(command = "cd dir", description = "change current working directory to 'dir'"),
+		@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
 	})
 	public static class ChangeDirectory implements Command, StateAware {
 
@@ -211,7 +211,7 @@ public class FileSystemModule implements Module {
 
 	@Description("output file line by line")
 	@Examples({
-			@Example(command = "lines file.txt", description = "output all lines of 'file.txt'"),
+		@Example(command = "lines file.txt", description = "output all lines of 'file.txt'"),
 	})
 	public static class Lines implements Command, StateAware {
 
@@ -244,8 +244,8 @@ public class FileSystemModule implements Module {
 
 	@Description("walk directory recursively")
 	@Examples({
-			@Example(command = "find .", description = "recursively output all paths in '.'"),
-			@Example(command = "find /tmp", description = "recursively output all paths in '/tmp'"),
+		@Example(command = "find .", description = "recursively output all paths in '.'"),
+		@Example(command = "find /tmp", description = "recursively output all paths in '/tmp'"),
 	})
 	public static class Find implements Command, StateAware {
 
@@ -280,8 +280,8 @@ public class FileSystemModule implements Module {
 
 	@Description("copy file")
 	@Examples({
-			@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
-			@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"),
+		@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
+		@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"),
 	})
 	public static class Copy implements Command, StateAware {
 
@@ -311,8 +311,8 @@ public class FileSystemModule implements Module {
 
 	@Description("move file")
 	@Examples({
-			@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
-			@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"),
+		@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
+		@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"),
 	})
 	public static class Move implements Command, StateAware {
 
@@ -342,8 +342,8 @@ public class FileSystemModule implements Module {
 
 	@Description("remove file")
 	@Examples({
-			@Example(command = "rm target.txt", description = "remove file using current working directory"),
-			@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"),
+		@Example(command = "rm target.txt", description = "remove file using current working directory"),
+		@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"),
 	})
 	public static class Remove implements Command, StateAware {
 
@@ -372,7 +372,7 @@ public class FileSystemModule implements Module {
 
 	@Description("show partitions information like df -h")
 	@Examples({
-			@Example(command = "partitions", description = "show all partitions"),
+		@Example(command = "partitions", description = "show all partitions"),
 	})
 	public static class Partitions implements Command {
 
@@ -385,15 +385,15 @@ public class FileSystemModule implements Module {
 			for (FileStore store : FileSystems.getDefault().getFileStores()) {
 				try {
 					out.send(Records
-							.builder()
-							.entry(Keys.of("name"), Values.ofText(store.name()))
-							.entry(Keys.of("type"), Values.ofText(store.type()))
-							.entry(Keys.of("total"), Values.ofSize(store.getTotalSpace()))
-							.entry(Keys.of("used"), Values.ofSize(store.getTotalSpace() - store.getUnallocatedSpace()))
-							.entry(Keys.of("free"), Values.ofSize(store.getUsableSpace()))
-							.entry(Keys.of("blocksize"), Values.ofSize(store.getBlockSize()))
-							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
-							.build());
+						         .builder()
+						         .entry(Keys.of("name"), Values.ofText(store.name()))
+						         .entry(Keys.of("type"), Values.ofText(store.type()))
+						         .entry(Keys.of("total"), Values.ofSize(store.getTotalSpace()))
+						         .entry(Keys.of("used"), Values.ofSize(store.getTotalSpace() - store.getUnallocatedSpace()))
+						         .entry(Keys.of("free"), Values.ofSize(store.getUsableSpace()))
+						         .entry(Keys.of("blocksize"), Values.ofSize(store.getBlockSize()))
+						         .entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
+						         .build());
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
@@ -405,7 +405,7 @@ public class FileSystemModule implements Module {
 	@Experimental(description = "usefulness of this command is quite limited right now")
 	@Description("detect content type of a file")
 	@Examples({
-			@Example(command = "probe file", description = "attempt to detect content type"),
+		@Example(command = "probe file", description = "attempt to detect content type"),
 	})
 	public static class Probe implements Command, StateAware {
 
@@ -439,7 +439,7 @@ public class FileSystemModule implements Module {
 
 	@Description("create symlink")
 	@Examples({
-			@Example(command = "symlink source target", description = "create symlink"),
+		@Example(command = "symlink source target", description = "create symlink"),
 	})
 	public static class Symlink implements Command, StateAware {
 
@@ -469,7 +469,7 @@ public class FileSystemModule implements Module {
 
 	@Description("create hardlink")
 	@Examples({
-			@Example(command = "hardlink source target", description = "create hardlink"),
+		@Example(command = "hardlink source target", description = "create hardlink"),
 	})
 	public static class Hardlink implements Command, StateAware {
 
@@ -499,7 +499,7 @@ public class FileSystemModule implements Module {
 
 	@Description("resolve to canonical absolute path")
 	@Examples({
-			@Example(command = "resolve ./symlink", description = "resolve symlink to the absolute path"),
+		@Example(command = "resolve ./symlink", description = "resolve symlink to the absolute path"),
 	})
 	public static class Resolve implements Command, StateAware {
 
@@ -530,7 +530,7 @@ public class FileSystemModule implements Module {
 
 	@Description("watch for filesystem change in the given path")
 	@Examples({
-			@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
+		@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
 	})
 	@Bug(description = "should be recursive by default", issue = "https://github.com/dfa1/hosh/issues/94")
 	public static class Watch implements Command, StateAware {
@@ -552,9 +552,9 @@ public class FileSystemModule implements Module {
 			}
 			Path dir = state.getCwd();
 			WatchEvent.Kind<?>[] events = {
-					StandardWatchEventKinds.ENTRY_CREATE,
-					StandardWatchEventKinds.ENTRY_DELETE,
-					StandardWatchEventKinds.ENTRY_MODIFY
+				StandardWatchEventKinds.ENTRY_CREATE,
+				StandardWatchEventKinds.ENTRY_DELETE,
+				StandardWatchEventKinds.ENTRY_MODIFY
 			};
 			try (WatchService watchService = dir.getFileSystem().newWatchService()) {
 				dir.register(watchService, events);
@@ -569,7 +569,7 @@ public class FileSystemModule implements Module {
 		}
 
 		private void withService(WatchService watchService, OutputChannel out) throws InterruptedException {
-			for (;;) {
+			while (true) {
 				LOGGER.info("waiting for events");
 				WatchKey key = watchService.take();
 				handle(out, key);
@@ -588,9 +588,9 @@ public class FileSystemModule implements Module {
 				@SuppressWarnings("unchecked")
 				WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
 				out.send(Records.builder()
-						.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
-						.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
-						.build());
+					         .entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
+					         .entry(Keys.PATH, Values.ofPath(pathEvent.context()))
+					         .build());
 			}
 		}
 	}
@@ -598,7 +598,7 @@ public class FileSystemModule implements Module {
 	@Experimental(description = "naive and ugly implementation (e.g. sleep(200) and output on err)")
 	@Description("execute inner block after successfully locking file")
 	@Examples({
-			@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
+		@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
 	})
 	public static class WithLock implements CommandWrapper<WithLock.LockResource>, StateAware {
 

@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * Link to an existing bug.
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target({ ElementType.TYPE, ElementType.METHOD })
+@Target({ElementType.TYPE, ElementType.METHOD})
 public @interface Bug {
 
 	String description();

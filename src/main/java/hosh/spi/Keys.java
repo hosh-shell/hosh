@@ -29,7 +29,7 @@ import java.util.Objects;
  * Standard keys used over and over through all commands. Usually such keys
  * convey some semantic information and some defaults regarding textual
  * representation in terminal.
- *
+ * <p>
  * Built-in commands can use "private" keys when appropriate.
  */
 public class Keys {

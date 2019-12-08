@@ -23,20 +23,19 @@
  */
 package hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import hosh.spi.Command;
 import hosh.spi.State;
-
-import java.util.function.Supplier;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.function.Supplier;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 public class SimpleCommandRegistryTest {
@@ -80,7 +79,7 @@ public class SimpleCommandRegistryTest {
 			sut.registerCommand("foo", supplier);
 			sut.registerCommand("foo", () -> anotherCommand);
 		}).hasMessage("command with same name already registered: foo")
-				.isInstanceOf(IllegalArgumentException.class);
+			.isInstanceOf(IllegalArgumentException.class);
 		// make sure first mapping is still in place
 		assertThat(state.getCommands()).containsEntry("foo", supplier);
 	}

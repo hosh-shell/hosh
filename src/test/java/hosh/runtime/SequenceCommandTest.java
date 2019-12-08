@@ -23,23 +23,22 @@
  */
 package hosh.runtime;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doReturn;
-
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
-
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 public class SequenceCommandTest {

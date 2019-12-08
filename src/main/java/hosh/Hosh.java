@@ -47,6 +47,18 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.impl.completer.AggregateCompleter;
+import org.jline.reader.impl.history.DefaultHistory;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,19 +78,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.jline.reader.LineReader;
-import org.jline.reader.LineReaderBuilder;
-import org.jline.reader.impl.completer.AggregateCompleter;
-import org.jline.reader.impl.history.DefaultHistory;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 
 /**
  * Main class
@@ -176,7 +175,7 @@ public class Hosh {
 	}
 
 	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Injector injector, OutputChannel out, OutputChannel err,
-			Logger logger) {
+	                                 Logger logger) {
 		try {
 			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);
@@ -192,26 +191,26 @@ public class Hosh {
 	private static String loadScript(Path path) {
 		try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
 			return lines
-					.map(line -> line.trim().endsWith("|") ? line : line + ";")
-					.collect(Collectors.joining("\n"));
+				       .map(line -> line.trim().endsWith("|") ? line : line + ";")
+				       .collect(Collectors.joining("\n"));
 		} catch (IOException e) {
 			throw new UncheckedIOException("unable to load: " + path, e);
 		}
 	}
 
 	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter, Injector injector,
-			OutputChannel out, OutputChannel err, Logger logger) {
+	                               OutputChannel out, OutputChannel err, Logger logger) {
 		LineReader lineReader = LineReaderBuilder
-				.builder()
-				.appName("hosh")
-				.history(new DefaultHistory())
-				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh_history"))
-				.completer(new AggregateCompleter(
-						new CommandCompleter(state),
-						new FileSystemCompleter(state),
-						new VariableExpansionCompleter(state)))
-				.terminal(terminal)
-				.build();
+			                        .builder()
+			                        .appName("hosh")
+			                        .history(new DefaultHistory())
+			                        .variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh_history"))
+			                        .completer(new AggregateCompleter(
+				                        new CommandCompleter(state),
+				                        new FileSystemCompleter(state),
+				                        new VariableExpansionCompleter(state)))
+			                        .terminal(terminal)
+			                        .build();
 		injector.setHistory(lineReader.getHistory());
 		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);

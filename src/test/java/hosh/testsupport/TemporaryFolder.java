@@ -23,14 +23,14 @@
  */
 package hosh.testsupport;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Heavily inspired by JUnit 4.12 TemporaryFolder but with less features.

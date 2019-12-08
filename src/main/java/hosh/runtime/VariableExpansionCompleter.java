@@ -24,13 +24,12 @@
 package hosh.runtime;
 
 import hosh.spi.State;
-
-import java.util.List;
-
 import org.jline.reader.Candidate;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
+
+import java.util.List;
 
 public class VariableExpansionCompleter implements Completer {
 
@@ -44,11 +43,11 @@ public class VariableExpansionCompleter implements Completer {
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
 		if (line.word().startsWith("${")) {
 			state.getVariables()
-					.keySet()
-					.stream()
-					.map(s -> "${" + s + "}")
-					.map(Candidates::complete)
-					.forEach(candidates::add);
+				.keySet()
+				.stream()
+				.map(s -> "${" + s + "}")
+				.map(Candidates::complete)
+				.forEach(candidates::add);
 		}
 	}
 }

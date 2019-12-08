@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * Used to produce user-facing documentation with 'help' built-in command.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 public @interface Example {
 
 	String command();

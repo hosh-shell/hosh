@@ -23,10 +23,6 @@
  */
 package hosh.modules;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-
 import hosh.modules.TerminalModule.Bell;
 import hosh.modules.TerminalModule.Clear;
 import hosh.modules.TerminalModule.Dump;
@@ -36,9 +32,6 @@ import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.Values;
-
-import java.util.List;
-
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.Nested;
@@ -49,6 +42,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 public class TerminalModuleTest {
 

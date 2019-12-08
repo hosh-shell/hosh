@@ -23,12 +23,12 @@
  */
 package hosh.testsupport;
 
-import java.util.TimeZone;
-
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
+
+import java.util.TimeZone;
 
 public class WithTimeZone implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 

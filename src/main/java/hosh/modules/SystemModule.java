@@ -43,6 +43,7 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Values;
+import org.jline.reader.LineReader;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -68,8 +69,6 @@ import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-
-import org.jline.reader.LineReader;
 
 public class SystemModule implements Module {
 
@@ -99,9 +98,9 @@ public class SystemModule implements Module {
 
 	@Description("write arguments to output")
 	@Examples({
-			@Example(command = "echo", description = "write empty line"),
-			@Example(command = "echo hello", description = "write 'hello'"),
-			@Example(command = "echo hello ${USER}", description = "write 'hello dfa', if USER=dfa"),
+		@Example(command = "echo", description = "write empty line"),
+		@Example(command = "echo hello", description = "write 'hello'"),
+		@Example(command = "echo hello ${USER}", description = "write 'hello dfa', if USER=dfa"),
 	})
 	public static class Echo implements Command {
 
@@ -115,7 +114,7 @@ public class SystemModule implements Module {
 
 	@Description("display all variables")
 	@Examples({
-			@Example(command = "env", description = "display all environment variables"),
+		@Example(command = "env", description = "display all environment variables"),
 	})
 	public static class Env implements Command, StateAware {
 
@@ -135,9 +134,9 @@ public class SystemModule implements Module {
 			Map<String, String> variables = state.getVariables();
 			for (var entry : variables.entrySet()) {
 				Record record = Records.builder()
-						.entry(Keys.NAME, Values.ofText(entry.getKey()))
-						.entry(Keys.VALUE, Values.ofText(entry.getValue()))
-						.build();
+					                .entry(Keys.NAME, Values.ofText(entry.getKey()))
+					                .entry(Keys.VALUE, Values.ofText(entry.getValue()))
+					                .build();
 				out.send(record);
 			}
 			return ExitStatus.success();
@@ -146,9 +145,9 @@ public class SystemModule implements Module {
 
 	@Description("exit current interactive session or script")
 	@Examples({
-			@Example(command = "exit", description = "exit with status 0 (success)"),
-			@Example(command = "exit 1", description = "exit with status 1 (error)"),
-			@Example(command = "exit 0", description = "exit with status 0 (success)"),
+		@Example(command = "exit", description = "exit with status 0 (success)"),
+		@Example(command = "exit 1", description = "exit with status 1 (error)"),
+		@Example(command = "exit 0", description = "exit with status 0 (success)"),
 	})
 	public static class Exit implements Command, StateAware {
 
@@ -184,8 +183,8 @@ public class SystemModule implements Module {
 
 	@Description("built-in help system")
 	@Examples({
-			@Example(command = "help", description = "print all built-in commands"),
-			@Example(command = "help command", description = "print help for specified command")
+		@Example(command = "help", description = "print all built-in commands"),
+		@Example(command = "help command", description = "print help for specified command")
 	})
 	public static class Help implements Command, StateAware {
 
@@ -203,9 +202,9 @@ public class SystemModule implements Module {
 					Description description = entry.getValue().get().getClass().getAnnotation(Description.class);
 					String name = entry.getKey();
 					Record record = Records.builder()
-							.entry(Keys.NAME, Values.ofText(name))
-							.entry(Keys.DESCRIPTION, Values.ofText(description.value()))
-							.build();
+						                .entry(Keys.NAME, Values.ofText(name))
+						                .entry(Keys.DESCRIPTION, Values.ofText(description.value()))
+						                .build();
 					out.send(record);
 				}
 				return ExitStatus.success();
@@ -242,8 +241,8 @@ public class SystemModule implements Module {
 
 	@Description("suspend execution for given duration, by default measured in millis")
 	@Examples({
-			@Example(command = "sleep 1 second", description = "suspend execution for 1 second"),
-			@Example(command = "sleep 1000", description = "suspend execution for 1000 millis"),
+		@Example(command = "sleep 1 second", description = "suspend execution for 1 second"),
+		@Example(command = "sleep 1000", description = "suspend execution for 1000 millis"),
 	})
 	public static class Sleep implements Command {
 
@@ -318,7 +317,7 @@ public class SystemModule implements Module {
 			Map.entry("seconds", ChronoUnit.SECONDS),
 			Map.entry("minutes", ChronoUnit.MINUTES),
 			Map.entry("hours", ChronoUnit.HOURS)
-			);
+		);
 
 		private Optional<ChronoUnit> parseUnit(String value) {
 			return Optional.ofNullable(validUnits.get(value));
@@ -327,8 +326,8 @@ public class SystemModule implements Module {
 
 	@Description("measure execution time of command or pipeline")
 	@Examples({
-			@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
-			@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
+		@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
+		@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
 	})
 	public static class WithTime implements CommandWrapper<Long> {
 
@@ -352,7 +351,7 @@ public class SystemModule implements Module {
 
 	@Description("process status")
 	@Examples({
-			@Example(command = "ps", description = "list all running process in the system as the current user"),
+		@Example(command = "ps", description = "list all running process in the system as the current user"),
 	})
 	public static class ProcessList implements Command {
 
@@ -365,12 +364,12 @@ public class SystemModule implements Module {
 			ProcessHandle.allProcesses().forEach(process -> {
 				Info info = process.info();
 				Record result = Records.builder()
-						.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
-						.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
-						.entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
-						.entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
-						.entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
-						.build();
+					                .entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
+					                .entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
+					                .entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
+					                .entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
+					                .entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
+					                .build();
 				out.send(result);
 			});
 			return ExitStatus.success();
@@ -379,7 +378,7 @@ public class SystemModule implements Module {
 
 	@Description("kill process")
 	@Examples({
-			@Example(command = "kill 38878", description = "kill process with PID 38878"),
+		@Example(command = "kill 38878", description = "kill process with PID 38878"),
 	})
 	public static class KillProcess implements Command {
 
@@ -424,7 +423,7 @@ public class SystemModule implements Module {
 
 	@Description("create a runtime error, mostly for testing purposes")
 	@Examples({
-			@Example(command = "lines file.txt | err", description = "inject an error in this pipeline")
+		@Example(command = "lines file.txt | err", description = "inject an error in this pipeline")
 	})
 	public static class Err implements Command {
 
@@ -436,7 +435,7 @@ public class SystemModule implements Module {
 
 	@Description("measure execution time (best, worst, average) of inner command")
 	@Examples({
-			@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
+		@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
 	})
 	public static class Benchmark implements CommandWrapper<SystemModule.Benchmark.Accumulator> {
 
@@ -464,11 +463,11 @@ public class SystemModule implements Module {
 			int runs = resource.results.size();
 			Duration avg = runs == 0 ? Duration.ZERO : resource.results.stream().reduce(Duration.ZERO, (acc, d) -> acc.plus(d)).dividedBy(runs);
 			out.send(Records.builder()
-					.entry(Keys.COUNT, Values.ofNumeric(runs))
-					.entry(BEST, Values.ofDuration(best))
-					.entry(WORST, Values.ofDuration(worst))
-					.entry(AVERAGE, Values.ofDuration(avg))
-					.build());
+				         .entry(Keys.COUNT, Values.ofNumeric(runs))
+				         .entry(BEST, Values.ofDuration(best))
+				         .entry(WORST, Values.ofDuration(worst))
+				         .entry(AVERAGE, Values.ofDuration(avg))
+				         .build());
 		}
 
 		@Override
@@ -511,7 +510,7 @@ public class SystemModule implements Module {
 
 	@Description("consume any record (e.g. like /dev/null)")
 	@Examples({
-			@Example(command = "ls | sink", description = "consume any record produced by ls")
+		@Example(command = "ls | sink", description = "consume any record produced by ls")
 	})
 	public static class Sink implements Command {
 
@@ -530,8 +529,8 @@ public class SystemModule implements Module {
 
 	@Description("create or update a variable binding")
 	@Examples({
-			@Example(command = "set FILE file.txt", description = "create variable FILE"),
-			@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
+		@Example(command = "set FILE file.txt", description = "create variable FILE"),
+		@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
 	})
 	public static class SetVariable implements Command, StateAware {
 
@@ -561,7 +560,7 @@ public class SystemModule implements Module {
 
 	@Description("delete a variable binding")
 	@Examples({
-			@Example(command = "unset FILE", description = "delete variable FILE, cannot be referenced anymore after this command"),
+		@Example(command = "unset FILE", description = "delete variable FILE, cannot be referenced anymore after this command"),
 	})
 	public static class UnsetVariable implements Command, StateAware {
 
@@ -586,7 +585,7 @@ public class SystemModule implements Module {
 
 	@Description("Read a string from standard input and assign result to variable. The trailing newline is stripped.")
 	@Examples({
-			@Example(command = "input FOO", description = "save string read to variable 'FOO'"),
+		@Example(command = "input FOO", description = "save string read to variable 'FOO'"),
 	})
 	public static class Input implements Command, StateAware, LineReaderAware {
 
@@ -635,7 +634,7 @@ public class SystemModule implements Module {
 	@Experimental(description = "probably should be merged with input? not sure about name")
 	@Description("Read a string from standard input in a secure way and assign result to variable. The trailing newline is stripped.")
 	@Examples({
-			@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
+		@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
 	})
 	public static class Secret implements Command, StateAware, LineReaderAware {
 
@@ -683,7 +682,7 @@ public class SystemModule implements Module {
 
 	@Description("capture output of a command into a variable")
 	@Examples({
-			@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
+		@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
 	})
 	@Experimental(description = "too low level compared to simply VARNAME=$(ls)")
 	public static class Capture implements Command, StateAware {
@@ -719,7 +718,7 @@ public class SystemModule implements Module {
 
 	@Description("send output of a command into a file")
 	@Examples({
-			@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
+		@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
 	})
 	@Experimental(description = "too low level compared to simply > file.txt or >> file.txt? too much power for end user (e.g. they could use DSYNC or READ)?")
 	public static class Open implements Command, StateAware {
@@ -752,10 +751,10 @@ public class SystemModule implements Module {
 
 		private OpenOption[] toOpenOptions(List<String> args) {
 			return args
-					.stream()
-					.skip(1)
-					.map(arg -> parseOption(arg))
-					.toArray(OpenOption[]::new);
+				       .stream()
+				       .skip(1)
+				       .map(arg -> parseOption(arg))
+				       .toArray(OpenOption[]::new);
 		}
 
 		private OpenOption parseOption(String arg) {

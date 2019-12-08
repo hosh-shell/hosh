@@ -23,17 +23,8 @@
  */
 package hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-
 import hosh.spi.State;
 import hosh.testsupport.TemporaryFolder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
@@ -46,6 +37,14 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 public class FileSystemCompleterTest {
@@ -91,11 +90,11 @@ public class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.hasSize(1)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo("a");
-					assertThat(candidate.complete()).isTrue();
-				});
+			.hasSize(1)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isEqualTo("a");
+				assertThat(candidate.complete()).isTrue();
+			});
 	}
 
 	@DisabledOnOs(OS.WINDOWS)
@@ -106,10 +105,10 @@ public class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.isNotEmpty()
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isNotBlank();
-				});
+			.isNotEmpty()
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isNotBlank();
+			});
 	}
 
 	@EnabledOnOs(OS.WINDOWS)
@@ -120,10 +119,10 @@ public class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.isNotEmpty()
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isNotBlank();
-				});
+			.isNotEmpty()
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isNotBlank();
+			});
 	}
 
 	@Test
@@ -134,11 +133,11 @@ public class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.hasSize(1)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo(dir.getAbsolutePath() + File.separator);
-					assertThat(candidate.complete()).isFalse();
-				});
+			.hasSize(1)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isEqualTo(dir.getAbsolutePath() + File.separator);
+				assertThat(candidate.complete()).isFalse();
+			});
 	}
 
 	@Test
@@ -149,11 +148,11 @@ public class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.hasSize(1)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo(newFile.getAbsolutePath());
-					assertThat(candidate.complete()).isTrue();
-				});
+			.hasSize(1)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isEqualTo(newFile.getAbsolutePath());
+				assertThat(candidate.complete()).isTrue();
+			});
 	}
 
 	@Test
@@ -164,10 +163,10 @@ public class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.hasSize(1)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo("aaa" + File.separator + "bbb" + File.separator);
-					assertThat(candidate.complete()).isFalse();
-				});
+			.hasSize(1)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isEqualTo("aaa" + File.separator + "bbb" + File.separator);
+				assertThat(candidate.complete()).isFalse();
+			});
 	}
 }

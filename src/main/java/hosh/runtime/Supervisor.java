@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * {@link Supervisor#submit(Callable)}
  * while providing a synchronization point via @{see
  * {@link Supervisor#waitForAll()}.
- *
+ * <p>
  * SIGINT is handled as well, if requested.
  */
 public class Supervisor implements AutoCloseable {
@@ -89,10 +89,10 @@ public class Supervisor implements AutoCloseable {
 
 	private ExitStatus deriveExitStatus(List<ExitStatus> results) {
 		return results
-				.stream()
-				.filter(ExitStatus::isError)
-				.findFirst()
-				.orElse(ExitStatus.success());
+			       .stream()
+			       .filter(ExitStatus::isError)
+			       .findFirst()
+			       .orElse(ExitStatus.success());
 	}
 
 	private List<ExitStatus> waitForCompletion() throws InterruptedException, ExecutionException {

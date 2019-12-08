@@ -35,11 +35,11 @@ public class PathInitializer {
 
 	public List<Path> initializePath(String path) {
 		return Optional.ofNullable(path)
-				.stream()
-				.map(s -> s.split(File.pathSeparator, 0))
-				.flatMap(Arrays::stream)
-				.filter(s -> !s.isBlank())
-				.map(Paths::get)
-				.collect(Collectors.toList());
+			       .stream()
+			       .map(s -> s.split(File.pathSeparator, 0))
+			       .flatMap(Arrays::stream)
+			       .filter(s -> !s.isBlank())
+			       .map(Paths::get)
+			       .collect(Collectors.toList());
 	}
 }

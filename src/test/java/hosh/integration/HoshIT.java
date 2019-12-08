@@ -23,11 +23,15 @@
  */
 package hosh.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import hosh.doc.Bug;
 import hosh.doc.Todo;
 import hosh.testsupport.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,12 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class HoshIT {
 
@@ -109,8 +108,8 @@ public class HoshIT {
 	@Test
 	public void scriptWithCdAndCwd() throws Exception {
 		Path scriptPath = givenScript(
-				"cd " + temporaryFolder.toPath().toAbsolutePath(),
-				"cwd"//
+			"cd " + temporaryFolder.toPath().toAbsolutePath(),
+			"cwd"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -122,7 +121,7 @@ public class HoshIT {
 	@Test
 	public void scriptWithOsVar() throws Exception {
 		Path scriptPath = givenScript(
-				"echo ${OS_ENV_VARIABLE}"//
+			"echo ${OS_ENV_VARIABLE}"//
 		);
 		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -134,7 +133,7 @@ public class HoshIT {
 	@Test
 	public void scriptWithMissingOsVar() throws Exception {
 		Path scriptPath = givenScript(
-				"echo ${OS_ENV_VARIABLE}"//
+			"echo ${OS_ENV_VARIABLE}"//
 		);
 		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -146,7 +145,7 @@ public class HoshIT {
 	@Test
 	public void scriptWithMissingOsVarWithFallback() throws Exception {
 		Path scriptPath = givenScript(
-				"echo ${OS_ENV_VARIABLE!fallback}"//
+			"echo ${OS_ENV_VARIABLE!fallback}"//
 		);
 		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -158,7 +157,7 @@ public class HoshIT {
 	@Test
 	public void scriptWithImplicitExit() throws Exception {
 		Path scriptPath = givenScript(
-				"echo hello"//
+			"echo hello"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -170,7 +169,7 @@ public class HoshIT {
 	@Test
 	public void scriptWithExplicitExit() throws Exception {
 		Path scriptPath = givenScript(
-				"exit 1"//
+			"exit 1"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
@@ -180,8 +179,8 @@ public class HoshIT {
 	@Test
 	public void scriptParsedThenExecuted() throws Exception {
 		Path scriptPath = givenScript(
-				"exit 0",
-				"AAAAB"//
+			"exit 0",
+			"AAAAB"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
@@ -193,7 +192,7 @@ public class HoshIT {
 	@Test
 	public void nonPipelineExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"git --version"//
+			"git --version"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
@@ -205,7 +204,7 @@ public class HoshIT {
 	@Test
 	public void pipelineWithInternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"rand | take 1 | count"//
+			"rand | take 1 | count"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
@@ -217,7 +216,7 @@ public class HoshIT {
 	@Test
 	public void pipelineReadFromExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"git --version | take 1 | count"//
+			"git --version | take 1 | count"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
@@ -229,7 +228,7 @@ public class HoshIT {
 	@Test
 	public void pipelineWriteToExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-				"cwd | git cat-file --batch" //
+			"cwd | git cat-file --batch" //
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
@@ -252,7 +251,7 @@ public class HoshIT {
 	@Test
 	public void pipelinesDontExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
-				"echo ${OS_ENV_VARIABLE} | take 1"//
+			"echo ${OS_ENV_VARIABLE} | take 1"//
 		);
 		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -265,7 +264,7 @@ public class HoshIT {
 	@Test
 	public void wrappersDontExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
-				"withTime { echo ${OS_ENV_VARIABLE} } "//
+			"withTime { echo ${OS_ENV_VARIABLE} } "//
 		);
 		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -277,7 +276,7 @@ public class HoshIT {
 	@Test
 	public void errorInProducer() throws Exception {
 		Path scriptPath = givenScript(
-				"err | count"//
+			"err | count"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -289,7 +288,7 @@ public class HoshIT {
 	@Test
 	public void errorInConsumer() throws Exception {
 		Path scriptPath = givenScript(
-				"ls | err"//
+			"ls | err"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -301,7 +300,7 @@ public class HoshIT {
 	@Test
 	public void consumeInfiniteProducer() throws Exception {
 		Path scriptPath = givenScript(
-				"rand | take 100 | count"//
+			"rand | take 100 | count"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -313,7 +312,7 @@ public class HoshIT {
 	@Test
 	public void benchmark() throws Exception {
 		Path scriptPath = givenScript(
-				"benchmark 2 { rand | take 100 | count } "//
+			"benchmark 2 { rand | take 100 | count } "//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -325,7 +324,7 @@ public class HoshIT {
 	@Test
 	public void unknownCommandInScript() throws Exception {
 		Path scriptPath = givenScript(
-				"FOOBAR"//
+			"FOOBAR"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -347,7 +346,7 @@ public class HoshIT {
 	@Test
 	public void commandWrapperThatUsedStateInBefore() throws Exception {
 		Path scriptPath = givenScript(
-				"withLock file.lock { echo inside critical section } "//
+			"withLock file.lock { echo inside critical section } "//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -360,7 +359,7 @@ public class HoshIT {
 	@Test
 	public void commandWrapperCapturesOutput() throws Exception {
 		Path scriptPath = givenScript(
-				"benchmark 1 { cwd } | schema"//
+			"benchmark 1 { cwd } | schema"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -372,8 +371,8 @@ public class HoshIT {
 	@Test
 	public void redirectOutputToVariable() throws Exception {
 		Path scriptPath = givenScript(
-				"echo 'world' | capture WHO", // this is WHO=$(echo 'world')
-				"echo hello ${WHO}"//
+			"echo 'world' | capture WHO", // this is WHO=$(echo 'world')
+			"echo hello ${WHO}"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -385,9 +384,9 @@ public class HoshIT {
 	@Test
 	public void comments() throws Exception {
 		Path scriptPath = givenScript(
-				"# echo 'hello'",
-				"# ls",
-				"exit 42"//
+			"# echo 'hello'",
+			"# ls",
+			"exit 42"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -399,7 +398,7 @@ public class HoshIT {
 	@Test
 	public void sequence() throws Exception {
 		Path scriptPath = givenScript(
-				"echo a ; echo b"//
+			"echo a ; echo b"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -412,9 +411,9 @@ public class HoshIT {
 	@Test
 	public void multilinePipeline() throws Exception {
 		Path scriptPath = givenScript(
-				"rand      |",
-				"  take 42 |",
-				"  count    ");
+			"rand      |",
+			"  take 42 |",
+			"  count    ");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
@@ -544,8 +543,8 @@ public class HoshIT {
 		cmd.addAll(List.of("-jar", "target/dist/hosh.jar"));
 		cmd.addAll(List.of(args));
 		return new ProcessBuilder()
-				.command(cmd)
-				.redirectErrorStream(true);
+			       .command(cmd)
+			       .redirectErrorStream(true);
 	}
 
 	private String absoluteJavaBinary() {
@@ -558,14 +557,14 @@ public class HoshIT {
 
 	private List<String> propagateJacocoAgentInvocation() {
 		String[] arguments = ProcessHandle
-				.current()
-				.info()
-				.arguments()
-				.orElse(new String[0]);
+			                     .current()
+			                     .info()
+			                     .arguments()
+			                     .orElse(new String[0]);
 		return Stream.of(arguments)
-				.filter(s -> s.contains("jacoco"))
-				.limit(1)
-				.collect(Collectors.toList());
+			       .filter(s -> s.contains("jacoco"))
+			       .limit(1)
+			       .collect(Collectors.toList());
 	}
 
 	private String consumeOutput(Process hosh) throws IOException {
@@ -594,9 +593,9 @@ public class HoshIT {
 		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
 		assertThat(terminated).isFalse();
 		int waitFor = new ProcessBuilder()
-				.command("kill", "-INT", Long.toString(hosh.pid()))
-				.start()
-				.waitFor();
+			              .command("kill", "-INT", Long.toString(hosh.pid()))
+			              .start()
+			              .waitFor();
 		assertThat(waitFor).isEqualTo(0);
 	}
 }

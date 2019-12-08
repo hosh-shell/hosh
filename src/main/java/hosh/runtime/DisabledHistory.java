@@ -23,12 +23,12 @@
  */
 package hosh.runtime;
 
+import org.jline.reader.History;
+import org.jline.reader.LineReader;
+
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ListIterator;
-
-import org.jline.reader.History;
-import org.jline.reader.LineReader;
 
 /**
  * Fake implementation of {@link History}: used for non-interactive sessions.

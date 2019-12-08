@@ -23,11 +23,11 @@
  */
 package hosh.runtime;
 
-import java.util.Optional;
-
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
+
+import java.util.Optional;
 
 public class ReplReader {
 

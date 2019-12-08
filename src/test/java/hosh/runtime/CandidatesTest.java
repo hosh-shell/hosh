@@ -23,10 +23,10 @@
  */
 package hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.jline.reader.Candidate;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CandidatesTest {
 

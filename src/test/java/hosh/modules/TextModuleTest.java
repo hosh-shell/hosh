@@ -23,12 +23,6 @@
  */
 package hosh.modules;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-
 import hosh.modules.TextModule.Count;
 import hosh.modules.TextModule.Distinct;
 import hosh.modules.TextModule.Drop;
@@ -54,12 +48,6 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 import hosh.testsupport.RecordMatcher;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,6 +57,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
+import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 public class TextModuleTest {
 
@@ -379,10 +378,10 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(Records.builder()
-					.entry(Keys.of("1"), Values.ofText("a"))
-					.entry(Keys.of("2"), Values.ofText("b"))
-					.entry(Keys.of("3"), Values.ofText("c"))
-					.build());
+				                        .entry(Keys.of("1"), Values.ofText("a"))
+				                        .entry(Keys.of("2"), Values.ofText("b"))
+				                        .entry(Keys.of("3"), Values.ofText("c"))
+				                        .build());
 			then(err).shouldHaveNoInteractions();
 		}
 	}
@@ -637,10 +636,10 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(
-					Records.builder()
-							.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
-							.entry(Keys.TEXT, Values.ofText("some data"))
-							.build());
+				Records.builder()
+					.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
+					.entry(Keys.TEXT, Values.ofText("some data"))
+					.build());
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -1092,8 +1091,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Records.singleton(Keys.of("header"), Values.ofText("count     text      ")),
-					Records.singleton(Keys.of("row"), Values.ofText("2         zvrnv     ")));
+				Records.singleton(Keys.of("header"), Values.ofText("count     text      ")),
+				Records.singleton(Keys.of("row"), Values.ofText("2         zvrnv     ")));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1107,8 +1106,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Records.singleton(Keys.of("header"), Values.ofText("count     text      ")),
-					Records.singleton(Keys.of("row"), Values.ofText("          zvrnv     ")));
+				Records.singleton(Keys.of("header"), Values.ofText("count     text      ")),
+				Records.singleton(Keys.of("row"), Values.ofText("          zvrnv     ")));
 		}
 
 		@Test

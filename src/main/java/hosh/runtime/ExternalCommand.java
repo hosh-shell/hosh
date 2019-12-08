@@ -150,7 +150,7 @@ public class ExternalCommand implements Command, StateAware {
 		@Override
 		public Process create(List<String> args, Path cwd, Map<String, String> env, PipelineCommand.Position position) throws IOException {
 			ProcessBuilder processBuilder = new ProcessBuilder(args)
-					.directory(cwd.toFile());
+				                                .directory(cwd.toFile());
 			processBuilder.environment().clear();
 			processBuilder.environment().putAll(env);
 			processBuilder.inheritIO();

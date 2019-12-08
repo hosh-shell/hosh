@@ -23,19 +23,18 @@
  */
 package hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.then;
-
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
-
-import java.util.concurrent.CancellationException;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.concurrent.CancellationException;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 public class CancellableChannelTest {
@@ -59,7 +58,7 @@ public class CancellableChannelTest {
 	public void sendInterrupted() {
 		Thread.currentThread().interrupt();
 		assertThatThrownBy(() -> sut.send(record))
-				.hasMessage("interrupted")
-				.isInstanceOf(CancellationException.class);
+			.hasMessage("interrupted")
+			.isInstanceOf(CancellationException.class);
 	}
 }

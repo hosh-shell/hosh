@@ -25,7 +25,6 @@ package hosh.runtime;
 
 import hosh.antlr4.HoshLexer;
 import hosh.antlr4.HoshParser;
-
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -61,7 +60,7 @@ public class Parser {
 
 		@Override
 		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
-				String msg, RecognitionException e) {
+		                        String msg, RecognitionException e) {
 			throw new ParseError(String.format("line %s:%s: %s", line, charPositionInLine, msg));
 		}
 	}

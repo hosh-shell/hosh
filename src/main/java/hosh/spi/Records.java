@@ -171,17 +171,17 @@ public class Records {
 		@Override
 		public Record append(Key newKey, Value newValue) {
 			return new Builder()
-					.entry(this.key, this.value)
-					.entry(newKey, newValue)
-					.build();
+				       .entry(this.key, this.value)
+				       .entry(newKey, newValue)
+				       .build();
 		}
 
 		@Override
 		public Record prepend(Key newKey, Value newValue) {
 			return new Builder()
-					.entry(newKey, newValue)
-					.entry(this.key, this.value)
-					.build();
+				       .entry(newKey, newValue)
+				       .entry(this.key, this.value)
+				       .build();
 		}
 
 		@Override
@@ -250,17 +250,17 @@ public class Records {
 		@Override
 		public List<Key> keys() {
 			return Arrays
-					.stream(entries)
-					.map(Entry::getKey)
-					.collect(Collectors.toUnmodifiableList());
+				       .stream(entries)
+				       .map(Entry::getKey)
+				       .collect(Collectors.toUnmodifiableList());
 		}
 
 		@Override
 		public List<Value> values() {
 			return Arrays
-					.stream(entries)
-					.map(Entry::getValue)
-					.collect(Collectors.toUnmodifiableList());
+				       .stream(entries)
+				       .map(Entry::getValue)
+				       .collect(Collectors.toUnmodifiableList());
 		}
 
 		@Override
@@ -301,10 +301,10 @@ public class Records {
 		@Override
 		public String toString() {
 			return String.format("Record[data={%s}]",
-					Arrays
-							.stream(entries)
-							.map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
-							.collect(Collectors.joining(",")));
+				Arrays
+					.stream(entries)
+					.map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+					.collect(Collectors.joining(",")));
 		}
 
 		@Override

@@ -25,6 +25,10 @@ package hosh.runtime;
 
 import hosh.spi.LoggerFactory;
 import hosh.spi.State;
+import org.jline.reader.Candidate;
+import org.jline.reader.Completer;
+import org.jline.reader.LineReader;
+import org.jline.reader.ParsedLine;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,11 +39,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
-import org.jline.reader.Candidate;
-import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
 
 public class CommandCompleter implements Completer {
 
@@ -60,10 +59,10 @@ public class CommandCompleter implements Completer {
 
 	private void completeBuiltinsExcludingOverrides(List<Candidate> candidates, Set<String> builtinOverrides) {
 		state.getCommands().keySet()
-				.stream()
-				.filter(command -> !builtinOverrides.contains(command))
-				.map(command -> Candidates.completeWithDescription(command, "built-in"))
-				.forEach(candidates::add);
+			.stream()
+			.filter(command -> !builtinOverrides.contains(command))
+			.map(command -> Candidates.completeWithDescription(command, "built-in"))
+			.forEach(candidates::add);
 	}
 
 	private void completeExternals(List<Candidate> candidates, Set<String> builtinOverrides) {
@@ -77,9 +76,9 @@ public class CommandCompleter implements Completer {
 	private void executableInPath(Path dir, List<Candidate> candidates, Set<String> builtinOverrides) {
 		try (Stream<Path> list = Files.list(dir)) {
 			list
-					.filter(p -> Files.isExecutable(p))
-					.map(p -> toCandidate(p, builtinOverrides))
-					.forEach(candidates::add);
+				.filter(p -> Files.isExecutable(p))
+				.map(p -> toCandidate(p, builtinOverrides))
+				.forEach(candidates::add);
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, "got exception while listing " + dir, e);
 		}

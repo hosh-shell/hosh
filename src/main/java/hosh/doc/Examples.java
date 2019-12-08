@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  * This is used to produce user-facing documentation.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 public @interface Examples {
 
 	Example[] value();

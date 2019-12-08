@@ -73,14 +73,14 @@ public class PipelineCommand implements Command, InterpreterAware {
 	// Inspired by implementation of
 	// java.lang.ProcessBuilder.startPipeline(List<ProcessBuilder).
 	public enum Position {
-			// command not in a pipeline
-			SOLE(false, false),
-			// first command of a pipeline
-			FIRST(false, true),
-			// last command of a pipeline
-			LAST(true, false),
-			// everything else
-			MIDDLE(false, false);
+		// command not in a pipeline
+		SOLE(false, false),
+		// first command of a pipeline
+		FIRST(false, true),
+		// last command of a pipeline
+		LAST(true, false),
+		// everything else
+		MIDDLE(false, false);
 
 		private final boolean redirectInput;
 

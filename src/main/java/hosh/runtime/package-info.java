@@ -23,7 +23,7 @@
  */
 /**
  * Implementation details.
- *
+ * <p>
  * Any non-api class (i.e. not consumed directly by modules) should go here.
  */
 package hosh.runtime;

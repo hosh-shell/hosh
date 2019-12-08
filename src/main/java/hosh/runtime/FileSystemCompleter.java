@@ -24,6 +24,10 @@
 package hosh.runtime;
 
 import hosh.spi.State;
+import org.jline.reader.Candidate;
+import org.jline.reader.Completer;
+import org.jline.reader.LineReader;
+import org.jline.reader.ParsedLine;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,11 +38,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
-
-import org.jline.reader.Candidate;
-import org.jline.reader.Completer;
-import org.jline.reader.LineReader;
-import org.jline.reader.ParsedLine;
 
 public class FileSystemCompleter implements Completer {
 
@@ -73,9 +72,9 @@ public class FileSystemCompleter implements Completer {
 	private void listCandidates(Path dir, UnaryOperator<Path> toPath, List<Candidate> candidates) {
 		try (Stream<Path> list = Files.list(dir)) {
 			list
-					.map(toPath)
-					.map(this::toCandidate)
-					.forEach(candidates::add);
+				.map(toPath)
+				.map(this::toCandidate)
+				.forEach(candidates::add);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

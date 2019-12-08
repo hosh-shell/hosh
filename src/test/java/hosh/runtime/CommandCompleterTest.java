@@ -23,19 +23,9 @@
  */
 package hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-
 import hosh.spi.Command;
 import hosh.spi.State;
 import hosh.testsupport.TemporaryFolder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
@@ -45,6 +35,15 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 public class CommandCompleterTest {
@@ -81,11 +80,11 @@ public class CommandCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.hasSize(1)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo("cmd");
-					assertThat(candidate.descr()).isEqualTo("built-in");
-				});
+			.hasSize(1)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isEqualTo("cmd");
+				assertThat(candidate.descr()).isEqualTo("built-in");
+			});
 	}
 
 	@Test
@@ -97,11 +96,11 @@ public class CommandCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.hasSize(1)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo("cmd");
-					assertThat(candidate.descr()).isEqualTo("built-in, overrides " + file.getAbsolutePath());
-				});
+			.hasSize(1)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isEqualTo("cmd");
+				assertThat(candidate.descr()).isEqualTo("built-in, overrides " + file.getAbsolutePath());
+			});
 	}
 
 	@Test
@@ -120,11 +119,11 @@ public class CommandCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.hasSize(1)
-				.allSatisfy(candidate -> {
-					assertThat(candidate.value()).isEqualTo("cmd");
-					assertThat(candidate.descr()).isEqualTo("external in " + temporaryFolder.toPath().toAbsolutePath());
-				});
+			.hasSize(1)
+			.allSatisfy(candidate -> {
+				assertThat(candidate.value()).isEqualTo("cmd");
+				assertThat(candidate.descr()).isEqualTo("external in " + temporaryFolder.toPath().toAbsolutePath());
+			});
 	}
 
 	@Test
@@ -134,7 +133,7 @@ public class CommandCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-				.isEmpty();
+			.isEmpty();
 	}
 
 	@Test

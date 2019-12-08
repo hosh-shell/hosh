@@ -23,21 +23,12 @@
  */
 package hosh.modules;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.Values;
-
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-
 import org.jline.reader.History;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,6 +36,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+
+import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 public class HistoryModuleTest {
 
@@ -90,7 +89,7 @@ public class HistoryModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.builder().entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH)).entry(Keys.INDEX, Values.ofNumeric(42))
-					.entry(Keys.TEXT, Values.ofText("cmd")).build());
+				                        .entry(Keys.TEXT, Values.ofText("cmd")).build());
 			then(err).shouldHaveNoInteractions();
 		}
 

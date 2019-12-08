@@ -30,7 +30,7 @@ import java.util.concurrent.CancellationException;
 
 /**
  * A decorator that makes any channel implementation cancellable.
- *
+ * <p>
  * This is needed to avoid handling interruptions in several classes
  * (i.e. commands and other channels).
  */

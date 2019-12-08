@@ -23,12 +23,6 @@
  */
 package hosh.modules;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-
 import hosh.doc.Bug;
 import hosh.modules.FileSystemModule.ChangeDirectory;
 import hosh.modules.FileSystemModule.Copy;
@@ -53,6 +47,17 @@ import hosh.spi.State;
 import hosh.spi.Values;
 import hosh.testsupport.RecordMatcher;
 import hosh.testsupport.TemporaryFolder;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -65,17 +70,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 public class FileSystemModuleTest {
 
@@ -128,9 +127,9 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
-					RecordMatcher.of(
-							Keys.PATH, Values.ofPath(Paths.get("dir")),
-							Keys.SIZE, Values.none()));
+				RecordMatcher.of(
+					Keys.PATH, Values.ofPath(Paths.get("dir")),
+					Keys.SIZE, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -142,8 +141,8 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-					Keys.PATH, Values.ofPath(Paths.get("file")),
-					Keys.SIZE, Values.ofSize(0)));
+				Keys.PATH, Values.ofPath(Paths.get("file")),
+				Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -156,11 +155,11 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-					Keys.PATH, Values.ofPath(Paths.get("file")),
-					Keys.SIZE, Values.ofSize(0)));
+				Keys.PATH, Values.ofPath(Paths.get("file")),
+				Keys.SIZE, Values.ofSize(0)));
 			then(out).should().send(RecordMatcher.of(
-					Keys.PATH, Values.ofPath(Paths.get("link")),
-					Keys.SIZE, Values.none()));
+				Keys.PATH, Values.ofPath(Paths.get("link")),
+				Keys.SIZE, Values.none()));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoInteractions();
 		}
@@ -207,8 +206,8 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-					Keys.PATH, Values.ofPath(Paths.get("aaa")),
-					Keys.SIZE, Values.ofSize(0)));
+				Keys.PATH, Values.ofPath(Paths.get("aaa")),
+				Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -233,8 +232,8 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-					Keys.PATH, Values.ofPath(Paths.get("aaa")),
-					Keys.SIZE, Values.ofSize(0)));
+				Keys.PATH, Values.ofPath(Paths.get("aaa")),
+				Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -246,8 +245,8 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-					Keys.PATH, Values.ofPath(Paths.get("aaa")),
-					Keys.SIZE, Values.ofSize(0)));
+				Keys.PATH, Values.ofPath(Paths.get("aaa")),
+				Keys.SIZE, Values.ofSize(0)));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -260,9 +259,9 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
-					RecordMatcher.of(
-							Keys.PATH, Values.ofPath(Path.of("aaa")),
-							Keys.SIZE, Values.none()));
+				RecordMatcher.of(
+					Keys.PATH, Values.ofPath(Path.of("aaa")),
+					Keys.SIZE, Values.none()));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -1041,8 +1040,8 @@ public class FileSystemModuleTest {
 		@Test
 		public void noArgs() {
 			assertThatThrownBy(() -> sut.before(List.of(), in, out, err))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("expecting file name");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("expecting file name");
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -1052,7 +1051,7 @@ public class FileSystemModuleTest {
 		public void wrongFile() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			assertThatThrownBy(() -> sut.before(List.of("../missing_directory/file.txt"), in, out, err))
-					.isInstanceOf(UncheckedIOException.class);
+				.isInstanceOf(UncheckedIOException.class);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -1066,7 +1065,7 @@ public class FileSystemModuleTest {
 			assertThat(resource).isNotNull();
 			// under same JVM tryLock throws exception
 			assertThatThrownBy(() -> resource.getRandomAccessFile().getChannel().tryLock())
-					.isInstanceOf(OverlappingFileLockException.class);
+				.isInstanceOf(OverlappingFileLockException.class);
 			sut.after(resource, in, out, err);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();

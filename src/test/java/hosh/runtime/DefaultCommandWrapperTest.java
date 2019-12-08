@@ -23,19 +23,11 @@
  */
 package hosh.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
-
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +35,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultCommandWrapperTest {
@@ -93,7 +92,7 @@ public class DefaultCommandWrapperTest {
 		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
 		given(interpreter.eval(statement, in, out, err)).willThrow(NullPointerException.class);
 		assertThatThrownBy(() -> sut.run(args, in, out, err))
-				.isInstanceOf(NullPointerException.class);
+			.isInstanceOf(NullPointerException.class);
 		then(commandWrapper).should().before(args, in, out, err);
 		then(commandWrapper).should().after(resource, in, out, err);
 	}
@@ -113,6 +112,6 @@ public class DefaultCommandWrapperTest {
 	@Test
 	public void representation() {
 		assertThat(sut)
-				.hasToString("DefaultCommandWrapper[nested=statement,commandWrapper=commandWrapper]");
+			.hasToString("DefaultCommandWrapper[nested=statement,commandWrapper=commandWrapper]");
 	}
 }

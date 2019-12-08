@@ -55,7 +55,7 @@ public class DefaultCommandWrapper<T> implements Command, InterpreterAware {
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		T resource = commandWrapper.before(args, in, out, err);
 		try {
-			for (;;) {
+			while (true) {
 				ExitStatus exitStatus = interpreter.eval(nested, in, out, err);
 				boolean retry = commandWrapper.retry(resource, in, out, err);
 				if (!retry) {

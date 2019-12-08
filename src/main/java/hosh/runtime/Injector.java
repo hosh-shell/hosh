@@ -29,7 +29,6 @@ import hosh.spi.LineReaderAware;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.TerminalAware;
-
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.terminal.Terminal;
