@@ -120,10 +120,6 @@ logging behaviour according to [Level](https://docs.oracle.com/en/java/javase/11
 
 Logging events will be persisted in `$HOME/.hosh.log`.
 
-## Eclipse support
-
-Project specific settings can be found under `./eclipse` directory.
-
 ## Docker support
 
 Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/) with [alpine-jre](https://hub.docker.com/r/adoptopenjdk/openjdk11):
