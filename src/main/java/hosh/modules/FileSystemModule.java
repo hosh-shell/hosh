@@ -678,7 +678,7 @@ public class FileSystemModule implements Module {
 			LOGGER.fine(() -> String.format("  resolving symlink '%s' to '%s'", path, resolvedPath));
 			return followSymlinksRecursively(resolvedPath);
 		} else {
-			return path.toRealPath();
+			return path;
 		}
 	}
 
