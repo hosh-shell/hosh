@@ -50,6 +50,7 @@ import hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -280,6 +281,17 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + cwd.toString())));
+		}
+
+		@EnabledOnOs(OS.WINDOWS)
+		@Test
+		public void resolveCurrentWorkingDirectory() {
+			given(state.getCwd()).willReturn(Path.of("C:\\vagrant"));
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).should(Mockito.atLeastOnce()).send(ArgumentMatchers.any());
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 

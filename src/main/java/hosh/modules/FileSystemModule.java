@@ -675,17 +675,21 @@ public class FileSystemModule implements Module {
 		if (Files.isSymbolicLink(path)) {
 			Path target = Files.readSymbolicLink(path);
 			Path resolvedPath = path.getParent().resolve(target);
-			LOGGER.fine(() -> String.format("'%s' -> '%s'", path, resolvedPath));
+			LOGGER.fine(() -> String.format("  resolving symlink '%s' to '%s'", path, resolvedPath));
 			return followSymlinksRecursively(resolvedPath);
 		} else {
-			return path;
+			return path.toRealPath();
 		}
 	}
 
 	private static Path resolveAsAbsolutePath(Path cwd, Path file) {
 		if (file.isAbsolute()) {
-			return file;
+			return normalized(file);
 		}
-		return cwd.resolve(file).normalize().toAbsolutePath();
+		return normalized(cwd.resolve(file));
+	}
+
+	private static Path normalized(Path path) {
+		return path.normalize().toAbsolutePath();
 	}
 }
