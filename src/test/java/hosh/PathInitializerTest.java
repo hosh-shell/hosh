@@ -25,6 +25,8 @@ package hosh;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -69,5 +71,12 @@ public class PathInitializerTest {
 	public void pathVariableWithEmptyElement() {
 		List<Path> path = sut.initializePath("/bin" + File.pathSeparator + "   " + File.pathSeparator + "/sbin");
 		assertThat(path).containsExactly(Path.of("/bin"), Path.of("/sbin"));
+	}
+
+	@EnabledOnOs(OS.WINDOWS)
+	@Test
+	public void pathVariableWithTrailingSpace() {
+		List<Path> path = sut.initializePath("c:/bin  ");
+		assertThat(path).containsExactly(Path.of("/bin"));
 	}
 }
