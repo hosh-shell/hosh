@@ -39,7 +39,7 @@ public class PathInitializer {
 			       .map(s -> s.split(File.pathSeparator, 0))
 			       .flatMap(Arrays::stream)
 			       .filter(s -> !s.isBlank())
-				   .peek(s -> System.out.println("PATH DIR: " + s))
+				   .peek(s -> System.err.println("PATH DIR: " + s))
 			       .map(Paths::get)
 			       .collect(Collectors.toList());
 	}
