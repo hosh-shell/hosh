@@ -24,7 +24,6 @@
 package hosh;
 
 import java.io.File;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -39,15 +38,9 @@ public class PathInitializer {
 			       .stream()
 			       .map(s -> s.split(File.pathSeparator, 0))
 			       .flatMap(Arrays::stream)
-				   //.map(String::strip)
+				   .map(String::strip)
 			       .filter(s -> !s.isBlank())
-			       .map(s -> {
-				       try {
-					       return Paths.get(s);
-				       } catch (InvalidPathException e) {
-					       throw new IllegalArgumentException("cannot resolve: " + s, e);
-				       }
-			       })
+			       .map(Paths::get)
 			       .collect(Collectors.toList());
 	}
 }

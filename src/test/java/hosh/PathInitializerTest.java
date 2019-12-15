@@ -76,7 +76,7 @@ public class PathInitializerTest {
 	@EnabledOnOs(OS.WINDOWS)
 	@Test
 	public void pathVariableWithTrailingSpace() {
-		List<Path> path = sut.initializePath("c:/bin  ");
-		assertThat(path).containsExactly(Path.of("/bin"));
+		List<Path> path = sut.initializePath("c:/Program Files "); // trailing space
+		assertThat(path).containsExactly(Path.of("c:/Program Files"));
 	}
 }
