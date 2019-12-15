@@ -275,18 +275,28 @@
 				<version>1.4.10</version>
 				<configuration>
 					<targetClasses>
-						<param>org.hosh.*</param>
+						<param>hosh.*</param>
 					</targetClasses>
 					<targetTests>
-						<param>org.hosh.*</param>
+						<param>hosh.*</param>
 					</targetTests>
+					<excludedClasses>
+						<param>hosh.antlr4.*</param>
+					</excludedClasses>
 					<excludedTestClasses>
-						<param>org.hosh.integration.*</param>
-						<param>org.hosh.runtime.CommandResolversTest*</param>
-						<param>org.hosh.modules.FileSystemModuleTest*</param>
-						<param>org.hosh.antlr4.*</param>
+						<param>hosh.integration.*</param>
+						<param>hosh.runtime.CommandResolversTest*</param>
+						<param>hosh.runtime.CommandCompleterTest*</param>
+						<param>hosh.modules.FileSystemModuleTest*</param>
 					</excludedTestClasses>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.pitest</groupId>
+						<artifactId>pitest-junit5-plugin</artifactId>
+						<version>0.10</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
