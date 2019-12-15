@@ -26,7 +26,6 @@ package hosh.fitness;
 import hosh.Hosh;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
-import net.jqwik.api.Property;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +53,6 @@ public class JUnitFitnessTest {
 				                                 .flatMap(c -> Stream.of(c.getDeclaredMethods()))
 				                                 .filter(m -> Modifier.isPublic(m.getModifiers()))
 				                                 .filter(m -> !Modifier.isStatic(m.getModifiers()))
-				                                 .filter(m -> m.getDeclaredAnnotation(Property.class) == null)
 				                                 .filter(m -> m.getDeclaredAnnotation(Test.class) == null)
 				                                 .filter(m -> m.getDeclaredAnnotation(ParameterizedTest.class) == null)
 				                                 .filter(m -> m.getDeclaredAnnotation(BeforeEach.class) == null)

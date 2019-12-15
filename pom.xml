@@ -101,9 +101,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.jqwik</groupId>
-			<artifactId>jqwik</artifactId>
-			<version>1.2.1</version>
+			<groupId>org.quicktheories</groupId>
+			<artifactId>quicktheories</artifactId>
+			<version>0.26</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

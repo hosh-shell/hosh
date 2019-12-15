@@ -23,15 +23,14 @@
  */
 package hosh.spi;
 
-import net.jqwik.api.ForAll;
-import net.jqwik.api.Property;
-import net.jqwik.api.constraints.CharRange;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.quicktheories.QuickTheory.qt;
+import static org.quicktheories.generators.SourceDSL.strings;
 
 public class ExitStatusTest {
 
@@ -55,15 +54,24 @@ public class ExitStatusTest {
 		assertThat(ExitStatus.error().value()).isEqualTo(1);
 	}
 
-	@Property
-	public boolean validLiteral(@ForAll int value) {
-		Optional<ExitStatus> parsed = ExitStatus.parse(String.valueOf(value));
-		return parsed.isPresent() && parsed.get().value() == value;
+	@Test
+	public void validLiterals() {
+		qt()
+			.forAll(strings().numeric())
+			.check(value -> {
+				Optional<ExitStatus> parsed = ExitStatus.parse(String.valueOf(value));
+				return parsed.isPresent();
+			});
 	}
 
-	@Property
-	public boolean invalidLiteral(@ForAll @CharRange(from = 'a', to = 'z') String value) {
-		Optional<ExitStatus> parsed = ExitStatus.parse(value);
-		return parsed.isEmpty();
+	@Test
+	public void invalidLiteral() {
+		qt()
+			.forAll(strings().basicLatinAlphabet().ofLengthBetween(0, 10))
+			.assuming(value -> value.matches(".*[a-zA-Z].*"))
+			.check(value -> {
+				Optional<ExitStatus> parsed = ExitStatus.parse(value);
+				return parsed.isEmpty();
+			});
 	}
 }
