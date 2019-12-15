@@ -45,7 +45,7 @@ public class PathInitializer {
 				       try {
 					       return Paths.get(s);
 				       } catch (InvalidPathException e) {
-					       throw new UncheckedIOException("cannot resolve: " + s, e);
+					       throw new IllegalArgumentException("cannot resolve: " + s, e);
 				       }
 			       })
 			       .collect(Collectors.toList());
