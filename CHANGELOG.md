@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - storing history in `$HOME/.hosh_history` instead of `$HOME/.hosh.history)
+- resolving `c:\\vagrant` into `\\vboxsrv\\`
 
 ## [0.0.35] - 2019-11-29
 
