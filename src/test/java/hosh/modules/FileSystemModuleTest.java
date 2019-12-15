@@ -283,16 +283,6 @@ public class FileSystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + cwd.toString())));
 		}
 
-		@EnabledOnOs(OS.WINDOWS)
-		@Test
-		public void resolveCurrentWorkingDirectory() {
-			given(state.getCwd()).willReturn(Path.of("C:\\vagrant"));
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveNoInteractions();
-			then(out).should(Mockito.atLeastOnce()).send(ArgumentMatchers.any());
-			then(err).shouldHaveNoInteractions();
-		}
 	}
 
 	@Nested
