@@ -39,6 +39,7 @@ public class PathInitializer {
 			       .stream()
 			       .map(s -> s.split(File.pathSeparator, 0))
 			       .flatMap(Arrays::stream)
+				   .map(String::strip)
 			       .filter(s -> !s.isBlank())
 			       .map(s -> {
 				       try {
