@@ -24,6 +24,8 @@
 package hosh;
 
 import java.io.File;
+import java.io.UncheckedIOException;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -39,8 +41,13 @@ public class PathInitializer {
 			       .map(s -> s.split(File.pathSeparator, 0))
 			       .flatMap(Arrays::stream)
 			       .filter(s -> !s.isBlank())
-				   .peek(s -> System.err.println("PATH DIR: " + s))
-			       .map(Paths::get)
+			       .map(s -> {
+				       try {
+					       return Paths.get(s);
+				       } catch (InvalidPathException e) {
+					       throw new UncheckedIOException("cannot resolve: " + s, e);
+				       }
+			       })
 			       .collect(Collectors.toList());
 	}
 }
