@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- "on demand" item creation
+   - e.g. `ls | take 1` now leads to just one read access to the file-system
+   - minor performance penalty
+
 ### Fixed
 - storing history in `$HOME/.hosh_history` instead of `$HOME/.hosh.history)
 - dropping trailing spaces during PATH init to avoid `java.nio.file.InvalidPathException`

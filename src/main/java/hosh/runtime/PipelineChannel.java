@@ -34,26 +34,21 @@ import hosh.spi.Values;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
 import java.util.logging.Logger;
 
 public class PipelineChannel implements InputChannel, OutputChannel {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
-	private static final int QUEUE_CAPACITY = 100;
-
-	private static final boolean QUEUE_FAIRNESS = false;
-
 	private final Record poisonPill = Records.singleton(Keys.of("poisonpill"), Values.none());
 
-	private final BlockingQueue<Record> queue;
+	private final LinkedTransferQueue<Record> queue;
 
 	private volatile boolean done;
 
 	public PipelineChannel() {
-		queue = new ArrayBlockingQueue<>(QUEUE_CAPACITY, QUEUE_FAIRNESS);
+		queue = new LinkedTransferQueue<>();
 		done = false;
 	}
 
@@ -81,11 +76,7 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 			throw new ProducerPoisonPill();
 		}
 		LOGGER.finer("sending record");
-		try {
-			queue.put(record);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
+		queue.put(record);
 	}
 
 	public void stopProducer() {
