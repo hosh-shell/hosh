@@ -76,7 +76,10 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 			throw new ProducerPoisonPill();
 		}
 		LOGGER.finer("sending record");
-		queue.put(record);
+		boolean success = queue.tryTransfer(record);
+		if (!success) {
+			queue.put(record);
+		}
 	}
 
 	public void stopProducer() {
