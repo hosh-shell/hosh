@@ -750,7 +750,7 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 		}
@@ -772,7 +772,7 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 		}
