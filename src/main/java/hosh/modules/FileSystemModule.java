@@ -60,6 +60,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -79,6 +80,7 @@ public class FileSystemModule implements Module {
 		registry.registerCommand("cd", ChangeDirectory::new);
 		registry.registerCommand("lines", Lines::new);
 		registry.registerCommand("walk", Walk::new);
+		registry.registerCommand("glob", Glob::new);
 		registry.registerCommand("cp", Copy::new);
 		registry.registerCommand("mv", Move::new);
 		registry.registerCommand("rm", Remove::new);
@@ -316,6 +318,37 @@ public class FileSystemModule implements Module {
 			public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
 				return FileVisitResult.CONTINUE;
 			}
+		}
+	}
+
+	@Todo(description = "allows to select path key")
+	@Description("glob pattern matching")
+	@Examples({
+		@Example(command = "walk . | glob '*.java'", description = "recursively find all 'java' files")
+	})
+	public static class Glob implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+				return ExitStatus.error();
+			}
+			String pattern = args.get(0);
+			PathMatcher pathMatcher = state.getCwd().getFileSystem().getPathMatcher("glob:" + pattern);
+			for (Record record : InputChannel.iterate(in)) {
+				record.value(Keys.PATH).flatMap(v -> v.unwrap(Path.class)).filter(pathMatcher::matches).ifPresent(p -> {
+					out.send(record);
+				});
+			}
+			return ExitStatus.success();
 		}
 	}
 

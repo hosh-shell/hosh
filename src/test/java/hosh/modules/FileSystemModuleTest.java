@@ -42,6 +42,7 @@ import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
+import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
@@ -69,12 +70,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 import static hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 public class FileSystemModuleTest {
 
@@ -807,7 +811,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ProbeTest {
+	public class GlobTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -847,16 +851,65 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveNoInteractions();
 		}
 
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ProbeTest {
+
+		@RegisterExtension
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private InputChannel in;
+
+		@Mock
+		private OutputChannel out;
+
+		@Mock
+		private OutputChannel err;
+
+		@InjectMocks
+		private FileSystemModule.Glob sut;
+
 		@Test
-		public void probeUnknownRelativeFile() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			File newFile = temporaryFolder.newFile("file.hosh");
-			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
-			assertThat(exitStatus).isSuccess();
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void match() {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(times(2)).recv();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void noMatch() {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("*.c"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(times(2)).recv();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
 	}
 
 	@Nested

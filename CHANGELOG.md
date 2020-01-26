@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "on demand" record creation
    - e.g. `ls | take 1` does only 1 read access to the file system
    - significative but acceptable performance penalty
+- `find` has been renamed to `walk`
+  - added `size` key, enabling to quickly find the largest file by doing `walk . | sort size`
 
 ### Fixed
 - storing history in `$HOME/.hosh_history` instead of `$HOME/.hosh.history)
