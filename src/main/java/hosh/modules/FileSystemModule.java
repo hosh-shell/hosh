@@ -77,7 +77,7 @@ public class FileSystemModule implements Module {
 		registry.registerCommand("cwd", CurrentWorkingDirectory::new);
 		registry.registerCommand("cd", ChangeDirectory::new);
 		registry.registerCommand("lines", Lines::new);
-		registry.registerCommand("find", Find::new);
+		registry.registerCommand("walk", Walk::new);
 		registry.registerCommand("cp", Copy::new);
 		registry.registerCommand("mv", Move::new);
 		registry.registerCommand("rm", Remove::new);
@@ -244,10 +244,10 @@ public class FileSystemModule implements Module {
 
 	@Description("walk directory recursively")
 	@Examples({
-		@Example(command = "find .", description = "recursively output all paths in '.'"),
-		@Example(command = "find /tmp", description = "recursively output all paths in '/tmp'"),
+		@Example(command = "walk .", description = "recursively output all paths in '.'"),
+		@Example(command = "walk /tmp", description = "recursively output all paths in '/tmp'"),
 	})
-	public static class Find implements Command, StateAware {
+	public static class Walk implements Command, StateAware {
 
 		private State state;
 

@@ -27,7 +27,7 @@ import hosh.doc.Bug;
 import hosh.modules.FileSystemModule.ChangeDirectory;
 import hosh.modules.FileSystemModule.Copy;
 import hosh.modules.FileSystemModule.CurrentWorkingDirectory;
-import hosh.modules.FileSystemModule.Find;
+import hosh.modules.FileSystemModule.Walk;
 import hosh.modules.FileSystemModule.Hardlink;
 import hosh.modules.FileSystemModule.Lines;
 import hosh.modules.FileSystemModule.ListFiles;
@@ -715,7 +715,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class FindTest {
+	public class WalkTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -733,7 +733,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Find sut;
+		private Walk sut;
 
 		@Test
 		public void noArgs() {
