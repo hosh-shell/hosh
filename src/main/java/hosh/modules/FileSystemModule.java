@@ -344,9 +344,14 @@ public class FileSystemModule implements Module {
 			String pattern = args.get(0);
 			PathMatcher pathMatcher = state.getCwd().getFileSystem().getPathMatcher("glob:" + pattern);
 			for (Record record : InputChannel.iterate(in)) {
-				record.value(Keys.PATH).flatMap(v -> v.unwrap(Path.class)).filter(pathMatcher::matches).ifPresent(p -> {
-					out.send(record);
-				});
+				record.value(Keys.PATH)
+					.flatMap(v -> v.unwrap(Path.class))
+					.map(Path::getFileName)
+					.filter(pathMatcher::matches)
+					.ifPresent(p -> {
+						out.send(record);
+					}
+				);
 			}
 			return ExitStatus.success();
 		}

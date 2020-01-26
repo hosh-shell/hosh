@@ -811,7 +811,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class GlobTest {
+	public class ProbeTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -855,7 +855,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ProbeTest {
+	public class GlobTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -886,9 +886,22 @@ public class FileSystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void match() {
+		public void matchRelativePath() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(times(2)).recv();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchAbsolutePath() {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("/tmp/file.java")));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
 			assertThat(exitStatus).isSuccess();
