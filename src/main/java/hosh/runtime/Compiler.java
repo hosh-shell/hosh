@@ -23,17 +23,6 @@
  */
 package hosh.runtime;
 
-import hosh.antlr4.HoshParser;
-import hosh.antlr4.HoshParser.CommandContext;
-import hosh.antlr4.HoshParser.ExpansionContext;
-import hosh.antlr4.HoshParser.ExpressionContext;
-import hosh.antlr4.HoshParser.InvocationContext;
-import hosh.antlr4.HoshParser.PipelineContext;
-import hosh.antlr4.HoshParser.SequenceContext;
-import hosh.antlr4.HoshParser.SimpleContext;
-import hosh.antlr4.HoshParser.StmtContext;
-import hosh.antlr4.HoshParser.StringContext;
-import hosh.antlr4.HoshParser.WrappedContext;
 import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
@@ -46,6 +35,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static hosh.antlr4.HoshParser.CommandContext;
+import static hosh.antlr4.HoshParser.DqstringContext;
+import static hosh.antlr4.HoshParser.ExpansionContext;
+import static hosh.antlr4.HoshParser.ExpressionContext;
+import static hosh.antlr4.HoshParser.InvocationContext;
+import static hosh.antlr4.HoshParser.LambdaContext;
+import static hosh.antlr4.HoshParser.PipelineContext;
+import static hosh.antlr4.HoshParser.ProgramContext;
+import static hosh.antlr4.HoshParser.SequenceContext;
+import static hosh.antlr4.HoshParser.SimpleContext;
+import static hosh.antlr4.HoshParser.SqstringContext;
+import static hosh.antlr4.HoshParser.StmtContext;
+import static hosh.antlr4.HoshParser.StringContext;
+import static hosh.antlr4.HoshParser.WrappedContext;
+
 public class Compiler {
 
 	private final CommandResolver commandResolver;
@@ -56,7 +60,7 @@ public class Compiler {
 
 	public Program compile(String input) {
 		Parser parser = new Parser();
-		HoshParser.ProgramContext programContext = parser.parse(input);
+		ProgramContext programContext = parser.parse(input);
 		List<Statement> statements = new ArrayList<>();
 		for (StmtContext stmtContext : programContext.stmt()) {
 			Statement statement = compileStatement(stmtContext);
@@ -112,7 +116,6 @@ public class Compiler {
 		throw new InternalBug(ctx);
 	}
 
-
 	private Statement compileSimple(SimpleContext ctx) {
 		Token token = ctx.invocation().ID().getSymbol();
 		String commandName = token.getText();
@@ -148,7 +151,7 @@ public class Compiler {
 		return new Statement(wrappedCommand, arguments, "wrapper: " + commandName);
 	}
 
-	private Statement compileLambda(HoshParser.LambdaContext ctx) {
+	private Statement compileLambda(LambdaContext ctx) {
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		String key = ctx.ID().getSymbol().getText();
 		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "lambda: " + ctx.getText());
@@ -163,30 +166,59 @@ public class Compiler {
 	}
 
 	private Resolvable compileArgument(ExpressionContext ctx) {
-		if (ctx.expansion() != null) {
-			return compileExpansion(ctx.expansion());
-		}
-		if (ctx.string() != null) {
-			return new Composite(compileString(ctx.string()));
-		}
-		throw new InternalBug(ctx);
-	}
-
-	private List<Resolvable> compileString(StringContext string) {
-		List<Resolvable> result = new ArrayList<>();
-		for (ExpansionContext ctx : string.expansion()) {
-			result.add(compileExpansion(ctx));
-		}
-		return result;
-	}
-
-	@Todo(description = "test explicitly with resolvable has been created")
-	private Resolvable compileExpansion(ExpansionContext ctx) {
 		if (ctx.ID() != null) {
 			Token token = ctx.ID().getSymbol();
 			String value = token.getText();
 			return new Constant(value);
 		}
+		if (ctx.expansion() != null) {
+			return compileExpansion(ctx.expansion());
+		}
+		if (ctx.string() != null) {
+			return compileString(ctx.string());
+		}
+		throw new InternalBug(ctx);
+	}
+
+	private Resolvable compileString(StringContext ctx) {
+		if (ctx.sqstring() != null) {
+			return compileSingleQuotedString(ctx.sqstring());
+		} else if (ctx.dqstring() != null) {
+			return compileDoubleQuotedString(ctx.dqstring());
+		} else {
+			throw new Compiler.InternalBug(ctx);
+		}
+	}
+
+	private Resolvable compileDoubleQuotedString(DqstringContext ctx) {
+		List<Resolvable> result = new ArrayList<>();
+		for (var part : ctx.dqpart()) {
+			if (part.DQUOTE_TEXT() != null) {
+				result.add(new Constant(part.DQUOTE_TEXT().getSymbol().getText()));
+			} else if (part.DQUOTE_VARIABLE() != null) {
+				Token token = part.DQUOTE_VARIABLE().getSymbol();
+				String name = dropDeref(token.getText());
+				result.add(new Variable(name));
+			} else if (part.DQUOTE_VARIABLE_OR_FALLBACK() != null) {
+				Token token = part.DQUOTE_VARIABLE_OR_FALLBACK().getSymbol();
+				String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
+				result.add(new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]));
+			} else {
+				throw new Compiler.InternalBug(ctx);
+			}
+		}
+		return new Composite(result);
+	}
+
+	private Resolvable compileSingleQuotedString(SqstringContext ctx) {
+		List<Resolvable> result = new ArrayList<>();
+		for (var text : ctx.SQUOTE_TEXT()) {
+			result.add(new Constant(text.getText()));
+		}
+		return new Composite(result);
+	}
+
+	private Resolvable compileExpansion(ExpansionContext ctx) {
 		if (ctx.VARIABLE() != null) {
 			Token token = ctx.VARIABLE().getSymbol();
 			String name = dropDeref(token.getText());
@@ -200,6 +232,7 @@ public class Compiler {
 		throw new InternalBug(ctx);
 	}
 
+	@Todo(description = "remove substring")
 	// ${VARIABLE} -> VARIABLE
 	private String dropDeref(String variable) {
 		return variable.substring(2, variable.length() - 1);
