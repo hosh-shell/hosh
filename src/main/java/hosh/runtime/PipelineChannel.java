@@ -76,9 +76,10 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 			throw new ProducerPoisonPill();
 		}
 		LOGGER.finer("sending record");
-		boolean success = queue.tryTransfer(record);
-		if (!success) {
-			queue.put(record);
+		try {
+			queue.transfer(record);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 
@@ -98,11 +99,6 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 		List<Record> consumer = new ArrayList<>();
 		queue.drainTo(consumer);
 		LOGGER.finer("done consuming remaining records");
-	}
-
-	@Override
-	public String toString() {
-		return String.format("PipelineChannel[done=%s,queue=%s]", done, queue);
 	}
 
 	// Since send() is a void method an exception is needed
