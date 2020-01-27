@@ -29,7 +29,7 @@ import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
- * To be used where a test is changing a thread names or interrupted flag.
+ * To be used when a test is changing a current thread name or interrupted flag.
  */
 public class WithThread implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 

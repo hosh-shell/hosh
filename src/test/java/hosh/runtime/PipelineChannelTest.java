@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Record;
+import hosh.testsupport.WithExecutor;
 import hosh.testsupport.WithThread;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -45,38 +45,41 @@ public class PipelineChannelTest {
 	@RegisterExtension
 	public final WithThread withThread = new WithThread();
 
-	private ExecutorService executorService = Executors.newFixedThreadPool(1);
+	@RegisterExtension
+	public final WithExecutor withExecutor = new WithExecutor(Executors.newFixedThreadPool(2));
 
 	@Mock(stubOnly = true)
 	private Record record;
 
-	private Future<?> assertAsync(Runnable runnable) {
-		return executorService.submit(runnable);
-	}
-
 	@Test
 	public void stopConsumer() throws ExecutionException, InterruptedException {
 		PipelineChannel sut = new PipelineChannel();
-		Future<?> future = assertAsync(() -> {
+		Future<?> recv = withExecutor.submit(() -> {
 			Optional<Record> recv1 = sut.recv();
 			assertThat(recv1).contains(record);
 			Optional<Record> recv2 = sut.recv();
 			assertThat(recv2).isEmpty();
 		});
-		sut.send(record);
-		sut.stopConsumer();
-		future.get();
+		Future<?> send = withExecutor.submit(() -> {
+			sut.send(record);
+			sut.stopConsumer();
+		});
+		send.get();
+		recv.get();
 	}
 
 	@Test
 	public void sendRecv() throws ExecutionException, InterruptedException {
 		PipelineChannel sut = new PipelineChannel();
-		Future<?> future = assertAsync(() -> {
+		Future<?> recv = withExecutor.submit(() -> {
 			Optional<Record> recv1 = sut.recv();
 			assertThat(recv1).contains(record);
 		});
-		sut.send(record);
-		future.get();
+		Future<?> send = withExecutor.submit(() -> {
+			sut.send(record);
+		});
+		recv.get();
+		send.get();
 	}
 
 	@Test
