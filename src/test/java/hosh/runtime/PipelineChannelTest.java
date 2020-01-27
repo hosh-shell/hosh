@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Record;
+import hosh.testsupport.WithExecutor;
 import hosh.testsupport.WithThread;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +33,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,26 +45,41 @@ public class PipelineChannelTest {
 	@RegisterExtension
 	public final WithThread withThread = new WithThread();
 
+	@RegisterExtension
+	public final WithExecutor withExecutor = new WithExecutor(Executors.newFixedThreadPool(2));
+
 	@Mock(stubOnly = true)
 	private Record record;
 
 	@Test
-	public void stopConsumer() {
+	public void stopConsumer() throws ExecutionException, InterruptedException {
 		PipelineChannel sut = new PipelineChannel();
-		sut.send(record);
-		sut.stopConsumer();
-		Optional<Record> recv1 = sut.recv();
-		assertThat(recv1).contains(record);
-		Optional<Record> recv2 = sut.recv();
-		assertThat(recv2).isEmpty();
+		Future<?> recv = withExecutor.submit(() -> {
+			Optional<Record> recv1 = sut.recv();
+			assertThat(recv1).contains(record);
+			Optional<Record> recv2 = sut.recv();
+			assertThat(recv2).isEmpty();
+		});
+		Future<?> send = withExecutor.submit(() -> {
+			sut.send(record);
+			sut.stopConsumer();
+		});
+		send.get();
+		recv.get();
 	}
 
 	@Test
-	public void sendRecv() {
+	public void sendRecv() throws ExecutionException, InterruptedException {
 		PipelineChannel sut = new PipelineChannel();
-		sut.send(record);
-		Optional<Record> recv1 = sut.recv();
-		assertThat(recv1).contains(record);
+		Future<?> recv = withExecutor.submit(() -> {
+			Optional<Record> recv1 = sut.recv();
+			assertThat(recv1).contains(record);
+		});
+		Future<?> send = withExecutor.submit(() -> {
+			sut.send(record);
+		});
+		recv.get();
+		send.get();
 	}
 
 	@Test
@@ -80,15 +99,4 @@ public class PipelineChannelTest {
 		assertThat(recv).isEmpty();
 	}
 
-	@Test
-	public void stringRepr() { // this is quite important while debugging
-		PipelineChannel sut = new PipelineChannel();
-		assertThat(sut).hasToString("PipelineChannel[done=false,queue=[]]");
-		sut.send(record);
-		assertThat(sut).hasToString("PipelineChannel[done=false,queue=[record]]");
-		sut.stopProducer();
-		assertThat(sut).hasToString("PipelineChannel[done=true,queue=[record]]");
-		sut.consumeAnyRemainingRecord();
-		assertThat(sut).hasToString("PipelineChannel[done=true,queue=[]]");
-	}
 }
