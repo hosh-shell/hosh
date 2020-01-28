@@ -530,9 +530,9 @@ public class FileSystemModuleTest {
 			File target = temporaryFolder.newFile("target.txt");
 			assert target.delete();
 			ExitStatus exitStatus = sut.run(List.of(source.getName(), target.getName()), in, out, err);
-			assertThat(source.exists()).isTrue();
-			assertThat(target.exists()).isTrue();
 			assertThat(exitStatus).isSuccess();
+			assertThat(source).exists();
+			assertThat(target).exists();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -544,9 +544,9 @@ public class FileSystemModuleTest {
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			assert target.delete();
 			ExitStatus exitStatus = sut.run(List.of(source.getAbsolutePath(), target.getAbsolutePath()), in, out, err);
-			assertThat(source.exists()).isTrue();
-			assertThat(target.exists()).isTrue();
 			assertThat(exitStatus).isSuccess();
+			assertThat(source).exists();
+			assertThat(target).exists();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -600,9 +600,9 @@ public class FileSystemModuleTest {
 			File target = temporaryFolder.newFile("target.txt");
 			assert target.delete();
 			ExitStatus exitStatus = sut.run(List.of(source.getName(), target.getName()), in, out, err);
-			assertThat(source.exists()).isFalse();
-			assertThat(target.exists()).isTrue();
 			assertThat(exitStatus).isSuccess();
+			assertThat(source).doesNotExist();
+			assertThat(target).exists();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -614,9 +614,9 @@ public class FileSystemModuleTest {
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			assert target.delete();
 			ExitStatus exitStatus = sut.run(List.of(source.getAbsolutePath(), target.getAbsolutePath()), in, out, err);
-			assertThat(source.exists()).isFalse();
-			assertThat(target.exists()).isTrue();
 			assertThat(exitStatus).isSuccess();
+			assertThat(source).doesNotExist();
+			assertThat(target).exists();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -659,8 +659,8 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			ExitStatus exitStatus = sut.run(List.of(target.getName()), in, out, err);
-			assertThat(target.exists()).isFalse();
 			assertThat(exitStatus).isSuccess();
+			assertThat(target).doesNotExist();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -670,8 +670,8 @@ public class FileSystemModuleTest {
 		public void removeAbsolute() throws IOException {
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			ExitStatus exitStatus = sut.run(List.of(target.getAbsolutePath()), in, out, err);
-			assertThat(target.exists()).isFalse();
 			assertThat(exitStatus).isSuccess();
+			assertThat(target).doesNotExist();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -941,8 +941,8 @@ public class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName(), "link"), in, out, err);
 			Path link = temporaryFolder.toPath().resolve("link");
-			assertThat(link).exists();
 			assertThat(exitStatus).isSuccess();
+			assertThat(link).exists();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
