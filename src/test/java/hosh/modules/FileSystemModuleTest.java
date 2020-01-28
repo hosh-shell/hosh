@@ -78,7 +78,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
 
 public class FileSystemModuleTest {
 
@@ -749,47 +748,55 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void relativePath() throws IOException {
+		public void emptyRelativeDirectory() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		public void nonEmptyRelativeDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
-			then(in).shouldHaveNoInteractions();
 		}
 
 		@Test
-		public void nonExistentRelativePath() throws IOException {
+		public void nonExistentRelativeDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			File newFile = temporaryFolder.newFile("file.txt");
-			assert newFile.delete();
-			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("path"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
-			then(out).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not found")));
 		}
 
 		@Test
-		public void absolutePath() throws IOException {
+		public void nonEmptyAbsoluteDirectory() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
-			then(in).shouldHaveNoInteractions();
 		}
 
 		@Test
-		public void nonExistentAbsolutePath() throws IOException {
+		public void absoluteFile() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
 			assert newFile.delete();
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isError();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
-			then(out).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
 		}
 
 		// on Windows a special permission is needed to create symlinks, see
@@ -799,13 +806,14 @@ public class FileSystemModuleTest {
 		public void resolveSymlinks() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFolder = temporaryFolder.newFolder("folder");
+			File newFile = temporaryFolder.newFile(newFolder, "file.txt");
 			File symlink = new File(temporaryFolder.toFile(), "symlink");
 			Files.createSymbolicLink(symlink.toPath(), newFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("symlink"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(err).shouldHaveNoInteractions();
-			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFolder.toPath())));
 			then(in).shouldHaveNoInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath()), Keys.SIZE, Values.ofSize(0)));
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 

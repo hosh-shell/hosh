@@ -268,7 +268,11 @@ public class FileSystemModule implements Module {
 			try {
 				Path target = followSymlinksRecursively(resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0))));
 				if (!Files.exists(target)) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + target)));
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("not found")));
+					return ExitStatus.error();
+				}
+				if (!Files.isDirectory(target)) {
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
 					return ExitStatus.error();
 				}
 				Files.walkFileTree(target, new VisitCallback(out));
@@ -290,11 +294,6 @@ public class FileSystemModule implements Module {
 
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-				out.send(Records
-					         .builder()
-					         .entry(Keys.PATH, Values.ofPath(dir))
-					         .entry(Keys.SIZE, Values.none())
-					         .build());
 				return FileVisitResult.CONTINUE;
 			}
 
