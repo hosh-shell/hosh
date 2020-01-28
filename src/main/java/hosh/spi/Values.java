@@ -463,6 +463,14 @@ public class Values {
 			return Objects.hash(path);
 		}
 
+		@Override
+		public <T> Optional<T> unwrap(Class<T> type) {
+			if (type.equals(Path.class)) {
+				return Optional.of(type.cast(path));
+			}
+			return Optional.empty();
+		}
+
 		private static final Comparator<Path> PATH_COMPARATOR = Comparator
 			                                                        .comparing(Path::toString, new AlphaNumericStringComparator());
 

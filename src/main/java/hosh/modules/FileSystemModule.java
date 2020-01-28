@@ -54,11 +54,13 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -77,7 +79,8 @@ public class FileSystemModule implements Module {
 		registry.registerCommand("cwd", CurrentWorkingDirectory::new);
 		registry.registerCommand("cd", ChangeDirectory::new);
 		registry.registerCommand("lines", Lines::new);
-		registry.registerCommand("find", Find::new);
+		registry.registerCommand("walk", Walk::new);
+		registry.registerCommand("glob", Glob::new);
 		registry.registerCommand("cp", Copy::new);
 		registry.registerCommand("mv", Move::new);
 		registry.registerCommand("rm", Remove::new);
@@ -244,10 +247,10 @@ public class FileSystemModule implements Module {
 
 	@Description("walk directory recursively")
 	@Examples({
-		@Example(command = "find .", description = "recursively output all paths in '.'"),
-		@Example(command = "find /tmp", description = "recursively output all paths in '/tmp'"),
+		@Example(command = "walk .", description = "recursively output all paths in '.'"),
+		@Example(command = "walk /tmp", description = "recursively output all paths in '/tmp'"),
 	})
-	public static class Find implements Command, StateAware {
+	public static class Walk implements Command, StateAware {
 
 		private State state;
 
@@ -262,19 +265,94 @@ public class FileSystemModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 				return ExitStatus.error();
 			}
-			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
-			try (Stream<Path> stream = Files.walk(followSymlinksRecursively(target))) {
-				stream.forEach(path -> {
-					Record result = Records.singleton(Keys.PATH, Values.ofPath(path.toAbsolutePath()));
-					out.send(result);
-				});
+			try {
+				Path target = followSymlinksRecursively(resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0))));
+				if (!Files.exists(target)) {
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("not found")));
+					return ExitStatus.error();
+				}
+				if (!Files.isDirectory(target)) {
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
+					return ExitStatus.error();
+				}
+				Files.walkFileTree(target, new VisitCallback(out));
 				return ExitStatus.success();
-			} catch (NoSuchFileException e) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + e.getFile())));
-				return ExitStatus.error();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
+		}
+
+		private static class VisitCallback implements FileVisitor<Path> {
+
+			private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
+			private final OutputChannel out;
+
+			public VisitCallback(OutputChannel out) {
+				this.out = out;
+			}
+
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+				out.send(Records
+					         .builder()
+					         .entry(Keys.PATH, Values.ofPath(file))
+					         .entry(Keys.SIZE, Values.ofSize(attrs.size()))
+					         .build());
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFileFailed(Path file, IOException exc) {
+				LOGGER.log(Level.SEVERE, "error while visiting: " + file, exc);
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+				return FileVisitResult.CONTINUE;
+			}
+		}
+	}
+
+	@Todo(description = "allows to select path key")
+	@Description("glob pattern matching")
+	@Examples({
+		@Example(command = "walk . | glob '*.java'", description = "recursively find all 'java' files")
+	})
+	public static class Glob implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+				return ExitStatus.error();
+			}
+			String pattern = args.get(0);
+			PathMatcher pathMatcher = state.getCwd().getFileSystem().getPathMatcher("glob:" + pattern);
+			for (Record record : InputChannel.iterate(in)) {
+				record.value(Keys.PATH)
+					.flatMap(v -> v.unwrap(Path.class))
+					.map(Path::getFileName)
+					.filter(pathMatcher::matches)
+					.ifPresent(p -> {
+						out.send(record);
+					}
+				);
+			}
+			return ExitStatus.success();
 		}
 	}
 

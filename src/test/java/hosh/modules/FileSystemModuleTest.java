@@ -27,7 +27,7 @@ import hosh.doc.Bug;
 import hosh.modules.FileSystemModule.ChangeDirectory;
 import hosh.modules.FileSystemModule.Copy;
 import hosh.modules.FileSystemModule.CurrentWorkingDirectory;
-import hosh.modules.FileSystemModule.Find;
+import hosh.modules.FileSystemModule.Walk;
 import hosh.modules.FileSystemModule.Hardlink;
 import hosh.modules.FileSystemModule.Lines;
 import hosh.modules.FileSystemModule.ListFiles;
@@ -42,6 +42,7 @@ import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
+import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
@@ -69,12 +70,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 import static hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 public class FileSystemModuleTest {
 
@@ -715,7 +718,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class FindTest {
+	public class WalkTest {
 
 		@RegisterExtension
 		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -733,7 +736,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Find sut;
+		private Walk sut;
 
 		@Test
 		public void noArgs() {
@@ -745,47 +748,54 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void relativePath() throws IOException {
+		public void emptyRelativeDirectory() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		public void nonEmptyRelativeDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
+			then(in).shouldHaveNoInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
-			then(in).shouldHaveNoInteractions();
 		}
 
 		@Test
-		public void nonExistentRelativePath() throws IOException {
+		public void nonExistentRelativeDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			File newFile = temporaryFolder.newFile("file.txt");
-			assertThat(newFile.delete()).isTrue();
-			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("path"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
-			then(out).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not found")));
 		}
 
 		@Test
-		public void absolutePath() throws IOException {
+		public void nonEmptyAbsoluteDirectory() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath())));
-			then(err).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
-		public void nonExistentAbsolutePath() throws IOException {
+		public void absoluteFile() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
-			assertThat(newFile.delete()).isTrue();
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isError();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
-			then(out).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
 		}
 
 		// on Windows a special permission is needed to create symlinks, see
@@ -795,13 +805,14 @@ public class FileSystemModuleTest {
 		public void resolveSymlinks() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFolder = temporaryFolder.newFolder("folder");
+			File newFile = temporaryFolder.newFile(newFolder, "file.txt");
 			File symlink = new File(temporaryFolder.toFile(), "symlink");
 			Files.createSymbolicLink(symlink.toPath(), newFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("symlink"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(err).shouldHaveNoInteractions();
-			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFolder.toPath())));
 			then(in).shouldHaveNoInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath()), Keys.SIZE, Values.ofSize(0)));
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -847,16 +858,78 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveNoInteractions();
 		}
 
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class GlobTest {
+
+		@RegisterExtension
+		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		private State state;
+
+		@Mock
+		private InputChannel in;
+
+		@Mock
+		private OutputChannel out;
+
+		@Mock
+		private OutputChannel err;
+
+		@InjectMocks
+		private FileSystemModule.Glob sut;
+
 		@Test
-		public void probeUnknownRelativeFile() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			File newFile = temporaryFolder.newFile("file.hosh");
-			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
-			assertThat(exitStatus).isSuccess();
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
 		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchRelativePath() {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(times(2)).recv();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchAbsolutePath() {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("/tmp/file.java")));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(times(2)).recv();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void noMatch() {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("*.c"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).should(times(2)).recv();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
 	}
 
 	@Nested
