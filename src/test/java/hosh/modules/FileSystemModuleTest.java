@@ -122,7 +122,7 @@ public class FileSystemModuleTest {
 		@Test
 		public void zeroArgsWithOneDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			temporaryFolder.newFolder("dir").mkdir();
+			temporaryFolder.newFolder("dir");
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -271,9 +271,9 @@ public class FileSystemModuleTest {
 		@Test
 		public void accessDenied() {
 			File cwd = temporaryFolder.toFile();
-			assert cwd.exists();
-			assert cwd.setReadable(false, true);
-			assert cwd.setExecutable(false, true);
+			assertThat(cwd.exists()).isTrue();
+			assertThat(cwd.setReadable(false, true)).isTrue();
+			assertThat(cwd.setExecutable(false, true)).isTrue();
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
@@ -528,7 +528,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File source = temporaryFolder.newFile("source.txt");
 			File target = temporaryFolder.newFile("target.txt");
-			assert target.delete();
+			assertThat(target.delete()).isTrue();
 			ExitStatus exitStatus = sut.run(List.of(source.getName(), target.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			assertThat(source).exists();
@@ -542,7 +542,7 @@ public class FileSystemModuleTest {
 		public void copyAbsoluteToAbsolute() throws IOException {
 			File source = temporaryFolder.newFile("source.txt").getAbsoluteFile();
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
-			assert target.delete();
+			assertThat(target.delete()).isTrue();
 			ExitStatus exitStatus = sut.run(List.of(source.getAbsolutePath(), target.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			assertThat(source).exists();
@@ -598,7 +598,7 @@ public class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File source = temporaryFolder.newFile("source.txt");
 			File target = temporaryFolder.newFile("target.txt");
-			assert target.delete();
+			assertThat(target.delete()).isTrue();
 			ExitStatus exitStatus = sut.run(List.of(source.getName(), target.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			assertThat(source).doesNotExist();
@@ -612,7 +612,7 @@ public class FileSystemModuleTest {
 		public void moveAbsoluteToAbsolute() throws IOException {
 			File source = temporaryFolder.newFile("source.txt").getAbsoluteFile();
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
-			assert target.delete();
+			assertThat(target.delete()).isTrue();
 			ExitStatus exitStatus = sut.run(List.of(source.getAbsolutePath(), target.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			assertThat(source).doesNotExist();
@@ -759,7 +759,7 @@ public class FileSystemModuleTest {
 		public void nonExistentRelativePath() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
-			assert newFile.delete();
+			assertThat(newFile.delete()).isTrue();
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));
@@ -780,7 +780,7 @@ public class FileSystemModuleTest {
 		@Test
 		public void nonExistentAbsolutePath() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
-			assert newFile.delete();
+			assertThat(newFile.delete()).isTrue();
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("path does not exist: " + newFile)));

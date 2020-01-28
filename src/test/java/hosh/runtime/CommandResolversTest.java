@@ -95,7 +95,7 @@ public class CommandResolversTest {
 		@Test
 		public void validAbsolutePath() throws IOException {
 			File file = folder.newFile("test");
-			assert file.setExecutable(true);
+			assertThat(file.setExecutable(true)).isTrue();
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			Optional<Command> result = sut.tryResolve(file.getAbsolutePath());
 			assertThat(result).isPresent();
@@ -119,10 +119,10 @@ public class CommandResolversTest {
 			assertThat(result).isEmpty();
 		}
 
-		@Test
 		@DisabledOnOs(OS.WINDOWS)
+		@Test
 		public void foundNonExecutableInPath() throws IOException {
-			assert folder.newFile("test").setExecutable(false);
+			assertThat(folder.newFile("test").setExecutable(false)).isTrue();
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -132,7 +132,7 @@ public class CommandResolversTest {
 
 		@Test
 		public void foundExecutableInPath() throws IOException {
-			assert folder.newFile("test").setExecutable(true);
+			assertThat(folder.newFile("test").setExecutable(true)).isTrue();
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -143,7 +143,7 @@ public class CommandResolversTest {
 		@Test
 		@EnabledOnOs(OS.WINDOWS)
 		public void notFoundInPathAsSpecifiedByPathExt() throws IOException {
-			assert folder.newFile("test.vbs").setExecutable(true); // VBS in not PATHEXT
+			assertThat(folder.newFile("test.vbs").setExecutable(true)).isTrue(); // VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -155,7 +155,7 @@ public class CommandResolversTest {
 		@Test
 		@EnabledOnOs(OS.WINDOWS)
 		public void foundInPathAsSpecifiedByPathExt() throws IOException {
-			assert folder.newFile("test.exe").setExecutable(true);
+			assertThat(folder.newFile("test.exe").setExecutable(true)).isTrue();
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -166,7 +166,7 @@ public class CommandResolversTest {
 
 		@Test
 		public void foundInCwd() throws IOException {
-			assert folder.newFile("test").setExecutable(true);
+			assertThat(folder.newFile("test").setExecutable(true)).isTrue();
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -192,9 +192,6 @@ public class CommandResolversTest {
 		public final TemporaryFolder folder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private Command command;
-
-		@Mock(stubOnly = true)
 		private State state;
 
 		@Mock(stubOnly = true)
@@ -217,7 +214,7 @@ public class CommandResolversTest {
 
 		@Test
 		public void findExecutableInPathext() throws IOException {
-			assert folder.newFile("TEST.EXE").setExecutable(true);
+			assertThat(folder.newFile("TEST.EXE").setExecutable(true)).isTrue();
 			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE"));
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -227,7 +224,7 @@ public class CommandResolversTest {
 
 		@Test
 		public void findExecutableNotInPathext() throws IOException {
-			assert folder.newFile("TEST.CMD").setExecutable(true);
+			assertThat(folder.newFile("TEST.CMD").setExecutable(true)).isTrue();
 			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE"));
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));

@@ -91,7 +91,7 @@ public class CommandCompleterTest {
 	public void builtinOverridesExternal() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		File file = temporaryFolder.newFile("cmd");
-		assert file.setExecutable(true, true);
+		assertThat(file.setExecutable(true, true)).isTrue();
 		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
@@ -115,7 +115,7 @@ public class CommandCompleterTest {
 	public void pathWithExecutable() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		File file = temporaryFolder.newFile("cmd");
-		assert file.setExecutable(true, true);
+		assertThat(file.setExecutable(true, true)).isTrue();
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
