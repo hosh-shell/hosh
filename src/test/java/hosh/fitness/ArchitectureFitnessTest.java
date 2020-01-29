@@ -23,16 +23,14 @@
  */
 package hosh.fitness;
 
-import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
-import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchRule;
 import hosh.Hosh;
-import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Enforcing package dependencies of the project:
@@ -42,26 +40,26 @@ import static org.assertj.core.api.Assertions.assertThat;
  * </ul>
  * The long term goal is to prepare ground for modules.
  */
+@AnalyzeClasses(packagesOf = Hosh.class)
 public class ArchitectureFitnessTest {
 
-	@Test
-	public void enforceProperDependenciesBetweenPackages() {
-		String packageName = Hosh.class.getPackageName();
-		JavaClasses importedClasses = new ClassFileImporter()
-			                              .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
-			                              .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_ARCHIVES)
-			                              .importPackages(packageName);
-		assertThat(importedClasses).isNotEmpty();
-		slices().matching(packageName).should().beFreeOfCycles();
+	@ArchTest
+	public final ArchRule noCycles =
+		slices().matching(Hosh.class.getPackageName()).should().beFreeOfCycles();
+
+	@ArchTest
+	public final ArchRule modulesCanUseSpi =
 		classes().that().resideInAPackage("..modules..")
-			.should().accessClassesThat().resideInAnyPackage("..spi..", "java..")
-			.check(importedClasses);
+			.should().accessClassesThat().resideInAnyPackage("..spi..", "java..");
+
+	@ArchTest
+	public final ArchRule modulesCannotUseRuntime =
 		noClasses().that().resideInAPackage("..modules..")
-			.should().accessClassesThat().resideInAPackage("..runtime..")
-			.check(importedClasses);
+			.should().accessClassesThat().resideInAPackage("..runtime..");
+
+	@ArchTest
+	public final ArchRule spiCannotUseRuntime =
 		noClasses().that().resideInAPackage("..spi..")
-			.should().accessClassesThat().resideInAPackage("..runtime..")
-			.check(importedClasses);
-	}
+			.should().accessClassesThat().resideInAPackage("..runtime..");
 
 }

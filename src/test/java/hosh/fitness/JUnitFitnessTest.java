@@ -27,7 +27,10 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaField;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchCondition;
+import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import hosh.Hosh;
@@ -46,11 +49,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
+import static hosh.fitness.ArchUnitConditions.haveAccesses;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Enforcing some useful rules for junit tests.
  */
+@AnalyzeClasses(packagesOf = Hosh.class)
 public class JUnitFitnessTest {
 
 	@Test
@@ -76,32 +81,11 @@ public class JUnitFitnessTest {
 		}
 	}
 
-	@Test
-	public void enforceNoUnusedMocks() {
-		String packageName = Hosh.class.getPackageName();
-		JavaClasses importedClasses = new ClassFileImporter()
-			                              .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
-			                              .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_ARCHIVES)
-			                              .importPackages(packageName);
-		assertThat(importedClasses).isNotEmpty();
-		fields().that().areNotStatic().and().areAnnotatedWith(Mock.class).should(haveAccesses()).check(importedClasses);
-	}
+	@ArchTest
+	public final ArchRule unusedMocks = fields()
+		                                        .that()
+		                                        .areNotStatic().and().areAnnotatedWith(Mock.class)
+		                                        .should(haveAccesses());
 
-	private static HaveAccesses haveAccesses() {
-		return new HaveAccesses();
-	}
 
-	private static class HaveAccesses extends ArchCondition<JavaField> {
-
-		public HaveAccesses() {
-			super("be used used or removed");
-		}
-
-		@Override
-		public void check(JavaField item, ConditionEvents events) {
-			if (item.getAccessesToSelf().isEmpty()) {
-				events.add(new SimpleConditionEvent(item, false, "unused @Mock " + item.getFullName()));
-			}
-		}
-	}
 }
