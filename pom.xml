@@ -285,10 +285,10 @@
 					</excludedClasses>
 					<excludedTestClasses>
 						<param>hosh.integration.*</param>
-						<param>hosh.runtime.CommandResolversTest*</param>
-						<param>hosh.runtime.CommandCompleterTest*</param>
-						<param>hosh.modules.FileSystemModuleTest*</param>
+						<param>hosh.runtime.PipelineCommandTest</param>
+						<param>hosh.runtime.PipelineChannelTest</param>
 					</excludedTestClasses>
+					<threads>2</threads>
 				</configuration>
 				<dependencies>
 					<dependency>
