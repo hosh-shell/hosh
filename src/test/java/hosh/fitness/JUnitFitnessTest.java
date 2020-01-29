@@ -23,6 +23,13 @@
  */
 package hosh.fitness;
 
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaField;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.lang.ArchCondition;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 import hosh.Hosh;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
@@ -30,6 +37,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.mockito.Mock;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -37,8 +45,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Enforcing some useful rules for junit tests.
+ */
 public class JUnitFitnessTest {
 
 	@Test
@@ -61,6 +73,35 @@ public class JUnitFitnessTest {
 			assertThat(suspiciousMethods)
 				.overridingErrorMessage("please review the following methods: %n%s", suspiciousMethods)
 				.isEmpty();
+		}
+	}
+
+	@Test
+	public void enforceNoUnusedMocks() {
+		String packageName = Hosh.class.getPackageName();
+		JavaClasses importedClasses = new ClassFileImporter()
+			                              .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_JARS)
+			                              .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_ARCHIVES)
+			                              .importPackages(packageName);
+		assertThat(importedClasses).isNotEmpty();
+		fields().that().areNotStatic().and().areAnnotatedWith(Mock.class).should(haveAccesses()).check(importedClasses);
+	}
+
+	private static HaveAccesses haveAccesses() {
+		return new HaveAccesses();
+	}
+
+	private static class HaveAccesses extends ArchCondition<JavaField> {
+
+		public HaveAccesses() {
+			super("be used used or removed");
+		}
+
+		@Override
+		public void check(JavaField item, ConditionEvents events) {
+			if (item.getAccessesToSelf().isEmpty()) {
+				events.add(new SimpleConditionEvent(item, false, "unused @Mock " + item.getFullName()));
+			}
 		}
 	}
 }

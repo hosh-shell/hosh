@@ -63,4 +63,5 @@ public class ArchitectureFitnessTest {
 			.should().accessClassesThat().resideInAPackage("..runtime..")
 			.check(importedClasses);
 	}
+
 }
