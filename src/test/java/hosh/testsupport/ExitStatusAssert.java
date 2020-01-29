@@ -37,16 +37,23 @@ public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatu
 	}
 
 	public void isSuccess() {
-		isNotNull().matches(ExitStatus::isSuccess, "isSuccess()");
+		isNotNull();
+		if (!actual.isSuccess()) {
+			failWithMessage("expected success but was error");
+		}
 	}
 
 	public void isError() {
-		isNotNull()
-			.matches(ExitStatus::isError, "isError()");
+		isNotNull();
+		if (!actual.isError()) {
+			failWithMessage("expected error but was success");
+		}
 	}
 
 	public void hasExitCode(int expectedCode) {
-		isNotNull()
-			.matches(exitStatus -> exitStatus.value() == expectedCode, "expecting exitCode " + expectedCode);
+		isNotNull();
+		if (expectedCode != actual.value()) {
+			failWithMessage("expected %d but as %d", expectedCode,  actual.value());
+		}
 	}
 }
