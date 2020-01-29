@@ -527,7 +527,7 @@ public class HoshIT {
 	}
 
 	private Process givenHoshProcess(String... args) throws IOException {
-		return givenHoshProcess(Collections.emptyMap(), args);
+		return givenHoshProcess(Map.of("HOSH_DISABLE_HISTORY", "true"), args);
 	}
 
 	private Process givenHoshProcess(Map<String, String> additionalEnv, String... args) throws IOException {

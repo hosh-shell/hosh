@@ -53,6 +53,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.completer.AggregateCompleter;
@@ -200,10 +201,17 @@ public class Hosh {
 
 	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter, Injector injector,
 	                               OutputChannel out, OutputChannel err, Logger logger) {
+		String disableHistory = System.getenv().getOrDefault("HOSH_DISABLE_HISTORY", "false");
+		History history;
+		if (Boolean.parseBoolean(disableHistory)) {
+			history = new DisabledHistory();
+		} else {
+			history = new DefaultHistory();
+		}
 		LineReader lineReader = LineReaderBuilder
 			                        .builder()
 			                        .appName("hosh")
-			                        .history(new DefaultHistory())
+			                        .history(history)
 			                        .variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh_history"))
 			                        .completer(new AggregateCompleter(
 				                        new CommandCompleter(state),

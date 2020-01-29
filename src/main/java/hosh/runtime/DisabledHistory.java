@@ -28,124 +28,111 @@ import org.jline.reader.LineReader;
 
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.ListIterator;
 
 /**
- * Fake implementation of {@link History}: used for non-interactive sessions.
+ * Fake no-op implementation of {@link History}: used for non-interactive sessions and for HoshIT.
  */
 public class DisabledHistory implements History {
 
-	private UnsupportedOperationException unsupportedOperation() {
-		return new UnsupportedOperationException("history is disabled");
-	}
-
 	@Override
 	public void attach(LineReader reader) {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public void load() {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public void save() {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public void write(Path file, boolean incremental) {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public void append(Path file, boolean incremental) {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public void read(Path file, boolean incremental) {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public void purge() {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public int size() {
-		throw unsupportedOperation();
+		return 0;
 	}
 
 	@Override
 	public int index() {
-		throw unsupportedOperation();
+		return 0;
 	}
 
 	@Override
 	public int first() {
-		throw unsupportedOperation();
+		return 0;
 	}
 
 	@Override
 	public int last() {
-		throw unsupportedOperation();
+		return 0;
 	}
 
 	@Override
 	public String get(int index) {
-		throw unsupportedOperation();
+		return null;
 	}
 
 	@Override
 	public void add(Instant time, String line) {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public ListIterator<Entry> iterator(int index) {
-		throw unsupportedOperation();
+		return Collections.emptyListIterator();
 	}
 
 	@Override
 	public String current() {
-		throw unsupportedOperation();
+		return null;
 	}
 
 	@Override
 	public boolean previous() {
-		throw unsupportedOperation();
+		return false;
 	}
 
 	@Override
 	public boolean next() {
-		throw unsupportedOperation();
+		return false;
 	}
 
 	@Override
 	public boolean moveToFirst() {
-		throw unsupportedOperation();
+		return false;
 	}
 
 	@Override
 	public boolean moveToLast() {
-		throw unsupportedOperation();
+		return false;
 	}
 
 	@Override
 	public boolean moveTo(int index) {
-		throw unsupportedOperation();
+		return false;
 	}
 
 	@Override
 	public void moveToEnd() {
-		throw unsupportedOperation();
 	}
 
 	@Override
 	public void resetIndex() {
-		throw unsupportedOperation();
 	}
 }
