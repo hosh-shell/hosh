@@ -71,12 +71,12 @@ public class ParserTest {
 			.isNotNull();
 	}
 
-	static Stream<String> all() {
+	private static Stream<String> all() {
 		return Stream.of(commands(), newLines(), comments(), pipelines(), incompletePipelines())
 			       .flatMap(List::stream);
 	}
 
-	static List<String> commands() {
+	private static List<String> commands() {
 		return List.of(
 			"/usr/bin/git; ls",
 			"/usr/bin/git; ls;",
@@ -117,7 +117,7 @@ public class ParserTest {
 			"ls \"${JAVA_HOME}/${JVM_BINARY}\"");
 	}
 
-	static List<String> newLines() {
+	private static List<String> newLines() {
 		return List.of(
 			"\n",
 			"\n\n",
@@ -126,7 +126,7 @@ public class ParserTest {
 			"\n\r\n");
 	}
 
-	static List<String> comments() {
+	private static List<String> comments() {
 		return List.of(
 			"#\n",
 			"#\r\n",
@@ -138,7 +138,7 @@ public class ParserTest {
 			"benchmark { ls | sink } # comment");
 	}
 
-	static List<String> pipelines() {
+	private static List<String> pipelines() {
 		return List.of(
 			"env | sink",
 			"git config --list | sink",
@@ -154,7 +154,7 @@ public class ParserTest {
 	}
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "accepted by parser but rejected by the compiler")
-	static List<String> incompletePipelines() {
+	private static List<String> incompletePipelines() {
 		return List.of(
 			"ls | ",
 			"ls -a | ",
