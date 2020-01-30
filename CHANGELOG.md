@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.36] - 2020-01-30
+
 ### Added
 - `glob` for glob pattern matching
   - works as generic filter for any record with `path` key
@@ -22,7 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - storing history in `$HOME/.hosh_history` instead of `$HOME/.hosh.history)
 - dropping trailing spaces during PATH init to avoid `java.nio.file.InvalidPathException`
 - improving path normalization (e.g. `c:\\vagrant` into `\\vboxsrv`)
-
 
 ## [0.0.35] - 2019-11-29
 
