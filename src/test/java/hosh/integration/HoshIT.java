@@ -485,7 +485,7 @@ public class HoshIT {
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
-		assertThat(output).startsWith("hosh v");
+		assertThat(output).startsWith("hosh ");
 	}
 
 	@Test
@@ -494,7 +494,7 @@ public class HoshIT {
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
 		assertThat(exitCode).isEqualTo(0);
-		assertThat(output).startsWith("hosh v");
+		assertThat(output).startsWith("hosh ");
 	}
 
 	@Test
