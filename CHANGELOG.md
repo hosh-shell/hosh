@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 ### Changed
+- azure-pipelines -> github-actions
+
 ### Fixed
-- bug #212: now it is possible to use several external commands in a pipeline
+- #212: now it is possible to use several external commands in a pipeline
 
 ## [0.0.36] - 2020-01-30
 
