@@ -41,18 +41,18 @@
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal</artifactId>
-			<version>3.13.2</version>
+			<version>3.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal-jna</artifactId>
-			<version>3.13.2</version>
+			<version>3.13.3</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-reader</artifactId>
-			<version>3.13.2</version>
+			<version>3.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
