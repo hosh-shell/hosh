@@ -1,12 +1,10 @@
-name: Java CI
+name: Java 11
 
 on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
