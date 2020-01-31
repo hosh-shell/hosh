@@ -3,13 +3,20 @@ name: Java 11
 on: [push]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  hotspot-supported:
+    name: HotSpot (supported)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-18.04, macOS-10.14, windows-2019]
+        java: [8, 11, 13]
+        architecture: [x32, x64]
+    runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.11
-    - name: Build with Maven
-      run: mvn -B verify --file pom.xml
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+          architecture: ${{ matrix.architecture }}
+      - name: Build project
+        run: ./mvnw -B verify
