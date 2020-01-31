@@ -80,7 +80,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 		// last command of a pipeline
 		LAST(true, false),
 		// everything else
-		MIDDLE(false, false);
+		MIDDLE(true, true);
 
 		private final boolean redirectInput;
 

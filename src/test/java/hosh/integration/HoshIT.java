@@ -27,6 +27,7 @@ import hosh.doc.Bug;
 import hosh.doc.Todo;
 import hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -234,6 +235,20 @@ public class HoshIT {
 		int exitCode = hosh.waitFor();
 		String output = consumeOutput(hosh);
 		assertThat(output).containsOnlyOnce("missing");
+		assertThat(exitCode).isEqualTo(0);
+	}
+
+	@DisabledOnOs(OS.WINDOWS)
+	@Bug(description = "regression test", issue ="https://github.com/dfa1/hosh/issues/212")
+	@Test
+	public void pipelineWithMiddleExternalCommands() throws Exception {
+		Path scriptPath = givenScript(
+			"git tag | wc -l | wc -l" //
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		int exitCode = hosh.waitFor();
+		String output = consumeOutput(hosh);
+		assertThat(output).isEqualToIgnoringWhitespace("1");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
