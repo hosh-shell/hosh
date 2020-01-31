@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4-runtime</artifactId>
-			<version>4.7.2</version>
+			<version>4.8-1</version>
 		</dependency>
 		<!-- testing -->
 		<dependency>
@@ -132,7 +132,7 @@
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>4.7.2</version>
+				<version>4.8-1</version>
 				<configuration>
 					<treatWarningsAsErrors>true</treatWarningsAsErrors>
 				</configuration>
