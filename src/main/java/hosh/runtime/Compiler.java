@@ -119,7 +119,7 @@ public class Compiler {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		});
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
-		return new Statement(command, arguments, commandName + ":");
+		return new Statement(command, arguments, commandName);
 	}
 
 	private Statement compileWrappedCommand(WrappedContext ctx) {
