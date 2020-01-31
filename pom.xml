@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org</groupId>
 	<artifactId>hosh</artifactId>
@@ -325,8 +326,8 @@
 								<requireMavenVersion>
 									<version>3.6.0</version>
 								</requireMavenVersion>
-								<requireNoRepositories />
-								<requireReleaseDeps />
+								<requireNoRepositories/>
+								<requireReleaseDeps/>
 							</rules>
 						</configuration>
 					</execution>
@@ -388,13 +389,19 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
 		<profile>
 			<id>sonar</id>
 			<properties>
-				<sonar.coverage.jacoco.xmlReportPaths>target/surefire-reports/,target/failsafe-reports/</sonar.coverage.jacoco.xmlReportPaths>
+				<sonar.coverage.jacoco.xmlReportPaths>target/surefire-reports/,target/failsafe-reports/
+				</sonar.coverage.jacoco.xmlReportPaths>
 				<sonar.exclusions>target/generated-sources/**</sonar.exclusions>
 			</properties>
 			<build>
