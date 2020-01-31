@@ -12,6 +12,10 @@ strategy:
       imageName: 'macos-10.13'
     windows:
       imageName: 'vs2017-win2016'
+    jdk11:
+      jdk_version: "1.11"
+    jdk13:
+      jdk_version: "1.13"
 
 pool:
   vmImage: $(imageName)
@@ -23,7 +27,7 @@ steps:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx128m'
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
+    jdkVersionOption: '$(jdk_version)'
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
