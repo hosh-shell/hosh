@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - "on demand" record creation
    - e.g. `ls | take 1` does only 1 read access to the file system
-   - significative but acceptable performance penalty
+   - noticeable performance penalty
 - `find` has been renamed to `walk`
   - added `size` key, enabling to quickly find the largest file by doing `walk . | sort size`
 
@@ -101,7 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new command: 'partitions'
 - new command: 'probe'
 - new command: 'symlink', 'hardlink'
-- autocomplete of any executable in PATH
+- auto-complete of any executable in PATH
 - JUnit 4.x -> 5.x
 
 ## [0.0.29] - 2019-04-19
@@ -113,7 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new command 'regex', basically named groups regexp to record
 - new command 'network', to display all network interfaces in this system
 - introducing annotation-based help system
-- improving autocomplete of partially specified directories
+- improving auto-complete of partially specified directories
 
 ## [0.0.27] - 2019-03-17
 - new system commands:
@@ -126,8 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.26] - 2019-03-10
 - new system commands: 'set' and 'unset'
 - new text commands: 'distinct' and 'duplicated'
-- autocompletion of variable expansion, triggered by '${'
-- improved autocompletion of directories
+- auto-completion of variable expansion, triggered by '${'
+- improved auto-completion of directories
 - introducing docker support
 
 ## [0.0.25] - 2019-03-01
@@ -148,7 +148,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.22] - 2019-02-09
 - introduced 'table' command: 'ls | table' for a bit nicer output
 - introduced 'benchmark' command (lots of sharp edges)
-- detecting and reporting extranous '}' at the end of statement
+- detecting and reporting extraneous '}' at the end of statement
 - follow symlinks when target of 'find' and 'ls' are symlinks
 
 ## [0.0.21] - 2019-02-04

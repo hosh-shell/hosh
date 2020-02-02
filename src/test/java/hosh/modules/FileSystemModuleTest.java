@@ -748,7 +748,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void emptyRelativeDirectory() throws IOException {
+		public void emptyRelativeDirectory() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -769,7 +769,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void nonExistentRelativeDirectory() throws IOException {
+		public void nonExistentRelativeDirectory() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("path"), in, out, err);
 			assertThat(exitStatus).isError();
