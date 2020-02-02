@@ -100,7 +100,7 @@ public class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program, out, err);
-		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+		assertThat(exitStatus).isError();
 		assertThat(variables).containsEntry("EXIT_STATUS", "1");
 	}
 
@@ -113,7 +113,7 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(args);
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
-		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+		assertThat(exitStatus).isError();
 	}
 
 	@Test
@@ -125,7 +125,7 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(args);
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
-		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+		assertThat(exitStatus).isError();
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("(no message provided)")));
 	}
 
@@ -138,7 +138,7 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(args);
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
-		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+		assertThat(exitStatus).isError();
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("simulated error")));
 	}
 

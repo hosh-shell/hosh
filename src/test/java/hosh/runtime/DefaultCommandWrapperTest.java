@@ -38,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -105,7 +106,7 @@ public class DefaultCommandWrapperTest {
 		given(commandWrapper.retry(resource, in, out, err)).willReturn(true, false);
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.success(), ExitStatus.error());
 		ExitStatus exitStatus = sut.run(args, in, out, err);
-		assertThat(exitStatus).isEqualTo(ExitStatus.error());
+		assertThat(exitStatus).isError();
 		then(commandWrapper).should(Mockito.times(2)).retry(resource, in, out, err);
 	}
 
