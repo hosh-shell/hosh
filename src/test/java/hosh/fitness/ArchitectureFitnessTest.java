@@ -62,4 +62,8 @@ public class ArchitectureFitnessTest {
 		noClasses().that().resideInAPackage("..spi..")
 			.should().accessClassesThat().resideInAPackage("..runtime..");
 
+	@ArchTest
+	public final ArchRule noReflection =
+		noClasses()
+			.should().accessClassesThat().resideInAPackage("java.lang.reflect");
 }
