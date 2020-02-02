@@ -23,9 +23,17 @@
  */
 package hosh.fitness;
 
+import com.tngtech.archunit.core.domain.JavaClass;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchCondition;
+import com.tngtech.archunit.lang.ArchRule;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 import hosh.BootstrapBuiltins;
 import hosh.Hosh;
 import hosh.doc.Description;
+import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
@@ -35,63 +43,60 @@ import hosh.runtime.Injector;
 import hosh.runtime.Parser.ParseError;
 import hosh.spi.Command;
 import hosh.spi.State;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ScanResult;
-import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@AnalyzeClasses(packagesOf = Hosh.class)
 public class DocFitnessTest {
 
-	@Test
-	public void checkExamplesSyntax() {
-		State state = new State();
-		BootstrapBuiltins bootstrapBuiltins = new BootstrapBuiltins();
-		bootstrapBuiltins.registerAllBuiltins(state);
-		assertThat(state.getCommands()).isNotEmpty();
-		Compiler compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state, new Injector()));
-		try (ScanResult scanResult = new ClassGraph().whitelistPackages(Hosh.class.getPackageName()).scan()) {
-			assertThat(scanResult.getAllClasses()).isNotEmpty();
-			scanResult
-				.getClassesImplementing(Command.class.getCanonicalName())
-				.loadClasses()
-				.stream()
-				.filter(c -> c.isAnnotationPresent(Examples.class))
-				.map(c -> c.getAnnotation(Examples.class))
-				.flatMap(examples -> Stream.of(examples.value()))
-				.forEach(example -> {
-					try {
-						Program program = compiler.compile(example.command());
-						assertThat(program).isNotNull();
-					} catch (CompileError e) {
-						throw new AssertionError("cannot compile '" + example.command() + "'", e);
-					} catch (ParseError e) {
-						throw new AssertionError("cannot parse '" + example.command() + "'", e);
-					}
-				});
+	@ArchTest
+	public final ArchRule commandsAreDocumented =
+		classes()
+			.that().implement(Command.class)
+			.and().arePublic()
+			.should().beAnnotatedWith(Description.class)
+			.andShould().beAnnotatedWith(Examples.class);
+
+	@ArchTest
+	public final ArchRule commandsHaveSyntacticallyCorrectExamples =
+		classes()
+			.that().areAnnotatedWith(Examples.class)
+			.and().arePublic()
+			.should(beSyntacticallyCorrect());
+
+	// implementation details
+	private static ArchCondition<JavaClass> beSyntacticallyCorrect() {
+		return new BeSyntacticallyCorrect();
+	}
+
+	private static class BeSyntacticallyCorrect extends ArchCondition<JavaClass> {
+
+		private final Compiler compiler;
+
+		private BeSyntacticallyCorrect() {
+			super("be syntactically correct");
+			State state = new State();
+			BootstrapBuiltins bootstrapBuiltins = new BootstrapBuiltins();
+			bootstrapBuiltins.registerAllBuiltins(state);
+			assertThat(state.getCommands()).isNotEmpty();
+			compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state, new Injector()));
+		}
+
+		@Override
+		public void check(JavaClass item, ConditionEvents events) {
+			for (Example example : item.getAnnotationOfType(Examples.class).value()) {
+				try {
+					Program program = compiler.compile(example.command());
+					assertThat(program).isNotNull();
+					events.add(SimpleConditionEvent.satisfied(item, "working example"));
+				} catch (CompileError e) {
+					events.add(SimpleConditionEvent.violated(item, item + ": compile failed: " + e.getMessage()));
+				} catch (ParseError e) {
+					events.add(SimpleConditionEvent.violated(item, item + ": parse failed:" + e.getMessage()));
+				}
+			}
 		}
 	}
 
-	@Test
-	public void displayHelpAndExamplesCoverage() {
-		ClassGraph allClasses = new ClassGraph().whitelistPackages(Hosh.class.getPackageName());
-		try (ScanResult scanResult = allClasses.scan()) {
-			assertThat(scanResult.getAllClasses()).isNotEmpty();
-			List<Class<?>> commands = scanResult
-				                          .getAllClasses()
-				                          .loadClasses()
-				                          .stream()
-				                          .filter(c -> c.getEnclosingClass() != null && c.getEnclosingClass().getSimpleName().endsWith("Module"))
-				                          .collect(Collectors.toList());
-			List<Class<?>> withHelp = commands.stream().filter(c -> c.isAnnotationPresent(Description.class)).collect(Collectors.toList());
-			List<Class<?>> withExamples = commands.stream().filter(c -> c.isAnnotationPresent(Examples.class))
-				                              .collect(Collectors.toList());
-			assertThat(withHelp).as("@Help").containsExactlyInAnyOrderElementsOf(commands);
-			assertThat(withExamples).as("@Examples").containsExactlyInAnyOrderElementsOf(commands);
-		}
-	}
 }
