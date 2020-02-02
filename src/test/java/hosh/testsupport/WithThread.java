@@ -45,4 +45,9 @@ public class WithThread implements Extension, BeforeTestExecutionCallback, After
 	public void beforeTestExecution(ExtensionContext context) {
 		backup = Thread.currentThread().getName();
 	}
+
+	public void renameTo(String newName) {
+		Thread.currentThread().setName(newName);
+	}
+
 }

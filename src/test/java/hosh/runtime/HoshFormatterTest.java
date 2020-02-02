@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import hosh.testsupport.WithThread;
 import hosh.testsupport.WithTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +44,10 @@ import static org.mockito.BDDMockito.given;
 public class HoshFormatterTest {
 
 	@RegisterExtension
-	public WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("Etc/GMT+8"));
+	public final WithThread withThread = new WithThread();
+
+	@RegisterExtension
+	public final WithTimeZone withTimeZone = new WithTimeZone(TimeZone.getTimeZone("Etc/GMT+8"));
 
 	@Mock(stubOnly = true)
 	private LogRecord logRecord;
@@ -53,6 +57,7 @@ public class HoshFormatterTest {
 
 	@Test
 	public void severeWithStacktrace() {
+		withThread.renameTo("main");
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
 		given(logRecord.getLevel()).willReturn(Level.SEVERE);
 		given(logRecord.getMessage()).willReturn("message");
@@ -64,6 +69,7 @@ public class HoshFormatterTest {
 
 	@Test
 	public void info() {
+		withThread.renameTo("main");
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
 		given(logRecord.getLevel()).willReturn(Level.INFO);
 		given(logRecord.getMessage()).willReturn("message");

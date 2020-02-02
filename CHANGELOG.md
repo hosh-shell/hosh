@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - azure-pipelines -> github-actions
+- enabling parallel test execution
 
 ### Fixed
 - #212: now it is possible to use several external commands in a pipeline
