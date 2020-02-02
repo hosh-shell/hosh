@@ -90,10 +90,13 @@ public class Hosh {
 	 */
 	public static class Environment {
 
+		private Environment() {
+		}
+
 		/**
 		 * Allows to configure default log level.
 		 *
-		 * Allowed values: as @{@link Level#parse(String)}
+		 * Allowed values: as @{@link Level#parse(String)}.
 		 * Default: null, meaning that logging is disabled.
 		 */
 		public static final String HOSH_LOG_LEVEL = "HOSH_LOG_LEVEL";
@@ -101,8 +104,8 @@ public class Hosh {
 		/**
 		 * Allows to enable/disable history.
 		 *
-		 * Allowed values: "true", "false
-		 * Default: "true"
+		 * Allowed values: "true", "false".
+		 * Default: "true".
 		 */
 		public static final String HOSH_HISTORY = "HOSH_HISTORY";
 
