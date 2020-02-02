@@ -552,7 +552,7 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return value.hashCode();
+			return Objects.hash(value);
 		}
 
 		@Override
@@ -564,7 +564,7 @@ public class Values {
 		public int compareTo(Value obj) {
 			if (obj instanceof StyledValue) {
 				StyledValue that = (StyledValue) obj;
-				return this.compareTo(that);
+				return this.value.compareTo(that.value);
 			} else if (obj instanceof None) {
 				return 1;
 			} else {
