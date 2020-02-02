@@ -23,9 +23,13 @@
  */
 package hosh.fitness;
 
+import com.tngtech.archunit.core.domain.JavaField;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
 import hosh.Hosh;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +39,6 @@ import org.mockito.Mock;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
-import static hosh.fitness.ArchUnitConditions.haveAccesses;
 
 /**
  * Enforcing some useful rules for junit tests.
@@ -60,4 +63,22 @@ public class JUnitFitnessTest {
 			.areNotStatic().and().areAnnotatedWith(Mock.class)
 			.should(haveAccesses());
 
+	// implementation details
+	private static HaveAccesses haveAccesses() {
+		return new HaveAccesses();
+	}
+
+	private static class HaveAccesses extends ArchCondition<JavaField> {
+
+		public HaveAccesses() {
+			super("be used used or removed");
+		}
+
+		@Override
+		public void check(JavaField item, ConditionEvents events) {
+			if (item.getAccessesToSelf().isEmpty()) {
+				events.add(SimpleConditionEvent.violated(item,"unused @Mock " + item.getFullName()));
+			}
+		}
+	}
 }
