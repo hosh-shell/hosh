@@ -400,8 +400,7 @@
 		<profile>
 			<id>sonar</id>
 			<properties>
-				<sonar.coverage.jacoco.xmlReportPaths>target/surefire-reports/,target/failsafe-reports/
-				</sonar.coverage.jacoco.xmlReportPaths>
+				<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 				<sonar.exclusions>target/generated-sources/**</sonar.exclusions>
 			</properties>
 			<build>
@@ -415,18 +414,15 @@
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
 						<version>0.8.5</version>
-						<configuration>
-							<append>true</append>
-						</configuration>
 						<executions>
 							<execution>
 								<id>agent-for-unit-tests</id>
 								<goals>
 									<goal>prepare-agent</goal>
 								</goals>
+								<phase>process-test-classes</phase>
 								<configuration>
 									<destFile>${sonar.jacoco.reportPath}</destFile>
-									<append>true</append>
 								</configuration>
 							</execution>
 							<execution>
@@ -434,10 +430,18 @@
 								<goals>
 									<goal>prepare-agent-integration</goal>
 								</goals>
+								<phase>pre-integration-test</phase>
 								<configuration>
 									<destFile>${sonar.jacoco.itReportPath}</destFile>
-									<append>true</append>
 								</configuration>
+							</execution>
+							<execution>
+								<id>report</id>
+								<goals>
+									<goal>report</goal>
+									<goal>report-integration</goal>
+								</goals>
+								<phase>post-integration-test</phase>
 							</execution>
 						</executions>
 					</plugin>
