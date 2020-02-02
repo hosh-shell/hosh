@@ -25,8 +25,10 @@ package hosh.runtime;
 
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
+import hosh.testsupport.WithThread;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,6 +40,9 @@ import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 public class CancellableChannelTest {
+
+	@RegisterExtension
+	public final WithThread withThread = new WithThread();
 
 	@Mock(stubOnly = true)
 	private Record record;
@@ -56,7 +61,7 @@ public class CancellableChannelTest {
 
 	@Test
 	public void sendInterrupted() {
-		Thread.currentThread().interrupt();
+		withThread.interrupt();
 		assertThatThrownBy(() -> sut.send(record))
 			.hasMessage("interrupted")
 			.isInstanceOf(CancellationException.class);

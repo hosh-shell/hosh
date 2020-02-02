@@ -85,7 +85,7 @@ public class PipelineChannelTest {
 	@Test
 	public void sendInterrupted() {
 		PipelineChannel sut = new PipelineChannel();
-		Thread.currentThread().interrupt();
+		withThread.interrupt();
 		sut.send(record);
 		boolean stillInterrupted = Thread.currentThread().isInterrupted();
 		assertThat(stillInterrupted).isTrue();
@@ -94,7 +94,7 @@ public class PipelineChannelTest {
 	@Test
 	public void recvInterrupted() {
 		PipelineChannel sut = new PipelineChannel();
-		Thread.currentThread().interrupt();
+		withThread.interrupt();
 		Optional<Record> recv = sut.recv();
 		assertThat(recv).isEmpty();
 	}

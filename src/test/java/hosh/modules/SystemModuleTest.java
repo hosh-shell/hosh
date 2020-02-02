@@ -403,7 +403,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void interrupts() {
-			Thread.currentThread().interrupt();
+			withThread.interrupt();
 			ExitStatus exitStatus = sut.run(List.of("1000"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();

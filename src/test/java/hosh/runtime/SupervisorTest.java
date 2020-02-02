@@ -62,7 +62,7 @@ public class SupervisorTest {
 			Thread.sleep(10_000);
 			return ExitStatus.success();
 		});
-		Thread.currentThread().interrupt(); // next call to Future.get() will throw InterruptedException
+		withThread.interrupt(); // next call to Future.get() will throw InterruptedException
 		ExitStatus waitForAll = sut.waitForAll();
 		assertThat(waitForAll).isError();
 	}
