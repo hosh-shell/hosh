@@ -9,8 +9,8 @@ on:
       - master
 
 jobs:
-  openjdk:
-    name: OpenJDK
+  ci:
+    name: ci
     strategy:
       fail-fast: false
       matrix:
@@ -25,4 +25,4 @@ jobs:
           java-version: ${{ matrix.java }}
           architecture: ${{ matrix.architecture }}
       - name: Build project
-        run: ./mvnw -B verify
+        run: ./mvnw --batch-mode verify
