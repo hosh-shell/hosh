@@ -85,6 +85,29 @@ import java.util.stream.Stream;
  */
 public class Hosh {
 
+	/**
+	 * OS environment variables supported by Hosh.
+	 */
+	public static class Environment {
+
+		/**
+		 * Allows to configure default log level.
+		 *
+		 * Allowed values: as @{@link Level#parse(String)}
+		 * Default: null, meaning that logging is disabled.
+		 */
+		public static final String HOSH_LOG_LEVEL = "HOSH_LOG_LEVEL";
+
+		/**
+		 * Allows to enable/disable history.
+		 *
+		 * Allowed values: "true", "false
+		 * Default: "true"
+		 */
+		public static final String HOSH_HISTORY = "HOSH_HISTORY";
+
+	}
+
 	private Hosh() {
 	}
 
@@ -106,7 +129,7 @@ public class Hosh {
 	private static void configureLogging() throws IOException {
 		LogManager logManager = LogManager.getLogManager();
 		logManager.reset();
-		String logLevel = System.getenv("HOSH_LOG_LEVEL");
+		String logLevel = System.getenv(Environment.HOSH_LOG_LEVEL);
 		if (logLevel == null) {
 			return;
 		}
@@ -201,12 +224,12 @@ public class Hosh {
 
 	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter, Injector injector,
 	                               OutputChannel out, OutputChannel err, Logger logger) {
-		String disableHistory = System.getenv().getOrDefault("HOSH_DISABLE_HISTORY", "false");
+		String historyEnabled = System.getenv().getOrDefault(Environment.HOSH_HISTORY, "true");
 		History history;
-		if (Boolean.parseBoolean(disableHistory)) {
-			history = new DisabledHistory();
-		} else {
+		if (Boolean.parseBoolean(historyEnabled)) {
 			history = new DefaultHistory();
+		} else {
+			history = new DisabledHistory();
 		}
 		LineReader lineReader = LineReaderBuilder
 			                        .builder()

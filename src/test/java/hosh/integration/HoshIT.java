@@ -23,6 +23,7 @@
  */
 package hosh.integration;
 
+import hosh.Hosh;
 import hosh.doc.Bug;
 import hosh.doc.Todo;
 import hosh.testsupport.TemporaryFolder;
@@ -541,7 +542,7 @@ public class HoshIT {
 	}
 
 	private Process givenHoshProcess(String... args) throws IOException {
-		return givenHoshProcess(Map.of("HOSH_DISABLE_HISTORY", "true"), args);
+		return givenHoshProcess(Map.of(Hosh.Environment.HOSH_HISTORY, "false"), args);
 	}
 
 	private Process givenHoshProcess(Map<String, String> additionalEnv, String... args) throws IOException {
