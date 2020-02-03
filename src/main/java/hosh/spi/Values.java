@@ -207,7 +207,7 @@ public class Values {
 		public boolean equals(Object obj) {
 			if (obj instanceof SizeValue) {
 				SizeValue that = (SizeValue) obj;
-				return Objects.equals(this.bytes, that.bytes);
+				return this.bytes == that.bytes;
 			} else {
 				return false;
 			}
@@ -215,16 +215,14 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(bytes);
+			return Long.hashCode(bytes);
 		}
-
-		private static final Comparator<SizeValue> SIZE_COMPARATOR = Comparator.comparing(x -> x.bytes);
 
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof SizeValue) {
 				SizeValue that = (SizeValue) obj;
-				return SIZE_COMPARATOR.compare(this, that);
+				return Long.compare(this.bytes, that.bytes);
 			} else if (obj instanceof None) {
 				return 1;
 			} else {
@@ -263,7 +261,7 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(number);
+			return Long.hashCode(number);
 		}
 
 		@Override
