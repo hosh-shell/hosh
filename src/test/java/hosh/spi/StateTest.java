@@ -25,12 +25,29 @@ package hosh.spi;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StateTest {
 
 	@Test
-	public void repr() {
+	public void asString() {
 		assertThat(new State()).hasToString("State[cwd='null',path=[],variables={},commands={}]");
 	}
+
+	@Test
+	public void cwdIsAlwaysAbsolute() {
+		State sut = new State();
+		Path path = Paths.get(".");
+		assertThat(path).isRelative();
+		sut.setCwd(path);
+		// transform path to a cwd
+		Path cwd = sut.getCwd();
+		assertThat(cwd)
+			.isAbsolute()
+			.isNormalized();
+	}
+
 }

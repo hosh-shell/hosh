@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -138,8 +139,8 @@ public class CommandResolversTest {
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent();
+			then(injector).should().injectDeps(any());
 		}
-
 		@Test
 		@EnabledOnOs(OS.WINDOWS)
 		public void notFoundInPathAsSpecifiedByPathExt() throws IOException {
@@ -162,6 +163,7 @@ public class CommandResolversTest {
 			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent();
+			then(injector).should().injectDeps(any());
 		}
 
 		@Test
@@ -172,6 +174,7 @@ public class CommandResolversTest {
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("./test");
 			assertThat(result).isPresent();
+			then(injector).should().injectDeps(any());
 		}
 
 		@Test

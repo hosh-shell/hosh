@@ -47,7 +47,7 @@ public class KeysTest {
 	}
 
 	@Test
-	public void representation() {
+	public void asString() {
 		assertThat(Keys.of("name"))
 			.hasToString("Key['name']");
 	}

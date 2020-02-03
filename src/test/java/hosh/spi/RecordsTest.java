@@ -58,7 +58,7 @@ public class RecordsTest {
 	}
 
 	@Test
-	public void representation() {
+	public void asString() {
 		Record a = Records.empty();
 		assertThat(a.toString()).isEqualTo("Record[data={}]");
 		Record b = a.append(Keys.SIZE, Values.ofSize(10));
@@ -112,6 +112,8 @@ public class RecordsTest {
 		assertThat(record.value(Keys.NAME)).isEmpty();
 		record = record.append(Keys.NAME, Values.none());
 		assertThat(record.value(Keys.NAME)).isNotEmpty().contains(Values.none());
+		record = record.prepend(Keys.INDEX, Values.ofNumeric(1));
+		assertThat(record.keys()).containsExactly(Keys.INDEX, Keys.NAME);
 	}
 
 	@Test
@@ -119,7 +121,7 @@ public class RecordsTest {
 		Records.Builder builder = Records.builder();
 		builder.entry(Keys.NAME, Values.none());
 		Record record = builder.build();
-		builder.entry(Keys.COUNT, Values.none()); // please note that this has been added after build()
+		builder.entry(new Entry(Keys.COUNT, Values.none())); // please note that this has been added after build()
 		assertThat(record.value(Keys.NAME)).isPresent();
 		assertThat(record.value(Keys.COUNT)).isEmpty();
 	}

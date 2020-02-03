@@ -111,7 +111,7 @@ public class DefaultCommandWrapperTest {
 	}
 
 	@Test
-	public void representation() {
+	public void asString() {
 		assertThat(sut)
 			.hasToString("DefaultCommandWrapper[nested=statement,commandWrapper=commandWrapper]");
 	}

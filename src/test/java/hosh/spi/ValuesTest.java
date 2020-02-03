@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
@@ -297,7 +298,7 @@ public class ValuesTest {
 		}
 
 		@Test
-		public void repr() {
+		public void asString() {
 			assertThat(Values.ofSize(0L)).hasToString("Size[0B]");
 			assertThat(Values.ofSize(512L)).hasToString("Size[512B]");
 			assertThat(Values.ofSize(1023L)).hasToString("Size[1023B]");
@@ -374,6 +375,13 @@ public class ValuesTest {
 			assertThatThrownBy(() -> Values.ofStyledPath(Paths.get("file"), null))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("style cannot be null");
+		}
+
+		@Test
+		public void unwrap() {
+			Value value = Values.ofPath(Paths.get("."));
+			assertThat(value.unwrap(Path.class)).isPresent();
+			assertThat(value.unwrap(Integer.class)).isEmpty();
 		}
 	}
 

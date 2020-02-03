@@ -42,7 +42,7 @@ public class NullChannelTest {
 	}
 
 	@Test
-	public void repr() {
+	public void asString() {
 		assertThat(sut).hasToString("NullChannel[]");
 	}
 }

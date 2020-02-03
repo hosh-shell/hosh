@@ -80,7 +80,7 @@ public class ConsoleChannelTest {
 	}
 
 	@Test
-	public void repr() {
+	public void asString() {
 		assertThat(sut).hasToString("ConsoleChannel[style=NONE]");
 	}
 }

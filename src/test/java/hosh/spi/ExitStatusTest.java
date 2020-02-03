@@ -40,7 +40,7 @@ public class ExitStatusTest {
 	}
 
 	@Test
-	public void repr() {
+	public void asString() {
 		assertThat(ExitStatus.of(42)).hasToString("ExitStatus[value=42]");
 	}
 
