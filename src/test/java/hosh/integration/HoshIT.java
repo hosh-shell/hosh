@@ -28,6 +28,7 @@ import hosh.doc.Bug;
 import hosh.doc.Todo;
 import hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -44,6 +45,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -320,8 +322,10 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).isEqualTo("100");
-		assertThat(exitCode).isEqualTo(0);
+		Assertions.assertTimeout(Duration.ofSeconds(5), () -> {
+			assertThat(output).isEqualTo("100");
+			assertThat(exitCode).isEqualTo(0);
+		});
 	}
 
 	@Test
