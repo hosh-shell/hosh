@@ -456,36 +456,28 @@ public class ValuesTest {
 	public class SortingBetweenValuesTest {
 
 		@Test
-		public void instantWithNone() {
+		public void instant() {
 			List<Value> sorted = Stream.of(
 				Values.ofInstant(Instant.ofEpochMilli(100)),
-				Values.none(),
-				Values.none(),
 				Values.ofInstant(Instant.ofEpochMilli(-100)),
 				Values.ofInstant(Instant.ofEpochMilli(0)))
 				                     .sorted()
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-				Values.none(),
-				Values.none(),
 				Values.ofInstant(Instant.ofEpochMilli(-100)),
 				Values.ofInstant(Instant.ofEpochMilli(0)),
 				Values.ofInstant(Instant.ofEpochMilli(100)));
 		}
 
 		@Test
-		public void numericWithNone() {
+		public void numeric() {
 			List<Value> sorted = Stream.of(
 				Values.ofNumeric(1),
-				Values.none(),
-				Values.none(),
 				Values.ofNumeric(-1),
 				Values.ofNumeric(0))
 				                     .sorted()
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-				Values.none(),
-				Values.none(),
 				Values.ofNumeric(-1),
 				Values.ofNumeric(0),
 				Values.ofNumeric(1));
@@ -495,15 +487,11 @@ public class ValuesTest {
 		public void textWithNone() {
 			List<Value> sorted = Stream.of(
 				Values.ofText("a"),
-				Values.none(),
-				Values.none(),
 				Values.ofText("z"),
 				Values.ofText("b"))
 				                     .sorted()
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-				Values.none(),
-				Values.none(),
 				Values.ofText("a"),
 				Values.ofText("b"),
 				Values.ofText("z"));
@@ -513,15 +501,11 @@ public class ValuesTest {
 		public void sizeWithNone() {
 			List<Value> sorted = Stream.of(
 				Values.ofSize(1),
-				Values.none(),
-				Values.none(),
 				Values.ofSize(2),
 				Values.ofSize(3))
 				                     .sorted()
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-				Values.none(),
-				Values.none(),
 				Values.ofSize(1),
 				Values.ofSize(2),
 				Values.ofSize(3));
@@ -531,15 +515,11 @@ public class ValuesTest {
 		public void pathWithNone() {
 			List<Value> sorted = Stream.of(
 				Values.ofPath(Paths.get("bbb")),
-				Values.none(),
-				Values.none(),
 				Values.ofPath(Paths.get("aaa")),
 				Values.ofPath(Paths.get("ccc")))
 				                     .sorted()
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-				Values.none(),
-				Values.none(),
 				Values.ofPath(Paths.get("aaa")),
 				Values.ofPath(Paths.get("bbb")),
 				Values.ofPath(Paths.get("ccc")));
@@ -548,15 +528,11 @@ public class ValuesTest {
 		@Test
 		public void durationWithNone() {
 			List<Value> sorted = Stream.of(
-				Values.none(),
 				Values.ofDuration(Duration.ofMillis(1)),
-				Values.none(),
 				Values.ofDuration(Duration.ofMillis(2)))
 				                     .sorted()
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-				Values.none(),
-				Values.none(),
 				Values.ofDuration(Duration.ofMillis(1)),
 				Values.ofDuration(Duration.ofMillis(2)));
 		}
