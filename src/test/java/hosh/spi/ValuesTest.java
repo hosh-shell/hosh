@@ -353,8 +353,7 @@ public class ValuesTest {
 
 		@Test
 		public void equalsContract() {
-			EqualsVerifier.forClass(Values.PathValue.class)
-					.verify();
+			EqualsVerifier.forClass(Values.PathValue.class).verify();
 		}
 
 		@Test
@@ -380,12 +379,18 @@ public class ValuesTest {
 
 	@Nested
 	public class WithStyleTest {
+
 		@Test
-		public void placeholder() {
-			throw new UnsupportedOperationException("TODO");
+		public void equalsContract() {
+			EqualsVerifier.forClass(Values.StyledValue.class).verify();
 		}
 
 		@Test
+		public void asString() {
+			assertThat(Values.withStyle(Values.ofPath(Paths.get("file")), Ansi.Style.FG_RED)).hasToString("StyledValue[value=Path[file],style='FG_RED']");
+		}
+
+			@Test
 		public void unwrap() {
 			Value value = Values.ofPath(Paths.get("."));
 			assertThat(value.unwrap(Path.class)).isPresent();

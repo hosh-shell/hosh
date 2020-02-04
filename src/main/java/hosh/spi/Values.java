@@ -515,9 +515,7 @@ public class Values {
 		}
 	}
 
-	// generic decorator to provide ansi style while delegating equals/hashCode to the decorated value
-	// i.e. style is used only in print()
-	static class StyledValue implements Value {
+	static final class StyledValue implements Value {
 
 		private final Value value;
 		private final Ansi.Style style;
@@ -544,7 +542,7 @@ public class Values {
 		public boolean equals(Object obj) {
 			if (obj instanceof StyledValue) {
 				StyledValue that = (StyledValue) obj;
-				return Objects.equals(this.value, that.value);
+				return Objects.equals(this.value, that.value) && Objects.equals(this.style, that.style);
 			} else {
 				return false;
 			}
@@ -552,7 +550,7 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(value);
+			return Objects.hash(value, style);
 		}
 
 		@Override
@@ -560,16 +558,34 @@ public class Values {
 			return String.format("StyledValue[value=%s,style='%s']", value, style);
 		}
 
+		private static final Comparator<StyledValue> BY_VALUE_AND_STYLE =
+			Comparator
+				.comparing(StyledValue::value)
+				.thenComparing(StyledValue::style);
+
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof StyledValue) {
 				StyledValue that = (StyledValue) obj;
-				return this.value.compareTo(that.value);
+				return BY_VALUE_AND_STYLE.compare(this, that);
 			} else if (obj instanceof None) {
 				return 1;
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
+		}
+
+		@Override
+		public <T> Optional<T> unwrap(Class<T> type) {
+			return value.unwrap(type);
+		}
+
+		private Value value() {
+			return value;
+		}
+
+		private Ansi.Style style() {
+			return style;
 		}
 	}
 }
