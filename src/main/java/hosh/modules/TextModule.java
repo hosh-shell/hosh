@@ -439,8 +439,7 @@ public class TextModule implements Module {
 		}
 
 		private void sortBy(Key key, List<Record> records) {
-			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key).orElse(null),
-				Comparator.nullsFirst(Comparator.naturalOrder()));
+			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key).orElse(Values.none()));
 			records.sort(comparator);
 		}
 

@@ -879,11 +879,21 @@ public class TextModuleTest {
 		@Captor
 		private ArgumentCaptor<Record> records;
 
+		@Test
+		public void empty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+		}
+
 		@SuppressWarnings("unchecked")
 		@Test
 		public void sortByExistingKey() {
-			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
-			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
+			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
+			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -895,8 +905,23 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
+		public void sortByExistingKeyNullFirst() {
+			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
+			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
+			Record record3 = Records.singleton(Keys.SIZE, Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.of(record3), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(Mockito.times(3)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactly(record3, record2, record1);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
 		public void sortByNonExistingKey() {
-			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
+			Record record1 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
