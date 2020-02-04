@@ -890,7 +890,7 @@ public class TextModuleTest {
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(2)).send(records.capture());
-			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record2, record1);
+			assertThat(records.getAllValues()).containsExactly(record2, record1);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -898,12 +898,12 @@ public class TextModuleTest {
 		public void sortByNonExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
-			ExitStatus exitStatus = sut.run(List.of("anotherkey"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(1)).send(records.capture());
-			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
+			assertThat(records.getAllValues()).containsExactly(record1);
 		}
 
 		@Test
