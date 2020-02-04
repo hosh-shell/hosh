@@ -55,6 +55,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -414,22 +415,51 @@ public class TextModule implements Module {
 
 	@Description("sort records according to the specified key")
 	@Examples({
-		@Example(command = "lines file.txt | sort text", description = "sort lines in 'file.txt'")
+		@Example(command = "lines file.txt | sort text", description = "sort lines in 'file.txt' in ascending order"),
+		@Example(command = "lines file.txt | sort desc text", description = "sort lines in 'file.txt' in descending order"),
+		@Example(command = "lines file.txt | sort asc text", description = "sort lines in 'file.txt' in ascending order")
 	})
 	public static class Sort implements Command {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+			if (args.size() == 0) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("use 'sort key' or 'sort [asc|desc] key'")));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			if (args.size() > 2) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("too many args")));
+				return ExitStatus.error();
+			}
+			String direction;
+			Key key;
+			if (args.size() == 1) {
+				direction = "asc";
+				key = Keys.of(args.get(0));
+			} else {
+				Optional<String> validate = validate(args.get(0));
+				if (validate.isEmpty()) {
+					err.send(Records.singleton(Keys.ERROR, Values.ofText("must be asc or desc")));
+					return ExitStatus.error();
+				}
+				direction = validate.get();
+				key = Keys.of(args.get(1));
+			}
 			List<Record> records = new ArrayList<>();
 			accumulate(in, records);
-			sortBy(key, records);
+			sortBy(order(key, direction), records);
 			output(out, records);
 			return ExitStatus.success();
+		}
+
+		private Optional<String> validate(String s) {
+			if ("asc".equals(s)) {
+				return Optional.of(s);
+			} else if ("desc".equals(s)) {
+				return Optional.of(s);
+			} else {
+				return Optional.empty();
+			}
 		}
 
 		private void accumulate(InputChannel in, List<Record> records) {
@@ -438,8 +468,16 @@ public class TextModule implements Module {
 			}
 		}
 
-		private void sortBy(Key key, List<Record> records) {
+		private Comparator<Record> order(Key key, String direction) {
 			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key).orElse(Values.none()));
+			if (direction.equals("desc")) {
+				return comparator.reversed();
+			} else {
+				return comparator;
+			}
+		}
+
+		private void sortBy(Comparator<Record> comparator, List<Record> records) {
 			records.sort(comparator);
 		}
 
