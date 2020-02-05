@@ -569,21 +569,5 @@ public class ValuesTest {
 			);
 		}
 
-		@Test
-		public void noneFirst() {
-			List<Value> sorted = Stream.of(
-				Values.ofNumeric(1),
-				Values.ofNumeric(-1),
-				Values.none(),
-				Values.ofNumeric(0))
-				                     .sorted(Values.noneFirst(Comparator.naturalOrder()))
-				                     .collect(Collectors.toList());
-			assertThat(sorted).containsExactly(
-				Values.none(),
-				Values.ofNumeric(-1),
-				Values.ofNumeric(0),
-				Values.ofNumeric(1)
-			);
-		}
 	}
 }

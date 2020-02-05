@@ -51,30 +51,24 @@ public class Values {
 
 	private static final None NONE = new None();
 
-	public static Comparator<Value> noneFirst(Comparator<Value> comparator) {
-		return new NullAwareComparator(true, comparator);
-	}
-
 	public static Comparator<Value> noneLast(Comparator<Value> comparator) {
-		return new NullAwareComparator(false, comparator);
+		return new NoneAwareComparator(comparator);
 	}
 
-	private static class NullAwareComparator implements Comparator<Value> {
+	private static class NoneAwareComparator implements Comparator<Value> {
 
-		private final boolean noneFirst;
 		private final Comparator<Value> inner;
 
-		private NullAwareComparator(boolean noneFirst, Comparator<Value> inner) {
-			this.noneFirst = noneFirst;
+		private NoneAwareComparator(Comparator<Value> inner) {
 			this.inner = inner;
 		}
 
 		@Override
 		public int compare(Value a, Value b) {
 			if (a instanceof None) {
-				return (b instanceof None) ? 0 : (noneFirst ? -1 : 1);
+				return (b instanceof None) ? 0 : 1;
 			} else if (b instanceof None) {
-				return noneFirst ? 1: -1;
+				return -1;
 			} else {
 				return inner.compare(a, b);
 			}
