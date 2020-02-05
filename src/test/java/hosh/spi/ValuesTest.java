@@ -469,8 +469,6 @@ public class ValuesTest {
 	@Nested
 	public class SortingBetweenValuesTest {
 
-
-
 		@Test
 		public void instant() {
 			List<Value> sorted = Stream.of(
@@ -551,6 +549,40 @@ public class ValuesTest {
 			assertThat(sorted).containsExactly(
 				Values.ofDuration(Duration.ofMillis(1)),
 				Values.ofDuration(Duration.ofMillis(2)));
+		}
+
+		@Test
+		public void noneLast() {
+			List<Value> sorted = Stream.of(
+				Values.ofNumeric(1),
+				Values.ofNumeric(-1),
+				Values.none(),
+				Values.ofNumeric(0))
+				                     .sorted(Values.noneLast())
+				                     .collect(Collectors.toList());
+			assertThat(sorted).containsExactly(
+				Values.ofNumeric(-1),
+				Values.ofNumeric(0),
+				Values.ofNumeric(1),
+				Values.none()
+			);
+		}
+
+		@Test
+		public void noneFirst() {
+			List<Value> sorted = Stream.of(
+				Values.ofNumeric(1),
+				Values.ofNumeric(-1),
+				Values.none(),
+				Values.ofNumeric(0))
+				                     .sorted(Values.noneFirst())
+				                     .collect(Collectors.toList());
+			assertThat(sorted).containsExactly(
+				Values.none(),
+				Values.ofNumeric(-1),
+				Values.ofNumeric(0),
+				Values.ofNumeric(1)
+			);
 		}
 	}
 }
