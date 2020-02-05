@@ -308,7 +308,7 @@ public class Values {
 			if (obj instanceof None) {
 				return 0;
 			} else {
-				return -1;
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
 	}

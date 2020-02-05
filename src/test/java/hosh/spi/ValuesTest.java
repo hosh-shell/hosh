@@ -70,6 +70,20 @@ public class ValuesTest {
 		}
 
 		@Test
+		public void compareToAnotherValueType() {
+			assertThatThrownBy(() -> Values.none().compareTo(Values.ofText("2")))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare None to Text[2]");
+		}
+
+		@Test
+		public void compareToNone() {
+			Value v1 = Values.none();
+			Value v2 = Values.none();
+			assertThat(v1).usingDefaultComparator().isEqualByComparingTo(v2);
+		}
+
+		@Test
 		public void asString() {
 			assertThat(Values.none()).hasToString("None");
 		}
@@ -454,6 +468,8 @@ public class ValuesTest {
 
 	@Nested
 	public class SortingBetweenValuesTest {
+
+
 
 		@Test
 		public void instant() {
