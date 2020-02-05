@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -558,7 +559,7 @@ public class ValuesTest {
 				Values.ofNumeric(-1),
 				Values.none(),
 				Values.ofNumeric(0))
-				                     .sorted(Values.noneLast())
+				                     .sorted(Values.noneLast(Comparator.naturalOrder()))
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 				Values.ofNumeric(-1),
@@ -575,7 +576,7 @@ public class ValuesTest {
 				Values.ofNumeric(-1),
 				Values.none(),
 				Values.ofNumeric(0))
-				                     .sorted(Values.noneFirst())
+				                     .sorted(Values.noneFirst(Comparator.naturalOrder()))
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 				Values.none(),

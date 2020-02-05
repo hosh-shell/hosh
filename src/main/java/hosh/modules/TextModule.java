@@ -469,7 +469,7 @@ public class TextModule implements Module {
 		}
 
 		private Comparator<Record> order(Key key, String direction) {
-			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key).orElse(Values.none()));
+			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key).orElse(Values.none()), Values.noneFirst(Comparator.naturalOrder()));
 			if (direction.equals("desc")) {
 				return comparator.reversed();
 			} else {

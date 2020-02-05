@@ -51,12 +51,12 @@ public class Values {
 
 	private static final None NONE = new None();
 
-	public static Comparator<Value> noneFirst() {
-		return new NullAwareComparator(true, Comparator.naturalOrder());
+	public static Comparator<Value> noneFirst(Comparator<Value> comparator) {
+		return new NullAwareComparator(true, comparator);
 	}
 
-	public static Comparator<Value> noneLast() {
-		return new NullAwareComparator(false, Comparator.naturalOrder());
+	public static Comparator<Value> noneLast(Comparator<Value> comparator) {
+		return new NullAwareComparator(false, comparator);
 	}
 
 	private static class NullAwareComparator implements Comparator<Value> {
