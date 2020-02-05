@@ -905,10 +905,10 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void sortByExistingKeyNullFirst() {
-			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
-			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
-			Record record3 = Records.singleton(Keys.SIZE, Values.ofNumeric(1));
+		public void sortByExistingKeyNullLast() {
+			Record record1 = Records.singleton(Keys.SIZE, Values.ofNumeric(1));
+			Record record2 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
+			Record record3 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.of(record3), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
