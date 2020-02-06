@@ -23,6 +23,8 @@
  */
 package hosh.spi;
 
+import hosh.doc.Todo;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,6 +34,7 @@ import java.util.Optional;
  * <p>
  * Iteration order is well defined.
  */
+@Todo(description = "Record should implement Value!")
 public interface Record extends Printable {
 
 	/**
