@@ -568,8 +568,6 @@ public class Values {
 			if (obj instanceof StyledValue) {
 				StyledValue that = (StyledValue) obj;
 				return BY_VALUE_AND_STYLE.compare(this, that);
-			} else if (obj instanceof None) {
-				return 1;
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}

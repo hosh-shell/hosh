@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -194,7 +195,7 @@ public class ValuesTest {
 		@Test
 		public void equalsContract() {
 			EqualsVerifier.forClass(Values.TextValue.class)
-					.verify();
+				.verify();
 		}
 
 		@Test
@@ -381,6 +382,36 @@ public class ValuesTest {
 	public class WithStyleTest {
 
 		@Test
+		public void appendOk() {
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			Value value = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
+			value.print(printWriter, Locale.getDefault());
+			assertThat(writer.toString()).isEqualTo("\u001B[44m1\u001B[49m");
+		}
+
+		@Test
+		public void nullValue() {
+			assertThatThrownBy(() -> Values.withStyle(null, Ansi.Style.BG_BLUE))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("value cannot be null");
+		}
+
+		@Test
+		public void nullStyle() {
+			assertThatThrownBy(() -> Values.withStyle(Values.ofText("aaa"), null))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("style cannot be null");
+		}
+
+		@Test
+		public void compareToAnotherValueType() {
+			assertThatThrownBy(() -> Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE).compareTo(Values.ofText("2")))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare StyledValue[value=Numeric[1],style='BG_BLUE'] to Text[2]");
+		}
+
+		@Test
 		public void equalsContract() {
 			EqualsVerifier.forClass(Values.StyledValue.class).verify();
 		}
@@ -390,7 +421,7 @@ public class ValuesTest {
 			assertThat(Values.withStyle(Values.ofPath(Paths.get("file")), Ansi.Style.FG_RED)).hasToString("StyledValue[value=Path[file],style='FG_RED']");
 		}
 
-			@Test
+		@Test
 		public void unwrap() {
 			Value value = Values.ofPath(Paths.get("."));
 			assertThat(value.unwrap(Path.class)).isPresent();
