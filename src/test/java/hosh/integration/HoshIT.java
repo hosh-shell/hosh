@@ -362,18 +362,6 @@ public class HoshIT {
 		assertThat(output).contains("'FOOBAR' unknown command");
 	}
 
-	@Test
-	public void commandWrapperThatUsedStateInBefore() throws Exception {
-		Path scriptPath = givenScript(
-			"withLock file.lock { echo inside critical section } "//
-		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
-		assertThat(output).contains("inside critical section");
-	}
-
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/71")
 	@Test
 	public void commandWrapperCapturesOutput() throws Exception {
