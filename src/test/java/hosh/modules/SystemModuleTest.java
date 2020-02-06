@@ -45,6 +45,7 @@ import hosh.modules.SystemModule.Sink;
 import hosh.modules.SystemModule.Sleep;
 import hosh.modules.SystemModule.UnsetVariable;
 import hosh.modules.SystemModule.WithTime;
+import hosh.spi.Ansi;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -238,9 +239,9 @@ public class SystemModuleTest {
 			then(err).shouldHaveNoInteractions();
 			assertThat(records.getAllValues())
 				.containsExactly(
-					Records.singleton(Keys.TEXT, Values.ofText("true - /bin/true replacement")),
-					Records.singleton(Keys.TEXT, Values.ofText("Examples")),
-					Records.singleton(Keys.TEXT, Values.ofText("true # returns exit success")));
+					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("true - /bin/true replacement"), Ansi.Style.BOLD)),
+					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("Examples"), Ansi.Style.BOLD)),
+					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("true # returns exit success"), Ansi.Style.ITALIC)));
 		}
 
 		@Test
@@ -253,9 +254,9 @@ public class SystemModuleTest {
 			then(err).shouldHaveNoInteractions();
 			assertThat(records.getAllValues())
 				.containsExactly(
-					Records.singleton(Keys.TEXT, Values.ofText("false - /bin/false replacement")),
-					Records.singleton(Keys.TEXT, Values.ofText("Examples")),
-					Records.singleton(Keys.TEXT, Values.ofText("N/A")));
+					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("false - /bin/false replacement"), Ansi.Style.BOLD)),
+					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("Examples"), Ansi.Style.BOLD)),
+					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("N/A"), Ansi.Style.FG_RED)));
 		}
 
 		@Test
