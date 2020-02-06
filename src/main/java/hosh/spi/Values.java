@@ -51,6 +51,30 @@ public class Values {
 
 	private static final None NONE = new None();
 
+	public static Comparator<Value> noneLast(Comparator<Value> comparator) {
+		return new NoneAwareComparator(comparator);
+	}
+
+	private static class NoneAwareComparator implements Comparator<Value> {
+
+		private final Comparator<Value> inner;
+
+		private NoneAwareComparator(Comparator<Value> inner) {
+			this.inner = inner;
+		}
+
+		@Override
+		public int compare(Value a, Value b) {
+			if (a instanceof None) {
+				return (b instanceof None) ? 0 : 1;
+			} else if (b instanceof None) {
+				return -1;
+			} else {
+				return inner.compare(a, b);
+			}
+		}
+	}
+
 	public static Value none() {
 		return NONE;
 	}
@@ -143,8 +167,6 @@ public class Values {
 			if (obj instanceof TextValue) {
 				TextValue that = (TextValue) obj;
 				return this.value.compareTo(that.value);
-			} else if (obj instanceof None) {
-				return 1;
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
@@ -223,8 +245,6 @@ public class Values {
 			if (obj instanceof SizeValue) {
 				SizeValue that = (SizeValue) obj;
 				return Long.compare(this.bytes, that.bytes);
-			} else if (obj instanceof None) {
-				return 1;
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
@@ -279,8 +299,6 @@ public class Values {
 			if (obj instanceof NumericValue) {
 				NumericValue that = (NumericValue) obj;
 				return Long.compare(this.number, that.number);
-			} else if (obj instanceof None) {
-				return 1;
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
@@ -314,7 +332,7 @@ public class Values {
 			if (obj instanceof None) {
 				return 0;
 			} else {
-				return -1;
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
 	}
@@ -335,8 +353,6 @@ public class Values {
 			if (obj instanceof DurationValue) {
 				DurationValue that = (DurationValue) obj;
 				return this.duration.compareTo(that.duration);
-			} else if (obj instanceof None) {
-				return 1;
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
@@ -384,8 +400,6 @@ public class Values {
 			if (obj instanceof InstantValue) {
 				InstantValue that = (InstantValue) obj;
 				return this.instant.compareTo(that.instant);
-			} else if (obj instanceof None) {
-				return 1;
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
@@ -469,16 +483,14 @@ public class Values {
 			return Optional.empty();
 		}
 
-		private static final Comparator<Path> PATH_COMPARATOR = Comparator
-			                                                        .comparing(Path::toString, new AlphaNumericStringComparator());
+		private static final Comparator<Path> PATH_COMPARATOR =
+				Comparator.comparing(Path::toString, new AlphaNumericStringComparator());
 
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof PathValue) {
 				PathValue that = (PathValue) obj;
 				return PATH_COMPARATOR.compare(this.path, that.path);
-			} else if (obj instanceof None) {
-				return 1;
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}

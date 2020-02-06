@@ -322,7 +322,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		Assertions.assertTimeout(Duration.ofSeconds(5), () -> {
+		Assertions.assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
 			assertThat(output).isEqualTo("100");
 			assertThat(exitCode).isEqualTo(0);
 		});

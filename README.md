@@ -35,7 +35,7 @@
 
 ### Sorting
 
-Sorting is always performed against a well defined key:
+Sorting is always performed using a well defined key column:
 ```
 hosh> ls
 # unsorted, following local filesystem
@@ -49,6 +49,29 @@ hosh> ls | sort path
 # files sorted by alphanum algorithm
 ...
 ```
+
+### Find top-n files by size
+
+Walk is able to recursively walk a directory and its subdirectories, providing
+file name and size:
+```
+hosh> walk . | schema
+path size
+...
+```
+
+By sorting the output of `walk` it is trivial to extract the biggest files:
+```
+hosh> walk . | sort desc size | take 5
+aaa 2,5MB
+bbb 1MB
+ccc 1MB
+ddd 1MB
+eee 1MB
+```
+
+Schema is same of `walk`
+
 
 ### Parsing
 

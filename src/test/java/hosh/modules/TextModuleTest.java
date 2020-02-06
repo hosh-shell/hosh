@@ -873,37 +873,100 @@ public class TextModuleTest {
 		@Mock
 		private OutputChannel err;
 
+		@Captor
+		private ArgumentCaptor<Record> records;
+
 		@InjectMocks
 		private Sort sut;
 
-		@Captor
-		private ArgumentCaptor<Record> records;
+		@Test
+		public void empty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void sortByExistingKey() {
-			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
-			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
+			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
+			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(2)).send(records.capture());
-			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record2, record1);
+			assertThat(records.getAllValues()).containsExactly(record2, record1);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void sortByExistingKeyNullLast() {
+			Record record1 = Records.singleton(Keys.SIZE, Values.ofNumeric(1));
+			Record record2 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
+			Record record3 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.of(record3), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(Mockito.times(3)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactly(record3, record2, record1);
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void sortByNonExistingKey() {
-			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
+			Record record1 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
-			ExitStatus exitStatus = sut.run(List.of("anotherkey"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(1)).send(records.capture());
-			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
+			assertThat(records.getAllValues()).containsExactly(record1);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void sortAscByExistingKey() {
+			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
+			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("asc", "name"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(Mockito.times(2)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactly(record2, record1);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void sortDescByExistingKey() {
+			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
+			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("desc", "name"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(Mockito.times(2)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactly(record1, record2);
+		}
+
+		@Test
+		public void invalidDirection() {
+			ExitStatus exitStatus = sut.run(List.of("ZZZ", "name"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("must be asc or desc")));
+			then(out).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
@@ -912,7 +975,17 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("use 'sort key' or 'sort [asc|desc] key'")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
+		@Test
+		public void tooManyArgs() {
+			ExitStatus exitStatus = sut.run(List.of("asc", "key", "aaa"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many args")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

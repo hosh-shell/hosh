@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- new `sort` features:
+   - `sort asc key`
+   - `sort desc key`
+   - improved design of `Values.none()`
 
 ### Changed
 - azure-pipelines -> github-actions
