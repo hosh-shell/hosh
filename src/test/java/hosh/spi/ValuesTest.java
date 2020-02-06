@@ -528,21 +528,21 @@ public class ValuesTest {
 		}
 
 		@Test
-		public void textWithNone() {
+		public void text() {
 			List<Value> sorted = Stream.of(
-				Values.ofText("a"),
-				Values.ofText("z"),
-				Values.ofText("b"))
+				Values.ofText("a2"),
+				Values.ofText("a10"),
+				Values.ofText("a1"))
 				                     .sorted()
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-				Values.ofText("a"),
-				Values.ofText("b"),
-				Values.ofText("z"));
+				Values.ofText("a1"),
+				Values.ofText("a2"),
+				Values.ofText("a10"));
 		}
 
 		@Test
-		public void sizeWithNone() {
+		public void size() {
 			List<Value> sorted = Stream.of(
 				Values.ofSize(1),
 				Values.ofSize(2),
@@ -556,7 +556,7 @@ public class ValuesTest {
 		}
 
 		@Test
-		public void pathWithNone() {
+		public void path() {
 			List<Value> sorted = Stream.of(
 				Values.ofPath(Paths.get("bbb")),
 				Values.ofPath(Paths.get("aaa")),
@@ -570,7 +570,7 @@ public class ValuesTest {
 		}
 
 		@Test
-		public void durationWithNone() {
+		public void duration() {
 			List<Value> sorted = Stream.of(
 				Values.ofDuration(Duration.ofMillis(1)),
 				Values.ofDuration(Duration.ofMillis(2)))

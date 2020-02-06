@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- using alphanum for generic text too
 - new `sort` features:
    - `sort asc key`
    - `sort desc key`

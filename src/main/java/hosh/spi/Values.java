@@ -147,11 +147,13 @@ public class Values {
 			return Objects.hash(value);
 		}
 
+		private static final Comparator<String> ALPHANUM = new AlphaNumericStringComparator();
+
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof TextValue) {
 				TextValue that = (TextValue) obj;
-				return this.value.compareTo(that.value);
+				return ALPHANUM.compare(this.value, that.value);
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
