@@ -23,8 +23,6 @@
  */
 package hosh.spi;
 
-import hosh.doc.Todo;
-
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -95,12 +93,7 @@ public class Values {
 	 * Generic text.
 	 */
 	public static Value ofText(String text) {
-		return new TextValue(text, Ansi.Style.NONE);
-	}
-
-	@Todo(description = "create a StyledValue decorator? be careful around equals/hashCode")
-	public static Value ofStyledText(String text, Ansi.Style style) {
-		return new TextValue(text, style);
+		return new TextValue(text);
 	}
 
 	/**
@@ -111,35 +104,27 @@ public class Values {
 	}
 
 	public static Value ofPath(Path path) {
-		return new PathValue(path, Ansi.Style.NONE);
+		return new PathValue(path);
 	}
 
-	public static Value ofStyledPath(Path path, Ansi.Style style) {
-		return new PathValue(path, style);
+	public static Value withStyle(Value value, Ansi.Style style) {
+		return new StyledValue(value, style);
 	}
 
 	static final class TextValue implements Value {
 
 		private final String value;
 
-		private final Ansi.Style style;
-
-		public TextValue(String value, Ansi.Style style) {
+		public TextValue(String value) {
 			if (value == null) {
 				throw new IllegalArgumentException("text cannot be null");
 			}
-			if (style == null) {
-				throw new IllegalArgumentException("style cannot be null");
-			}
-			this.style = style;
 			this.value = value;
 		}
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			style.enable(printWriter);
 			printWriter.append(value);
-			style.disable(printWriter);
 		}
 
 		@Override
@@ -435,24 +420,16 @@ public class Values {
 
 		private final Path path;
 
-		private final Ansi.Style style;
-
-		public PathValue(Path path, Ansi.Style style) {
+		public PathValue(Path path) {
 			if (path == null) {
 				throw new IllegalArgumentException("path cannot be null");
 			}
-			if (style == null) {
-				throw new IllegalArgumentException("style cannot be null");
-			}
 			this.path = path;
-			this.style = style;
 		}
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			style.enable(printWriter);
 			printWriter.append(path.toString());
-			style.disable(printWriter);
 		}
 
 		@Override
@@ -535,6 +512,80 @@ public class Values {
 				}
 			}
 			return compareValue;
+		}
+	}
+
+	static final class StyledValue implements Value {
+
+		private final Value value;
+		private final Ansi.Style style;
+
+		public StyledValue(Value value, Ansi.Style style) {
+			if (value == null) {
+				throw new IllegalArgumentException("value cannot be null");
+			}
+			if (style == null) {
+				throw new IllegalArgumentException("style cannot be null");
+			}
+			this.value = value;
+			this.style = style;
+		}
+
+		@Override
+		public void print(PrintWriter printWriter, Locale locale) {
+			style.enable(printWriter);
+			value.print(printWriter, locale);
+			style.disable(printWriter);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof StyledValue) {
+				StyledValue that = (StyledValue) obj;
+				return Objects.equals(this.value, that.value) && Objects.equals(this.style, that.style);
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(value, style);
+		}
+
+		@Override
+		public String toString() {
+			return String.format("StyledValue[value=%s,style='%s']", value, style);
+		}
+
+		private static final Comparator<StyledValue> BY_VALUE_AND_STYLE =
+			Comparator
+				.comparing(StyledValue::value)
+				.thenComparing(StyledValue::style);
+
+		@Override
+		public int compareTo(Value obj) {
+			if (obj instanceof StyledValue) {
+				StyledValue that = (StyledValue) obj;
+				return BY_VALUE_AND_STYLE.compare(this, that);
+			} else if (obj instanceof None) {
+				return 1;
+			} else {
+				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+			}
+		}
+
+		@Override
+		public <T> Optional<T> unwrap(Class<T> type) {
+			return value.unwrap(type);
+		}
+
+		private Value value() {
+			return value;
+		}
+
+		private Ansi.Style style() {
+			return style;
 		}
 	}
 }

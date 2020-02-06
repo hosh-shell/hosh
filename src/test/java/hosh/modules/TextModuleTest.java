@@ -40,6 +40,7 @@ import hosh.modules.TextModule.Table;
 import hosh.modules.TextModule.Take;
 import hosh.modules.TextModule.Timestamp;
 import hosh.modules.TextModule.Trim;
+import hosh.spi.Ansi;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -1164,8 +1165,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.of("header"), Values.ofText("count     text      ")),
-				Records.singleton(Keys.of("row"), Values.ofText("2         zvrnv     ")));
+				Records.singleton(Keys.of("header"),Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
+				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         zvrnv     "), Ansi.Style.BG_BLUE)));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1179,8 +1180,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.of("header"), Values.ofText("count     text      ")),
-				Records.singleton(Keys.of("row"), Values.ofText("          zvrnv     ")));
+				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
+				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          zvrnv     "), Ansi.Style.BG_BLUE)));
 		}
 
 		@Test

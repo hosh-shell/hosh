@@ -194,8 +194,7 @@ public class ValuesTest {
 		@Test
 		public void equalsContract() {
 			EqualsVerifier.forClass(Values.TextValue.class)
-				.withIgnoredFields("style")
-				.verify();
+					.verify();
 		}
 
 		@Test
@@ -215,13 +214,6 @@ public class ValuesTest {
 			assertThatThrownBy(() -> Values.ofText(null))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("text cannot be null");
-		}
-
-		@Test
-		public void nullStyles() {
-			assertThatThrownBy(() -> Values.ofStyledText("asd", null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("style cannot be null");
 		}
 
 		@Test
@@ -361,9 +353,7 @@ public class ValuesTest {
 
 		@Test
 		public void equalsContract() {
-			EqualsVerifier.forClass(Values.PathValue.class)
-				.withIgnoredFields("style")
-				.verify();
+			EqualsVerifier.forClass(Values.PathValue.class).verify();
 		}
 
 		@Test
@@ -385,14 +375,22 @@ public class ValuesTest {
 				.hasMessage("path cannot be null");
 		}
 
+	}
+
+	@Nested
+	public class WithStyleTest {
+
 		@Test
-		public void nullStyle() {
-			assertThatThrownBy(() -> Values.ofStyledPath(Paths.get("file"), null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("style cannot be null");
+		public void equalsContract() {
+			EqualsVerifier.forClass(Values.StyledValue.class).verify();
 		}
 
 		@Test
+		public void asString() {
+			assertThat(Values.withStyle(Values.ofPath(Paths.get("file")), Ansi.Style.FG_RED)).hasToString("StyledValue[value=Path[file],style='FG_RED']");
+		}
+
+			@Test
 		public void unwrap() {
 			Value value = Values.ofPath(Paths.get("."));
 			assertThat(value.unwrap(Path.class)).isPresent();

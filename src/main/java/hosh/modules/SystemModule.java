@@ -221,15 +221,15 @@ public class SystemModule implements Module {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
 					return ExitStatus.error();
 				}
-				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(commandName + " - " + builtIn.value(), Style.BOLD)));
+				out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(commandName + " - " + builtIn.value()), Style.BOLD)));
 				Examples examples = commandClass.getAnnotation(Examples.class);
-				out.send(Records.singleton(Keys.TEXT, Values.ofStyledText("Examples", Style.BOLD)));
+				out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("Examples"), Style.BOLD)));
 				if (examples != null) {
 					for (Example ex : examples.value()) {
-						out.send(Records.singleton(Keys.TEXT, Values.ofStyledText(ex.command() + " # " + ex.description(), Style.ITALIC)));
+						out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(ex.command() + " # " + ex.description()), Style.ITALIC)));
 					}
 				} else {
-					out.send(Records.singleton(Keys.TEXT, Values.ofStyledText("N/A", Style.FG_RED)));
+					out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("N/A"), Style.FG_RED)));
 				}
 				return ExitStatus.success();
 			} else {
