@@ -849,7 +849,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void probeKnownRelativeFile() throws IOException {
+		public void probeKnown() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
@@ -859,6 +859,16 @@ public class FileSystemModuleTest {
 			then(err).shouldHaveNoInteractions();
 		}
 
+		@Test
+		public void probeUnknown() throws IOException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			File newFile = temporaryFolder.newFile("file.ppp");
+			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
+		}
 	}
 
 	@Nested

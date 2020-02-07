@@ -413,6 +413,15 @@ public class SystemModuleTest {
 		}
 
 		@Test
+		public void tooManyArgs() {
+			ExitStatus exitStatus = sut.run(List.of("1", "seconds", "extra"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+		}
+
+		@Test
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
@@ -469,13 +478,23 @@ public class SystemModuleTest {
 
 		@ValueSource(strings = {"PT0M", "PT0S"})
 		@ParameterizedTest
-		public void sleepWithIso8601(String iso8601Spec) {
+		public void sleepWithValidIso8601(String iso8601Spec) {
 			ExitStatus exitStatus = sut.run(List.of(iso8601Spec), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
 		}
+
+		@Test
+		public void sleepWithInvalidIso8601() {
+			ExitStatus exitStatus = sut.run(List.of("PTM"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: PTM")));
+		}
+
 	}
 
 	@Nested
