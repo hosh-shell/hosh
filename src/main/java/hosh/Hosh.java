@@ -95,7 +95,7 @@ public class Hosh {
 
 		/**
 		 * Allows to configure default log level.
-		 *
+		 * <p>
 		 * Allowed values: as @{@link Level#parse(String)}.
 		 * Default: null, meaning that logging is disabled.
 		 */
@@ -103,7 +103,7 @@ public class Hosh {
 
 		/**
 		 * Allows to enable/disable history.
-		 *
+		 * <p>
 		 * Allowed values: "true", "false".
 		 * Default: "true".
 		 */

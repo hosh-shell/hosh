@@ -463,7 +463,7 @@ public class Values {
 		}
 
 		private static final Comparator<Path> PATH_COMPARATOR =
-				Comparator.comparing(Path::toString, new AlphaNumericStringComparator());
+			Comparator.comparing(Path::toString, new AlphaNumericStringComparator());
 
 		@Override
 		public int compareTo(Value obj) {
