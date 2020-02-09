@@ -83,13 +83,14 @@ public class HistoryModuleTest {
 		public void noArgsWithHistory() {
 			given(history.iterator()).willReturn(Collections.singletonList(entry).listIterator());
 			given(entry.time()).willReturn(Instant.EPOCH);
-			given(entry.index()).willReturn(42);
 			given(entry.line()).willReturn("cmd");
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(Records.builder().entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH)).entry(Keys.INDEX, Values.ofNumeric(42))
-				                        .entry(Keys.TEXT, Values.ofText("cmd")).build());
+			then(out).should().send(Records.builder()
+				                        .entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
+				                        .entry(Keys.TEXT, Values.ofText("cmd"))
+				                        .build());
 			then(err).shouldHaveNoInteractions();
 		}
 

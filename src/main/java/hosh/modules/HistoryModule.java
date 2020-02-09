@@ -70,7 +70,6 @@ public class HistoryModule implements Module {
 			for (var entry : history) {
 				Record record = Records.builder()
 					                .entry(Keys.TIMESTAMP, Values.ofInstant(entry.time()))
-					                .entry(Keys.INDEX, Values.ofNumeric(entry.index()))
 					                .entry(Keys.TEXT, Values.ofText(entry.line()))
 					                .build();
 				out.send(record);

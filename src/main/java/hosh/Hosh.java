@@ -234,6 +234,7 @@ public class Hosh {
 		} else {
 			history = new DisabledHistory();
 		}
+		injector.setHistory(history);
 		LineReader lineReader = LineReaderBuilder
 			                        .builder()
 			                        .appName("hosh")
@@ -245,7 +246,6 @@ public class Hosh {
 				                        new VariableExpansionCompleter(state)))
 			                        .terminal(terminal)
 			                        .build();
-		injector.setHistory(lineReader.getHistory());
 		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);
 		while (true) {
