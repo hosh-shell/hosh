@@ -1157,7 +1157,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void table() {
-			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("zvrnv")).build();
+			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -1166,13 +1166,13 @@ public class TextModuleTest {
 			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
 				Records.singleton(Keys.of("header"),Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         zvrnv     "), Ansi.Style.BG_BLUE)));
+				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         whatever  "), Ansi.Style.BG_BLUE)));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void tableWithNone() {
-			Record record1 = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("zvrnv")).build();
+			Record record1 = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -1181,7 +1181,7 @@ public class TextModuleTest {
 			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
 				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          zvrnv     "), Ansi.Style.BG_BLUE)));
+				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          whatever  "), Ansi.Style.BG_BLUE)));
 		}
 
 		@Test
