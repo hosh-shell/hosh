@@ -23,6 +23,8 @@
  */
 package hosh.spi;
 
+import hosh.doc.Experimental;
+
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -48,30 +50,6 @@ public class Values {
 	}
 
 	private static final None NONE = new None();
-
-	public static Comparator<Value> noneLast(Comparator<Value> comparator) {
-		return new NoneAwareComparator(comparator);
-	}
-
-	private static class NoneAwareComparator implements Comparator<Value> {
-
-		private final Comparator<Value> inner;
-
-		private NoneAwareComparator(Comparator<Value> inner) {
-			this.inner = inner;
-		}
-
-		@Override
-		public int compare(Value a, Value b) {
-			if (a instanceof None) {
-				return (b instanceof None) ? 0 : 1;
-			} else if (b instanceof None) {
-				return -1;
-			} else {
-				return inner.compare(a, b);
-			}
-		}
-	}
 
 	public static Value none() {
 		return NONE;
@@ -147,13 +125,13 @@ public class Values {
 			return Objects.hash(value);
 		}
 
-		private static final Comparator<String> ALPHANUM = new AlphaNumericStringComparator();
+		private static final Comparator<String> BY_TEXT_ALPHA_NUM = new Comparators.AlphaNumericStringComparator();
 
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof TextValue) {
 				TextValue that = (TextValue) obj;
-				return ALPHANUM.compare(this.value, that.value);
+				return BY_TEXT_ALPHA_NUM.compare(this.value, that.value);
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
@@ -462,58 +440,17 @@ public class Values {
 			return Optional.empty();
 		}
 
-		private static final Comparator<Path> PATH_COMPARATOR =
-			Comparator.comparing(Path::toString, new AlphaNumericStringComparator());
+		private static final Comparator<Path> BY_PATH_ALPHANUM =
+			Comparator.comparing(Path::toString, new Comparators.AlphaNumericStringComparator());
 
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof PathValue) {
 				PathValue that = (PathValue) obj;
-				return PATH_COMPARATOR.compare(this.path, that.path);
+				return BY_PATH_ALPHANUM.compare(this.path, that.path);
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
-		}
-	}
-
-	/**
-	 * The Alphanum Algorithm is an improved sorting algorithm for strings
-	 * containing numbers. Instead of sorting numbers in ASCII order like
-	 * a standard sort, this algorithm sorts numbers in numeric order.
-	 * <p>
-	 * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
-	 */
-	static class AlphaNumericStringComparator implements Comparator<String> {
-
-		private static final Pattern CHUNK = Pattern.compile("(\\d+)|(\\D+)");
-
-		@Override
-		public int compare(String s1, String s2) {
-			int compareValue = 0;
-			Matcher s1ChunkMatcher = CHUNK.matcher(s1);
-			Matcher s2ChunkMatcher = CHUNK.matcher(s2);
-			while (s1ChunkMatcher.find() && s2ChunkMatcher.find() && compareValue == 0) {
-				String s1ChunkValue = s1ChunkMatcher.group();
-				String s2ChunkValue = s2ChunkMatcher.group();
-				try {
-					Integer s1Integer = Integer.valueOf(s1ChunkValue);
-					Integer s2Integer = Integer.valueOf(s2ChunkValue);
-					compareValue = s1Integer.compareTo(s2Integer);
-				} catch (NumberFormatException e) {
-					// not a number, use string comparison.
-					compareValue = s1ChunkValue.compareTo(s2ChunkValue);
-				}
-				// if they are equal thus far, but one has more left, it should come after the
-				// one that doesn't.
-				if (compareValue == 0) {
-					if (s1ChunkMatcher.hitEnd() && !s2ChunkMatcher.hitEnd()) {
-						compareValue = -1;
-					} else if (!s1ChunkMatcher.hitEnd() && s2ChunkMatcher.hitEnd()) {
-						compareValue = 1;
-					}
-				}
-			}
-			return compareValue;
 		}
 	}
 
@@ -587,5 +524,82 @@ public class Values {
 		private Ansi.Style style() {
 			return style;
 		}
+	}
+
+	@Experimental(description = "new API")
+	public static class Comparators {
+
+		private Comparators(){
+		}
+
+		/**
+		 * The Alphanum Algorithm is an improved sorting algorithm for strings
+		 * containing numbers. Instead of sorting numbers in ASCII order like
+		 * a standard sort, this algorithm sorts numbers in numeric order.
+		 * <p>
+		 * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
+		 */
+		public static Comparator<String> alphanum() {
+			return new AlphaNumericStringComparator();
+		}
+
+		public static Comparator<Value> noneLast(Comparator<Value> comparator) {
+			return new NoneLastComparator(comparator);
+		}
+
+		static class AlphaNumericStringComparator implements Comparator<String> {
+
+			private static final Pattern CHUNK = Pattern.compile("(\\d+)|(\\D+)");
+
+			@Override
+			public int compare(String s1, String s2) {
+				int compareValue = 0;
+				Matcher s1ChunkMatcher = CHUNK.matcher(s1);
+				Matcher s2ChunkMatcher = CHUNK.matcher(s2);
+				while (s1ChunkMatcher.find() && s2ChunkMatcher.find() && compareValue == 0) {
+					String s1ChunkValue = s1ChunkMatcher.group();
+					String s2ChunkValue = s2ChunkMatcher.group();
+					try {
+						Integer s1Integer = Integer.valueOf(s1ChunkValue);
+						Integer s2Integer = Integer.valueOf(s2ChunkValue);
+						compareValue = s1Integer.compareTo(s2Integer);
+					} catch (NumberFormatException e) {
+						// not a number, use string comparison.
+						compareValue = s1ChunkValue.compareTo(s2ChunkValue);
+					}
+					// if they are equal thus far, but one has more left, it should come after the
+					// one that doesn't.
+					if (compareValue == 0) {
+						if (s1ChunkMatcher.hitEnd() && !s2ChunkMatcher.hitEnd()) {
+							compareValue = -1;
+						} else if (!s1ChunkMatcher.hitEnd() && s2ChunkMatcher.hitEnd()) {
+							compareValue = 1;
+						}
+					}
+				}
+				return compareValue;
+			}
+		}
+
+		static class NoneLastComparator implements Comparator<Value> {
+
+			private final Comparator<Value> inner;
+
+			private NoneLastComparator(Comparator<Value> inner) {
+				this.inner = inner;
+			}
+
+			@Override
+			public int compare(Value a, Value b) {
+				if (a instanceof None) {
+					return (b instanceof None) ? 0 : 1;
+				} else if (b instanceof None) {
+					return -1;
+				} else {
+					return inner.compare(a, b);
+				}
+			}
+		}
+
 	}
 }

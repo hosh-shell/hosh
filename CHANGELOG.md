@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    - improved design of `Values.none()`
 
 ### Changed
+- re-arranged some public methods
 - azure-pipelines -> github-actions
 - enabling parallel test execution
 
