@@ -558,15 +558,17 @@ public class ValuesTest {
 		@Test
 		public void path() {
 			List<Value> sorted = Stream.of(
-				Values.ofPath(Paths.get("bbb")),
-				Values.ofPath(Paths.get("aaa")),
-				Values.ofPath(Paths.get("ccc")))
+				Values.ofPath(Paths.get("a10")),
+				Values.ofPath(Paths.get("a1")),
+				Values.ofPath(Paths.get("a20")),
+				Values.ofPath(Paths.get("a2")))
 				                     .sorted()
 				                     .collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
-				Values.ofPath(Paths.get("aaa")),
-				Values.ofPath(Paths.get("bbb")),
-				Values.ofPath(Paths.get("ccc")));
+				Values.ofPath(Paths.get("a1")),
+				Values.ofPath(Paths.get("a2")),
+				Values.ofPath(Paths.get("a10")),
+				Values.ofPath(Paths.get("a20")));
 		}
 
 		@Test
