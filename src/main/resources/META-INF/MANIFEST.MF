@@ -1,0 +1,3 @@
+Main-Class: hosh.Hosh
+Add-Exports: java.base/jdk.internal.misc
+

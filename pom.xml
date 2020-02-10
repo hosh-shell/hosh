@@ -146,14 +146,16 @@
 				<version>3.8.1</version>
 				<configuration>
 					<source>11</source>
-					<release>11</release>
+					<target>11</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 					<useIncrementalCompilation>false</useIncrementalCompilation>
 					<staleMillis>1</staleMillis>
 					<compilerArgs>
+						<arg>--add-exports</arg><arg>java.base/jdk.internal.misc=hosh</arg>
 						<arg>-Werror</arg>
 						<arg>-Xlint:all</arg>
+						<arg>-Xlint:-requires-automatic</arg>
 						<arg>-Xpkginfo:always</arg>
 					</compilerArgs>
 				</configuration>
@@ -224,9 +226,7 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<archive>
-						<manifest>
-							<mainClass>hosh.Hosh</mainClass>
-						</manifest>
+						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
 					</archive>
 					<attach>false</attach>
 					<appendAssemblyId>false</appendAssemblyId>
@@ -249,6 +249,7 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
+					<argLine>--add-exports java.base/jdk.internal.misc=hosh</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -345,6 +346,7 @@
 							<sourceDirectories>
 								<sourceDirectory>src/main/java</sourceDirectory>
 							</sourceDirectories>
+							<excludes>**/module-info.java</excludes>
 						</configuration>
 					</execution>
 				</executions>

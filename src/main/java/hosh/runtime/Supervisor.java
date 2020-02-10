@@ -25,6 +25,7 @@ package hosh.runtime;
 
 import hosh.spi.ExitStatus;
 import hosh.spi.LoggerFactory;
+import jdk.internal.misc.Signal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,22 +107,21 @@ public class Supervisor implements AutoCloseable {
 	private void restoreDefaultSigintHandler() {
 		if (handleSignals) {
 			LOGGER.fine("restoring default INT signal handler");
-			org.jline.utils.Signals.registerDefault("INT");
+			jdk.internal.misc.Signal.handle(new jdk.internal.misc.Signal("INT"), Signal.Handler.SIG_DFL);
 		}
 	}
 
 	private void cancelFuturesOnSigint() {
 		if (handleSignals) {
 			LOGGER.fine("register INT signal handler");
-			org.jline.utils.Signals.register("INT", () -> {
+			jdk.internal.misc.Signal.handle(new jdk.internal.misc.Signal("INT"), sig -> {
 				LOGGER.info("got INT signal");
-				futures.forEach(this::cancelIfStillRunning);
+				futures.forEach(future -> {
+					LOGGER.finer(() -> String.format("cancelling future %s", future));
+					future.cancel(true);
+				});
 			});
 		}
 	}
 
-	private void cancelIfStillRunning(Future<ExitStatus> future) {
-		LOGGER.finer(() -> String.format("cancelling future %s", future));
-		future.cancel(true);
-	}
 }
