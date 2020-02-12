@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - switched back to jansi: final jar now is 1.3MB instead of 2.5MB
 - azure-pipelines -> github-actions
 - enabling parallel test execution
+- preliminary introduction of java-module.info
 
 ### Fixed
 - #212: now it is possible to use several external commands in a pipeline
