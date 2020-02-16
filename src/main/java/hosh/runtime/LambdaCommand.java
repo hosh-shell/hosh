@@ -29,15 +29,19 @@ import hosh.spi.InputChannel;
 import hosh.spi.Key;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
+import hosh.spi.State;
+import hosh.spi.StateAware;
 import hosh.spi.Value;
 
 import java.util.List;
+import java.util.Map;
 
-public class LambdaCommand implements Command, InterpreterAware {
+public class LambdaCommand implements Command, InterpreterAware, StateAware {
 
 	private final Key key;
 	private final Compiler.Statement statement;
 	private Interpreter interpreter;
+	private State state;
 
 	public LambdaCommand(Key key, Compiler.Statement statement) {
 		this.key = key;
@@ -50,9 +54,16 @@ public class LambdaCommand implements Command, InterpreterAware {
 	}
 
 	@Override
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	@Override
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		for (Record record : InputChannel.iterate(in)) {
 			Value value = record.value(key).orElseThrow(IllegalArgumentException::new);
+			Map<String, String> variables = state.getVariables();
+			variables.put(key.name(), value.unwrap(String.class).orElse("unwrap failed"));
 			ExitStatus eval = interpreter.eval(statement, in, out, err);
 			if (eval.isError()) {
 				return eval;

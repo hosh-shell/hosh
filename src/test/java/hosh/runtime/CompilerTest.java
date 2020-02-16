@@ -399,7 +399,7 @@ public class CompilerTest {
 			.hasSize(1)
 			.first().satisfies(statement -> {
 			assertThat(statement.getArguments()).isEmpty();
-			assertThat(statement.getCommand()).isInstanceOf(SequenceCommand.class);
+			assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
 		});
 	}
 }
