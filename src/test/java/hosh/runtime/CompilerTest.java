@@ -389,4 +389,17 @@ public class CompilerTest {
 			assertThat(statement.getCommand()).isInstanceOf(SequenceCommand.class);
 		});
 	}
+
+	@Test
+	public void lambda() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("echo");
+		Program program = sut.compile("ls | { path -> echo ${path} }");
+		assertThat(program.getStatements())
+			.hasSize(1)
+			.first().satisfies(statement -> {
+			assertThat(statement.getArguments()).isEmpty();
+			assertThat(statement.getCommand()).isInstanceOf(SequenceCommand.class);
+		});
+	}
 }
