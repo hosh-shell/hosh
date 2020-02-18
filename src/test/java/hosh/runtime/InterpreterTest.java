@@ -64,6 +64,9 @@ public class InterpreterTest {
 	private State state;
 
 	@Mock
+	private Injector injector;
+
+	@Mock
 	private InputChannel in;
 
 	@Mock
@@ -89,7 +92,7 @@ public class InterpreterTest {
 
 	@BeforeEach
 	public void setup() {
-		sut = new Interpreter(state);
+		sut = new Interpreter(state, injector);
 	}
 
 	@Test

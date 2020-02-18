@@ -66,14 +66,11 @@ public class CommandResolversTest {
 		@Mock(stubOnly = true)
 		private State state;
 
-		@Mock
-		private Injector injector;
-
 		private CommandResolver sut;
 
 		@BeforeEach
 		public void setup() {
-			sut = CommandResolvers.builtinsThenExternal(state, injector);
+			sut = CommandResolvers.builtinsThenExternal(state);
 		}
 
 		@Test
@@ -90,7 +87,6 @@ public class CommandResolversTest {
 			given(state.getCommands()).willReturn(Map.of("test", () -> command));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent().hasValue(command);
-			then(injector).should().injectDeps(command);
 		}
 
 		@Test
@@ -139,7 +135,6 @@ public class CommandResolversTest {
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent();
-			then(injector).should().injectDeps(any());
 		}
 		@Test
 		@EnabledOnOs(OS.WINDOWS)
@@ -163,7 +158,6 @@ public class CommandResolversTest {
 			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent();
-			then(injector).should().injectDeps(any());
 		}
 
 		@Test
@@ -174,7 +168,6 @@ public class CommandResolversTest {
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("./test");
 			assertThat(result).isPresent();
-			then(injector).should().injectDeps(any());
 		}
 
 		@Test
@@ -197,14 +190,11 @@ public class CommandResolversTest {
 		@Mock(stubOnly = true)
 		private State state;
 
-		@Mock(stubOnly = true)
-		private Injector injector;
-
 		private WindowsCommandResolver sut;
 
 		@BeforeEach
 		public void setup() {
-			sut = new WindowsCommandResolver(state, injector);
+			sut = new WindowsCommandResolver(state);
 		}
 
 		@Test

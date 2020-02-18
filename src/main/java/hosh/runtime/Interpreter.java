@@ -50,9 +50,11 @@ public class Interpreter {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 	private final State state;
+	private final Injector injector;
 
-	public Interpreter(State state) {
+	public Interpreter(State state, Injector injector) {
 		this.state = state;
+		this.injector = injector;
 	}
 
 	public ExitStatus eval(Program program, OutputChannel out, OutputChannel err) {
@@ -98,6 +100,7 @@ public class Interpreter {
 	protected ExitStatus eval(Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
 		Command command = statement.getCommand();
 		injectInterpreter(command);
+		injector.injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
 		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));

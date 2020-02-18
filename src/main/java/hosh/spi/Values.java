@@ -437,6 +437,9 @@ public class Values {
 			if (type.equals(Path.class)) {
 				return Optional.of(type.cast(path));
 			}
+			if (type.equals(String.class)) {
+				return Optional.of(type.cast(path.toString()));
+			}
 			return Optional.empty();
 		}
 
