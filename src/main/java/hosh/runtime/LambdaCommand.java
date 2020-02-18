@@ -69,6 +69,7 @@ public class LambdaCommand implements Command, InterpreterAware, StateAware {
 				return eval;
 			}
 		}
+		state.getVariables().remove(key.name());
 		return ExitStatus.success();
 	}
 }
