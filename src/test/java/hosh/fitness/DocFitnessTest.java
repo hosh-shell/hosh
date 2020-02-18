@@ -80,7 +80,7 @@ public class DocFitnessTest {
 			BootstrapBuiltins bootstrapBuiltins = new BootstrapBuiltins();
 			bootstrapBuiltins.registerAllBuiltins(state);
 			assertThat(state.getCommands()).isNotEmpty();
-			compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state, new Injector()));
+			compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state));
 		}
 
 		@Override
