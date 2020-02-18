@@ -29,6 +29,7 @@ import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -399,7 +400,7 @@ public class CompilerTest {
 			.hasSize(1)
 			.first().satisfies(statement -> {
 			assertThat(statement.getArguments()).isEmpty();
-			assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
+			assertThat(statement.getCommand()).asInstanceOf(InstanceOfAssertFactories.type(PipelineCommand.class));
 		});
 	}
 }

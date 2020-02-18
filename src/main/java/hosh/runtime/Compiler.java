@@ -152,8 +152,8 @@ public class Compiler {
 
 	private Statement compileLambda(HoshParser.LambdaContext lambda) {
 		Statement nestedStatement = compileStatement(lambda.stmt());
-		Key key = Keys.of(lambda.ID().getSymbol().getText());
-		return new Statement(new LambdaCommand(key, nestedStatement), List.of(), "lambda");
+		String key = lambda.ID().getSymbol().getText();
+		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "lambda");
 	}
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {

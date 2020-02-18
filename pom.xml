@@ -156,7 +156,7 @@
 						<arg>-Xlint:all</arg>
 						<arg>-Xlint:-requires-automatic</arg>
 						<arg>-Xpkginfo:always</arg>
-						<arg>--add-exports</arg><arg>java.base/jdk.internal.misc=hosh</arg>
+						<arg>--add-exports</arg><arg>java.base/jdk.internal.misc=ALL-UNNAMED</arg>
 					</compilerArgs>
 				</configuration>
 			</plugin>
@@ -249,7 +249,7 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
-					<argLine>--add-exports java.base/jdk.internal.misc=hosh</argLine>
+					<argLine>--add-exports java.base/jdk.internal.misc=ALL-UNNAMED</argLine>
 				</configuration>
 			</plugin>
 			<plugin>

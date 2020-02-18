@@ -28,6 +28,7 @@ import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Key;
+import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.State;
@@ -39,14 +40,14 @@ import java.util.Map;
 
 public class LambdaCommand implements Command, InterpreterAware, StateAware {
 
-	private final Key key;
 	private final Compiler.Statement statement;
+	private final String key;
 	private Interpreter interpreter;
 	private State state;
 
-	public LambdaCommand(Key key, Compiler.Statement statement) {
-		this.key = key;
+	public LambdaCommand(Compiler.Statement statement, String key) {
 		this.statement = statement;
+		this.key = key;
 	}
 
 	@Override
@@ -59,7 +60,7 @@ public class LambdaCommand implements Command, InterpreterAware, StateAware {
 		this.state = state;
 	}
 
-	@Todo(description = "make a copy of variables to avoid concurrent modification in commands using state.getVariables")
+	@Todo(description = "generalize with a list of keys")
 	// env | { name -> echo ${name} }
 	// Caused by: java.util.ConcurrentModificationException
 	//        at java.base/java.util.LinkedHashMap$LinkedHashIterator.nextNode(LinkedHashMap.java:719)
@@ -70,16 +71,17 @@ public class LambdaCommand implements Command, InterpreterAware, StateAware {
 	//        at hosh.runtime.PipelineCommand.lambda$runAsync$2(PipelineCommand.java:1
 	@Override
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		Key internedKey = Keys.of(key);
 		for (Record record : InputChannel.iterate(in)) {
-			Value value = record.value(key).orElseThrow(IllegalArgumentException::new);
+			Value value = record.value(internedKey).orElseThrow(IllegalArgumentException::new);
 			Map<String, String> variables = state.getVariables();
-			variables.put(key.name(), value.unwrap(String.class).orElse("unwrap failed"));
+			variables.put(key, value.unwrap(String.class).orElse("unwrap failed"));
 			ExitStatus eval = interpreter.eval(statement, in, out, err);
 			if (eval.isError()) {
 				return eval;
 			}
 		}
-		state.getVariables().remove(key.name());
+		state.getVariables().remove(key);
 		return ExitStatus.success();
 	}
 }
