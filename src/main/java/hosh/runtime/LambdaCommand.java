@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -58,6 +59,15 @@ public class LambdaCommand implements Command, InterpreterAware, StateAware {
 		this.state = state;
 	}
 
+	@Todo(description = "make a copy of variables to avoid concurrent modification in commands using state.getVariables")
+	// env | { name -> echo ${name} }
+	// Caused by: java.util.ConcurrentModificationException
+	//        at java.base/java.util.LinkedHashMap$LinkedHashIterator.nextNode(LinkedHashMap.java:719)
+	//        at java.base/java.util.LinkedHashMap$LinkedEntryIterator.next(LinkedHashMap.java:751)
+	//        at java.base/java.util.LinkedHashMap$LinkedEntryIterator.next(LinkedHashMap.java:749)
+	//        at hosh.modules.SystemModule$Env.run(SystemModule.java:135)
+	//        at hosh.runtime.Interpreter.eval(Interpreter.java:106)
+	//        at hosh.runtime.PipelineCommand.lambda$runAsync$2(PipelineCommand.java:1
 	@Override
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		for (Record record : InputChannel.iterate(in)) {
