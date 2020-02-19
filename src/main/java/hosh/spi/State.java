@@ -42,7 +42,7 @@ import java.util.function.Supplier;
 public class State {
 
 	// variables
-	private final Map<String, String> variables = new LinkedHashMap<>();
+	private Map<String, String> variables = new LinkedHashMap<>();
 
 	// registered commands
 	private final Map<String, Supplier<Command>> commands = new LinkedHashMap<>();
@@ -66,6 +66,10 @@ public class State {
 
 	public Map<String, Supplier<Command>> getCommands() {
 		return commands;
+	}
+
+	public void setVariables(Map<String, String> variables) {
+		this.variables = variables;
 	}
 
 	public Map<String, String> getVariables() {

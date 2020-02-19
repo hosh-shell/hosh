@@ -35,6 +35,7 @@ import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Value;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,27 +62,26 @@ public class LambdaCommand implements Command, InterpreterAware, StateAware {
 	}
 
 	@Todo(description = "generalize with a list of keys")
-	// env | { name -> echo ${name} }
-	// Caused by: java.util.ConcurrentModificationException
-	//        at java.base/java.util.LinkedHashMap$LinkedHashIterator.nextNode(LinkedHashMap.java:719)
-	//        at java.base/java.util.LinkedHashMap$LinkedEntryIterator.next(LinkedHashMap.java:751)
-	//        at java.base/java.util.LinkedHashMap$LinkedEntryIterator.next(LinkedHashMap.java:749)
-	//        at hosh.modules.SystemModule$Env.run(SystemModule.java:135)
-	//        at hosh.runtime.Interpreter.eval(Interpreter.java:106)
-	//        at hosh.runtime.PipelineCommand.lambda$runAsync$2(PipelineCommand.java:1
 	@Override
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		Key internedKey = Keys.of(key);
 		for (Record record : InputChannel.iterate(in)) {
 			Value value = record.value(internedKey).orElseThrow(IllegalArgumentException::new);
-			Map<String, String> variables = state.getVariables();
-			variables.put(key, value.unwrap(String.class).orElse("unwrap failed"));
-			ExitStatus eval = interpreter.eval(statement, in, out, err);
-			if (eval.isError()) {
-				return eval;
+			Map<String, String> original = state.getVariables();
+			Map<String, String> modified = new HashMap<>(original);
+			modified.put(key, value.unwrap(String.class).orElse("unwrap failed"));
+			state.setVariables(modified);
+			try {
+				ExitStatus eval = interpreter.eval(statement, in, out, err);
+				if (eval.isError()) {
+					return eval;
+				}
+			} finally {
+				// any change made by inner statement to variable will be lost here
+				// create a new Resolvable implementation?
+				state.setVariables(original);
 			}
 		}
-		state.getVariables().remove(key);
 		return ExitStatus.success();
 	}
 
