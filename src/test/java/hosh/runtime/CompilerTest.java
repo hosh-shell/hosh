@@ -398,9 +398,18 @@ public class CompilerTest {
 		Program program = sut.compile("ls | { path -> echo ${path} }");
 		assertThat(program.getStatements())
 			.hasSize(1)
-			.first().satisfies(statement -> {
-			assertThat(statement.getArguments()).isEmpty();
-			assertThat(statement.getCommand()).asInstanceOf(InstanceOfAssertFactories.type(PipelineCommand.class));
-		});
+			.first()
+			.satisfies(statement -> {
+				assertThat(statement.getArguments()).isEmpty();
+				assertThat(statement.getCommand())
+					.asInstanceOf(InstanceOfAssertFactories.type(PipelineCommand.class))
+					.satisfies(pipelineCommand -> {
+						assertThat(pipelineCommand.getConsumer().getCommand())
+							.asInstanceOf(InstanceOfAssertFactories.type(LambdaCommand.class))
+							.satisfies(lambdaCommand -> {
+								assertThat(lambdaCommand.getKey()).isEqualTo("path");
+							});
+					});
+			});
 	}
 }
