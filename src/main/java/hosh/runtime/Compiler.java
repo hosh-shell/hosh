@@ -37,8 +37,6 @@ import hosh.antlr4.HoshParser.WrappedContext;
 import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
-import hosh.spi.Key;
-import hosh.spi.Keys;
 import hosh.spi.State;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
