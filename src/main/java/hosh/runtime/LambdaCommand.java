@@ -78,7 +78,6 @@ public class LambdaCommand implements Command, InterpreterAware, StateAware {
 				}
 			} finally {
 				// any change made by inner statement to variable will be lost here
-				// create a new Resolvable implementation?
 				state.setVariables(original);
 			}
 		}
