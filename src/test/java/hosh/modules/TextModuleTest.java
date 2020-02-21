@@ -134,7 +134,7 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void trimKeyOfDifferentType() {
-			Record record = Records.singleton(Keys.COUNT, Values.ofNumeric(42));
+			Record record = Records.singleton(Keys.COUNT, Values.ofInstant(Instant.EPOCH));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
