@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- lambda command
+  - alternative to glob expansion
+  - `command | { size -> ... ` binding of `size` variable for each incoming record
 - using alphanum for generic text too
 - new `sort` features:
    - `sort asc key`
@@ -20,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - preliminary introduction of java-module.info
 
 ### Fixed
-- #212: now it is possible to use several external commands in a pipeline
+- #212: now it is possible to use several external commands at once in a pipeline
 
 ## [0.0.36] - 2020-01-30
 
