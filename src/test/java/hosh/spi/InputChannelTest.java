@@ -59,6 +59,14 @@ public class InputChannelTest {
 		assertThat(iterable).containsExactly(record);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void twoRecords() {
+		given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+		Iterable<Record> iterable = InputChannel.iterate(in);
+		assertThat(iterable).containsExactly(record, record);
+	}
+
 	@Test
 	public void throwsNoSuchElementsWhenConsumed() {
 		given(in.recv()).willReturn(Optional.empty());
@@ -66,5 +74,13 @@ public class InputChannelTest {
 		assertThatThrownBy(() -> {
 			iterable.iterator().next();
 		}).isInstanceOf(NoSuchElementException.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void iterationTerminatesOnFirstEmptyResult() {
+		given(in.recv()).willReturn(Optional.empty(), Optional.of(record));
+		Iterable<Record> iterable = InputChannel.iterate(in);
+		assertThat(iterable).isEmpty();
 	}
 }
