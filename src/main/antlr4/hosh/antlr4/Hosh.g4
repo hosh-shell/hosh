@@ -4,7 +4,6 @@ program
 	: ( stmt )* EOF
 	;
 
-
 stmt
 	: sequence terminator?
 	;
@@ -23,6 +22,7 @@ pipeline
 command
 	: wrapped
 	| simple
+	| lambda
 	;
 
 wrapped
@@ -31,10 +31,13 @@ wrapped
 	| wrapped '}' // will be rejected by compiler
 	;
 
-
 simple
 	: invocation
 	;
+
+lambda
+    : '{' ID '->' stmt '}'
+    ;
 
 // by now compiler requires command (ID) to be statically defined
 // later should be possible to compile line by line, performing variable expansion before compiling
@@ -98,4 +101,3 @@ COMMENT
 WS
 	: [ \t\n\r]+ -> skip
 	;
-	

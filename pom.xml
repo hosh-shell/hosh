@@ -152,11 +152,10 @@
 					<useIncrementalCompilation>false</useIncrementalCompilation>
 					<staleMillis>1</staleMillis>
 					<compilerArgs>
-						<arg>--add-exports</arg><arg>java.base/jdk.internal.misc=hosh</arg>
-						<arg>-Werror</arg>
 						<arg>-Xlint:all</arg>
 						<arg>-Xlint:-requires-automatic</arg>
 						<arg>-Xpkginfo:always</arg>
+						<arg>--add-exports</arg><arg>java.base/jdk.internal.misc=hosh</arg>
 					</compilerArgs>
 				</configuration>
 			</plugin>

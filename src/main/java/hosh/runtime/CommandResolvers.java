@@ -45,13 +45,13 @@ public class CommandResolvers {
 	private CommandResolvers() {
 	}
 
-	public static CommandResolver builtinsThenExternal(State state, Injector injector) {
+	public static CommandResolver builtinsThenExternal(State state) {
 		boolean isWindows = System.getProperty("os.name").startsWith("Windows");
 		List<CommandResolver> order = new ArrayList<>();
-		order.add(new BuiltinCommandResolver(state, injector));
-		order.add(new ExternalCommandResolver(state, injector));
+		order.add(new BuiltinCommandResolver(state));
+		order.add(new ExternalCommandResolver(state));
 		if (isWindows) {
-			order.add(new WindowsCommandResolver(state, injector));
+			order.add(new WindowsCommandResolver(state));
 		}
 		return new AggregateCommandResolver(order);
 	}
@@ -82,11 +82,9 @@ public class CommandResolvers {
 
 		private final State state;
 
-		private final Injector injector;
 
-		public ExternalCommandResolver(State state, Injector injector) {
+		public ExternalCommandResolver(State state) {
 			this.state = state;
-			this.injector = injector;
 		}
 
 		@Override
@@ -114,7 +112,6 @@ public class CommandResolvers {
 			if (isExecutable(candidate)) {
 				LOGGER.info(() -> String.format("  found in %s", candidate));
 				ExternalCommand command = new ExternalCommand(candidate);
-				injector.injectDeps(command);
 				return Optional.of(command);
 			} else {
 				return Optional.empty();
@@ -132,11 +129,9 @@ public class CommandResolvers {
 
 		private final State state;
 
-		private final Injector injector;
 
-		public BuiltinCommandResolver(State state, Injector injector) {
+		public BuiltinCommandResolver(State state) {
 			this.state = state;
-			this.injector = injector;
 		}
 
 		@Override
@@ -148,7 +143,6 @@ public class CommandResolvers {
 				return Optional.empty();
 			} else {
 				Command command = commandSupplier.get();
-				injector.injectDeps(command);
 				LOGGER.info(() -> String.format("  found '%s'", command.getClass()));
 				return Optional.of(command);
 			}
@@ -161,9 +155,9 @@ public class CommandResolvers {
 
 		private final ExternalCommandResolver resolver;
 
-		public WindowsCommandResolver(State state, Injector injector) {
+		public WindowsCommandResolver(State state) {
 			this.state = state;
-			resolver = new ExternalCommandResolver(state, injector);
+			resolver = new ExternalCommandResolver(state);
 		}
 
 		@Override

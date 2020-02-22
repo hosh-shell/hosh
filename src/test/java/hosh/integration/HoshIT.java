@@ -475,6 +475,20 @@ public class HoshIT {
 	}
 
 	@Test
+	public void lambdaAfterGlobExpansion() throws Exception {
+		Path path = givenFolder("A.class", "B.class", "C.java");
+		Path scriptPath = givenScript("walk " + path.toAbsolutePath() + " | glob '*.class' | { path -> rm ${path} }");
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(exitCode).isEqualTo(0);
+		assertThat(output).isEmpty();
+		assertThat(path.resolve("A.class")).doesNotExist();
+		assertThat(path.resolve("B.class")).doesNotExist();
+		assertThat(path.resolve("C.java")).exists();
+	}
+
+	@Test
 	public void versionLongOption() throws Exception {
 		Process hosh = givenHoshProcess("--version");
 		String output = consumeOutput(hosh);
@@ -533,6 +547,14 @@ public class HoshIT {
 		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
 		Files.write(scriptPath, List.of(lines));
 		return scriptPath;
+	}
+
+	private Path givenFolder(String... filenames) throws IOException {
+		Path folder = temporaryFolder.newFolder("folder").toPath();
+		for (String filename : filenames) {
+			Files.write(folder.resolve(filename), List.of("some content"));
+		}
+		return folder;
 	}
 
 	private Process givenHoshProcess(String... args) throws IOException {

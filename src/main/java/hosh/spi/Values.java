@@ -268,6 +268,15 @@ public class Values {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
 		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public <T> Optional<T> unwrap(Class<T> type) {
+			if (type == String.class) {
+				return (Optional<T>) Optional.of(Long.toString(number));
+			}
+			return Optional.empty();
+		}
 	}
 
 	static final class None implements Value {
@@ -436,6 +445,9 @@ public class Values {
 		public <T> Optional<T> unwrap(Class<T> type) {
 			if (type.equals(Path.class)) {
 				return Optional.of(type.cast(path));
+			}
+			if (type.equals(String.class)) {
+				return Optional.of(type.cast(path.toString()));
 			}
 			return Optional.empty();
 		}

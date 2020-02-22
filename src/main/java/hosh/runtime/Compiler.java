@@ -106,8 +106,12 @@ public class Compiler {
 		if (ctx.wrapped() != null) {
 			return compileWrappedCommand(ctx.wrapped());
 		}
+		if (ctx.lambda() != null) {
+			return compileLambda(ctx.lambda());
+		}
 		throw new InternalBug(ctx);
 	}
+
 
 	private Statement compileSimple(SimpleContext ctx) {
 		Token token = ctx.invocation().ID().getSymbol();
@@ -142,6 +146,12 @@ public class Compiler {
 		DefaultCommandWrapper<?> wrappedCommand = new DefaultCommandWrapper<>(nestedStatement, commandWrapper);
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
 		return new Statement(wrappedCommand, arguments, commandName + ":");
+	}
+
+	private Statement compileLambda(HoshParser.LambdaContext lambda) {
+		Statement nestedStatement = compileStatement(lambda.stmt());
+		String key = lambda.ID().getSymbol().getText();
+		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "lambda");
 	}
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {

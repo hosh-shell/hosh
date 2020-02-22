@@ -33,6 +33,12 @@
 
 ## Examples
 
+## Glob expansion
+
+To recursively remove all `.class` files in `target`:
+ 
+`walk target | glob '*.class' | { path -> rm ${path}; echo removed ${path} }`
+
 ### Sorting
 
 Sorting is always performed using a well defined key column:
