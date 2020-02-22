@@ -39,7 +39,6 @@ import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
 import hosh.runtime.Compiler.CompileError;
 import hosh.runtime.Compiler.Program;
-import hosh.runtime.Injector;
 import hosh.runtime.Parser.ParseError;
 import hosh.spi.Command;
 import hosh.spi.State;

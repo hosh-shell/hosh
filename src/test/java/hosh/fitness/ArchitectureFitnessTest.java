@@ -38,7 +38,7 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
  * <li>modules can see only spi</li>
  * <li>runtime can see spi but spi cannot see runtime</li>
  * </ul>
- * The long term goal is to prepare ground for modules.
+ * The short term goal is to prepare ground for Java modules.
  */
 @AnalyzeClasses(packagesOf = Hosh.class)
 public class ArchitectureFitnessTest {

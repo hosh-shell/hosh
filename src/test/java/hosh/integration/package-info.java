@@ -22,8 +22,6 @@
  * SOFTWARE.
  */
 /**
- * Integration tests.
- * <p>
- * These tests could take advantage of the whole package hosh.jar.
+ * Integration tests for UBER-Jar (i.e. hosh.jar).
  */
 package hosh.integration;
