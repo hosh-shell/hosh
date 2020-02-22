@@ -33,7 +33,6 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
 import hosh.testsupport.TemporaryFolder;
-import hosh.testsupport.WithThread;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,9 +61,6 @@ import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class ExternalCommandTest {
-
-	@RegisterExtension
-	public final WithThread withThread = new WithThread();
 
 	@RegisterExtension
 	public final TemporaryFolder folder = new TemporaryFolder();

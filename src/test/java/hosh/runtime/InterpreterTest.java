@@ -197,7 +197,7 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Constant("-jar"), new Compiler.Constant("hosh.jar")));
 		given(statement.getLocation()).willReturn("java");
 		sut.eval(statement, in, out, err);
-		assertThat(Thread.currentThread().getName()).isEqualTo("command='java -jar hosh.jar'");
+		assertThat(withThread.currentName()).isEqualTo("command='java -jar hosh.jar'");
 		then(err).shouldHaveNoInteractions(); // checking no assertion failures happened
 	}
 
@@ -208,7 +208,7 @@ public class InterpreterTest {
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("java");
 		sut.eval(statement, in, out, err);
-		assertThat(Thread.currentThread().getName()).isEqualTo("command='java'");
+		assertThat(withThread.currentName()).isEqualTo("command='java'");
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
 	}
 }

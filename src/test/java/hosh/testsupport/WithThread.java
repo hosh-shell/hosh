@@ -46,8 +46,16 @@ public class WithThread implements Extension, BeforeTestExecutionCallback, After
 		backup = Thread.currentThread().getName();
 	}
 
+	public String currentName() {
+		return Thread.currentThread().getName();
+	}
+
 	public void renameTo(String newName) {
 		Thread.currentThread().setName(newName);
+	}
+
+	public boolean isInterrupted() {
+		return Thread.currentThread().isInterrupted();
 	}
 
 	public void interrupt() {
