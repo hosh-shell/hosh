@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dfa1</groupId>
 	<artifactId>hosh</artifactId>
-	<version>0.0.37-SNAPSHOT</version>
+	<version>0.0.37</version>
 	<url>https://github.com/dfa1/hosh</url>
 	<name>hosh</name>
 	<description>The Human Oriented SHell</description>
@@ -27,7 +26,7 @@
 	</developers>
 	<scm>
 		<developerConnection>scm:git:.</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v0.0.37</tag>
 	</scm>
 	<distributionManagement>
 		<repository>
@@ -328,8 +327,8 @@
 								<requireMavenVersion>
 									<version>3.6.0</version>
 								</requireMavenVersion>
-								<requireNoRepositories/>
-								<requireReleaseDeps/>
+								<requireNoRepositories />
+								<requireReleaseDeps />
 							</rules>
 						</configuration>
 					</execution>
