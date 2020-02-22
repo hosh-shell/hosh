@@ -36,7 +36,7 @@
 ## Glob expansion
 
 To recursively remove all `.class` files in `target`:
- 
+
 `walk target | glob '*.class' | { path -> rm ${path}; echo removed ${path} }`
 
 ### Sorting
@@ -110,10 +110,11 @@ hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
 
 ## Inspired by
 
-- PowerShell https://docs.microsoft.com/en-us/powershell/
-- Zsh https://zsh.org
 - https://www.martinfowler.com/articles/collection-pipeline/
 - https://mywiki.wooledge.org/BashPitfalls
+- PowerShell https://docs.microsoft.com/en-us/powershell/
+- Zsh https://zsh.org
+- Elvish https://elv.sh/
 
 ## Similar projects
 
