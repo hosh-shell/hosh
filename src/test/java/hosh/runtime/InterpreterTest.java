@@ -96,6 +96,17 @@ public class InterpreterTest {
 	}
 
 	@Test
+	public void injectDependencies() {
+		given(state.getVariables()).willReturn(variables);
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		given(program.getStatements()).willReturn(List.of(statement));
+		given(statement.getCommand()).willReturn(command);
+		given(statement.getArguments()).willReturn(args);
+		sut.eval(program, out, err);
+		then(injector).should().injectDeps(command);
+	}
+
+	@Test
 	public void storeCommandExitStatus() {
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
