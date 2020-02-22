@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 module hosh {
-	requires java.base;
 	requires java.logging;
 	requires java.net.http;
 
@@ -32,9 +31,6 @@ module hosh {
 	requires commons.cli;
 
 	requires org.antlr.antlr4.runtime;
-
-	// workaround for signal handling
-	requires jdk.unsupported;
 
 	// workarounds for mockito
 	opens hosh;
