@@ -9,9 +9,9 @@ stmt
 	;
 
 sequence
-    : pipeline terminator sequence
-    | pipeline
-    ;
+	: pipeline terminator sequence
+	| pipeline
+	;
 
 pipeline
 	: command '|' stmt
@@ -36,8 +36,8 @@ simple
 	;
 
 lambda
-    : '{' ID '->' stmt '}'
-    ;
+	: '{' ID '->' stmt '}'
+	;
 
 // by now compiler requires command (ID) to be statically defined
 // later should be possible to compile line by line, performing variable expansion before compiling
@@ -46,20 +46,20 @@ invocation
 	;
 
 expression
-    : expansion
-    | string
-    ;
+	: expansion
+	| string
+	;
 
 string
-    : '\'' ( expansion )+ '\''
-    | '"' ( expansion )+ '"'
-    ;
+	: '\'' ( expansion )+ '\''
+	| '"' ( expansion )+ '"'
+	;
 
 expansion
-    : ID
-    | VARIABLE
-    | VARIABLE_OR_FALLBACK
-    ;
+	: ID
+	| VARIABLE
+	| VARIABLE_OR_FALLBACK
+	;
 
 terminator
 	:  ';'
