@@ -21,22 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module hosh {
-	requires java.logging;
-	requires java.net.http;
+package hosh.runtime.jfr;
 
-	requires jdk.jfr;
+import jdk.jfr.Category;
+import jdk.jfr.Event;
+import jdk.jfr.Label;
+import jdk.jfr.StackTrace;
 
-	requires jline.reader;
-	requires jline.terminal;
+@Category("hosh")
+@Label("command execution")
+@StackTrace(false)
+public class CommandExecution extends Event {
 
-	requires commons.cli;
+	@Label("command")
+	private final String command;
 
-	requires org.antlr.antlr4.runtime;
+	@Label("arguments")
+	private final String arguments;
 
-	// workarounds for mockito
-	opens hosh;
-	opens hosh.runtime;
-	opens hosh.spi;
-	opens hosh.modules;
+	public CommandExecution(String command, String arguments) {
+		this.command = command;
+		this.arguments = arguments;
+	}
+
+	public String getCommand() {
+		return command;
+	}
+
+	public String getArguments() {
+		return arguments;
+	}
 }

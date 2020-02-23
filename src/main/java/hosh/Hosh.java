@@ -115,9 +115,10 @@ public class Hosh {
 	}
 
 	public static void main(String[] args) throws Exception {
+		String version = VersionLoader.loadVersion();
 		configureLogging();
 		Logger logger = LoggerFactory.forEnclosingClass();
-		String version = VersionLoader.loadVersion();
+
 		logger.info(() -> String.format("starting hosh %s", version));
 		ExitStatus exitStatus;
 		try (Terminal terminal = TerminalBuilder.builder().jansi(true).exec(false).build()) {

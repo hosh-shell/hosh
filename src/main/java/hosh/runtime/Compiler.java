@@ -77,7 +77,7 @@ public class Compiler {
 			Statement first = compilePipeline(ctx.pipeline());
 			Statement second = compileSequence(ctx.sequence());
 			SequenceCommand command = new SequenceCommand(first, second);
-			return new Statement(command, List.of(), "");
+			return new Statement(command, List.of(), "sequence: " + ctx.getText());
 		}
 		throw new InternalBug(ctx);
 	}
@@ -94,7 +94,7 @@ public class Compiler {
 			Statement producer = compileCommand(ctx.command());
 			Statement consumer = compileStatement(ctx.stmt());
 			PipelineCommand command = new PipelineCommand(producer, consumer);
-			return new Statement(command, List.of(), "");
+			return new Statement(command, List.of(), "pipeline: " + ctx.getText());
 		}
 		throw new InternalBug(ctx);
 	}
@@ -123,7 +123,7 @@ public class Compiler {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		});
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
-		return new Statement(command, arguments, commandName);
+		return new Statement(command, arguments, "simple: " + commandName);
 	}
 
 	private Statement compileWrappedCommand(WrappedContext ctx) {
@@ -145,13 +145,13 @@ public class Compiler {
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		DefaultCommandWrapper<?> wrappedCommand = new DefaultCommandWrapper<>(nestedStatement, commandWrapper);
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
-		return new Statement(wrappedCommand, arguments, commandName + ":");
+		return new Statement(wrappedCommand, arguments, "wrapper: " + commandName);
 	}
 
-	private Statement compileLambda(HoshParser.LambdaContext lambda) {
-		Statement nestedStatement = compileStatement(lambda.stmt());
-		String key = lambda.ID().getSymbol().getText();
-		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "lambda");
+	private Statement compileLambda(HoshParser.LambdaContext ctx) {
+		Statement nestedStatement = compileStatement(ctx.stmt());
+		String key = ctx.ID().getSymbol().getText();
+		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "lambda: " + ctx.getText());
 	}
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {

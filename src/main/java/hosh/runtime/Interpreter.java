@@ -26,6 +26,7 @@ package hosh.runtime;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Resolvable;
 import hosh.runtime.Compiler.Statement;
+import hosh.runtime.jfr.CommandExecution;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -103,7 +104,13 @@ public class Interpreter {
 		injector.injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
-		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
+		CommandExecution commandExecution = new CommandExecution(statement.getLocation(), resolvedArguments.toString());
+		commandExecution.begin();
+		try {
+			return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
+		} finally {
+			commandExecution.commit();
+		}
 	}
 
 	private void injectInterpreter(Command command) {
