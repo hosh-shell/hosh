@@ -8,11 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - preliminary support for Flight Recorder (JEP 328)
- - providing just custom events for command executions
- - improving location while using `HOSH_LOG` as well
+  - providing just custom events for command executions
+  - improving location while using `HOSH_LOG` as well
 
 ### Changed
+
 ### Fixed
+- #205: improving handling of strings
 
 ## [0.0.37] - 2020-02-22
 

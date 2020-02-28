@@ -78,6 +78,7 @@ public class ParserTest {
 
 	private static List<String> commands() {
 		return List.of(
+			"",
 			"/usr/bin/git; ls",
 			"/usr/bin/git; ls;",
 			"/usr/bin/git",
@@ -96,7 +97,10 @@ public class ParserTest {
 			"cd c:\\temp\n",
 			"cd c:/temp\n",
 			"cd ${DIR}",
+			"echo ''", // empty string
+			"echo '       '", // spaces
 			"vim 'filename with spaces'",
+			"vim 'filename with newline\n'",
 			"vim \"filename with spaces\"",
 			"git commit -am \"commit message\"",
 			"withTime { git push }",
@@ -114,7 +118,9 @@ public class ParserTest {
 			"echo ${HELLO}${WHO}",
 			"ls ${JAVA_HOME}/bin",
 			"ls ${JAVA_HOME}/${JVM_BINARY}",
-			"ls \"${JAVA_HOME}/${JVM_BINARY}\"");
+			"ls \"${JAVA_HOME}\"",
+			"ls \"${JAVA_HOME}/${JVM_BINARY}\""
+			);
 	}
 
 	private static List<String> newLines() {

@@ -24,11 +24,13 @@
 package hosh.runtime;
 
 import hosh.doc.Bug;
+import hosh.doc.Todo;
 import hosh.runtime.Compiler.CompileError;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
+import hosh.spi.State;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -38,14 +40,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
+@Todo(description = "use nested classes for grouping")
 @ExtendWith(MockitoExtension.class)
 public class CompilerTest {
+
+	@Mock(stubOnly = true)
+	private State state;
 
 	@Mock(stubOnly = true)
 	private Command command;
@@ -71,6 +78,7 @@ public class CompilerTest {
 			.hasMessage("line 1:12: incomplete pipeline near '|'");
 	}
 
+	@Disabled
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/42", description = "rejected by the compiler")
 	@Test
 	public void extraBraces() {
@@ -181,29 +189,6 @@ public class CompilerTest {
 		});
 	}
 
-	@Test
-	public void commandWithStringArgument() {
-		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
-		Program program = sut.compile("git '${HOME}${BIN}'");
-		assertThat(program.getStatements())
-			.hasSize(1)
-			.first().satisfies(statement -> {
-			assertThat(statement.getCommand()).isSameAs(command);
-			assertThat(statement.getArguments()).hasSize(1);
-		});
-	}
-
-	@Test
-	public void commandWithStringArguments() {
-		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
-		Program program = sut.compile("git '${HOME}${BIN}' ${CMD}");
-		assertThat(program.getStatements())
-			.hasSize(1)
-			.first().satisfies(statement -> {
-			assertThat(statement.getCommand()).isSameAs(command);
-			assertThat(statement.getArguments()).hasSize(2);
-		});
-	}
 
 	@Test
 	public void commandNotRegisteredInAPipeline() {
@@ -238,14 +223,60 @@ public class CompilerTest {
 	}
 
 	@Test
+	public void emptySingleQuotedString() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
+		Program program = sut.compile("echo ''");
+		assertThat(program.getStatements())
+			.hasSize(1).first().satisfies(statement -> {
+			assertThat(statement.getCommand()).isSameAs(command);
+			assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
+				String resolve = argument.resolve(state);
+				assertThat(resolve).isEqualTo("");
+			});
+		});
+	}
+
+	@Test
 	public void singleQuotedString() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 		Program program = sut.compile("vim 'file with spaces'");
 		assertThat(program.getStatements())
+			.hasSize(1).first().satisfies(statement -> {
+			assertThat(statement.getCommand()).isSameAs(command);
+			assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
+				String resolve = argument.resolve(state);
+				assertThat(resolve).isEqualTo("file with spaces");
+			});
+		});
+	}
+
+	@Test
+	public void singleQuotedStringWithVariables() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+		Program program = sut.compile("git '${HOME}${BIN}'");
+		assertThat(program.getStatements())
 			.hasSize(1)
 			.first().satisfies(statement -> {
 			assertThat(statement.getCommand()).isSameAs(command);
-			assertThat(statement.getArguments()).hasSize(1); // check string content
+			assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
+				String resolved = argument.resolve(state);
+				assertThat(resolved).isEqualTo("${HOME}${BIN}");
+			});
+		});
+	}
+
+	@Test
+	public void emptyDoubleQuotedString() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
+		Program program = sut.compile("vim \"\"");
+		assertThat(program.getStatements())
+			.hasSize(1)
+			.first().satisfies(statement -> {
+			assertThat(statement.getCommand()).isSameAs(command);
+			assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
+				String resolve = argument.resolve(state);
+				assertThat(resolve).isEqualTo("");
+			});
 		});
 	}
 
@@ -257,7 +288,58 @@ public class CompilerTest {
 			.hasSize(1)
 			.first().satisfies(statement -> {
 			assertThat(statement.getCommand()).isSameAs(command);
-			assertThat(statement.getArguments()).hasSize(1); // check string content
+			assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
+				String resolve = argument.resolve(state);
+				assertThat(resolve).isEqualTo("file with spaces");
+			});
+		});
+	}
+
+	@Test
+	public void doubleQuotedStringWithVariable() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+		doReturn(Map.of("HOME", "/home/dfa")).when(state).getVariables();
+		Program program = sut.compile("ls \"${HOME}\"");
+		assertThat(program.getStatements())
+			.hasSize(1)
+			.first().satisfies(statement -> {
+			assertThat(statement.getCommand()).isSameAs(command);
+			assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
+				String resolved = argument.resolve(state);
+				assertThat(resolved).isEqualTo("/home/dfa");
+			});
+		});
+	}
+
+	@Test
+	public void doubleQuotedStringWithVariables() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+		doReturn(Map.of("HOME", "/home/dfa", "BIN", "bin")).when(state).getVariables();
+		Program program = sut.compile("ls \"${HOME}/${BIN}\"");
+		assertThat(program.getStatements())
+			.hasSize(1)
+			.first().satisfies(statement -> {
+			assertThat(statement.getCommand()).isSameAs(command);
+			assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
+				String resolved = argument.resolve(state);
+				assertThat(resolved).isEqualTo("/home/dfa/bin");
+			});
+		});
+	}
+
+	@Test
+	public void doubleQuotedStringWithFallback() {
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+		doReturn(Map.of("HOME", "/home/dfa")).when(state).getVariables();
+		Program program = sut.compile("ls \"${HOME!/home}/${BIN!bin}\"");
+		assertThat(program.getStatements())
+			.hasSize(1)
+			.first().satisfies(statement -> {
+			assertThat(statement.getCommand()).isSameAs(command);
+			assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
+				String resolved = argument.resolve(state);
+				assertThat(resolved).isEqualTo("/home/dfa/bin");
+			});
 		});
 	}
 

@@ -72,7 +72,7 @@ import java.util.regex.Pattern;
 
 public class SystemModule implements Module {
 
-	// keep in sync with Hosh.g4
+	// keep in sync with HoshParser.g4
 	private static final Pattern VARIABLE = Pattern.compile("[A-Za-z_\\-]+");
 
 	@Override
