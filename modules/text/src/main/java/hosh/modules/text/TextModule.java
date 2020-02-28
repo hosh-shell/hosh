@@ -42,7 +42,6 @@ import hosh.spi.Records;
 import hosh.spi.Value;
 import hosh.spi.Values;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -52,7 +51,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
@@ -162,21 +160,9 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			String sep = args.get(0);
-			Locale locale = Locale.getDefault();
 			for (Record record : InputChannel.iterate(in)) {
 				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				Iterator<Value> values = record.values().iterator();
-				boolean skipSep = true;
-				while (values.hasNext()) {
-					Value value = values.next();
-					if (skipSep) {
-						skipSep = false;
-					} else {
-						sw.append(sep);
-					}
-					value.print(pw, locale);
-				}
+				record.accept(Records.Visitors.print(sw, sep));
 				out.send(Records.singleton(Keys.TEXT, Values.ofText(sw.toString())));
 			}
 			return ExitStatus.success();
@@ -242,8 +228,7 @@ public class TextModule implements Module {
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
 					StringWriter sw = new StringWriter();
-					PrintWriter pw = new PrintWriter(sw);
-					record.print(pw, Locale.getDefault());
+					Records.Visitors.print(sw);
 					Matcher matcher = pattern.matcher(sw.toString());
 					Records.Builder builder = Records.builder();
 					if (matcher.find()) {

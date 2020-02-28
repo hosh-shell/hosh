@@ -23,6 +23,9 @@
  */
 package hosh.spi;
 
+import hosh.doc.Experimental;
+import hosh.doc.Todo;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -32,7 +35,8 @@ import java.util.stream.Stream;
  * <p>
  * Iteration order is well defined (i.e. insertion order).
  */
-public interface Record extends Printable {
+@Todo(description = "Record should implement Value!")
+public interface Record {
 
 	/**
 	 * Yields a new Record with the specified mapping as last one.
@@ -53,6 +57,20 @@ public interface Record extends Printable {
 	Optional<Value> value(Key key);
 
 	int size();
+
+	void accept(Visitor visitor);
+
+	@Experimental(description = "visitor")
+	interface Visitor {
+
+		void begin(int count);
+
+		void key(Key key);
+
+		void value(Value value);
+
+		void end();
+	}
 
 	/**
 	 * An immutable value object representing a key/value pair.

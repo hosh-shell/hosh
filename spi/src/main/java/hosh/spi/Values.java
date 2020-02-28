@@ -113,6 +113,11 @@ public class Values {
 		}
 
 		@Override
+		public void accept(Record.Visitor visitor) {
+
+		}
+
+		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
 			printWriter.append(value);
 		}

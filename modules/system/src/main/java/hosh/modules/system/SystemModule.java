@@ -63,7 +63,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -872,16 +871,15 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("capture variable"));
 				return ExitStatus.error();
 			}
-			Locale locale = Locale.getDefault();
 			String key = args.get(0);
 			if (!VARIABLE.matcher(key).matches()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			StringWriter result = new StringWriter();
-			PrintWriter pw = new PrintWriter(result);
+			Record.Visitor print = Records.Visitors.print(result);
 			for (Record incoming : InputChannel.iterate(in)) {
-				incoming.print(pw, locale);
+				incoming.accept(print);
 			}
 			state.getVariables().put(key, result.toString());
 			return ExitStatus.success();
@@ -908,12 +906,11 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("open file [WRITE|APPEND|...]"));
 				return ExitStatus.error();
 			}
-			Locale locale = Locale.getDefault();
 			var path = state.getCwd().resolve(Paths.get(args.get(0)));
 			try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
+				Record.Visitor print = Records.Visitors.print(pw);
 				for (Record incoming : InputChannel.iterate(in)) {
-					incoming.print(pw, locale);
-					pw.println();
+					incoming.accept(print);
 				}
 				return ExitStatus.success();
 			} catch (IOException e) {

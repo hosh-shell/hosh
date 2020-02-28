@@ -30,7 +30,7 @@ import java.util.Optional;
 /**
  * The value in @{see Record}.
  */
-public interface Value extends Comparable<Value>, Printable {
+public interface Value extends Comparable<Value> {
 
 	default <T> Optional<T> unwrap(Class<T> type) {
 		return Optional.empty();
@@ -39,6 +39,10 @@ public interface Value extends Comparable<Value>, Printable {
 	@Experimental(description = "right now this is basically add()")
 	default Optional<Value> merge(Value value) {
 		return Optional.empty();
+	}
+
+	default void accept(Record.Visitor visitor) {
+		visitor.value(this);
 	}
 
 }

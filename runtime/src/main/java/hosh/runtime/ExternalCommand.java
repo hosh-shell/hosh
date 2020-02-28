@@ -116,11 +116,10 @@ class ExternalCommand implements Command, StateAware {
 	}
 
 	private void pipeChannelToOutputStream(InputChannel in, OutputStream outputStream) {
-		Locale locale = Locale.getDefault();
 		try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
+			Record.Visitor print = Records.Visitors.print(pw);
 			for (Record record : InputChannel.iterate(in)) {
-				record.print(pw, locale);
-				pw.println();
+				record.accept(print);
 			}
 		}
 	}

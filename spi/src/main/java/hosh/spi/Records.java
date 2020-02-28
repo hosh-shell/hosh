@@ -26,10 +26,10 @@ package hosh.spi;
 import hosh.spi.Record.Entry;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -117,6 +117,12 @@ public class Records {
 		}
 
 		@Override
+		public void accept(Visitor visitor) {
+			visitor.begin(0);
+			visitor.end();
+		}
+
+		@Override
 		public final int hashCode() {
 			return 17;
 		}
@@ -136,10 +142,6 @@ public class Records {
 			return "Record[data={}]";
 		}
 
-		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			// no-op
-		}
 	}
 
 	static class Singleton implements Record {
@@ -216,8 +218,11 @@ public class Records {
 		}
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			entry.getValue().print(printWriter, locale);
+		public void accept(Visitor visitor) {
+			visitor.begin(1);
+			visitor.key(entry.getKey());
+			visitor.value(entry.getValue());
+			visitor.end();
 		}
 	}
 
@@ -303,15 +308,59 @@ public class Records {
 		}
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			Iterator<Value> iterator = values().iterator();
-			while (iterator.hasNext()) {
-				Value value = iterator.next();
-				value.print(printWriter, locale);
-				if (iterator.hasNext()) {
-					printWriter.append(" ");
-				}
+		public void accept(Visitor visitor) {
+			visitor.begin(entries.length);
+			for (var entry : entries) {
+				visitor.key(entry.getKey());
+				visitor.value(entry.getValue());
 			}
+			visitor.end();
+		}
+	}
+
+	public static class Visitors {
+
+		private Visitors() {
+		}
+
+		public static Record.Visitor print(StringWriter stringWriter) {
+			return print(new PrintWriter(stringWriter));
+		}
+
+		public static Record.Visitor print(StringWriter stringWriter, String sep) {
+			return print(new PrintWriter(stringWriter), sep);
+		}
+
+		public static Record.Visitor print(PrintWriter printWriter) {
+			return print(printWriter, " ");
+		}
+
+		public static Record.Visitor print(PrintWriter printWriter, String sep) {
+			return new Record.Visitor() {
+				private boolean printSeparator = false;
+
+				@Override
+				public void begin(int count) {
+				}
+
+				@Override
+				public void key(Key key) {
+				}
+
+				@Override
+				public void value(Value value) {
+					if (printSeparator) {
+						printWriter.print(sep);
+					}
+					printSeparator = true;
+					value.accept(this);
+				}
+
+				@Override
+				public void end() {
+					printWriter.flush();
+				}
+			};
 		}
 	}
 
