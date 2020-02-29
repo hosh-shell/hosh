@@ -109,13 +109,13 @@ public class InterpreterTest {
 	@Test
 	public void storeCommandExitStatus() {
 		given(state.getVariables()).willReturn(variables);
-		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.error());
+		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.of(2));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(args);
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
-		assertThat(variables).containsEntry("EXIT_STATUS", "1");
+		assertThat(variables).containsEntry("EXIT_STATUS", "2");
 	}
 
 	@Test
@@ -140,7 +140,7 @@ public class InterpreterTest {
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
-		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("(no message provided)")));
+		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("(no message provided)"), Keys.LOCATION, Values.ofText("cmd")));
 	}
 
 	@Test
@@ -153,7 +153,7 @@ public class InterpreterTest {
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
-		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("simulated error")));
+		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("simulated error"), Keys.LOCATION, Values.ofText("cmd")));
 	}
 
 	@Test
