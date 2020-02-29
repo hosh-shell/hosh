@@ -5,16 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+### Changed
+### Fixed
+
+## [0.0.38] - 2020-02-29
 
 ### Added
 - preliminary support for Flight Recorder (JEP 328)
-  - providing just custom events for command executions
-  - improving location while using `HOSH_LOG` as well
+  - custom events for command executions
+  - improved `location` while using `HOSH_LOG` as well
 
 ### Changed
+- improved handling of strings
 
 ### Fixed
-- #205: improving handling of strings
+- #205: ability to use '{' (any other character in strings)
+   - now it is possible to use `glob '*.{java,jar}'` and much more
 
 ## [0.0.37] - 2020-02-22
 
