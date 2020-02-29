@@ -1,4 +1,4 @@
-# Human Oriented SHell
+# HOSH
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/dfa1/hosh/workflows/CI/badge.svg)](https://github.com/dfa1/hosh/actions?query=workflow%3ACI) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dfa1_hosh&metric=alert_status)](https://sonarcloud.io/dashboard?id=dfa1_hosh)
  [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dfa1_hosh&metric=coverage)](https://sonarcloud.io/dashboard?id=dfa1_hosh)
@@ -27,24 +27,18 @@
     - `withTime { lines pom.xml | sink }`
     - `withLock file.lock { ... }`
 - **robust scripts by default**
-    - as if running bash scripts with `set -euo pipefail` as described in [unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
+    - as if running bash scripts with `set -euo pipefail` ([unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/))
 
 ¹ it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
 
 ## Examples
-
-## Glob expansion
-
-To recursively remove all `.class` files in `target`:
-
-`walk target | glob '*.class' | { path -> rm ${path}; echo removed ${path} }`
 
 ### Sorting
 
 Sorting is always performed using a well defined key column:
 ```
 hosh> ls
-# unsorted, following local filesystem
+# unsorted, following local filesystem order
 ...
 hosh> ls | schema
 path size
@@ -107,6 +101,14 @@ Hosh (no external commands):
 hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
 ```
 
+### Glob expansion
+
+To recursively remove all `.class` files in `target`:
+
+`hosh> walk target | glob '*.class' | { path -> rm ${path}; echo removed ${path} }`
+
+`{ path -> ... }` is lambda syntax, inside this scope is possible to use `${path}`.
+
 
 ## Inspired by
 
@@ -123,25 +125,25 @@ hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
 - kotlin https://github.com/holgerbrandl/kscript
 - go https://github.com/bitfield/script
 
-# Development
+## Development
 
-## Requirements
+### Requirements
 
-Java 11
+JDK 11
 
-## Build
+### Build
 
 `$ ./mvnw clean verify`
 
-## Run
+### Run
 
 `$ java -jar target/dist/hosh.jar`
 
-## Debug
+### Debug
 
 `$ java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar target/dist/hosh.jar`
 
-## Logging
+### Logging
 
 Hosh uses `java.util.logging` (to not require additional dependencies). `HOSH_LOG_LEVEL` controls
 logging behaviour according to [Level](https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/Level.html). By default logging is disabled, to enable it:
@@ -150,9 +152,9 @@ logging behaviour according to [Level](https://docs.oracle.com/en/java/javase/11
 
 Logging events will be persisted in `$HOME/.hosh.log`.
 
-## Docker support
+### Docker support
 
-Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/) with [alpine-jre](https://hub.docker.com/r/adoptopenjdk/openjdk11):
+Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/):
 
 `$ ./mvnw -Pdocker clean verify`
 
