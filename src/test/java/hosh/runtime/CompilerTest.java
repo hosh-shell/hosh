@@ -78,7 +78,6 @@ public class CompilerTest {
 			.hasMessage("line 1:12: incomplete pipeline near '|'");
 	}
 
-	@Disabled
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/42", description = "rejected by the compiler")
 	@Test
 	public void extraBraces() {

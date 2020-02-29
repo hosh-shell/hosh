@@ -5,11 +5,11 @@ PIPE
 	;
 
 OPEN_CURLY
-	: '{' -> pushMode(DEFAULT_MODE)
+	: '{'
 	;
 
 CLOSE_CURLY
-	: '}' -> popMode
+	: '}'
 	;
 
 ARROW
@@ -81,11 +81,10 @@ DQUOTE_TEXT
 	;
 
 DQUOTE_VARIABLE
-	: DOLLAR V+ CLOSE_CURLY
+	: '${' V+ CLOSE_CURLY
 	;
 
 DQUOTE_VARIABLE_OR_FALLBACK
-	: DOLLAR V+ '!' I+ CLOSE_CURLY
+	: '${' V+ '!' I+ CLOSE_CURLY
 	;
 
-DOLLAR: '${' -> pushMode(DEFAULT_MODE);
