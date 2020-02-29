@@ -27,7 +27,6 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
-import hosh.doc.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
@@ -548,7 +547,6 @@ public class TextModule implements Module {
 	@Examples({
 		@Example(command = "rand | enumerate | take 3", description = "create 3 random records")
 	})
-	@Todo(description = "extends with seed, min-max interval; add also 'doubles', 'booleans', etc")
 	public static class Rand implements Command {
 
 		@SuppressWarnings("squid:S2189")

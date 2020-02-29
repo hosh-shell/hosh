@@ -24,7 +24,6 @@
 package hosh.runtime;
 
 import hosh.doc.Bug;
-import hosh.doc.Todo;
 import hosh.runtime.Compiler.CompileError;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Statement;
@@ -47,7 +46,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
-@Todo(description = "use nested classes for grouping")
 @ExtendWith(MockitoExtension.class)
 public class CompilerTest {
 
