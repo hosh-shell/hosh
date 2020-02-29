@@ -28,8 +28,6 @@ import hosh.doc.Bug;
 import hosh.doc.Todo;
 import hosh.testsupport.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -46,7 +44,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -242,7 +239,7 @@ public class HoshIT {
 	}
 
 	@DisabledOnOs(OS.WINDOWS)
-	@Bug(description = "regression test", issue ="https://github.com/dfa1/hosh/issues/212")
+	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/212")
 	@Test
 	public void pipelineWithMiddleExternalCommands() throws Exception {
 		Path scriptPath = givenScript(
@@ -306,7 +303,7 @@ public class HoshIT {
 	@Test
 	public void errorInProducer() throws Exception {
 		Path scriptPath = givenScript(
-			"err | count"//
+			"err | ls"//
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -327,7 +324,18 @@ public class HoshIT {
 		assertThat(exitCode).isEqualTo(1);
 	}
 
-	@Disabled("maybe it is the root cause of github actions problems?")
+	@Test
+	public void consumerAndProducerBothInError() throws Exception {
+		Path scriptPath = givenScript(
+			"err | err"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		boolean success = hosh.waitFor(1, TimeUnit.SECONDS);
+		assertThat(output).contains("injected error: please do not report");
+		assertThat(success).isTrue(); // no timeout
+	}
+
 	@Test
 	public void consumeInfiniteProducer() throws Exception {
 		Path scriptPath = givenScript(
@@ -335,11 +343,9 @@ public class HoshIT {
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		Assertions.assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
-			assertThat(output).isEqualTo("100");
-			assertThat(exitCode).isEqualTo(0);
-		});
+		boolean success = hosh.waitFor(1, TimeUnit.SECONDS);
+		assertThat(output).isEqualTo("100");
+		assertThat(success).isTrue(); // no timeout
 	}
 
 	@Test
