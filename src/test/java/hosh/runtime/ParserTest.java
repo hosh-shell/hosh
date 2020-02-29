@@ -119,7 +119,10 @@ public class ParserTest {
 			"ls ${JAVA_HOME}/bin",
 			"ls ${JAVA_HOME}/${JVM_BINARY}",
 			"ls \"${JAVA_HOME}\"",
-			"ls \"${JAVA_HOME}/${JVM_BINARY}\""
+			"ls \"${JAVA_HOME}/${JVM_BINARY}\"",
+			"walk . | glob '*'",
+			"walk . | glob '*.{jar,war}'",
+			"walk . | glob '*.[ch]'"
 			);
 	}
 
