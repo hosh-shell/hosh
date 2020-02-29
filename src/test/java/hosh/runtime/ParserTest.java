@@ -97,8 +97,6 @@ public class ParserTest {
 			"cd c:\\temp\n",
 			"cd c:/temp\n",
 			"cd ${DIR}",
-			"echo ''", // empty string
-			"echo '       '", // spaces
 			"vim 'filename with spaces'",
 			"vim 'filename with newline\n'",
 			"vim \"filename with spaces\"",
@@ -119,8 +117,14 @@ public class ParserTest {
 			"ls ${JAVA_HOME}/bin",
 			"ls ${JAVA_HOME}/${JVM_BINARY}",
 			"ls \"${JAVA_HOME}\"",
-			"ls \"${JAVA_HOME}/${JVM_BINARY}\""
-			);
+			"ls \"${JAVA_HOME}/${JVM_BINARY}\"",
+			"echo 'òàù\"è+ì|!£$%&/()=?^'",
+			"echo \"òàù'è+ì|!£&/()=?^\"",
+			"echo '{}|'",
+			"echo \"{}|\"",
+			"echo ''", // empty string
+			"echo '       '" // spaces
+		);
 	}
 
 	private static List<String> newLines() {
