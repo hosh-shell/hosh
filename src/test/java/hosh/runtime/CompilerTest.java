@@ -213,6 +213,8 @@ public class CompilerTest {
 		assertThat(program.getStatements())
 			.hasSize(1)
 			.first().satisfies(statement -> {
+			assertThat(statement.getLocation()).isEqualTo("withTime");
+			assertThat(statement.getDetails()).isEqualTo("wrapper: withTime-t-a{gitpush}");
 			assertThat(statement.getArguments()).hasSize(2);
 		});
 	}
@@ -270,6 +272,8 @@ public class CompilerTest {
 		assertThat(program.getStatements())
 			.hasSize(1)
 			.first().satisfies(statement -> {
+			assertThat(statement.getLocation()).isEqualTo("");
+			assertThat(statement.getDetails()).isEqualTo("pipeline: benchmark50{ls}|schema");
 			assertThat(statement.getArguments()).isEmpty();
 			assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
 			PipelineCommand pipeline = (PipelineCommand) statement.getCommand();
@@ -299,6 +303,8 @@ public class CompilerTest {
 		assertThat(program.getStatements())
 			.hasSize(1)
 			.first().satisfies(statement -> {
+			assertThat(statement.getLocation()).isEqualTo("cmd");
+			assertThat(statement.getDetails()).isEqualTo("simple: cmd");
 			assertThat(statement.getCommand()).isSameAs(command);
 			assertThat(statement.getArguments()).isEmpty();
 		});
@@ -325,6 +331,8 @@ public class CompilerTest {
 		assertThat(program.getStatements())
 			.hasSize(1)
 			.first().satisfies(statement -> {
+			assertThat(statement.getLocation()).isEmpty();
+			assertThat(statement.getDetails()).isEqualTo("sequence: ls/tmp;schema");
 			assertThat(statement.getArguments()).isEmpty();
 			assertThat(statement.getCommand()).isInstanceOf(SequenceCommand.class);
 			SequenceCommand sequenceCommand = (SequenceCommand) statement.getCommand();
@@ -341,6 +349,8 @@ public class CompilerTest {
 		assertThat(program.getStatements())
 			.hasSize(1)
 			.first().satisfies(statement -> {
+			assertThat(statement.getLocation()).isEmpty();
+			assertThat(statement.getDetails()).isEqualTo("sequence: ls/tmp|schema;ls/tmp|schema");
 			assertThat(statement.getArguments()).isEmpty();
 			assertThat(statement.getCommand()).isInstanceOf(SequenceCommand.class);
 		});
@@ -355,6 +365,8 @@ public class CompilerTest {
 			.hasSize(1)
 			.first()
 			.satisfies(statement -> {
+				assertThat(statement.getLocation()).isEmpty();
+				assertThat(statement.getDetails()).isEqualTo("pipeline: ls|{path->echo${path}}");
 				assertThat(statement.getArguments()).isEmpty();
 				assertThat(statement.getCommand())
 					.asInstanceOf(InstanceOfAssertFactories.type(PipelineCommand.class))

@@ -292,6 +292,18 @@ public class HoshIT {
 	}
 
 	@Test
+	public void errorInSimpleCommand() throws Exception {
+		Path scriptPath = givenScript(
+			"err"//
+		);
+		Process hosh = givenHoshProcess(scriptPath.toString());
+		String output = consumeOutput(hosh);
+		int exitCode = hosh.waitFor();
+		assertThat(output).contains("err injected error: please do not report");
+		assertThat(exitCode).isEqualTo(1);
+	}
+
+	@Test
 	public void errorInProducer() throws Exception {
 		Path scriptPath = givenScript(
 			"err | count"//

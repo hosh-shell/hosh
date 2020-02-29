@@ -81,7 +81,7 @@ public class Compiler {
 			Statement first = compilePipeline(ctx.pipeline());
 			Statement second = compileSequence(ctx.sequence());
 			SequenceCommand command = new SequenceCommand(first, second);
-			return new Statement(command, List.of(), "sequence: " + ctx.getText());
+			return new Statement(command, List.of(), "", "sequence: " + ctx.getText());
 		}
 		throw new InternalBug(ctx);
 	}
@@ -98,7 +98,7 @@ public class Compiler {
 			Statement producer = compileCommand(ctx.command());
 			Statement consumer = compileStatement(ctx.stmt());
 			PipelineCommand command = new PipelineCommand(producer, consumer);
-			return new Statement(command, List.of(), "pipeline: " + ctx.getText());
+			return new Statement(command, List.of(), "", "pipeline: " + ctx.getText());
 		}
 		throw new InternalBug(ctx);
 	}
@@ -126,7 +126,7 @@ public class Compiler {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		});
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
-		return new Statement(command, arguments, "simple: " + commandName);
+		return new Statement(command, arguments, commandName, "simple: " + commandName);
 	}
 
 	private Statement compileWrappedCommand(WrappedContext ctx) {
@@ -148,13 +148,13 @@ public class Compiler {
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		DefaultCommandWrapper<?> wrappedCommand = new DefaultCommandWrapper<>(nestedStatement, commandWrapper);
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
-		return new Statement(wrappedCommand, arguments, "wrapper: " + commandName);
+		return new Statement(wrappedCommand, arguments, commandName, "wrapper: " + ctx.getText());
 	}
 
 	private Statement compileLambda(LambdaContext ctx) {
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		String key = ctx.ID().getSymbol().getText();
-		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "lambda: " + ctx.getText());
+		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "", "lambda: " + ctx.getText());
 	}
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {
@@ -259,10 +259,13 @@ public class Compiler {
 
 		private final String location;
 
-		public Statement(Command command, List<Resolvable> arguments, String location) {
+		private final String details;
+
+		public Statement(Command command, List<Resolvable> arguments, String location, String details) {
 			this.command = command;
 			this.arguments = arguments;
 			this.location = location;
+			this.details = details;
 		}
 
 		public Command getCommand() {
@@ -274,13 +277,20 @@ public class Compiler {
 		}
 
 		/**
-		 * Describe command in a human readable form.
-		 *
-		 * @return a human readable description of the command
-		 * (e.g. 'ls' or '/usr/bin/cat')
+		 * Describe command in a human readable form: the main purpose is to automatically adding the location of an error.
+		 * <p>
+		 * For example, assuming the following pipeline "ls | cmd1 | cmd2",
+		 * if cmd1 is returning error, the error message will start with "cmd1".
 		 */
 		public String getLocation() {
 			return location;
+		}
+
+		/**
+		 * Used only for debugging purposes.
+		 */
+		public String getDetails() {
+			return details;
 		}
 	}
 

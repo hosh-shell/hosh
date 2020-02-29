@@ -104,7 +104,7 @@ public class Interpreter {
 		injector.injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
-		CommandExecution commandExecution = new CommandExecution(statement.getLocation(), resolvedArguments.toString());
+		CommandExecution commandExecution = new CommandExecution(statement.getDetails(), resolvedArguments.toString());
 		commandExecution.begin();
 		try {
 			return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
