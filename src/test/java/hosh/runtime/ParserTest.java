@@ -119,10 +119,7 @@ public class ParserTest {
 			"ls ${JAVA_HOME}/bin",
 			"ls ${JAVA_HOME}/${JVM_BINARY}",
 			"ls \"${JAVA_HOME}\"",
-			"ls \"${JAVA_HOME}/${JVM_BINARY}\"",
-			"walk . | glob '*'",
-			"walk . | glob '*.{jar,war}'",
-			"walk . | glob '*.[ch]'"
+			"ls \"${JAVA_HOME}/${JVM_BINARY}\""
 			);
 	}
 
@@ -159,7 +156,11 @@ public class ParserTest {
 			"cat file.txt | grep /regexp/ | wc -l",
 			"withTime { cat file.txt | grep /regexp/ | wc -l }",
 			"withTime { cat file.txt } | schema",
-			"withTime { cat file.txt | grep /regexp/ } | schema");
+			"withTime { cat file.txt | grep /regexp/ } | schema",
+			"walk . | glob '*'",
+			"walk . | glob '*.{jar,war}'", // regression test for #205
+			"walk . | glob '*.[ch]'"
+		);
 	}
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "accepted by parser but rejected by the compiler")
