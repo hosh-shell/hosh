@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- sign jar file with GPG when deploy on github
 
 ### Changed
 - `walk`: terminate as soon as first error is raised
