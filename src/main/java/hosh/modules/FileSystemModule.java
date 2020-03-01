@@ -310,7 +310,7 @@ public class FileSystemModule implements Module {
 			@Override
 			public FileVisitResult visitFileFailed(Path file, IOException exc) {
 				LOGGER.log(Level.SEVERE, "error while visiting: " + file, exc);
-				return FileVisitResult.CONTINUE;
+				return FileVisitResult.TERMINATE;
 			}
 
 			@Override
