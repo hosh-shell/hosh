@@ -28,10 +28,6 @@ OPEN_DQUOTE
 	: '"' -> pushMode(STRING)
 	;
 
-NEWLINE
-	: '\r'? '\n' -> skip
-	;
-
 ID
 	: I+
 	;
