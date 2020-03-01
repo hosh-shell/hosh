@@ -425,7 +425,8 @@
 		<profile>
 			<id>sonar</id>
 			<properties>
-				<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml
+				<sonar.coverage.jacoco.xmlReportPaths>
+					target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml
 				</sonar.coverage.jacoco.xmlReportPaths>
 				<sonar.exclusions>target/generated-sources/**</sonar.exclusions>
 			</properties>

@@ -28,9 +28,6 @@ import hosh.spi.Record;
 
 import java.util.Optional;
 
-/**
- * This is a special-case channel used in the REPL.
- */
 public class NullChannel implements InputChannel {
 
 	@Override
