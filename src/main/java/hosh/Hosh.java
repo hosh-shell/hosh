@@ -121,7 +121,7 @@ public class Hosh {
 
 		logger.info(() -> String.format("starting hosh %s", version));
 		ExitStatus exitStatus;
-		try (Terminal terminal = TerminalBuilder.builder().jansi(true).exec(false).build()) {
+		try (Terminal terminal = TerminalBuilder.builder().jansi(true).jna(false).exec(false).build()) {
 			exitStatus = run(terminal, version, logger, args);
 		}
 		System.exit(exitStatus.value());
