@@ -10,6 +10,7 @@ program
 
 stmt
 	: sequence terminator?
+	| terminator
 	;
 
 sequence
@@ -81,4 +82,5 @@ expansion
 
 terminator
 	: SEMICOLON
+	| NEWLINE
 	;

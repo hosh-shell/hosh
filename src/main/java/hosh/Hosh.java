@@ -77,8 +77,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Main class
@@ -202,8 +200,7 @@ public class Hosh {
 		return options;
 	}
 
-	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Injector injector, OutputChannel out, OutputChannel err,
-	                                 Logger logger) {
+	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Injector injector, OutputChannel out, OutputChannel err, Logger logger) {
 		try {
 			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);
@@ -217,10 +214,8 @@ public class Hosh {
 	}
 
 	private static String loadScript(Path path) {
-		try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-			return lines
-				       .map(line -> line.trim().endsWith("|") ? line : line + ";")
-				       .collect(Collectors.joining("\n"));
+		try {
+			return Files.readString(path, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new UncheckedIOException("unable to load: " + path, e);
 		}

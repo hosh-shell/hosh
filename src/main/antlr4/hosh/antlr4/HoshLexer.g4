@@ -56,8 +56,14 @@ COMMENT
 	:  '#' ~('\r' | '\n')* -> skip
 	;
 
+NEWLINE
+	: '\n'
+	| '\n\r'
+	| '\r'
+	;
+
 WS
-	: [ \t\n\r]+ -> skip
+	: [ \t]+ -> skip
 	;
 
 mode LITERAL_STRING;
