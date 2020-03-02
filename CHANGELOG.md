@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - `walk`: terminate as soon as first error is raised
+- removing automatic semicolon insertion
 
 ### Fixed
 

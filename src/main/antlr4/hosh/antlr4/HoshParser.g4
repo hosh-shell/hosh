@@ -5,15 +5,15 @@ options {
 }
 
 program
-	: ( stmt )* EOF
+	: ( stmt | NEWLINE )* EOF
 	;
 
 stmt
-	: sequence terminator?
+	: sequence SEMICOLON?
 	;
 
 sequence
-	: pipeline terminator sequence
+	: pipeline SEMICOLON sequence
 	| pipeline
 	;
 
@@ -77,8 +77,4 @@ dqpart
 expansion
 	: VARIABLE
 	| VARIABLE_OR_FALLBACK
-	;
-
-terminator
-	: SEMICOLON
 	;

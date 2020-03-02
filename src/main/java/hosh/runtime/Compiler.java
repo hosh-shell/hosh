@@ -62,15 +62,18 @@ public class Compiler {
 		Parser parser = new Parser();
 		ProgramContext programContext = parser.parse(input);
 		List<Statement> statements = new ArrayList<>();
-		for (StmtContext stmtContext : programContext.stmt()) {
-			Statement statement = compileStatement(stmtContext);
+		for (StmtContext ctx : programContext.stmt()) {
+			Statement statement = compileStatement(ctx);
 			statements.add(statement);
 		}
 		return new Program(statements);
 	}
 
 	private Statement compileStatement(StmtContext ctx) {
-		return compileSequence(ctx.sequence());
+		if (ctx.sequence() != null) {
+			return compileSequence(ctx.sequence());
+		}
+		throw new InternalBug(ctx);
 	}
 
 	private Statement compileSequence(SequenceContext ctx) {
@@ -183,11 +186,11 @@ public class Compiler {
 	private Resolvable compileString(StringContext ctx) {
 		if (ctx.sqstring() != null) {
 			return compileSingleQuotedString(ctx.sqstring());
-		} else if (ctx.dqstring() != null) {
-			return compileDoubleQuotedString(ctx.dqstring());
-		} else {
-			throw new Compiler.InternalBug(ctx);
 		}
+		if (ctx.dqstring() != null) {
+			return compileDoubleQuotedString(ctx.dqstring());
+		}
+		throw new InternalBug(ctx);
 	}
 
 	private Resolvable compileDoubleQuotedString(DqstringContext ctx) {
@@ -204,7 +207,7 @@ public class Compiler {
 				String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
 				result.add(new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]));
 			} else {
-				throw new Compiler.InternalBug(ctx);
+				throw new InternalBug(ctx);
 			}
 		}
 		return new Composite(result);
@@ -384,4 +387,5 @@ public class Compiler {
 			super("internal bug in compiler near: " + parseTree.getText());
 		}
 	}
+
 }

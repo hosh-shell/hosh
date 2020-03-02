@@ -20,6 +20,12 @@ SEMICOLON
 	: ';'
 	;
 
+NEWLINE
+	: '\n'
+	| '\n\r'
+	| '\r'
+	;
+
 OPEN_SQUOTE
 	: '\'' -> pushMode(LITERAL_STRING)
 	;
@@ -57,7 +63,7 @@ COMMENT
 	;
 
 WS
-	: [ \t\n\r]+ -> skip
+	: [ \t]+ -> skip
 	;
 
 mode LITERAL_STRING;

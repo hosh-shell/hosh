@@ -1,4 +1,2 @@
-rand |
-  drop 100 |
-  take 100 |
-  count
+# expected outcome: 100
+rand | drop 100 | take 100 | count

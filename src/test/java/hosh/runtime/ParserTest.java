@@ -107,7 +107,7 @@ public class ParserTest {
 			"withTime { git push ; clear }",
 			"withTime { git push ; clear; }",
 			"withLock /tmp/push.lock { git push }",
-			"withLock /tmp/push.lock { git push\n git push --tags\n }",
+			"withLock /tmp/push.lock { git push; git push --tags }",
 			"withTime { withLock /tmp/push.lock { git push } }",
 			"cd C:\\Users\\VSSADM~1\\AppData\\Local\\Temp\\junit16864313966026428034",
 			"regex line '\\w+'",
