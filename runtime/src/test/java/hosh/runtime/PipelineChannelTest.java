@@ -46,7 +46,7 @@ class PipelineChannelTest {
 	final WithThread withThread = new WithThread();
 
 	@RegisterExtension
-	final WithExecutor withExecutor = new WithExecutor(Executors.newFixedThreadPool(2));
+	public final WithExecutor withExecutor = new WithExecutor(Executors.newUnboundedExecutor(Thread.builder().virtual().factory()));
 
 	@Mock(stubOnly = true)
 	Record record;
