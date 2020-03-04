@@ -45,7 +45,8 @@ public class ArchitectureFitnessTest {
 
 	@ArchTest
 	public final ArchRule noCycles =
-		slices().matching(Hosh.class.getPackageName()).should().beFreeOfCycles();
+		slices().matching(Hosh.class.getPackageName())
+			.should().beFreeOfCycles();
 
 	@ArchTest
 	public final ArchRule modulesCanUseSpi =
