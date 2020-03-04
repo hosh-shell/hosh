@@ -22,8 +22,7 @@ SEMICOLON
 
 NEWLINE
 	: '\n'
-	| '\n\r'
-	| '\r'
+	| '\r\n'
 	;
 
 OPEN_SQUOTE
