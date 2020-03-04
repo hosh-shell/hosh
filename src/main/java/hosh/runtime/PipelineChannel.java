@@ -34,7 +34,7 @@ import hosh.spi.Values;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Logger;
 
 public class PipelineChannel implements InputChannel, OutputChannel {
@@ -43,12 +43,12 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 
 	private final Record poisonPill = Records.singleton(Keys.of("poisonpill"), Values.none());
 
-	private final LinkedTransferQueue<Record> queue;
+	private final SynchronousQueue<Record> queue;
 
 	private volatile boolean done;
 
 	public PipelineChannel() {
-		queue = new LinkedTransferQueue<>();
+		queue = new SynchronousQueue<>();
 		done = false;
 	}
 
@@ -72,12 +72,12 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 
 	@Override
 	public void send(Record record) {
+		LOGGER.finer("sending record");
 		if (done) {
 			throw new ProducerPoisonPill();
 		}
-		LOGGER.finer("sending record");
 		try {
-			queue.transfer(record);
+			queue.put(record);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
