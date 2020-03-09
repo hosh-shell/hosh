@@ -1,3 +1,11 @@
+import hosh.modules.FileSystemModule;
+import hosh.modules.HistoryModule;
+import hosh.modules.NetworkModule;
+import hosh.modules.SystemModule;
+import hosh.modules.TerminalModule;
+import hosh.modules.TextModule;
+import hosh.spi.Module;
+
 /*
  * MIT License
  *
@@ -39,4 +47,9 @@ module hosh {
 	opens hosh.runtime;
 	opens hosh.spi;
 	opens hosh.modules;
+
+	// workaround for running tests in idea
+	uses Module;
+	provides Module
+	with FileSystemModule, HistoryModule, NetworkModule, SystemModule, TerminalModule, TextModule;
 }
