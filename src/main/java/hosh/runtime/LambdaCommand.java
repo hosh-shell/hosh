@@ -31,13 +31,16 @@ import hosh.spi.Key;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
+import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Value;
+import hosh.spi.Values;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class LambdaCommand implements Command, InterpreterAware, StateAware {
 
@@ -66,7 +69,12 @@ public class LambdaCommand implements Command, InterpreterAware, StateAware {
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		Key internedKey = Keys.of(key);
 		for (Record record : InputChannel.iterate(in)) {
-			Value value = record.value(internedKey).orElseThrow(IllegalArgumentException::new);
+			Optional<Value> lambdaParameter = record.value(internedKey);
+			if (lambdaParameter.isEmpty()) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText(String.format("missing key '%s'", key))));
+				return ExitStatus.error();
+			}
+			Value value = lambdaParameter.orElseThrow(IllegalArgumentException::new);
 			Map<String, String> original = state.getVariables();
 			Map<String, String> modified = new HashMap<>(original);
 			modified.put(key, value.unwrap(String.class).orElse("unwrap failed"));

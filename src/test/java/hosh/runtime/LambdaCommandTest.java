@@ -57,13 +57,13 @@ public class LambdaCommandTest {
 	@Mock(stubOnly = true)
 	private Compiler.Statement statement;
 
-	@Mock(stubOnly = true)
+	@Mock
 	private InputChannel in;
 
-	@Mock(stubOnly = true)
+	@Mock
 	private OutputChannel out;
 
-	@Mock(stubOnly = true)
+	@Mock
 	private OutputChannel err;
 
 	@Mock
@@ -80,7 +80,7 @@ public class LambdaCommandTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void success() {
+	public void presentKeyWithInnerCommandSuccess() {
 		Map<String, String> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.success());
@@ -90,11 +90,14 @@ public class LambdaCommandTest {
 		assertThat(variables).isEmpty();
 		then(state).should().setVariables(Collections.singletonMap("path", "file"));
 		then(state).should().setVariables(variables);
+		then(in).shouldHaveNoMoreInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void error() {
+	public void presentKeyWithInnerCommandError() {
 		Map<String, String> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.error());
@@ -102,7 +105,25 @@ public class LambdaCommandTest {
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
 		assertThat(variables).isEmpty();
+		then(state).should().setVariables(Collections.singletonMap("path", "file"));
 		then(state).should().setVariables(variables);
+		then(in).shouldHaveNoMoreInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void missingKey() {
+		Map<String, String> variables = new HashMap<>();
+		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.TEXT, Values.ofPath(Path.of("file")))), Optional.empty());
+		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		assertThat(exitStatus).isError();
+		assertThat(variables).isEmpty();
+		then(state).shouldHaveNoInteractions();
+		then(in).shouldHaveNoMoreInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("missing key 'path'")));
 	}
 
 }

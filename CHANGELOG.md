@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - removing automatic semicolon insertion
 
 ### Fixed
+- improved error handling of lambda
 
 ## [0.0.38] - 2020-02-29
 
