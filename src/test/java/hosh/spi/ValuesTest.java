@@ -260,6 +260,15 @@ public class ValuesTest {
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("cannot compare Numeric[42] to Text[2]");
 		}
+
+		@Test
+		public void unwrap() {
+			Value value = Values.ofNumeric(42);
+			assertThat(value.unwrap(Integer.class)).isEmpty();
+			assertThat(value.unwrap(Long.class)).isPresent().contains(42L);
+			assertThat(value.unwrap(String.class)).isPresent().contains("42");
+		}
+
 	}
 
 	@Nested

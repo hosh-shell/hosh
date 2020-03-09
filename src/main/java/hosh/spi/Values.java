@@ -275,6 +275,9 @@ public class Values {
 			if (type == String.class) {
 				return (Optional<T>) Optional.of(Long.toString(number));
 			}
+			if (type == Long.class) {
+				return (Optional<T>) Optional.of(number);
+			}
 			return Optional.empty();
 		}
 	}
