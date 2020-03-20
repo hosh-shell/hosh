@@ -50,6 +50,8 @@ public class Supervisor implements AutoCloseable {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
+	private static final Signal INT = new Signal("INT");
+
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 
 	private final List<Future<ExitStatus>> futures = new ArrayList<>();
@@ -107,14 +109,14 @@ public class Supervisor implements AutoCloseable {
 	private void restoreDefaultSigintHandler() {
 		if (handleSignals) {
 			LOGGER.fine("restoring default INT signal handler");
-			jdk.internal.misc.Signal.handle(new jdk.internal.misc.Signal("INT"), Signal.Handler.SIG_DFL);
+			jdk.internal.misc.Signal.handle(INT, Signal.Handler.SIG_DFL);
 		}
 	}
 
 	private void cancelFuturesOnSigint() {
 		if (handleSignals) {
 			LOGGER.fine("register INT signal handler");
-			jdk.internal.misc.Signal.handle(new jdk.internal.misc.Signal("INT"), sig -> {
+			jdk.internal.misc.Signal.handle(INT, sig -> {
 				LOGGER.info("got INT signal");
 				futures.forEach(future -> {
 					LOGGER.finer(() -> String.format("cancelling future %s", future));
