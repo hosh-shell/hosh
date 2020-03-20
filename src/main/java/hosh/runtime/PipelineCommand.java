@@ -148,7 +148,6 @@ class PipelineCommand implements Command, InterpreterAware {
 	private void stopProducer(InputChannel in) {
 		Downcast.of(in, PipelineChannel.class).ifPresent(pipeIn -> {
 			pipeIn.stopProducer();
-			pipeIn.consumeAnyRemainingRecord();
 		});
 	}
 }

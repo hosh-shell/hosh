@@ -31,8 +31,6 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
@@ -98,13 +96,6 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 		if (!done) {
 			send(poisonPill);
 		}
-	}
-
-	public void consumeAnyRemainingRecord() {
-		LOGGER.finer("consuming remaining records");
-		List<Record> consumer = new ArrayList<>();
-		queue.drainTo(consumer);
-		LOGGER.finer("done consuming remaining records");
 	}
 
 	// Since send() is a void method an exception is needed
