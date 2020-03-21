@@ -114,7 +114,9 @@ public class Interpreter {
 	}
 
 	private void injectInterpreter(Command command) {
-		Downcast.of(command, InterpreterAware.class).ifPresent(cmd -> cmd.setInterpreter(this));
+		if (command instanceof InterpreterAware) {
+			((InterpreterAware) command).setInterpreter(this);
+		}
 	}
 
 	private void changeCurrentThreadName(String commandName, List<String> resolvedArguments) {

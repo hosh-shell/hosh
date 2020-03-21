@@ -48,10 +48,18 @@ public class Injector {
 	private Terminal terminal;
 
 	public void injectDeps(Command command) {
-		Downcast.of(command, HistoryAware.class).ifPresent(cmd -> cmd.setHistory(history));
-		Downcast.of(command, LineReaderAware.class).ifPresent(cmd -> cmd.setLineReader(lineReader));
-		Downcast.of(command, StateAware.class).ifPresent(cmd -> cmd.setState(state));
-		Downcast.of(command, TerminalAware.class).ifPresent(cmd -> cmd.setTerminal(terminal));
+		if (command instanceof HistoryAware) {
+			((HistoryAware) command).setHistory(history);
+		}
+		if (command instanceof LineReaderAware) {
+			((LineReaderAware) command).setLineReader(lineReader);
+		}
+		if (command instanceof StateAware) {
+			((StateAware) command).setState(state);
+		}
+		if (command instanceof TerminalAware) {
+			((TerminalAware) command).setTerminal(terminal);
+		}
 	}
 
 	public void setHistory(History history) {
@@ -69,4 +77,5 @@ public class Injector {
 	public void setTerminal(Terminal terminal) {
 		this.terminal = terminal;
 	}
+
 }

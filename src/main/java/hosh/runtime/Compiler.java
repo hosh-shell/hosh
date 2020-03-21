@@ -125,9 +125,9 @@ public class Compiler {
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
 			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
-		Downcast.of(command, CommandWrapper.class).ifPresent(cmd -> {
+		if (command instanceof CommandWrapper) {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
-		});
+		}
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
 		return new Statement(command, arguments, commandName, "simple: " + commandName);
 	}
@@ -142,8 +142,10 @@ public class Compiler {
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
 			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
-		CommandWrapper<?> commandWrapper = Downcast.of(command, CommandWrapper.class)
-			                                   .orElseThrow(() -> new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName)));
+		if (!(command instanceof CommandWrapper)) {
+			throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));
+		}
+		CommandWrapper<?> commandWrapper = (CommandWrapper<?>) command;
 		if (ctx.stmt() == null) {
 			int line = ctx.start.getLine();
 			throw new CompileError(String.format("line %d: '%s' with empty wrapping statement", line, commandName));
