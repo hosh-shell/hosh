@@ -421,15 +421,15 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Description("create a runtime error, mostly for testing purposes")
+	@Description("create a runtime error (exception), mostly for testing purposes")
 	@Examples({
-		@Example(command = "lines file.txt | err", description = "inject an error in this pipeline")
+		@Example(command = "lines file.txt | err", description = "the pipeline will fail")
 	})
 	public static class Err implements Command {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			throw new NullPointerException("injected error: please do not report");
+			throw new NullPointerException("please do not report: this is a simulated error");
 		}
 	}
 

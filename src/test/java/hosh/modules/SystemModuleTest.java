@@ -551,8 +551,13 @@ public class SystemModuleTest {
 		@Test
 		public void noArgs() {
 			assertThatThrownBy(() -> sut.run(List.of(), in, out, err))
-				.hasMessage("injected error: please do not report")
-				.isInstanceOf(NullPointerException.class);
+				.hasMessage("please do not report: this is a simulated error")
+				.isInstanceOf(NullPointerException.class)
+				.satisfies(e -> {
+					then(in).shouldHaveNoInteractions();
+					then(out).shouldHaveNoInteractions();
+					then(err).shouldHaveNoInteractions();
+				});
 		}
 	}
 

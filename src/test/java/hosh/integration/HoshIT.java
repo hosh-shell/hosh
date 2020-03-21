@@ -296,7 +296,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).contains("err injected error: please do not report");
+		assertThat(output).contains("please do not report");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
@@ -308,7 +308,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).contains("injected error: please do not report");
+		assertThat(output).contains("please do not report");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
@@ -320,7 +320,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).contains("injected error: please do not report");
+		assertThat(output).contains("please do not report");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
@@ -332,7 +332,7 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		boolean success = hosh.waitFor(1, TimeUnit.SECONDS);
-		assertThat(output).contains("injected error: please do not report");
+		assertThat(output).contains("please do not report");
 		assertThat(success).isTrue(); // no timeout
 	}
 
