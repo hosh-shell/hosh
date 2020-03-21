@@ -26,8 +26,7 @@ package hosh.spi;
 import java.util.ServiceLoader;
 
 /**
- * Marker interface for {@link ServiceLoader}: any inner class implementing
- * {@link Command} will be automatically registered.
+ * Marker interface for {@link ServiceLoader}.
  */
 public interface Module {
 
