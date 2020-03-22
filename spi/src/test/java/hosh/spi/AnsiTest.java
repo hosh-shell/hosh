@@ -49,4 +49,13 @@ public class AnsiTest {
 		Ansi.Style.FG_RED.disable(pw);
 		assertThat(out).hasToString("\u001b[31m\u001b[39m");
 	}
+
+	@Test
+	public void drop() {
+		assertThat(Ansi.drop("")).isEqualTo("");
+		assertThat(Ansi.drop("aaa")).isEqualTo("aaa");
+		assertThat(Ansi.drop("\u001b[31m\u001b[39m")).isEmpty();
+		assertThat(Ansi.drop("\u001b[31maaa\u001b[39m")).isEqualTo("aaa");
+
+	}
 }

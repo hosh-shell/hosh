@@ -803,14 +803,24 @@ public class TextModule implements Module {
 			Map<Key, Integer> result = new HashMap<>();
 			for (Record record : records) {
 				for (Record.Entry entry : record.entries()) {
-					StringWriter writer = new StringWriter();
-					PrintWriter printWriter = new PrintWriter(writer);
-					entry.getValue().print(printWriter, Locale.getDefault());
-					int length = writer.toString().length() + 1;
+					String value = toString(entry);
+					int length = lengthFor(value);
 					result.compute(entry.getKey(), (k, v) -> v == null ? length : Math.max(v, length));
 				}
 			}
+			System.out.println(result);
 			return result;
+		}
+
+		private String toString(Entry entry) {
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			entry.getValue().print(printWriter, Locale.getDefault());
+			return writer.toString();
+		}
+
+		private int lengthFor(String value) {
+			return Ansi.drop(value).length() + 1;
 		}
 
 		private List<Record> accumulate(InputChannel in) {

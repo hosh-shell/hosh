@@ -30,6 +30,10 @@ public class Ansi {
 	private Ansi() {
 	}
 
+	public static String drop(String maybeAnsi) {
+		return maybeAnsi.replaceAll("\u001b\\[[0-9]+m", "");
+	}
+
 	public enum Style {
 		// special
 		NONE("", ""),
