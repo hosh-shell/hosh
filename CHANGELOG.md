@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - sign jar file with GPG when deploy on github
+- `ls`: adding mtime, atime and ctime
 
 ### Changed
 - introducing Java modules
