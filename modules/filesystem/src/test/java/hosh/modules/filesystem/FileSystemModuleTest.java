@@ -25,7 +25,6 @@ package hosh.modules.filesystem;
 
 import hosh.doc.Bug;
 import hosh.modules.filesystem.FileSystemModule.WithLock.LockResource;
-import hosh.spi.Ansi;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -120,7 +119,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
 				RecordMatcher.of(
-					Keys.PATH, Values.withStyle(Values.ofPath(Paths.get("dir")), Ansi.Style.FG_CYAN),
+					Keys.PATH, Values.ofPath(Paths.get("dir")),
 					Keys.SIZE, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
@@ -133,7 +132,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.withStyle(Values.ofPath(Paths.get("file")), Ansi.Style.NONE),
+				Keys.PATH, Values.ofPath(Paths.get("file")),
 				Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
 		}
@@ -147,10 +146,10 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.withStyle(Values.ofPath(Paths.get("file")), Ansi.Style.NONE),
+				Keys.PATH, Values.ofPath(Paths.get("file")),
 				Keys.SIZE, Values.ofSize(0)));
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.withStyle(Values.ofPath(Paths.get("link")), Ansi.Style.FG_MAGENTA),
+				Keys.PATH, Values.ofPath(Paths.get("link")),
 				Keys.SIZE, Values.none()));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -198,7 +197,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.withStyle(Values.ofPath(Paths.get("aaa")), Ansi.Style.NONE),
+				Keys.PATH, Values.ofPath(Paths.get("aaa")),
 				Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -224,7 +223,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.withStyle(Values.ofPath(Paths.get("aaa")), Ansi.Style.NONE),
+				Keys.PATH, Values.ofPath(Paths.get("aaa")),
 				Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -237,7 +236,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.withStyle(Values.ofPath(Paths.get("aaa")), Ansi.Style.NONE),
+				Keys.PATH, Values.ofPath(Paths.get("aaa")),
 				Keys.SIZE, Values.ofSize(0)));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -252,7 +251,7 @@ public class FileSystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
 				RecordMatcher.of(
-					Keys.PATH, Values.withStyle(Values.ofPath(Path.of("aaa")), Ansi.Style.FG_CYAN),
+					Keys.PATH, Values.ofPath(Path.of("aaa")),
 					Keys.SIZE, Values.none()));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();

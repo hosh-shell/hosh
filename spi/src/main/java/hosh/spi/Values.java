@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
@@ -399,7 +400,7 @@ public class Values {
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			printWriter.append(instant.toString());
+			printWriter.append(instant.truncatedTo(ChronoUnit.SECONDS).toString());
 		}
 
 		@Override

@@ -23,6 +23,7 @@
  */
 package hosh.spi;
 
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 
 /**
@@ -98,9 +99,25 @@ public class Keys {
 	public static final Key DURATION = Keys.of("duration");
 
 	/**
-	 * Denotes an instant value (i.e. java.time.Instant).
+	 * Denotes a generic instant value (i.e. java.time.Instant).
 	 */
 	public static final Key TIMESTAMP = Keys.of("timestamp");
+
+	/**
+	 * Last modification time of a file (see {@link BasicFileAttributes#lastModifiedTime()}.
+ 	 */
+	public static final Key MODIFIED = Keys.of("modified");
+
+	/**
+	 * Last access time of a file (see {@link BasicFileAttributes#lastAccessTime()}.
+	 */
+	public static final Key ACCESSED = Keys.of("accessed");
+
+	/**
+	 * Creation time of a file (see {@link BasicFileAttributes#creationTime()}.
+	 */
+	public static final Key CREATED = Keys.of("created");
+
 
 	private Keys() {
 	}

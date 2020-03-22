@@ -29,7 +29,6 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
-import hosh.spi.Ansi;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
 import hosh.spi.CommandWrapper;
@@ -102,7 +101,7 @@ public class FileSystemModule implements Module {
 		@Example(command = "ls /tmp", description = "list specified absolute directory"),
 		@Example(command = "ls directory", description = "list relative directory")
 	})
-	@Todo(description = "add support for mtime, atime, ctime, uid, gid, etc")
+	@Todo(description = "add support for uid, gid, permissions")
 	public static class ListFiles implements Command, StateAware {
 
 		private State state;
@@ -130,8 +129,11 @@ public class FileSystemModule implements Module {
 					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 					Value size = attributes.isRegularFile() ? Values.ofSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
-						               .entry(Keys.PATH, Values.withStyle(Values.ofPath(path.getFileName()), colorFor(attributes)))
+						               .entry(Keys.PATH, Values.ofPath(path.getFileName()))
 						               .entry(Keys.SIZE, size)
+						               .entry(Keys.CREATED, Values.ofInstant(attributes.creationTime().toInstant()))
+						               .entry(Keys.MODIFIED, Values.ofInstant(attributes.lastModifiedTime().toInstant()))
+						               .entry(Keys.ACCESSED, Values.ofInstant(attributes.lastAccessTime().toInstant()))
 						               .build();
 					out.send(entry);
 				}
@@ -145,19 +147,6 @@ public class FileSystemModule implements Module {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
-		}
-
-		private Ansi.Style colorFor(BasicFileAttributes attributes) {
-			if (attributes.isDirectory()) {
-				return Ansi.Style.FG_CYAN;
-			}
-			if (attributes.isSymbolicLink()) {
-				return Ansi.Style.FG_MAGENTA;
-			}
-			if (attributes.isOther()) {
-				return Ansi.Style.FG_YELLOW;
-			}
-			return Ansi.Style.NONE;
 		}
 	}
 

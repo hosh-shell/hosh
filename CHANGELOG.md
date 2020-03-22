@@ -15,17 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `max`, `min`: calculate max and min value, works for any value (e.g. timestamp, numeric, strings)
 - `sum`: supports size and numeric values
 - `confirm`: ask a question and wait for user confirmation
+- `ls`: adding creation, modification and last access time
+- `ls`: removing ANSI coloring
+    (to be reimplemented later)
 
 ### Changed
 - changed `groupId` in maven
    dfa1 -> `hosh`
 - `http`: integration tests (https://postman-echo.com)
 - `sort`: consistent order of arguments
-    `key` is mandatory and always in first position 
+    `key` is mandatory and always in first position
     `asc`, `desc` are optional and always in second position
 
 ### Fixed
-- `probe`: fix exit status when content type cannot be determined 
+- `probe`: fix exit status when content type cannot be determined
 - minor fixes
    ignoring UAC errors in test on windows
    stability of integration tests

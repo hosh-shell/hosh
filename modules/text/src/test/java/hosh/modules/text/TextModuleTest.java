@@ -1573,7 +1573,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void zeroArgs() {
+		public void nonZeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
