@@ -118,12 +118,11 @@ public class Keys {
 	 */
 	public static final Key CREATED = Keys.of("created");
 
-
-	private Keys() {
-	}
-
 	public static Key of(String key) {
 		return new StringKey(key);
+	}
+
+	private Keys() {
 	}
 
 	static final class StringKey implements Key {

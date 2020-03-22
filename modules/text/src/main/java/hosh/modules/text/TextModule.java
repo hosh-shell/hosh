@@ -831,6 +831,9 @@ public class TextModule implements Module {
 			Keys.PATH, 30,
 			Keys.SIZE, 10,
 			Keys.TIMESTAMP, 30,
+			Keys.CTIME, 22,
+			Keys.MTIME, 22,
+			Keys.ATIME, 22,
 			Keys.of("hwaddress"), 20);
 	}
 }
