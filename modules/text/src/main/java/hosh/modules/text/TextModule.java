@@ -767,14 +767,12 @@ public class TextModule implements Module {
 
 	}
 
+	@Experimental(description = "this is just a proof of concept")
 	@Description("create a nicely formatted table with keys a columns")
 	@Examples({
 		@Example(command = "rand | enumerate | take 3 | table", description = "output a nicely formatted table")
 	})
-	@Experimental(description = "this is just a proof of concept", issue = "https://github.com/dfa1/hosh/issues/139")
 	public static class Table implements Command {
-
-		private int i = 0;
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
@@ -782,18 +780,48 @@ public class TextModule implements Module {
 				err.send(Errors.usage("table"));
 				return ExitStatus.error();
 			}
-			boolean headerSent = false;
-			for (Record record : InputChannel.iterate(in)) {
-				if (!headerSent) {
-					sendHeader(record.keys(), out);
-					headerSent = true;
-				}
-				sendRow(record, out);
-			}
+			List<Record> records = accumulate(in);
+			Map<Key, Integer> paddings = calculatePaddings(records);
+			outputTable(out, records, paddings);
 			return ExitStatus.success();
 		}
 
-		private void sendRow(Record record, OutputChannel out) {
+		private void outputTable(OutputChannel out, List<Record> records, Map<Key, Integer> paddings) {
+			boolean headerSent = false;
+			int i = 0;
+			for (Record record : records) {
+				if (!headerSent) {
+					sendHeader(paddings, record.keys(), out);
+					headerSent = true;
+				}
+				sendRow(i, paddings, record, out);
+				i += 1;
+			}
+		}
+
+		private Map<Key, Integer> calculatePaddings(List<Record> records) {
+			Map<Key, Integer> result = new HashMap<>();
+			for (Record record : records) {
+				for (Record.Entry entry : record.entries()) {
+					StringWriter writer = new StringWriter();
+					PrintWriter printWriter = new PrintWriter(writer);
+					entry.getValue().print(printWriter, Locale.getDefault());
+					int length = writer.toString().length() + 1;
+					result.compute(entry.getKey(), (k, v) -> v == null ? length : Math.max(v, length));
+				}
+			}
+			return result;
+		}
+
+		private List<Record> accumulate(InputChannel in) {
+			List<Record> records = new LinkedList<>();
+			for (Record record : InputChannel.iterate(in)) {
+				records.add(record);
+			}
+			return records;
+		}
+
+		private void sendRow(int i, Map<Key, Integer> paddings, Record record, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			StringBuilder formatter = new StringBuilder();
 			Collection<Record.Entry> entries = record.entries();
@@ -801,39 +829,30 @@ public class TextModule implements Module {
 			for (Record.Entry entry : entries) {
 				StringWriter writer = new StringWriter();
 				PrintWriter printWriter = new PrintWriter(writer);
-				formatter.append(formatterFor(entry.getKey()));
+				formatter.append(formatterFor(paddings.get(entry.getKey())));
 				entry.getValue().print(printWriter, locale);
 				formattedValues.add(writer.toString());
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
-			out.send(Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText(row), alternateColor())));
+			out.send(Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText(row), alternateColor(i))));
 		}
 
-		private Style alternateColor() {
-			return ++i % 2 == 0 ? Ansi.Style.BG_WHITE : Ansi.Style.BG_BLUE;
+		private Style alternateColor(int i) {
+			return i % 2 == 0 ? Ansi.Style.BG_WHITE : Ansi.Style.BG_BLUE;
 		}
 
-		private String formatterFor(Key key) {
-			return String.format("%%-%ds", paddings.getOrDefault(key, 10));
+		private String formatterFor(int length) {
+			return String.format("%%-%ds", length);
 		}
 
-		private void sendHeader(Collection<Key> keys, OutputChannel out) {
+		private void sendHeader(Map<Key, Integer> paddings, Collection<Key> keys, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			String format = keys.stream()
+				.map(paddings::get)
 				.map(this::formatterFor)
 				.collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
 			out.send(Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText(header), Ansi.Style.FG_CYAN)));
 		}
-
-		private final Map<Key, Integer> paddings = Map.of(
-			Keys.NAME, 30,
-			Keys.PATH, 30,
-			Keys.SIZE, 10,
-			Keys.TIMESTAMP, 30,
-			Keys.CTIME, 22,
-			Keys.MTIME, 22,
-			Keys.ATIME, 22,
-			Keys.of("hwaddress"), 20);
 	}
 }
