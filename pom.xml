@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal-jansi</artifactId>
-			<version>3.14.0</version>
+			<version>3.14.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
