@@ -557,11 +557,12 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Random random = ThreadLocalRandom.current();
-			while (true) {
+			while (!Thread.interrupted()) {
 				long next = random.nextLong();
 				Record of = Records.singleton(Keys.RAND, Values.ofNumeric(next));
 				out.send(of);
 			}
+			return ExitStatus.success();
 		}
 	}
 

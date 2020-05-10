@@ -49,9 +49,11 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 import hosh.testsupport.RecordMatcher;
+import hosh.testsupport.WithThread;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -71,6 +73,46 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 public class TextModuleTest {
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class RandTest {
+
+		@RegisterExtension
+		public final WithThread withThread = new WithThread();
+
+		@Mock
+		private InputChannel in;
+
+		@Mock
+		private OutputChannel out;
+
+		@Mock
+		private OutputChannel err;
+
+		@InjectMocks
+		private TextModule.Rand sut;
+
+		@Test // not a very good test, just checking if rand can be interrupted
+		public void interrupt() {
+			withThread.interrupt();
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		public void oneArg() {
+			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+		}
+
+	}
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
@@ -379,10 +421,10 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(Records.builder()
-				                        .entry(Keys.of("1"), Values.ofText("a"))
-				                        .entry(Keys.of("2"), Values.ofText("b"))
-				                        .entry(Keys.of("3"), Values.ofText("c"))
-				                        .build());
+					.entry(Keys.of("1"), Values.ofText("a"))
+					.entry(Keys.of("2"), Values.ofText("b"))
+					.entry(Keys.of("3"), Values.ofText("c"))
+					.build());
 			then(err).shouldHaveNoInteractions();
 		}
 	}
@@ -637,10 +679,10 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(
-				Records.builder()
-					.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
-					.entry(Keys.TEXT, Values.ofText("some data"))
-					.build());
+					Records.builder()
+							.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
+							.entry(Keys.TEXT, Values.ofText("some data"))
+							.build());
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -1165,8 +1207,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.of("header"),Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         whatever  "), Ansi.Style.BG_BLUE)));
+					Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
+					Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         whatever  "), Ansi.Style.BG_BLUE)));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1180,8 +1222,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(Mockito.times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          whatever  "), Ansi.Style.BG_BLUE)));
+					Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
+					Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          whatever  "), Ansi.Style.BG_BLUE)));
 		}
 
 		@Test
