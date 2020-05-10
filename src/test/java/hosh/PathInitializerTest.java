@@ -50,7 +50,7 @@ public class PathInitializerTest {
 	}
 
 	@Test
-	public void emptyEmptyVariable() {
+	public void emptyVariable() {
 		List<Path> path = sut.initializePath("");
 		assertThat(path).isEmpty();
 	}
