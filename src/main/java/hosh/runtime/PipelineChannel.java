@@ -103,5 +103,11 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 	public static class ProducerPoisonPill extends RuntimeException {
 
 		private static final long serialVersionUID = 1L;
+
+		@Override
+		public synchronized Throwable fillInStackTrace() {
+			// this is really control-flow exception, no need for stacktrace
+			return this;
+		}
 	}
 }
