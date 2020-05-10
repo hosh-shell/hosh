@@ -149,11 +149,7 @@ class PipelineCommand implements Command, InterpreterAware {
 	private void stopConsumer(OutputChannel out) {
 		if (out instanceof PipelineChannel) {
 			PipelineChannel pipelineChannel = (PipelineChannel) out;
-			try {
-				pipelineChannel.stopConsumer();
-			} catch (ProducerPoisonPill e) {
-				// ignore, since this is a cleanup action channel could be already closed
-			}
+			pipelineChannel.stopConsumer();
 		}
 	}
 

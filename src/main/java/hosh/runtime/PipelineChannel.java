@@ -58,7 +58,6 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 			Record record = queue.take();
 			if (record == poisonPill) {
 				LOGGER.finer("got poison pill");
-				done = true;
 				return Optional.empty();
 			}
 			LOGGER.finer("got record");
@@ -81,6 +80,7 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 				if (transferred) {
 					return;
 				}
+				LOGGER.finer("send failed, retry...");
 			} while (queue.hasWaitingConsumer());
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -88,14 +88,14 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 	}
 
 	public void stopProducer() {
-		done = true;
 		LOGGER.fine("producer stop requested");
+		done = true;
 	}
 
 	public void stopConsumer() {
-		if (!done) {
-			send(poisonPill);
-		}
+		LOGGER.fine("consumer stop requested");
+		done = true;
+		queue.add(poisonPill);
 	}
 
 	// Since send() is a void method an exception is needed
