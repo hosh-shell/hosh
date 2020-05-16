@@ -53,7 +53,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-class ExternalCommand implements Command, StateAware {
+public class ExternalCommand implements Command, StateAware {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 

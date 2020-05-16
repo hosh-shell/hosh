@@ -24,8 +24,8 @@
 package hosh.runtime;
 
 /**
- * Marker interface for special commands like 'PipelineCommand' or
- * 'DefaultCommandWrapper'.
+ * Marker interface for special commands like @see {@link PipelineCommand} or
+ * {@link DefaultCommandWrapper}.
  * <p>
  * This is an implementation detail and should be never exposed to the outside
  * (spi or modules).

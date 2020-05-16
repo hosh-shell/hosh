@@ -30,6 +30,9 @@ import org.jline.reader.Candidate;
  */
 public class Candidates {
 
+	private Candidates() {
+	}
+
 	public static Candidate incomplete(String value) {
 		return new Candidate(value, value, null, null, null, null, false);
 	}
@@ -42,6 +45,4 @@ public class Candidates {
 		return new Candidate(value, value, null, description, null, null, true);
 	}
 
-	private Candidates() {
-	}
 }
