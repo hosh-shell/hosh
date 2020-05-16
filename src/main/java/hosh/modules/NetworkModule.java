@@ -133,6 +133,7 @@ public class NetworkModule implements Module {
 			this.requestor = requestor;
 		}
 
+		@Todo(description = "add version to user agent (e.g. hosh/0.0.29)")
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
@@ -141,6 +142,7 @@ public class NetworkModule implements Module {
 			}
 			HttpRequest request = HttpRequest.newBuilder()
 				                      .uri(URI.create(args.get(0)))
+									  .setHeader("User-Agent", "Hosh")
 				                      .GET()
 				                      .build();
 			try {
