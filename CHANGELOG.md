@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - sign jar file with GPG when deploy on github
 
 ### Changed
-- `walk`: terminate as soon as first error is raised
+- `walk`: 'fail fast' error handling
+- `walk`: dropping absolute path by default
 - removing automatic semicolon insertion
 
 ### Fixed

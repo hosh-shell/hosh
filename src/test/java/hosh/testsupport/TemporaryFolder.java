@@ -23,6 +23,7 @@
  */
 package hosh.testsupport;
 
+import hosh.doc.Todo;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
@@ -35,6 +36,7 @@ import java.nio.file.Path;
 /**
  * Heavily inspired by JUnit 4.12 TemporaryFolder but with less features.
  */
+@Todo(description = "don't expose java.io.File, tests usually want java.nio.file.Path")
 public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEachCallback {
 
 	private File folder;

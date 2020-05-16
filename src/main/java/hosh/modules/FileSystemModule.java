@@ -275,7 +275,7 @@ public class FileSystemModule implements Module {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
 					return ExitStatus.error();
 				}
-				Files.walkFileTree(target, new VisitCallback(out));
+				Files.walkFileTree(target, new VisitCallback(out, state.getCwd()));
 				return ExitStatus.success();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -287,9 +287,11 @@ public class FileSystemModule implements Module {
 			private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 			private final OutputChannel out;
+			private final Path cwd;
 
-			public VisitCallback(OutputChannel out) {
+			public VisitCallback(OutputChannel out, Path cwd) {
 				this.out = out;
+				this.cwd = cwd;
 			}
 
 			@Override
@@ -301,7 +303,7 @@ public class FileSystemModule implements Module {
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 				out.send(Records
 					         .builder()
-					         .entry(Keys.PATH, Values.ofPath(file))
+					         .entry(Keys.PATH, Values.ofPath(cwd.relativize(file)))
 					         .entry(Keys.SIZE, Values.ofSize(attrs.size()))
 					         .build());
 				return FileVisitResult.CONTINUE;
