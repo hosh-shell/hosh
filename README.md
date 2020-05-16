@@ -60,7 +60,7 @@ path size
 ...
 ```
 
-By sorting the output of `walk` it is trivial to extract the biggest files:
+By sorting the output of `walk` it is trivial to detect the biggest files:
 ```
 hosh> walk . | sort desc size | take 5
 aaa 2,5MB
@@ -70,7 +70,7 @@ ddd 1MB
 eee 1MB
 ```
 
-Schema is same of `walk`
+Schema is same of `walk`.
 
 
 ### Parsing
