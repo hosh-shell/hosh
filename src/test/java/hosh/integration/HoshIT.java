@@ -54,6 +54,9 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Acceptance tests by spawning java -jar hosh.jar.
+ */
 public class HoshIT {
 
 	@RegisterExtension
@@ -163,8 +166,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).isEqualTo("hello");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
@@ -331,9 +334,9 @@ public class HoshIT {
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
-		boolean success = hosh.waitFor(1, TimeUnit.SECONDS);
+		int exitCode = hosh.waitFor();
 		assertThat(output).contains("please do not report");
-		assertThat(success).isTrue(); // no timeout
+		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
@@ -343,9 +346,9 @@ public class HoshIT {
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
-		boolean success = hosh.waitFor(1, TimeUnit.SECONDS);
+		int exitCode = hosh.waitFor();
 		assertThat(output).isEqualTo("100");
-		assertThat(success).isTrue(); // no timeout
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
@@ -356,8 +359,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).matches("100\r?\n100\r?\n2 PT\\d+.\\d+S PT\\d+.\\d+S PT\\d+.\\d+S");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
@@ -368,8 +371,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(1);
 		assertThat(output).contains("line 1: 'FOOBAR' unknown command");
+		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
@@ -378,8 +381,8 @@ public class HoshIT {
 		sendInput(hosh, "FOOBAR\nexit\n");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).contains("'FOOBAR' unknown command");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/71")
@@ -391,8 +394,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).contains("path", "count best worst average");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
@@ -418,8 +421,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(42);
 		assertThat(output).isEmpty();
+		assertThat(exitCode).isEqualTo(42);
 	}
 
 	@Test
@@ -430,8 +433,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).contains("a", "b");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@DisabledOnOs(OS.WINDOWS)
@@ -485,11 +488,11 @@ public class HoshIT {
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).isEmpty();
 		assertThat(path.resolve("A.class")).doesNotExist();
 		assertThat(path.resolve("B.class")).doesNotExist();
 		assertThat(path.resolve("C.java")).exists();
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
@@ -497,8 +500,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess("--version");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).startsWith("hosh ");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
@@ -506,8 +509,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess("-v");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).startsWith("hosh ");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
@@ -524,8 +527,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess("-h");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(0);
 		assertThat(output).startsWith("usage: ");
+		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
@@ -533,8 +536,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess("--blahblah");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(1);
 		assertThat(output).startsWith("hosh: Unrecognized option: --blahblah");
+		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
@@ -542,8 +545,8 @@ public class HoshIT {
 		Process hosh = givenHoshProcess("aaa.hosh", "bbb.hosh");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(exitCode).isEqualTo(1);
 		assertThat(output).startsWith("hosh: too many scripts");
+		assertThat(exitCode).isEqualTo(1);
 	}
 
 	// simple test infrastructure
