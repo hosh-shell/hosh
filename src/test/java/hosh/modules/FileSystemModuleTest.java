@@ -799,9 +799,6 @@ public class FileSystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
 		}
 
-		// on Windows a special permission is needed to create symlinks, see
-		// https://stackoverflow.com/a/24353758
-		@DisabledOnOs(OS.WINDOWS)
 		@Test
 		public void resolveSymlinks() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
