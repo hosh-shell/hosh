@@ -765,7 +765,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(Path.of("file.txt")), Keys.SIZE, Values.ofSize(0)));
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -780,13 +780,12 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void nonEmptyAbsoluteDirectorySameCwd() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			temporaryFolder.newFile("file.txt");
+		public void nonEmptyAbsoluteDirectory() throws IOException {
+			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(Path.of("file.txt")), Keys.SIZE, Values.ofSize(0)));
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath().toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -800,7 +799,8 @@ public class FileSystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
 		}
 
-		// on Windows a special permission is needed to create symlinks, see README.md
+		// on Windows a special permission is needed to create symlinks, see
+		// https://stackoverflow.com/a/24353758
 		@DisabledOnOs(OS.WINDOWS)
 		@Test
 		public void resolveSymlinks() throws IOException {
@@ -812,7 +812,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("symlink"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(Path.of("folder", "file.txt")), Keys.SIZE, Values.ofSize(0)));
+			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toPath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
 		}
 	}
