@@ -6,10 +6,12 @@
 
 ## Main features
 
-- **portable**¹
-    - works out-of-the-box in Windows, MacOS and Linux
+Hosh is an experimental shell written in Java, featuring: 
+
+- **portability**¹
+    - works out-of-the-box in Windows, MacOS, Linux 
     - written in Java 11, distributed as [Uber-JAR](https://imagej.net/Uber-JAR)
-- **usability as first class citizen** (much more work and effort is needed in this area)
+- **usability as first class citizen** (much more design and work is needed in this area)
     - sorting with [alphanum](http://davekoelle.com/alphanum.html)
     - ANSI colors by default
     - errors always colored in red
@@ -19,11 +21,11 @@
        - `HISTCONTROL=ignoredups`
        - no limits
        - append to history is incremental and shared between all sessions
-- **pipelines** built around schema-less records
+- **pipelines** built around schema-less records:
     - built-in commands produce records with well defined keys
     - interoperability with external commands is achieved by using single-key records
     - `lines pom.xml | enumerate | take 10`
-- **grouping commands**, with before/after behavior
+- **grouping commands**, with before/after behavior 
     - `withTime { lines pom.xml | sink }`
     - `withLock file.lock { ... }`
 - **robust scripts by default**
@@ -35,7 +37,7 @@
 
 ### Sorting
 
-Sorting is always performed using a well defined key column:
+Sorting is always performed using a well defined key:
 ```
 hosh> ls
 # unsorted, following local filesystem order
@@ -101,11 +103,11 @@ Hosh (no external commands):
 hosh> http https://git.io/v9MjZ | take 10 | split text '\\t' | select 10 1 12
 ```
 
-### Glob expansion
+### Glob expansion and lambda blocks
 
 To recursively remove all `.class` files in `target`:
 
-`hosh> walk target | glob '*.class' | { path -> rm ${path}; echo removed ${path} }`
+`hosh> walk target/ | glob '*.class' | { path -> rm ${path}; echo removed ${path} }`
 
 `{ path -> ... }` is lambda syntax, inside this scope is possible to use `${path}`.
 
@@ -116,7 +118,8 @@ To recursively remove all `.class` files in `target`:
 - https://mywiki.wooledge.org/BashPitfalls
 - PowerShell https://docs.microsoft.com/en-us/powershell/
 - Zsh https://zsh.org
-- Elvish https://elv.sh/
+- Elvish https://elv.sh
+- Fish https://fishshell.com
 
 ## Similar projects
 
@@ -165,7 +168,7 @@ Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/):
 If any test fails with "java.nio.file.FileSystemException: A required privilege is not held by the client."
 then:
 
-- run secpol.msc
+- run **secpol.msc**
 - go to Security Settings|Local Policies|User Rights Assignment|Create symbolic links
 - add your user name.
 - restart your session.
