@@ -49,13 +49,11 @@ import hosh.spi.Records;
 import hosh.spi.Values;
 import hosh.test.support.RecordMatcher;
 import hosh.test.support.WithThread;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
-import org.mockito.BDDMockito;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -99,18 +97,18 @@ public class TextModuleTest {
 			withThread.interrupt();
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 		}
 
 	}
@@ -133,57 +131,57 @@ public class TextModuleTest {
 
 		@Test
 		public void empty() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 argument")));
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 argument")));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void trimMissingKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("  abc  "));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.ERROR.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void trimKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("  abc  "));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("abc")));
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("abc")));
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void trimKeyOfDifferentType() {
 			Record record = Records.singleton(Keys.COUNT, Values.ofInstant(Instant.EPOCH));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -207,43 +205,43 @@ public class TextModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: join separator")));
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: join separator")));
 		}
 
 		@Test
 		public void empty() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void oneValue() {
 			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1")));
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1")));
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoValues() {
 			Record record = Records.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.NAME, Values.ofNumeric(2)).build();
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1,2")));
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1,2")));
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -267,43 +265,43 @@ public class TextModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sum key")));
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sum key")));
 		}
 
 		@Test
 		public void empty() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(0)));
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(0)));
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void nonMatchingKey() {
 			Record record = Records.singleton(Keys.INDEX, Values.ofSize(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(0)));
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(0)));
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void matchingKey() {
 			Record record = Records.singleton(Keys.SIZE, Values.ofSize(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(2)));
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(2)));
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -325,47 +323,47 @@ public class TextModuleTest {
 
 		@Test
 		public void empty() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void noArgs() {
-			BDDMockito.given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.NAME, Values.ofNumeric(1))), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.NAME, Values.ofNumeric(1))), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.empty());
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.empty());
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void oneArgKeepKey() {
 			Record record = Records.singleton(Keys.NAME, Values.ofText("foo"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.NAME.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).should(times(2)).recv();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).should(times(2)).recv();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoArgsIgnoreMissingKeys() {
 			Record record = Records.singleton(Keys.NAME, Values.ofText("foo"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.NAME.name(), Keys.COUNT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).should(times(2)).recv();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).should(times(2)).recv();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -389,44 +387,44 @@ public class TextModuleTest {
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
 		}
 
 		@Test
 		public void twoArgsNoInput() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), " "), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoArgsMatching() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("a b c"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), " "), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).should(times(2)).recv();
-			BDDMockito.then(out).should().send(Records.builder()
+			then(in).should(times(2)).recv();
+			then(out).should().send(Records.builder()
 					.entry(Keys.of("1"), Values.ofText("a"))
 					.entry(Keys.of("2"), Values.ofText("b"))
 					.entry(Keys.of("3"), Values.ofText("c"))
 					.build());
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -450,64 +448,64 @@ public class TextModuleTest {
 		public void zeroArg() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
 		}
 
 		@Test
 		public void twoArgsNoInput() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoArgsNonMatching() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText(""));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoArgsMatching() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("1"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).should(times(2)).recv();
-			BDDMockito.then(out).should().send(Records.singleton(Keys.of("id"), Values.ofText("1")));
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).should(times(2)).recv();
+			then(out).should().send(Records.singleton(Keys.of("id"), Values.ofText("1")));
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void twoArgsMissingKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("1"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name(), "(?<id>\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).should(times(2)).recv();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).should(times(2)).recv();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 	}
 
@@ -531,22 +529,22 @@ public class TextModuleTest {
 		@Test
 		public void zeroArg() {
 			Record record = Records.singleton(Keys.COUNT, null).append(Keys.INDEX, null);
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.singleton(Keys.of("schema"), Values.ofText("count index")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.of("schema"), Values.ofText("count index")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -570,44 +568,44 @@ public class TextModuleTest {
 		@Test
 		public void twoRecords() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(2)));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(2)));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void oneRecord() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(1)));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(1)));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void zeroRecords() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(0)));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(0)));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -631,23 +629,23 @@ public class TextModuleTest {
 		@Test
 		public void zeroArg() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(Records.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.TEXT, Values.ofText("some data")).build());
-			BDDMockito.then(out).should().send(Records.singleton(Keys.INDEX, Values.ofNumeric(2)));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.TEXT, Values.ofText("some data")).build());
+			then(out).should().send(Records.singleton(Keys.INDEX, Values.ofNumeric(2)));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -673,28 +671,28 @@ public class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		public void zeroArg() {
-			BDDMockito.given(clock.instant()).willReturn(Instant.EPOCH);
+			given(clock.instant()).willReturn(Instant.EPOCH);
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(
 					Records.builder()
 							.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
 							.entry(Keys.TEXT, Values.ofText("some data"))
 							.build());
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -718,43 +716,43 @@ public class TextModuleTest {
 		@Test
 		public void dropZero() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void dropOne() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void negativeArg() {
 			ExitStatus exitStatus = sut.run(List.of("-1"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 		}
 	}
 
@@ -776,36 +774,36 @@ public class TextModuleTest {
 
 		@Test
 		public void takeZero() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).should().recv();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).should().recv();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void takeExactly() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void takeLess() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -813,33 +811,33 @@ public class TextModuleTest {
 		public void takeMore() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			Record record2 = Records.singleton(Keys.TEXT, Values.ofText("another value"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("5"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(out).should().send(record2);
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(out).should().send(record2);
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void negativeArg() {
 			ExitStatus exitStatus = sut.run(List.of("-1"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
 		}
 
 		@Test
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -863,44 +861,44 @@ public class TextModuleTest {
 		@Test
 		public void printMatchingLines() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some string"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), ".*string.*"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(record);
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
 		public void ignoreNonMatchingLines() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some string"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("key", ".*number.*"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("key"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -925,12 +923,12 @@ public class TextModuleTest {
 
 		@Test
 		public void empty() {
-			BDDMockito.given(in.recv()).willReturn(Optional.empty());
+			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
@@ -938,12 +936,12 @@ public class TextModuleTest {
 		public void sortByExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(2)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(record2, record1);
 		}
 
@@ -953,12 +951,12 @@ public class TextModuleTest {
 			Record record1 = Records.singleton(Keys.SIZE, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record3 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.of(record3), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.of(record3), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(3)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(3)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(record3, record2, record1);
 		}
 
@@ -966,12 +964,12 @@ public class TextModuleTest {
 		@Test
 		public void sortByNonExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(1)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(1)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(record1);
 		}
 
@@ -980,12 +978,12 @@ public class TextModuleTest {
 		public void sortAscByExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("asc", "name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(2)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(record2, record1);
 		}
 
@@ -994,12 +992,12 @@ public class TextModuleTest {
 		public void sortDescByExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("desc", "name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(2)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(record1, record2);
 		}
 
@@ -1007,30 +1005,30 @@ public class TextModuleTest {
 		public void invalidDirection() {
 			ExitStatus exitStatus = sut.run(List.of("ZZZ", "name"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("must be asc or desc")));
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("must be asc or desc")));
+			then(out).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("use 'sort key' or 'sort [asc|desc] key'")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("use 'sort key' or 'sort [asc|desc] key'")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@Test
 		public void tooManyArgs() {
 			ExitStatus exitStatus = sut.run(List.of("asc", "key", "aaa"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many args")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many args")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -1058,12 +1056,12 @@ public class TextModuleTest {
 		public void missingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("anotherkey"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(Mockito.never()).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(Mockito.never()).send(records.capture());
 			assertThat(records.getAllValues()).isEmpty();
 		}
 
@@ -1072,12 +1070,12 @@ public class TextModuleTest {
 		public void distinctValues() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(2)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1, record2);
 		}
 
@@ -1086,12 +1084,12 @@ public class TextModuleTest {
 		public void duplicatedValues() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should().send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should().send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
 		}
 
@@ -1099,10 +1097,10 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -1130,12 +1128,12 @@ public class TextModuleTest {
 		public void missingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("anotherkey"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(0)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(0)).send(records.capture());
 			assertThat(records.getAllValues()).isEmpty();
 		}
 
@@ -1144,12 +1142,12 @@ public class TextModuleTest {
 		public void distinctValues() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(Mockito.never()).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(Mockito.never()).send(records.capture());
 			assertThat(records.getAllValues()).isEmpty();
 		}
 
@@ -1158,12 +1156,12 @@ public class TextModuleTest {
 		public void duplicatedValues() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(1)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(1)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactlyInAnyOrder(record1);
 		}
 
@@ -1171,10 +1169,10 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 
@@ -1201,12 +1199,12 @@ public class TextModuleTest {
 		@Test
 		public void table() {
 			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(2)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
 					Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
 					Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         whatever  "), Ansi.Style.BG_BLUE)));
@@ -1216,12 +1214,12 @@ public class TextModuleTest {
 		@Test
 		public void tableWithNone() {
 			Record record1 = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
-			BDDMockito.given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).should(times(2)).send(records.capture());
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
 					Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
 					Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          whatever  "), Ansi.Style.BG_BLUE)));
@@ -1231,10 +1229,10 @@ public class TextModuleTest {
 		public void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
 			assertThat(exitStatus).isError();
-			BDDMockito.then(in).shouldHaveNoMoreInteractions();
-			BDDMockito.then(out).shouldHaveNoMoreInteractions();
-			BDDMockito.then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
-			BDDMockito.then(err).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
 }
