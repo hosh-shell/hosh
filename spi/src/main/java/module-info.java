@@ -24,6 +24,7 @@
  */
 
 module hosh.spi {
+	requires java.base;
 	requires java.logging;
 
 	requires jline.reader;

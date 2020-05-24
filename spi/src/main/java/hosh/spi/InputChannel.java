@@ -28,7 +28,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
- * A possibly infinite stream of @{{@link java.lang.Record}.
+ * A possibly infinite stream of @{{@link Record}.
  */
 public interface InputChannel {
 
@@ -36,20 +36,20 @@ public interface InputChannel {
 	 * Yield next record in this channel, yields {@link Optional#empty()} to signal
 	 * end of channel.
 	 */
-	Optional<java.lang.Record> recv();
+	Optional<Record> recv();
 
 	/**
 	 * Allow to use for-each statement. Consumes the input channel.
 	 */
-	static Iterable<java.lang.Record> iterate(InputChannel in) {
+	static Iterable<Record> iterate(InputChannel in) {
 		return () -> new InputChannelIterator(in);
 	}
 
-	class InputChannelIterator implements Iterator<java.lang.Record> {
+	class InputChannelIterator implements Iterator<Record> {
 
 		private final InputChannel in;
 
-		private java.lang.Record next;
+		private Record next;
 
 		public InputChannelIterator(InputChannel in) {
 			this.in = in;
@@ -60,7 +60,7 @@ public interface InputChannel {
 			if (next != null) {
 				return true;
 			}
-			Optional<java.lang.Record> maybeNext = in.recv();
+			Optional<Record> maybeNext = in.recv();
 			if (maybeNext.isPresent()) {
 				next = maybeNext.get();
 				return true;
@@ -69,11 +69,11 @@ public interface InputChannel {
 		}
 
 		@Override
-		public java.lang.Record next() {
+		public Record next() {
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}
-			java.lang.Record result = next;
+			Record result = next;
 			next = null;
 			return result;
 		}

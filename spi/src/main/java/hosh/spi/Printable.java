@@ -23,8 +23,6 @@
  */
 package hosh.spi;
 
-import hosh.doc.Todo;
-
 import java.io.PrintWriter;
 import java.util.Locale;
 

@@ -31,5 +31,5 @@ package hosh.spi;
  */
 public interface OutputChannel {
 
-	void send(java.lang.Record record);
+	void send(Record record);
 }

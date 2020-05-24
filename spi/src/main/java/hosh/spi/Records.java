@@ -41,11 +41,11 @@ public class Records {
 	private Records() {
 	}
 
-	public static java.lang.Record empty() {
+	public static Record empty() {
 		return new Records.Empty();
 	}
 
-	public static java.lang.Record singleton(Key key, Value value) {
+	public static Record singleton(Key key, Value value) {
 		return new Records.Singleton(key, value);
 	}
 
@@ -74,12 +74,12 @@ public class Records {
 			return this;
 		}
 
-		public java.lang.Record build() {
+		public Record build() {
 			return new Generic(data.toArray(Entry[]::new));
 		}
 	}
 
-	static class Empty implements java.lang.Record {
+	static class Empty implements Record {
 
 		@Override
 		public List<Key> keys() {
@@ -92,17 +92,17 @@ public class Records {
 		}
 
 		@Override
-		public List<java.lang.Record.Entry> entries() {
+		public List<Record.Entry> entries() {
 			return Collections.emptyList();
 		}
 
 		@Override
-		public java.lang.Record append(Key key, Value value) {
+		public Record append(Key key, Value value) {
 			return new Records.Singleton(key, value);
 		}
 
 		@Override
-		public java.lang.Record prepend(Key key, Value value) {
+		public Record prepend(Key key, Value value) {
 			return new Records.Singleton(key, value);
 		}
 
@@ -123,8 +123,8 @@ public class Records {
 
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof java.lang.Record) {
-				java.lang.Record that = (java.lang.Record) obj;
+			if (obj instanceof Record) {
+				Record that = (Record) obj;
 				return that.size() == 0;
 			} else {
 				return false;
@@ -142,7 +142,7 @@ public class Records {
 		}
 	}
 
-	static class Singleton implements java.lang.Record {
+	static class Singleton implements Record {
 
 		private final Key key;
 
@@ -164,12 +164,12 @@ public class Records {
 		}
 
 		@Override
-		public List<java.lang.Record.Entry> entries() {
-			return Collections.singletonList(new java.lang.Record.Entry(key, value));
+		public List<Record.Entry> entries() {
+			return Collections.singletonList(new Record.Entry(key, value));
 		}
 
 		@Override
-		public java.lang.Record append(Key newKey, Value newValue) {
+		public Record append(Key newKey, Value newValue) {
 			return new Builder()
 				       .entry(this.key, this.value)
 				       .entry(newKey, newValue)
@@ -177,7 +177,7 @@ public class Records {
 		}
 
 		@Override
-		public java.lang.Record prepend(Key newKey, Value newValue) {
+		public Record prepend(Key newKey, Value newValue) {
 			return new Builder()
 				       .entry(newKey, newValue)
 				       .entry(this.key, this.value)
@@ -205,8 +205,8 @@ public class Records {
 
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof java.lang.Record) {
-				java.lang.Record that = (java.lang.Record) obj;
+			if (obj instanceof Record) {
+				Record that = (Record) obj;
 				return that.size() == 1 && this.entries().equals(that.entries());
 			} else {
 				return false;
@@ -224,7 +224,7 @@ public class Records {
 		}
 	}
 
-	static class Generic implements java.lang.Record {
+	static class Generic implements Record {
 
 		private final Entry[] entries;
 
@@ -233,14 +233,14 @@ public class Records {
 		}
 
 		@Override
-		public java.lang.Record append(Key key, Value value) {
+		public Record append(Key key, Value value) {
 			Entry[] newEntries = Arrays.copyOf(entries, entries.length + 1);
 			newEntries[entries.length] = new Entry(key, value);
 			return new Generic(newEntries);
 		}
 
 		@Override
-		public java.lang.Record prepend(Key key, Value value) {
+		public Record prepend(Key key, Value value) {
 			Entry[] newEntries = new Entry[entries.length + 1];
 			newEntries[0] = new Entry(key, value);
 			System.arraycopy(entries, 0, newEntries, 1, entries.length);
@@ -290,8 +290,8 @@ public class Records {
 
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof java.lang.Record) {
-				java.lang.Record that = (java.lang.Record) obj;
+			if (obj instanceof Record) {
+				Record that = (Record) obj;
 				return this.size() == that.size() && this.entries().equals(that.entries());
 			} else {
 				return false;

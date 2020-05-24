@@ -23,8 +23,6 @@
  */
 package hosh.spi;
 
-import hosh.doc.Todo;
-
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
