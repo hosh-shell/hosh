@@ -23,7 +23,6 @@
  */
 package hosh.spi;
 
-import hosh.spi.Record.Entry;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 

@@ -9,6 +9,6 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>hosh-spi</artifactId>
+	<artifactId>hosh-hosh.spi</artifactId>
 
 </project>
