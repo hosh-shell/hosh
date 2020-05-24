@@ -21,12 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.modules;
+package hosh.modules.text;
 
-import hosh.doc.Description;
-import hosh.doc.Example;
-import hosh.doc.Examples;
-import hosh.doc.Experimental;
+import hosh.spi.Description;
+import hosh.spi.Example;
+import hosh.spi.Examples;
+import hosh.spi.Experimental;
 import hosh.spi.Ansi;
 import hosh.spi.Ansi.Style;
 import hosh.spi.Command;

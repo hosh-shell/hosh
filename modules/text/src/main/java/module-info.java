@@ -23,17 +23,13 @@
  * SOFTWARE.
  */
 
+import hosh.spi.Module;
+import hosh.modules.text.TextModule;
 
 module hosh.modules.text {
 	requires hosh.spi;
-	// workarounds for mockito
-	opens hosh;
-	opens hosh.runtime;
-	opens hosh.spi;
-	opens hosh.modules;
 
 	// workaround for running tests in idea
 	uses Module;
-	provides Module
-	with FileSystemModule, HistoryModule, NetworkModule, SystemModule, TerminalModule, TextModule;
+	provides Module with TextModule;
 }

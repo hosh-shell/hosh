@@ -24,10 +24,12 @@
  */
 
 module hosh.spi {
+
 	requires java.base;
 	requires java.logging;
 
 	requires jline.reader;
 	requires jline.terminal;
 
+	exports hosh.spi;
 }

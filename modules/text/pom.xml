@@ -10,4 +10,11 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hosh-text-module</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-spi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>

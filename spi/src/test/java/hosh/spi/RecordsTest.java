@@ -86,7 +86,7 @@ public class RecordsTest {
 		EqualsVerifier.forClass(Records.Empty.class).verify();
 		EqualsVerifier.forClass(Records.Singleton.class).verify();
 		EqualsVerifier.forClass(Records.Generic.class).withNonnullFields("entries").verify();
-		EqualsVerifier.forClass(Entry.class).verify();
+		EqualsVerifier.forClass(Record.Entry.class).verify();
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class RecordsTest {
 		Records.Builder builder = Records.builder();
 		builder.entry(Keys.NAME, Values.none());
 		Record record = builder.build();
-		builder.entry(new Entry(Keys.COUNT, Values.none())); // please note that this has been added after build()
+		builder.entry(new Record.Entry(Keys.COUNT, Values.none())); // please note that this has been added after build()
 		assertThat(record.value(Keys.NAME)).isPresent();
 		assertThat(record.value(Keys.COUNT)).isEmpty();
 	}
@@ -138,7 +138,7 @@ public class RecordsTest {
 		Record a = Records.singleton(Keys.NAME, Values.none());
 		assertThat(a.keys()).containsExactly(Keys.NAME);
 		assertThat(a.values()).containsExactly(Values.none());
-		assertThat(a.entries()).containsExactly(new Entry(Keys.NAME, Values.none()));
+		assertThat(a.entries()).containsExactly(new Record.Entry(Keys.NAME, Values.none()));
 	}
 
 	@Test
@@ -146,12 +146,12 @@ public class RecordsTest {
 		Record a = Records.singleton(Keys.NAME, Values.none()).prepend(Keys.COUNT, Values.none());
 		assertThat(a.keys()).containsExactly(Keys.COUNT, Keys.NAME);
 		assertThat(a.values()).containsExactly(Values.none(), Values.none());
-		assertThat(a.entries()).containsExactly(new Entry(Keys.COUNT, Values.none()), new Entry(Keys.NAME, Values.none()));
+		assertThat(a.entries()).containsExactly(new Record.Entry(Keys.COUNT, Values.none()), new Record.Entry(Keys.NAME, Values.none()));
 	}
 
 	@Test
 	public void entry() {
-		Entry entry = new Entry(Keys.NAME, Values.none());
+		Record.Entry entry = new Record.Entry(Keys.NAME, Values.none());
 		assertThat(entry).hasToString("Entry[key=Key['name'],value=None]");
 		assertThat(entry.getKey()).isEqualTo(Keys.NAME);
 		assertThat(entry.getValue()).isEqualTo(Values.none());
