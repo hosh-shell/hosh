@@ -168,7 +168,9 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
-					<argLine>--add-exports java.base/jdk.internal.misc=hosh</argLine>
+					<argLine>
+						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
+					</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
