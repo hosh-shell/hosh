@@ -1,0 +1,322 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018-2020 Davide Angelocola
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package hosh.spi;
+
+import hosh.spi.Record.Entry;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+public class Records {
+
+	private Records() {
+	}
+
+	public static java.lang.Record empty() {
+		return new Records.Empty();
+	}
+
+	public static java.lang.Record singleton(Key key, Value value) {
+		return new Records.Singleton(key, value);
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	/**
+	 * Mutable builder of Record objects. Retains insertion order.
+	 */
+	public static class Builder {
+
+		private final ArrayList<Entry> data = new ArrayList<>();
+
+		private Builder() {
+		}
+
+		// reuse existing entry (can be shared because it is immutable)
+		public Builder entry(Entry entry) {
+			data.add(entry);
+			return this;
+		}
+
+		public Builder entry(Key key, Value value) {
+			data.add(new Entry(key, value));
+			return this;
+		}
+
+		public java.lang.Record build() {
+			return new Generic(data.toArray(Entry[]::new));
+		}
+	}
+
+	static class Empty implements java.lang.Record {
+
+		@Override
+		public List<Key> keys() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public List<Value> values() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public List<java.lang.Record.Entry> entries() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public java.lang.Record append(Key key, Value value) {
+			return new Records.Singleton(key, value);
+		}
+
+		@Override
+		public java.lang.Record prepend(Key key, Value value) {
+			return new Records.Singleton(key, value);
+		}
+
+		@Override
+		public Optional<Value> value(Key key) {
+			return Optional.empty();
+		}
+
+		@Override
+		public int size() {
+			return 0;
+		}
+
+		@Override
+		public final int hashCode() {
+			return 17;
+		}
+
+		@Override
+		public final boolean equals(Object obj) {
+			if (obj instanceof java.lang.Record) {
+				java.lang.Record that = (java.lang.Record) obj;
+				return that.size() == 0;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public String toString() {
+			return "Record[data={}]";
+		}
+
+		@Override
+		public void print(PrintWriter printWriter, Locale locale) {
+			// no-op
+		}
+	}
+
+	static class Singleton implements java.lang.Record {
+
+		private final Key key;
+
+		private final Value value;
+
+		public Singleton(Key key, Value value) {
+			this.key = key;
+			this.value = value;
+		}
+
+		@Override
+		public List<Key> keys() {
+			return Collections.singletonList(key);
+		}
+
+		@Override
+		public List<Value> values() {
+			return Collections.singletonList(value);
+		}
+
+		@Override
+		public List<java.lang.Record.Entry> entries() {
+			return Collections.singletonList(new java.lang.Record.Entry(key, value));
+		}
+
+		@Override
+		public java.lang.Record append(Key newKey, Value newValue) {
+			return new Builder()
+				       .entry(this.key, this.value)
+				       .entry(newKey, newValue)
+				       .build();
+		}
+
+		@Override
+		public java.lang.Record prepend(Key newKey, Value newValue) {
+			return new Builder()
+				       .entry(newKey, newValue)
+				       .entry(this.key, this.value)
+				       .build();
+		}
+
+		@Override
+		public Optional<Value> value(Key wantedKey) {
+			if (Objects.equals(this.key, wantedKey)) {
+				return Optional.of(value);
+			} else {
+				return Optional.empty();
+			}
+		}
+
+		@Override
+		public int size() {
+			return 1;
+		}
+
+		@Override
+		public final int hashCode() {
+			return Objects.hash(key, value);
+		}
+
+		@Override
+		public final boolean equals(Object obj) {
+			if (obj instanceof java.lang.Record) {
+				java.lang.Record that = (java.lang.Record) obj;
+				return that.size() == 1 && this.entries().equals(that.entries());
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Record[data={%s=%s}]", key, value);
+		}
+
+		@Override
+		public void print(PrintWriter printWriter, Locale locale) {
+			value.print(printWriter, locale);
+		}
+	}
+
+	static class Generic implements java.lang.Record {
+
+		private final Entry[] entries;
+
+		private Generic(Entry[] entries) {
+			this.entries = entries;
+		}
+
+		@Override
+		public java.lang.Record append(Key key, Value value) {
+			Entry[] newEntries = Arrays.copyOf(entries, entries.length + 1);
+			newEntries[entries.length] = new Entry(key, value);
+			return new Generic(newEntries);
+		}
+
+		@Override
+		public java.lang.Record prepend(Key key, Value value) {
+			Entry[] newEntries = new Entry[entries.length + 1];
+			newEntries[0] = new Entry(key, value);
+			System.arraycopy(entries, 0, newEntries, 1, entries.length);
+			return new Generic(newEntries);
+		}
+
+		@Override
+		public List<Key> keys() {
+			return Arrays
+				       .stream(entries)
+				       .map(Entry::getKey)
+				       .collect(Collectors.toUnmodifiableList());
+		}
+
+		@Override
+		public List<Value> values() {
+			return Arrays
+				       .stream(entries)
+				       .map(Entry::getValue)
+				       .collect(Collectors.toUnmodifiableList());
+		}
+
+		@Override
+		public List<Entry> entries() {
+			return List.of(entries);
+		}
+
+		@Override
+		public Optional<Value> value(Key key) {
+			for (Entry entry : entries) {
+				if (entry.getKey().equals(key)) {
+					return Optional.of(entry.getValue());
+				}
+			}
+			return Optional.empty();
+		}
+
+		@Override
+		public int size() {
+			return entries.length;
+		}
+
+		@Override
+		public final int hashCode() {
+			return Arrays.hashCode(entries);
+		}
+
+		@Override
+		public final boolean equals(Object obj) {
+			if (obj instanceof java.lang.Record) {
+				java.lang.Record that = (java.lang.Record) obj;
+				return this.size() == that.size() && this.entries().equals(that.entries());
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Record[data={%s}]",
+				Arrays
+					.stream(entries)
+					.map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+					.collect(Collectors.joining(",")));
+		}
+
+		@Override
+		public void print(PrintWriter printWriter, Locale locale) {
+			Iterator<Value> iterator = values().iterator();
+			while (iterator.hasNext()) {
+				Value value = iterator.next();
+				value.print(printWriter, locale);
+				if (iterator.hasNext()) {
+					printWriter.append(" ");
+				}
+			}
+		}
+	}
+}

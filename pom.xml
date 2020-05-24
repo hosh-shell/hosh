@@ -41,7 +41,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
-		<module>spi</module>
+		<module>hosh.spi</module>
 		<module>core</module>
 		<module>modules/system</module>
 		<module>modules/text</module>
@@ -137,26 +137,16 @@
 			<version>1.7.30</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>spi</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>hosh</finalName>
 		<plugins>
-			<plugin>
-				<groupId>org.antlr</groupId>
-				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>4.8-1</version>
-				<configuration>
-					<treatWarningsAsErrors>true</treatWarningsAsErrors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>antlr</id>
-						<goals>
-							<goal>antlr4</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
