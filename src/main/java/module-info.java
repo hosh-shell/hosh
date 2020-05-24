@@ -1,10 +1,3 @@
-import hosh.modules.FileSystemModule;
-import hosh.modules.HistoryModule;
-import hosh.modules.NetworkModule;
-import hosh.modules.SystemModule;
-import hosh.modules.TerminalModule;
-import hosh.modules.TextModule;
-import hosh.spi.Module;
 
 /*
  * MIT License
@@ -29,6 +22,15 @@ import hosh.spi.Module;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import hosh.modules.FileSystemModule;
+import hosh.modules.HistoryModule;
+import hosh.modules.NetworkModule;
+import hosh.modules.SystemModule;
+import hosh.modules.TerminalModule;
+import hosh.modules.TextModule;
+import hosh.spi.Module;
+
 module hosh {
 	requires java.logging;
 	requires java.net.http;
