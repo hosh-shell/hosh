@@ -15,6 +15,7 @@
 		<dependency>
 			<groupId>dfa</groupId>
 			<artifactId>hosh-spi</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

@@ -41,13 +41,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
-		<module>hosh.spi</module>
-		<module>core</module>
+		<module>spi</module>
 		<module>modules/system</module>
 		<module>modules/text</module>
 		<module>modules/history</module>
 		<module>modules/terminal</module>
 		<module>modules/fs</module>
+		<module>runtime</module>
 	</modules>
 	<dependencies>
 		<dependency>
@@ -136,12 +136,6 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.30</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>dfa1</groupId>
-			<artifactId>spi</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<build>
