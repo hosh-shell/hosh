@@ -16,5 +16,33 @@
 			<artifactId>hosh-spi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-test-support</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-test-support</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>
+						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
+						--add-opens hosh.modules.text/hosh.modules.text=ALL-UNNAMED
+						--add-modules hosh.test.support
+					</argLine>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
 </project>

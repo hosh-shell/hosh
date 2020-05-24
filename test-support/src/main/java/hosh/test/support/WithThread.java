@@ -21,33 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.testsupport;
+package hosh.test.support;
 
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import java.util.TimeZone;
+/**
+ * To be used to control current thread name or interrupted flag.
+ */
+public class WithThread implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
-public class WithTimeZone implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+	private String backup;
 
-	private final TimeZone wanted;
-
-	private TimeZone backup;
-
-	public WithTimeZone(TimeZone wanted) {
-		this.wanted = wanted;
+	@Override
+	public void afterTestExecution(ExtensionContext context) {
+		Thread.currentThread().setName(backup);
+		Thread.interrupted();
 	}
 
 	@Override
 	public void beforeTestExecution(ExtensionContext context) {
-		backup = TimeZone.getDefault();
-		TimeZone.setDefault(wanted);
+		backup = Thread.currentThread().getName();
 	}
 
-	@Override
-	public void afterTestExecution(ExtensionContext context) {
-		TimeZone.setDefault(backup);
+	public String currentName() {
+		return Thread.currentThread().getName();
 	}
+
+	public void renameTo(String newName) {
+		Thread.currentThread().setName(newName);
+	}
+
+	public boolean isInterrupted() {
+		return Thread.currentThread().isInterrupted();
+	}
+
+	public void interrupt() {
+		Thread.currentThread().interrupt();
+	}
+
 }

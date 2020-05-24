@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.testsupport;
+package hosh.test.support;
 
 import hosh.spi.Key;
 import hosh.spi.Record;

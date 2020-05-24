@@ -21,39 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.testsupport;
+package hosh.test.support;
 
-import hosh.spi.ExitStatus;
-import org.assertj.core.api.AbstractAssert;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatus> {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
-	public static ExitStatusAssert assertThat(ExitStatus actual) {
-		return new ExitStatusAssert(actual);
+public class WithExecutor implements AfterAllCallback {
+
+	private final ExecutorService executorService;
+
+	public WithExecutor(ExecutorService executorService) {
+		this.executorService = executorService;
 	}
 
-	private ExitStatusAssert(ExitStatus actual) {
-		super(actual, ExitStatusAssert.class);
+	public Future<?> submit(Runnable task) {
+		return executorService.submit(task);
 	}
 
-	public void isSuccess() {
-		isNotNull();
-		if (!actual.isSuccess()) {
-			failWithMessage("expected success but was error");
-		}
+	@Override
+	public void afterAll(ExtensionContext extensionContext) {
+		executorService.shutdown();
 	}
 
-	public void isError() {
-		isNotNull();
-		if (!actual.isError()) {
-			failWithMessage("expected error but was success");
-		}
-	}
-
-	public void hasExitCode(int expectedCode) {
-		isNotNull();
-		if (expectedCode != actual.value()) {
-			failWithMessage("expected %d but as %d", expectedCode,  actual.value());
-		}
-	}
 }
