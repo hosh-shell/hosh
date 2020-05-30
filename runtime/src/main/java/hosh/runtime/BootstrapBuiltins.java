@@ -23,7 +23,6 @@
  */
 package hosh.runtime;
 
-import hosh.runtime.SimpleCommandRegistry;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Module;
 import hosh.spi.State;

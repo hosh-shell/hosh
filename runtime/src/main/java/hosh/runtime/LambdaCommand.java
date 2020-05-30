@@ -24,7 +24,6 @@
 package hosh.runtime;
 
 import hosh.spi.Todo;
-import hosh.runtime.Interpreter;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
