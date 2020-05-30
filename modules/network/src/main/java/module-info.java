@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+import hosh.spi.Module;
 import hosh.modules.network.NetworkModule;
 
 module hosh.modules.fs {

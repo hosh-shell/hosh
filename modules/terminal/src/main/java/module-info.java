@@ -22,9 +22,13 @@
  * SOFTWARE.
  */
 
+import hosh.modules.terminal.TerminalModule;
+import hosh.spi.Module;
+
 module hosh.modules.fs {
 	requires hosh.spi;
 	requires java.logging;
+	requires jline.terminal;
 
 	uses Module;
 	provides Module with TerminalModule;

@@ -22,11 +22,13 @@
  * SOFTWARE.
  */
 
+import hosh.spi.Module;
 import hosh.modules.history.HistoryModule;
 
 module hosh.modules.fs {
 	requires hosh.spi;
 	requires java.logging;
+	requires jline.reader;
 
 	uses Module;
 	provides Module with HistoryModule;

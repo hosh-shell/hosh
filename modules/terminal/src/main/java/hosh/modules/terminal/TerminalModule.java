@@ -23,9 +23,9 @@
  */
 package hosh.modules.terminal;
 
-import hosh.doc.Description;
-import hosh.doc.Example;
-import hosh.doc.Examples;
+import hosh.spi.Description;
+import hosh.spi.Example;
+import hosh.spi.Examples;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
 import hosh.spi.ExitStatus;

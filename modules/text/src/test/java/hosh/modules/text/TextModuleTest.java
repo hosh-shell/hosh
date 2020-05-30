@@ -1,4 +1,4 @@
-package hosh.modules.text;/*
+/*
  * MIT License
  *
  * Copyright (c) 2018-2020 Davide Angelocola
@@ -21,7 +21,9 @@ package hosh.modules.text;/*
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package hosh.modules.text;
 
+import hosh.modules.text.TextModule;
 import hosh.modules.text.TextModule.Count;
 import hosh.modules.text.TextModule.Distinct;
 import hosh.modules.text.TextModule.Drop;

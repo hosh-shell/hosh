@@ -23,9 +23,9 @@
  */
 package hosh.modules.terminal;
 
-import hosh.modules.TerminalModule.Bell;
-import hosh.modules.TerminalModule.Clear;
-import hosh.modules.TerminalModule.Dump;
+import hosh.modules.terminal.TerminalModule.Bell;
+import hosh.modules.terminal.TerminalModule.Clear;
+import hosh.modules.terminal.TerminalModule.Dump;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -45,7 +45,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 

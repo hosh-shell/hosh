@@ -24,20 +24,6 @@
 package hosh.modules.filesystem;
 
 import hosh.spi.Bug;
-import hosh.modules.FileSystemModule.ChangeDirectory;
-import hosh.modules.FileSystemModule.Copy;
-import hosh.modules.FileSystemModule.CurrentWorkingDirectory;
-import hosh.modules.FileSystemModule.Hardlink;
-import hosh.modules.FileSystemModule.Lines;
-import hosh.modules.FileSystemModule.ListFiles;
-import hosh.modules.FileSystemModule.Move;
-import hosh.modules.FileSystemModule.Partitions;
-import hosh.modules.FileSystemModule.Probe;
-import hosh.modules.FileSystemModule.Remove;
-import hosh.modules.FileSystemModule.Resolve;
-import hosh.modules.FileSystemModule.Symlink;
-import hosh.modules.FileSystemModule.Walk;
-import hosh.modules.FileSystemModule.WithLock;
 import hosh.spi.Ansi;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -47,8 +33,8 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
-import hosh.testsupport.RecordMatcher;
-import hosh.testsupport.TemporaryFolder;
+import hosh.test.support.RecordMatcher;
+import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -78,6 +64,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 
 public class FileSystemModuleTest {
 
@@ -101,7 +88,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private ListFiles sut;
+		private FileSystemModule.ListFiles sut;
 
 		@Test
 		public void errorTwoOrMoreArgs() {
@@ -306,7 +293,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private ChangeDirectory sut;
+		private FileSystemModule.ChangeDirectory sut;
 
 		@Test
 		public void noArgs() {
@@ -382,7 +369,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private CurrentWorkingDirectory sut;
+		private FileSystemModule.CurrentWorkingDirectory sut;
 
 		@Test
 		public void noArgs() {
@@ -424,7 +411,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Lines sut;
+		private FileSystemModule.Lines sut;
 
 		@Test
 		public void emptyFile() throws IOException {
@@ -506,7 +493,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Copy sut;
+		private FileSystemModule.Copy sut;
 
 		@Test
 		public void zeroArgs() {
@@ -576,7 +563,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Move sut;
+		private FileSystemModule.Move sut;
 
 		@Test
 		public void zeroArgs() {
@@ -646,7 +633,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Remove sut;
+		private FileSystemModule.Remove sut;
 
 		@Test
 		public void zeroArgs() {
@@ -695,7 +682,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Partitions sut;
+		private FileSystemModule.Partitions sut;
 
 		@Test
 		public void listAllPartitions() {
@@ -736,7 +723,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Walk sut;
+		private FileSystemModule.Walk sut;
 
 		@Test
 		public void noArgs() {
@@ -833,7 +820,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Probe sut;
+		private FileSystemModule.Probe sut;
 
 		@Test
 		public void noArgs() {
@@ -959,7 +946,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Symlink sut;
+		private FileSystemModule.Symlink sut;
 
 		@Test
 		public void noArgs() {
@@ -1004,7 +991,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Hardlink sut;
+		private FileSystemModule.Hardlink sut;
 
 		@Test
 		public void noArgs() {
@@ -1049,7 +1036,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Resolve sut;
+		private FileSystemModule.Resolve sut;
 
 		@Test
 		public void noArgs() {
@@ -1115,7 +1102,7 @@ public class FileSystemModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private WithLock sut;
+		private FileSystemModule.WithLock sut;
 
 		@Test
 		public void noArgs() {
@@ -1141,7 +1128,7 @@ public class FileSystemModuleTest {
 		public void lock() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File lockFile = temporaryFolder.newFile("file.txt");
-			WithLock.LockResource resource = sut.before(List.of("file.txt"), in, out, err);
+			FileSystemModule.WithLock.LockResource resource = sut.before(List.of("file.txt"), in, out, err);
 			assertThat(resource).isNotNull();
 			// under same JVM tryLock throws exception
 			assertThatThrownBy(() -> resource.getRandomAccessFile().getChannel().tryLock())
