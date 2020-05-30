@@ -9,7 +9,7 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>hosh-terminal-module</artifactId>
+	<artifactId>hosh-network-module</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>dfa1</groupId>
@@ -31,7 +31,7 @@
 				<configuration>
 					<argLine>
 						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
-						--add-opens hosh.modules.terminal/hosh.modules.terminal=ALL-UNNAMED
+						--add-opens hosh.modules.network/hosh.modules.network=ALL-UNNAMED
 					</argLine>
 				</configuration>
 			</plugin>

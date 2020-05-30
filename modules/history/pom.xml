@@ -9,8 +9,32 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-
 	<artifactId>hosh-history-module</artifactId>
-
-
+	<dependencies>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-spi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-test-support</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>
+						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
+						--add-opens hosh.modules.history/hosh.modules.history=ALL-UNNAMED
+					</argLine>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

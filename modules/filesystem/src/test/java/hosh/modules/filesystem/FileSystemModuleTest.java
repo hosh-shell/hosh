@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.modules;
+package hosh.modules.filesystem;
 
-import hosh.doc.Bug;
+import hosh.spi.Bug;
 import hosh.modules.FileSystemModule.ChangeDirectory;
 import hosh.modules.FileSystemModule.Copy;
 import hosh.modules.FileSystemModule.CurrentWorkingDirectory;
@@ -258,7 +258,7 @@ public class FileSystemModuleTest {
 		public void listDotDot() throws IOException {
 			File cwd = temporaryFolder.newFolder("aaa");
 			given(state.getCwd()).willReturn(cwd.toPath().toAbsolutePath());
-			ExitStatus exitStatus = sut.run(List.of(".."), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("modules/network/src/main"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(

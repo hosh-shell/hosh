@@ -21,39 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.modules;
+package hosh.modules.network;
 
-import hosh.modules.TerminalModule.Bell;
-import hosh.modules.TerminalModule.Clear;
-import hosh.modules.TerminalModule.Dump;
+import hosh.doc.Todo;
+import hosh.modules.NetworkModule.Http;
+import hosh.modules.NetworkModule.Http.Requestor;
+import hosh.modules.NetworkModule.Network;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
+import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
-import org.jline.terminal.Attributes;
-import org.jline.terminal.Terminal;
+import hosh.testsupport.WithThread;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static hosh.testsupport.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-public class TerminalModuleTest {
+public class NetworkModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ClearTest {
+	public class NetworkTest {
 
 		@Mock
 		private InputChannel in;
@@ -64,82 +67,35 @@ public class TerminalModuleTest {
 		@Mock
 		private OutputChannel err;
 
-		@Mock
-		private Terminal terminal;
-
 		@InjectMocks
-		private Clear sut;
+		private Network sut;
 
+		@Todo(description = "this is a very bland test: let's try to consolidate this command before investing more")
 		@Test
 		public void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(terminal).should().puts(ArgumentMatchers.any());
-			then(terminal).should().flush();
-			then(terminal).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(Mockito.atLeastOnce()).send(Mockito.any(Record.class));
+			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		public void oneArg() {
-			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(terminal).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
-			then(err).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
 		}
 	}
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class BellTest {
+	public class HttpTest {
 
-		@Mock
-		private InputChannel in;
-
-		@Mock
-		private OutputChannel out;
-
-		@Mock
-		private OutputChannel err;
-
-		@Mock
-		private Terminal terminal;
-
-		@InjectMocks
-		private Bell sut;
-
-		@Test
-		public void noArgs() {
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus).isSuccess();
-			then(terminal).should().puts(ArgumentMatchers.any());
-			then(terminal).should().flush();
-			then(terminal).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveNoMoreInteractions();
-		}
-
-		@Test
-		public void oneArg() {
-			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
-			assertThat(exitStatus).isError();
-			then(terminal).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
-			then(err).shouldHaveNoMoreInteractions();
-		}
-	}
-
-	@Nested
-	@ExtendWith(MockitoExtension.class)
-	public class DumpTest {
+		@RegisterExtension
+		public final WithThread withThread = new WithThread();
 
 		@Mock
 		private InputChannel in;
@@ -151,20 +107,42 @@ public class TerminalModuleTest {
 		private OutputChannel err;
 
 		@Mock(stubOnly = true)
-		private Terminal terminal;
+		private Requestor requestor;
+
+		@Mock(stubOnly = true)
+		private HttpResponse<Stream<String>> response;
 
 		@InjectMocks
-		private Dump sut;
+		private Http sut;
 
 		@Test
 		public void noArgs() {
-			given(terminal.getType()).willReturn("xterm");
-			given(terminal.getAttributes()).willReturn(new Attributes());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: http URL")));
+		}
+
+		@Test
+		public void oneArg() throws InterruptedException {
+			given(requestor.send(Mockito.any())).willReturn(response);
+			given(response.body()).willReturn(Stream.of("line1"));
+			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(Mockito.any());
-			then(err).shouldHaveNoMoreInteractions();
+			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		public void interrupted() throws InterruptedException {
+			given(requestor.send(Mockito.any())).willThrow(new InterruptedException("simulated"));
+			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 		}
 	}
 }
