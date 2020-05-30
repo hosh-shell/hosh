@@ -578,7 +578,7 @@ public class HoshIT {
 		List<String> cmd = new ArrayList<>();
 		cmd.add(absoluteJavaBinary());
 		cmd.addAll(propagateJacocoAgentInvocation());
-		cmd.addAll(List.of("-jar", "target/dist/hosh.jar"));
+		cmd.addAll(List.of("-jar", "target/hosh.jar"));
 		cmd.addAll(List.of(args));
 		return new ProcessBuilder()
 			       .command(cmd)
