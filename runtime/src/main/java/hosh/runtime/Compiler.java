@@ -23,10 +23,10 @@
  */
 package hosh.runtime;
 
-import hosh.spi.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
+import hosh.spi.Todo;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -35,20 +35,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static hosh.runtime.antlr4.HoshParser.CommandContext;
-import static hosh.runtime.antlr4.HoshParser.DqstringContext;
-import static hosh.runtime.antlr4.HoshParser.ExpansionContext;
-import static hosh.runtime.antlr4.HoshParser.ExpressionContext;
-import static hosh.runtime.antlr4.HoshParser.InvocationContext;
-import static hosh.runtime.antlr4.HoshParser.LambdaContext;
-import static hosh.runtime.antlr4.HoshParser.PipelineContext;
-import static hosh.runtime.antlr4.HoshParser.ProgramContext;
-import static hosh.runtime.antlr4.HoshParser.SequenceContext;
-import static hosh.runtime.antlr4.HoshParser.SimpleContext;
-import static hosh.runtime.antlr4.HoshParser.SqstringContext;
-import static hosh.runtime.antlr4.HoshParser.StmtContext;
-import static hosh.runtime.antlr4.HoshParser.StringContext;
-import static hosh.runtime.antlr4.HoshParser.WrappedContext;
+import static hosh.runtime.HoshParser.CommandContext;
+import static hosh.runtime.HoshParser.DqstringContext;
+import static hosh.runtime.HoshParser.ExpansionContext;
+import static hosh.runtime.HoshParser.ExpressionContext;
+import static hosh.runtime.HoshParser.InvocationContext;
+import static hosh.runtime.HoshParser.LambdaContext;
+import static hosh.runtime.HoshParser.PipelineContext;
+import static hosh.runtime.HoshParser.ProgramContext;
+import static hosh.runtime.HoshParser.SequenceContext;
+import static hosh.runtime.HoshParser.SimpleContext;
+import static hosh.runtime.HoshParser.SqstringContext;
+import static hosh.runtime.HoshParser.StmtContext;
+import static hosh.runtime.HoshParser.StringContext;
+import static hosh.runtime.HoshParser.WrappedContext;
 
 public class Compiler {
 
