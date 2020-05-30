@@ -22,13 +22,8 @@
  * SOFTWARE.
  */
 
-import hosh.modules.filesystem.FileSystemModule;
-import hosh.spi.Module;
-
 module hosh.modules.filesystem {
 	requires hosh.spi;
 	requires java.logging;
 
-	uses Module;
-	provides Module with FileSystemModule;
 }

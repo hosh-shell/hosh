@@ -21,13 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import hosh.spi.Module;
-import hosh.modules.text.TextModule;
-
 module hosh.modules.text {
 	requires hosh.spi;
-
-	uses Module;
-	provides Module with TextModule;
 }
