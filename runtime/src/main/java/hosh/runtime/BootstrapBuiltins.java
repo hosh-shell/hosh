@@ -21,9 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package hosh.runtime;
+
+import hosh.runtime.SimpleCommandRegistry;
+import hosh.spi.CommandRegistry;
+import hosh.spi.Module;
+import hosh.spi.State;
+
+import java.util.ServiceLoader;
+
 /**
- * Implementation details.
- * <p>
- * Any non-api class (i.e. not consumed directly by modules) should go here.
+ * Registers all built-in command, used in both production and test.
  */
-package runtime;
+public class BootstrapBuiltins {
+
+	public void registerAllBuiltins(State state) {
+		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
+		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
+		for (Module module : modules) {
+			module.initialize(commandRegistry);
+		}
+	}
+}

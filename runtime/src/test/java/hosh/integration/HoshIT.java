@@ -23,7 +23,7 @@
  */
 package hosh.integration;
 
-import hosh.Hosh;
+import hosh.runtime.Hosh;
 import hosh.doc.Bug;
 import hosh.doc.Todo;
 import hosh.testsupport.TemporaryFolder;

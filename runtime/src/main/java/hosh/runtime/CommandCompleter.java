@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package runtime;
+package hosh.runtime;
 
 import hosh.spi.LoggerFactory;
 import hosh.spi.State;

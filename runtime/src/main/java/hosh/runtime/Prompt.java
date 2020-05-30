@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package runtime;
+package hosh.runtime;
 
-import hosh.doc.Todo;
+import hosh.spi.Todo;
 import hosh.spi.Ansi;
 
 import java.io.PrintWriter;

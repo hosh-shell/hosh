@@ -21,10 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package runtime;
+package hosh.runtime;
 
-import hosh.antlr4.HoshLexer;
-import hosh.antlr4.HoshParser;
+import hosh.runtime.antlr4.HoshLexer;
+import hosh.runtime.antlr4.HoshParser;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

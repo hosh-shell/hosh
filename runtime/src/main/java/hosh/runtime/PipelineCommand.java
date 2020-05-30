@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package runtime;
+package hosh.runtime;
 
-import runtime.Compiler.Statement;
-import runtime.PipelineChannel.ProducerPoisonPill;
+import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -130,7 +129,7 @@ public class PipelineCommand implements Command, InterpreterAware {
 			pipelinePosition(position, command);
 			try {
 				return interpreter.eval(statement, in, out, err);
-			} catch (ProducerPoisonPill e) {
+			} catch (PipelineChannel.ProducerPoisonPill e) {
 				return ExitStatus.success();
 			} finally {
 				stopProducer(in);

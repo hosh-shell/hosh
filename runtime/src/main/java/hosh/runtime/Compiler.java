@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package runtime;
+package hosh.runtime;
 
-import hosh.doc.Todo;
+import hosh.spi.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
@@ -35,20 +35,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static hosh.antlr4.HoshParser.CommandContext;
-import static hosh.antlr4.HoshParser.DqstringContext;
-import static hosh.antlr4.HoshParser.ExpansionContext;
-import static hosh.antlr4.HoshParser.ExpressionContext;
-import static hosh.antlr4.HoshParser.InvocationContext;
-import static hosh.antlr4.HoshParser.LambdaContext;
-import static hosh.antlr4.HoshParser.PipelineContext;
-import static hosh.antlr4.HoshParser.ProgramContext;
-import static hosh.antlr4.HoshParser.SequenceContext;
-import static hosh.antlr4.HoshParser.SimpleContext;
-import static hosh.antlr4.HoshParser.SqstringContext;
-import static hosh.antlr4.HoshParser.StmtContext;
-import static hosh.antlr4.HoshParser.StringContext;
-import static hosh.antlr4.HoshParser.WrappedContext;
+import static hosh.runtime.antlr4.HoshParser.CommandContext;
+import static hosh.runtime.antlr4.HoshParser.DqstringContext;
+import static hosh.runtime.antlr4.HoshParser.ExpansionContext;
+import static hosh.runtime.antlr4.HoshParser.ExpressionContext;
+import static hosh.runtime.antlr4.HoshParser.InvocationContext;
+import static hosh.runtime.antlr4.HoshParser.LambdaContext;
+import static hosh.runtime.antlr4.HoshParser.PipelineContext;
+import static hosh.runtime.antlr4.HoshParser.ProgramContext;
+import static hosh.runtime.antlr4.HoshParser.SequenceContext;
+import static hosh.runtime.antlr4.HoshParser.SimpleContext;
+import static hosh.runtime.antlr4.HoshParser.SqstringContext;
+import static hosh.runtime.antlr4.HoshParser.StmtContext;
+import static hosh.runtime.antlr4.HoshParser.StringContext;
+import static hosh.runtime.antlr4.HoshParser.WrappedContext;
 
 public class Compiler {
 
@@ -83,7 +83,7 @@ public class Compiler {
 		if (ctx.getChildCount() == 3) {
 			Statement first = compilePipeline(ctx.pipeline());
 			Statement second = compileSequence(ctx.sequence());
-			SequenceCommand command = new SequenceCommand(first, second);
+			runtime.SequenceCommand command = new runtime.SequenceCommand(first, second);
 			return new Statement(command, List.of(), "", "sequence: " + ctx.getText());
 		}
 		throw new InternalBug(ctx);
@@ -100,7 +100,7 @@ public class Compiler {
 		if (ctx.getChildCount() == 3) { // pipeline
 			Statement producer = compileCommand(ctx.command());
 			Statement consumer = compileStatement(ctx.stmt());
-			PipelineCommand command = new PipelineCommand(producer, consumer);
+			runtime.PipelineCommand command = new runtime.PipelineCommand(producer, consumer);
 			return new Statement(command, List.of(), "", "pipeline: " + ctx.getText());
 		}
 		throw new InternalBug(ctx);
@@ -151,7 +151,7 @@ public class Compiler {
 			throw new CompileError(String.format("line %d: '%s' with empty wrapping statement", line, commandName));
 		}
 		Statement nestedStatement = compileStatement(ctx.stmt());
-		DefaultCommandWrapper<?> wrappedCommand = new DefaultCommandWrapper<>(nestedStatement, commandWrapper);
+		runtime.DefaultCommandWrapper<?> wrappedCommand = new runtime.DefaultCommandWrapper<>(nestedStatement, commandWrapper);
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
 		return new Statement(wrappedCommand, arguments, commandName, "wrapper: " + ctx.getText());
 	}
@@ -159,7 +159,7 @@ public class Compiler {
 	private Statement compileLambda(LambdaContext ctx) {
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		String key = ctx.ID().getSymbol().getText();
-		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "", "lambda: " + ctx.getText());
+		return new Statement(new runtime.LambdaCommand(nestedStatement, key), List.of(), "", "lambda: " + ctx.getText());
 	}
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {
