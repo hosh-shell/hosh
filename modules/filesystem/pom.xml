@@ -9,7 +9,7 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>hosh-text-module</artifactId>
+	<artifactId>hosh-fs-module</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>dfa1</groupId>
@@ -31,7 +31,7 @@
 				<configuration>
 					<argLine>
 						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
-						--add-opens hosh.modules.text/hosh.modules.text=ALL-UNNAMED
+						--add-opens hosh.modules.filesystem/hosh.modules.filesystem=ALL-UNNAMED
 					</argLine>
 				</configuration>
 			</plugin>

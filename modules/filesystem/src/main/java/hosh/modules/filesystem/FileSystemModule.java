@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.modules;
+package hosh.modules.filesystem;
 
-import hosh.doc.Bug;
-import hosh.doc.Description;
-import hosh.doc.Example;
-import hosh.doc.Examples;
-import hosh.doc.Experimental;
-import hosh.doc.Todo;
+import hosh.spi.Bug;
+import hosh.spi.Description;
+import hosh.spi.Example;
+import hosh.spi.Examples;
+import hosh.spi.Experimental;
+import hosh.spi.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
@@ -36,11 +36,11 @@ import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
-import hosh.spi.LoggerFactory;
 import hosh.spi.Module;
+import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
-import hosh.spi.Record;
 import hosh.spi.Records;
+import hosh.spi.Record;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Value;

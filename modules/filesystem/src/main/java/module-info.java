@@ -22,12 +22,13 @@
  * SOFTWARE.
  */
 
+import hosh.modules.filesystem.FileSystemModule;
 import hosh.spi.Module;
-import hosh.modules.text.TextModule;
 
-module hosh.modules.text {
+module hosh.modules.fs {
 	requires hosh.spi;
+	requires java.logging;
 
 	uses Module;
-	provides Module with TextModule;
+	provides Module with FileSystemModule;
 }
