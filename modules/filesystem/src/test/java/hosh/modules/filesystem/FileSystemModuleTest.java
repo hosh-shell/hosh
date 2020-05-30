@@ -245,7 +245,7 @@ public class FileSystemModuleTest {
 		public void listDotDot() throws IOException {
 			File cwd = temporaryFolder.newFolder("aaa");
 			given(state.getCwd()).willReturn(cwd.toPath().toAbsolutePath());
-			ExitStatus exitStatus = sut.run(List.of("modules/network/src/main"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of(".."), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
