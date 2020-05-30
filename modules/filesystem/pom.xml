@@ -9,7 +9,7 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>hosh-fs-module</artifactId>
+	<artifactId>hosh-filesystem-module</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>dfa1</groupId>

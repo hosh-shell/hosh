@@ -25,7 +25,7 @@
 import hosh.modules.filesystem.FileSystemModule;
 import hosh.spi.Module;
 
-module hosh.modules.fs {
+module hosh.modules.filesystem {
 	requires hosh.spi;
 	requires java.logging;
 
