@@ -23,10 +23,7 @@
  */
 package hosh.modules.network;
 
-import hosh.doc.Todo;
-import hosh.modules.NetworkModule.Http;
-import hosh.modules.NetworkModule.Http.Requestor;
-import hosh.modules.NetworkModule.Network;
+import hosh.spi.Todo;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -34,7 +31,7 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
-import hosh.testsupport.WithThread;
+import hosh.test.support.WithThread;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +45,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -68,7 +65,7 @@ public class NetworkModuleTest {
 		private OutputChannel err;
 
 		@InjectMocks
-		private Network sut;
+		private NetworkModule.Network sut;
 
 		@Todo(description = "this is a very bland test: let's try to consolidate this command before investing more")
 		@Test
@@ -107,13 +104,13 @@ public class NetworkModuleTest {
 		private OutputChannel err;
 
 		@Mock(stubOnly = true)
-		private Requestor requestor;
+		private NetworkModule.Http.Requestor requestor;
 
 		@Mock(stubOnly = true)
 		private HttpResponse<Stream<String>> response;
 
 		@InjectMocks
-		private Http sut;
+		private NetworkModule.Http sut;
 
 		@Test
 		public void noArgs() {

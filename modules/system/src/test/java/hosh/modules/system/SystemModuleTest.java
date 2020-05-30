@@ -55,9 +55,9 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
-import hosh.testsupport.RecordMatcher;
-import hosh.testsupport.TemporaryFolder;
-import hosh.testsupport.WithThread;
+import hosh.test.support.RecordMatcher;
+import hosh.test.support.TemporaryFolder;
+import hosh.test.support.WithThread;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.junit.jupiter.api.Nested;
@@ -89,6 +89,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 
 public class SystemModuleTest {
 

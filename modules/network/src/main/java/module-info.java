@@ -25,9 +25,10 @@
 import hosh.spi.Module;
 import hosh.modules.network.NetworkModule;
 
-module hosh.modules.fs {
+module hosh.modules.network {
 	requires hosh.spi;
 	requires java.logging;
+	requires java.net.http;
 
 	uses Module;
 	provides Module with NetworkModule;
