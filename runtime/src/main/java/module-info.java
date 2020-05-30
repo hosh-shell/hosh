@@ -33,4 +33,6 @@ module hosh.runtime {
 	requires commons.cli;
 
 	requires org.antlr.antlr4.runtime;
+
+	uses hosh.spi.Module;
 }

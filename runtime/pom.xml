@@ -17,6 +17,42 @@
 		</dependency>
 		<dependency>
 			<groupId>dfa1</groupId>
+			<artifactId>hosh-filesystem-module</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-history-module</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-network-module</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-system-module</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-terminal-module</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-text-module</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
 			<artifactId>hosh-test-support</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>

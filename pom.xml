@@ -200,7 +200,7 @@
 						<param>hosh.*</param>
 					</targetTests>
 					<excludedClasses>
-						<param>hosh.antlr4.*</param>
+						<param>hosh.runtime.antlr4.*</param>
 					</excludedClasses>
 					<excludedTestClasses>
 						<param>hosh.integration.*</param>
@@ -216,27 +216,6 @@
 						<version>0.12</version>
 					</dependency>
 				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0-M3</version>
-				<executions>
-					<execution>
-						<id>enforce-no-repositories</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireMavenVersion>
-									<version>3.6.0</version>
-								</requireMavenVersion>
-								<requireNoRepositories/>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -294,11 +273,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

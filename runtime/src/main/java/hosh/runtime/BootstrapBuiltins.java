@@ -24,20 +24,26 @@
 package hosh.runtime;
 
 import hosh.spi.CommandRegistry;
+import hosh.spi.LoggerFactory;
 import hosh.spi.Module;
 import hosh.spi.State;
 
 import java.util.ServiceLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Registers all built-in command, used in both production and test.
  */
 public class BootstrapBuiltins {
 
+	private final Logger logger = LoggerFactory.forEnclosingClass();
+
 	public void registerAllBuiltins(State state) {
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {
+			logger.log(Level.INFO, "registering " + module.getClass().getCanonicalName());
 			module.initialize(commandRegistry);
 		}
 	}
