@@ -25,7 +25,7 @@
 import hosh.modules.terminal.TerminalModule;
 import hosh.spi.Module;
 
-module hosh.modules.fs {
+module hosh.modules.terminal {
 	requires hosh.spi;
 	requires java.logging;
 	requires jline.terminal;

@@ -25,7 +25,7 @@
 import hosh.spi.Module;
 import hosh.modules.history.HistoryModule;
 
-module hosh.modules.fs {
+module hosh.modules.history {
 	requires hosh.spi;
 	requires java.logging;
 	requires jline.reader;

@@ -24,7 +24,7 @@
 import hosh.modules.system.SystemModule;
 import hosh.spi.Module;
 
-module hosh.modules.fs {
+module hosh.modules.system {
 	requires hosh.spi;
 	requires java.logging;
 	requires jline.reader;
