@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh;
+package hosh.runtime;
 
 import hosh.runtime.PathInitializer;
 import org.junit.jupiter.api.BeforeEach;

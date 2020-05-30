@@ -42,6 +42,8 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
 /**
  * Enforcing some useful rules for junit tests.
+ *
+ * @deprecated adapt to modular build or remove it
  */
 @AnalyzeClasses(packagesOf = Hosh.class)
 public class JUnitFitnessTest {

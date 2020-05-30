@@ -23,8 +23,8 @@
  */
 package hosh.runtime;
 
-import hosh.testsupport.WithThread;
-import hosh.testsupport.WithTimeZone;
+import hosh.test.support.WithThread;
+import hosh.test.support.WithTimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;

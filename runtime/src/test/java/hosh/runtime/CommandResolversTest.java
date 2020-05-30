@@ -26,7 +26,7 @@ package hosh.runtime;
 import hosh.runtime.CommandResolvers.WindowsCommandResolver;
 import hosh.spi.Command;
 import hosh.spi.State;
-import hosh.testsupport.TemporaryFolder;
+import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

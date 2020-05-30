@@ -24,8 +24,8 @@
 package hosh.runtime;
 
 import hosh.spi.Record;
-import hosh.testsupport.WithExecutor;
-import hosh.testsupport.WithThread;
+import hosh.test.support.WithExecutor;
+import hosh.test.support.WithThread;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;

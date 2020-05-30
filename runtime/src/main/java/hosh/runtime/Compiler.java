@@ -35,20 +35,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static hosh.runtime.HoshParser.CommandContext;
-import static hosh.runtime.HoshParser.DqstringContext;
-import static hosh.runtime.HoshParser.ExpansionContext;
-import static hosh.runtime.HoshParser.ExpressionContext;
-import static hosh.runtime.HoshParser.InvocationContext;
-import static hosh.runtime.HoshParser.LambdaContext;
-import static hosh.runtime.HoshParser.PipelineContext;
-import static hosh.runtime.HoshParser.ProgramContext;
-import static hosh.runtime.HoshParser.SequenceContext;
-import static hosh.runtime.HoshParser.SimpleContext;
-import static hosh.runtime.HoshParser.SqstringContext;
-import static hosh.runtime.HoshParser.StmtContext;
-import static hosh.runtime.HoshParser.StringContext;
-import static hosh.runtime.HoshParser.WrappedContext;
+import static hosh.runtime.antlr4.HoshParser.CommandContext;
+import static hosh.runtime.antlr4.HoshParser.DqstringContext;
+import static hosh.runtime.antlr4.HoshParser.ExpansionContext;
+import static hosh.runtime.antlr4.HoshParser.ExpressionContext;
+import static hosh.runtime.antlr4.HoshParser.InvocationContext;
+import static hosh.runtime.antlr4.HoshParser.LambdaContext;
+import static hosh.runtime.antlr4.HoshParser.PipelineContext;
+import static hosh.runtime.antlr4.HoshParser.ProgramContext;
+import static hosh.runtime.antlr4.HoshParser.SequenceContext;
+import static hosh.runtime.antlr4.HoshParser.SimpleContext;
+import static hosh.runtime.antlr4.HoshParser.SqstringContext;
+import static hosh.runtime.antlr4.HoshParser.StmtContext;
+import static hosh.runtime.antlr4.HoshParser.StringContext;
+import static hosh.runtime.antlr4.HoshParser.WrappedContext;
 
 public class Compiler {
 
@@ -83,7 +83,7 @@ public class Compiler {
 		if (ctx.getChildCount() == 3) {
 			Statement first = compilePipeline(ctx.pipeline());
 			Statement second = compileSequence(ctx.sequence());
-			runtime.SequenceCommand command = new runtime.SequenceCommand(first, second);
+			SequenceCommand command = new SequenceCommand(first, second);
 			return new Statement(command, List.of(), "", "sequence: " + ctx.getText());
 		}
 		throw new InternalBug(ctx);
@@ -100,7 +100,7 @@ public class Compiler {
 		if (ctx.getChildCount() == 3) { // pipeline
 			Statement producer = compileCommand(ctx.command());
 			Statement consumer = compileStatement(ctx.stmt());
-			runtime.PipelineCommand command = new runtime.PipelineCommand(producer, consumer);
+			PipelineCommand command = new PipelineCommand(producer, consumer);
 			return new Statement(command, List.of(), "", "pipeline: " + ctx.getText());
 		}
 		throw new InternalBug(ctx);
@@ -151,7 +151,7 @@ public class Compiler {
 			throw new CompileError(String.format("line %d: '%s' with empty wrapping statement", line, commandName));
 		}
 		Statement nestedStatement = compileStatement(ctx.stmt());
-		runtime.DefaultCommandWrapper<?> wrappedCommand = new runtime.DefaultCommandWrapper<>(nestedStatement, commandWrapper);
+		DefaultCommandWrapper<?> wrappedCommand = new DefaultCommandWrapper<>(nestedStatement, commandWrapper);
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
 		return new Statement(wrappedCommand, arguments, commandName, "wrapper: " + ctx.getText());
 	}
@@ -159,7 +159,7 @@ public class Compiler {
 	private Statement compileLambda(LambdaContext ctx) {
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		String key = ctx.ID().getSymbol().getText();
-		return new Statement(new runtime.LambdaCommand(nestedStatement, key), List.of(), "", "lambda: " + ctx.getText());
+		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "", "lambda: " + ctx.getText());
 	}
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {

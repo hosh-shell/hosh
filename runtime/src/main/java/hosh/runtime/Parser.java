@@ -23,8 +23,8 @@
  */
 package hosh.runtime;
 
-import hosh.runtime.HoshLexer;
-import hosh.runtime.HoshParser;
+import hosh.runtime.antlr4.HoshLexer;
+import hosh.runtime.antlr4.HoshParser;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

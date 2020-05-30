@@ -25,7 +25,7 @@ package hosh.runtime;
 
 import hosh.spi.Command;
 import hosh.spi.State;
-import hosh.testsupport.TemporaryFolder;
+import hosh.test.support.TemporaryFolder;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;

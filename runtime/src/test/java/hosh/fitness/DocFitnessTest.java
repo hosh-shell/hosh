@@ -32,9 +32,9 @@ import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import hosh.runtime.BootstrapBuiltins;
 import hosh.runtime.Hosh;
-import hosh.doc.Description;
-import hosh.doc.Example;
-import hosh.doc.Examples;
+import hosh.spi.Description;
+import hosh.spi.Example;
+import hosh.spi.Examples;
 import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
 import hosh.runtime.Compiler.CompileError;
@@ -46,6 +46,11 @@ import hosh.spi.State;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Run compile all examples
+ *
+ * @deprecated adapt to modular build or remove it
+ */
 @AnalyzeClasses(packagesOf = Hosh.class)
 public class DocFitnessTest {
 

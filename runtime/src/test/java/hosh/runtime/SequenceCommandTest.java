@@ -36,7 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doReturn;
 

@@ -15,20 +15,15 @@
 			<artifactId>hosh-spi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>dfa1</groupId>
+			<artifactId>hosh-test-support</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<compilerArgs>
-						<arg>--add-exports</arg>
-						<arg>java.base/jdk.internal.misc=hosh.runtime</arg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
@@ -83,7 +78,7 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>${project.build.directory}/generated-sources/antlr4</source>
+								<source>${project.basedir}/hosh-runtime/target/generated-sources/antlr4</source>
 							</sources>
 						</configuration>
 					</execution>
@@ -126,6 +121,17 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>
+						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
+						--add-opens hosh.runtime/hosh.runtime=ALL-UNNAMED
+						--add-exports java.base/jdk.internal.misc=hosh.runtime
+					</argLine>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -32,7 +32,7 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
-import hosh.testsupport.TemporaryFolder;
+import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,6 +57,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class ExternalCommandTest {

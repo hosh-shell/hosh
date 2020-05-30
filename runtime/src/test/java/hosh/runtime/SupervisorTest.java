@@ -24,7 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.ExitStatus;
-import hosh.testsupport.WithThread;
+import hosh.test.support.WithThread;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.concurrent.ExecutionException;
 
-import static hosh.testsupport.ExitStatusAssert.assertThat;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class SupervisorTest {

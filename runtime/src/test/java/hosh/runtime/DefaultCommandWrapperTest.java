@@ -42,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultCommandWrapperTest {

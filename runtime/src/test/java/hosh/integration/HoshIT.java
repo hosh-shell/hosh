@@ -24,9 +24,9 @@
 package hosh.integration;
 
 import hosh.runtime.Hosh;
-import hosh.doc.Bug;
-import hosh.doc.Todo;
-import hosh.testsupport.TemporaryFolder;
+import hosh.spi.Bug;
+import hosh.spi.Todo;
+import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;

@@ -33,8 +33,8 @@ import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.State;
 import hosh.spi.Values;
-import hosh.testsupport.RecordMatcher;
-import hosh.testsupport.WithThread;
+import hosh.test.support.RecordMatcher;
+import hosh.test.support.WithThread;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static hosh.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
