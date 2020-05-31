@@ -21,16 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module hosh.runtime {
-	requires hosh.spi;
-
+module hosh {
+	requires hosh.runtime;
 	requires java.logging;
-	requires jdk.jfr;
-
+	requires hosh.spi;
+	requires commons.cli;
 	requires jline.reader;
 	requires jline.terminal;
-
-	requires org.antlr.antlr4.runtime;
-
-	exports hosh.runtime;
 }

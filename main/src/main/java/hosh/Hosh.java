@@ -21,9 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh;
 
+import hosh.runtime.BootstrapBuiltins;
+import hosh.runtime.CancellableChannel;
+import hosh.runtime.CommandCompleter;
+import hosh.runtime.CommandResolver;
+import hosh.runtime.CommandResolvers;
+import hosh.runtime.Compiler;
 import hosh.runtime.Compiler.Program;
+import hosh.runtime.ConsoleChannel;
+import hosh.runtime.DisabledHistory;
+import hosh.runtime.FileSystemCompleter;
+import hosh.runtime.HoshFormatter;
+import hosh.runtime.Injector;
+import hosh.runtime.Interpreter;
+import hosh.runtime.PathInitializer;
+import hosh.runtime.Prompt;
+import hosh.runtime.ReplReader;
+import hosh.runtime.VariableExpansionCompleter;
+import hosh.runtime.VersionLoader;
 import hosh.spi.Ansi;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;

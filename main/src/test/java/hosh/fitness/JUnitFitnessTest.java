@@ -30,7 +30,7 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import hosh.runtime.Hosh;
+import hosh.Hosh;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,8 +42,6 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
 /**
  * Enforcing some useful rules for junit tests.
- *
- * @deprecated adapt to modular build or remove it
  */
 @AnalyzeClasses(packagesOf = Hosh.class)
 public class JUnitFitnessTest {
