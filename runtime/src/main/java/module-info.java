@@ -33,4 +33,6 @@ module hosh.runtime {
 	requires org.antlr.antlr4.runtime;
 
 	exports hosh.runtime;
+
+	uses hosh.spi.Module;
 }

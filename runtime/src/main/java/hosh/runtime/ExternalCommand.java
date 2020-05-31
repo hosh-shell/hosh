@@ -52,7 +52,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ExternalCommand implements Command, StateAware {
+// generated for any non built-in commands (native)
+class ExternalCommand implements Command, StateAware {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
