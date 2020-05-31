@@ -98,7 +98,7 @@ public class SystemModuleTest {
 	public class ExitTest {
 
 		@Spy
-		private State state = new State();
+		private final State state = new State();
 
 		@Mock
 		private InputChannel in;
@@ -739,7 +739,7 @@ public class SystemModuleTest {
 		private OutputChannel err;
 
 		@Spy
-		private State state = new State();
+		private final State state = new State();
 
 		@InjectMocks
 		private SetVariable sut;
@@ -808,7 +808,7 @@ public class SystemModuleTest {
 		private OutputChannel err;
 
 		@Spy
-		private State state = new State();
+		private final State state = new State();
 
 		@InjectMocks
 		private UnsetVariable sut;
@@ -922,7 +922,7 @@ public class SystemModuleTest {
 	public class CaptureTest {
 
 		@Spy
-		private State state = new State();
+		private final State state = new State();
 
 		@Mock
 		private InputChannel in;
@@ -1108,7 +1108,7 @@ public class SystemModuleTest {
 		private LineReader lineReader;
 
 		@Spy
-		private State state = new State();
+		private final State state = new State();
 
 		@Mock
 		private InputChannel in;
@@ -1171,7 +1171,7 @@ public class SystemModuleTest {
 		private LineReader lineReader;
 
 		@Spy
-		private State state = new State();
+		private final State state = new State();
 
 		@Mock
 		private InputChannel in;

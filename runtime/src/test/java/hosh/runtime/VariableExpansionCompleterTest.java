@@ -51,7 +51,7 @@ public class VariableExpansionCompleterTest {
 	private ParsedLine parsedLine;
 
 	@Spy
-	private State state = new State();
+	private final State state = new State();
 
 	@InjectMocks
 	private VariableExpansionCompleter sut;

@@ -21,36 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.fitness;
+package hosh.test.fitness;
 
 import com.tngtech.archunit.core.domain.JavaField;
-import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import hosh.Hosh;
+import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.mockito.Mock;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
-
 /**
  * Fitness function to check:
  * - methods in tests are well encapsulated (e.g. no public utility methods, etc)
  * - all @Mocks are used (@InjectMock prevents to see that easily)
  */
-@AnalyzeClasses(packagesOf = Hosh.class)
-public class JUnitFitnessTest {
+public abstract class UnitTestsFitnessTest {
 
+	@SuppressWarnings("unused")
 	@ArchTest
-	public final ArchRule unannotatedMethodsInTestsMustBePrivate =
-		methods().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Test")
+	public static final ArchRule UNANNOTATED_METHODS_IN_TESTS_MUST_BE_PRIVATE =
+		ArchRuleDefinition.methods().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Test")
 			.or().areDeclaredInClassesThat().haveSimpleNameEndingWith("IT")
 			.and().areNotPrivate()
 			.should().beAnnotatedWith(Test.class)
@@ -58,9 +54,10 @@ public class JUnitFitnessTest {
 			.orShould().beAnnotatedWith(AfterEach.class)
 			.orShould().beAnnotatedWith(ParameterizedTest.class);
 
+	@SuppressWarnings("unused")
 	@ArchTest
-	public final ArchRule noUnusedMocks =
-		fields()
+	public static final ArchRule MOCKS_MUST_BE_USED =
+		ArchRuleDefinition.fields()
 			.that()
 			.areNotStatic().and().areAnnotatedWith(Mock.class)
 			.should(haveAccesses());
@@ -79,7 +76,7 @@ public class JUnitFitnessTest {
 		@Override
 		public void check(JavaField item, ConditionEvents events) {
 			if (item.getAccessesToSelf().isEmpty()) {
-				events.add(SimpleConditionEvent.violated(item,"unused @Mock " + item.getFullName()));
+				events.add(SimpleConditionEvent.violated(item, "unused @Mock " + item.getFullName()));
 			}
 		}
 	}

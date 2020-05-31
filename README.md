@@ -33,7 +33,6 @@ Hosh is an experimental shell written in Java, featuring:
 - **built with modern tooling and concepts**
     - Java modules (but still not fully modular)
     - fitness functions from *Evolutionary Architecture* ISBN-13: 978-1491986363)
-    - 
 
 ¹ it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
 

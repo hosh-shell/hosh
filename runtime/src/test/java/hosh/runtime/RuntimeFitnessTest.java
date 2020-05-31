@@ -21,9 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/**
- * Architecture tests.
- * <p>
- * Fitness functions (see Evolutionary Architecture ISBN-13: 978-1491986363).
- */
-package hosh.fitness;
+package hosh.runtime;
+
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import hosh.test.fitness.UnitTestsFitnessTest;
+
+@AnalyzeClasses(packagesOf = VersionLoader.class)
+public class RuntimeFitnessTest extends UnitTestsFitnessTest {
+
+}

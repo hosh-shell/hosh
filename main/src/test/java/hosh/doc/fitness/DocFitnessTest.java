@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.fitness;
+package hosh.doc.fitness;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.junit.AnalyzeClasses;
@@ -30,11 +30,11 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import hosh.runtime.BootstrapBuiltins;
-import hosh.Hosh;
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
+import hosh.runtime.BootstrapBuiltins;
+import hosh.Hosh;
 import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
 import hosh.runtime.Compiler.CompileError;

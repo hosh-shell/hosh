@@ -47,7 +47,7 @@ public class SimpleCommandRegistryTest {
 	private Command anotherCommand;
 
 	@Spy
-	private State state = new State();
+	private final State state = new State();
 
 	@InjectMocks
 	private SimpleCommandRegistry sut;

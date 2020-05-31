@@ -21,13 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module hosh {
-	requires java.logging;
+package hosh.modules.system;
 
-	requires hosh.runtime;
-	requires hosh.spi;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import hosh.test.fitness.UnitTestsFitnessTest;
 
-	requires commons.cli;
-	requires jline.reader;
-	requires jline.terminal;
+@AnalyzeClasses(packagesOf = SystemModule.class)
+public class SystemModuleFitnessTest extends UnitTestsFitnessTest {
+
 }
