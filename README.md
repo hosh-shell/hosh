@@ -30,6 +30,10 @@ Hosh is an experimental shell written in Java, featuring:
     - `withLock file.lock { ... }`
 - **robust scripts by default**
     - as if running bash scripts with `set -euo pipefail` ([unofficial-strict-mode](http://redsymbol.net/articles/unofficial-bash-strict-mode/))
+- **built with modern tooling and concepts**
+    - Java modules (but still not fully modular)
+    - fitness functions from *Evolutionary Architecture* ISBN-13: 978-1491986363)
+    - 
 
 ¹ it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
 
@@ -140,18 +144,18 @@ JDK 11
 
 ### Run
 
-`$ java -jar target/dist/hosh.jar`
+`$ java -jar main/target/hosh.jar`
 
 ### Debug
 
-`$ java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar target/dist/hosh.jar`
+`$ java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar main/target/hosh.jar`
 
 ### Logging
 
 Hosh uses `java.util.logging` (to not require additional dependencies). `HOSH_LOG_LEVEL` controls
 logging behaviour according to [Level](https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/Level.html). By default logging is disabled, to enable it:
 
-`$ HOSH_LOG_LEVEL=FINE java -jar target/dist/hosh.jar`
+`$ HOSH_LOG_LEVEL=FINE java -jar main/target/hosh.jar`
 
 Logging events will be persisted in `$HOME/.hosh.log`.
 
