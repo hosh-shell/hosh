@@ -6,10 +6,10 @@
 
 ## Main features
 
-Hosh is an experimental shell written in Java, featuring: 
+Hosh is an experimental shell written in Java, featuring:
 
 - **portability**¹
-    - works out-of-the-box in Windows, MacOS, Linux 
+    - works out-of-the-box in Windows, MacOS, Linux
     - written in Java 11, distributed as [Uber-JAR](https://imagej.net/Uber-JAR)
 - **usability as first class citizen** (much more design and work is needed in this area)
     - sorting with [alphanum](http://davekoelle.com/alphanum.html)
@@ -25,7 +25,7 @@ Hosh is an experimental shell written in Java, featuring:
     - built-in commands produce records with well defined keys
     - interoperability with external commands is achieved by using single-key records
     - `lines pom.xml | enumerate | take 10`
-- **grouping commands**, with before/after behavior 
+- **grouping commands**, with before/after behavior
     - `withTime { lines pom.xml | sink }`
     - `withLock file.lock { ... }`
 - **robust scripts by default**
@@ -40,7 +40,7 @@ Hosh is an experimental shell written in Java, featuring:
 
 ### Sorting
 
-Sorting is always performed using a well defined key:
+Sorting is always performed using a well-defined key:
 ```
 hosh> ls
 # unsorted, following local filesystem order
