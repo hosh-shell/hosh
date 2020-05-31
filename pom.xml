@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dfa1</groupId>
 	<artifactId>hosh</artifactId>
+	<packaging>pom</packaging>
 	<version>0.1.0-SNAPSHOT</version>
 	<url>https://github.com/dfa1/hosh</url>
-	<name>hosh</name>
 	<description>The Human Oriented SHell</description>
 	<inceptionYear>2018</inceptionYear>
 	<licenses>
@@ -39,6 +39,18 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	<modules>
+		<module>spi</module>
+		<module>modules/system</module>
+		<module>modules/text</module>
+		<module>modules/history</module>
+		<module>modules/network</module>
+		<module>modules/terminal</module>
+		<module>modules/filesystem</module>
+		<module>runtime</module>
+		<module>test-support</module>
+		<module>main</module>
+	</modules>
 	<dependencies>
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -129,24 +141,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>hosh</finalName>
 		<plugins>
-			<plugin>
-				<groupId>org.antlr</groupId>
-				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>4.8-1</version>
-				<configuration>
-					<treatWarningsAsErrors>true</treatWarningsAsErrors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>antlr</id>
-						<goals>
-							<goal>antlr4</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -163,91 +158,9 @@
 						<arg>-Xlint:-requires-automatic</arg>
 						<arg>-Xpkginfo:always</arg>
 						<arg>--add-exports</arg>
-						<arg>java.base/jdk.internal.misc=hosh</arg>
+						<arg>java.base/jdk.internal.misc=hosh.runtime</arg>
 					</compilerArgs>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${project.build.directory}/generated-sources/antlr4</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-				<version>4.0.0</version>
-				<executions>
-					<execution>
-						<id>fetch-git-revision</id>
-						<goals>
-							<goal>revision</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<generateGitPropertiesFile>true</generateGitPropertiesFile>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/target/classes</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<include>*.md</include>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.3.0</version>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-					<attach>true</attach>
-					<appendAssemblyId>false</appendAssemblyId>
-					<outputDirectory>${project.build.directory}/dist</outputDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>assemble-all</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -256,7 +169,7 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
-					<argLine>--add-exports java.base/jdk.internal.misc=hosh</argLine>
+					<argLine>--add-exports java.base/jdk.internal.misc=hosh.runtime</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -287,7 +200,7 @@
 						<param>hosh.*</param>
 					</targetTests>
 					<excludedClasses>
-						<param>hosh.antlr4.*</param>
+						<param>hosh.runtime.antlr4.*</param>
 					</excludedClasses>
 					<excludedTestClasses>
 						<param>hosh.integration.*</param>
@@ -303,28 +216,6 @@
 						<version>0.12</version>
 					</dependency>
 				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0-M3</version>
-				<executions>
-					<execution>
-						<id>enforce-no-repositories</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireMavenVersion>
-									<version>3.6.0</version>
-								</requireMavenVersion>
-								<requireNoRepositories/>
-								<requireReleaseDeps/>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -382,11 +273,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
