@@ -67,7 +67,7 @@ public class CommandCompleterTest {
 	private CommandCompleter sut;
 
 	@Test
-	public void emptyPathAndNoBuitins() {
+	public void emptyPathAndNoBuiltins() {
 		given(state.getPath()).willReturn(List.of());
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
