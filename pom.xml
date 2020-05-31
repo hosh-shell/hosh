@@ -4,7 +4,7 @@
 	<groupId>dfa1</groupId>
 	<artifactId>hosh</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1.0</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<url>https://github.com/dfa1/hosh</url>
 	<description>The Human Oriented SHell</description>
 	<inceptionYear>2018</inceptionYear>
@@ -26,7 +26,7 @@
 	</developers>
 	<scm>
 		<developerConnection>scm:git:.</developerConnection>
-		<tag>v0.1.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
 		<repository>
