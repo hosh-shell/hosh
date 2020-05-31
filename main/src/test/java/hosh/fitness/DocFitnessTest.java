@@ -47,7 +47,10 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Run compile all examples
+ * Fitness function to check that:
+ *  - all commands are documented
+ *  - all examples are syntactically correct
+ *    (by compile execute all examples found as annotations)
  */
 @AnalyzeClasses(packagesOf = Hosh.class)
 public class DocFitnessTest {

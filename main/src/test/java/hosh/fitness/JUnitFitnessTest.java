@@ -41,13 +41,15 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
 /**
- * Enforcing some useful rules for junit tests.
+ * Fitness function to check:
+ * - methods in tests are well encapsulated (e.g. no public utility methods, etc)
+ * - all @Mocks are used (@InjectMock prevents to see that easily)
  */
 @AnalyzeClasses(packagesOf = Hosh.class)
 public class JUnitFitnessTest {
 
 	@ArchTest
-	public final ArchRule unannotatedMethodsInTests =
+	public final ArchRule unannotatedMethodsInTestsMustBePrivate =
 		methods().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Test")
 			.or().areDeclaredInClassesThat().haveSimpleNameEndingWith("IT")
 			.and().areNotPrivate()
@@ -57,7 +59,7 @@ public class JUnitFitnessTest {
 			.orShould().beAnnotatedWith(ParameterizedTest.class);
 
 	@ArchTest
-	public final ArchRule unusedMocks =
+	public final ArchRule noUnusedMocks =
 		fields()
 			.that()
 			.areNotStatic().and().areAnnotatedWith(Mock.class)
