@@ -23,7 +23,7 @@
  */
 package hosh.runtime;
 
-import hosh.spi.Todo;
+import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;

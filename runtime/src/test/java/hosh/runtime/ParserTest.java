@@ -24,7 +24,7 @@
 package hosh.runtime;
 
 import hosh.runtime.antlr4.HoshParser.ProgramContext;
-import hosh.spi.Bug;
+import hosh.doc.Bug;
 import hosh.runtime.Parser.ParseError;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

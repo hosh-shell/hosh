@@ -23,7 +23,7 @@
  */
 package hosh.runtime;
 
-import hosh.spi.Bug;
+import hosh.doc.Bug;
 import hosh.runtime.Compiler.CompileError;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Statement;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi;
+package hosh.doc;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,15 +29,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Document a planned feature or a small improvement.
+ * Link to an existing bug.
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target({
-	ElementType.TYPE, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.PACKAGE, ElementType.FIELD
-})
-public @interface Todo {
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface Bug {
 
 	String description();
 
-	String issue() default "";
+	String issue();
 }

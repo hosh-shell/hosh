@@ -23,10 +23,10 @@
  */
 package hosh.modules.network;
 
-import hosh.spi.Description;
-import hosh.spi.Example;
-import hosh.spi.Examples;
-import hosh.spi.Todo;
+import hosh.doc.Description;
+import hosh.doc.Example;
+import hosh.doc.Examples;
+import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
 import hosh.spi.ExitStatus;

@@ -23,7 +23,7 @@
  */
 package hosh.runtime;
 
-import hosh.spi.Todo;
+import hosh.doc.Todo;
 import hosh.spi.Ansi;
 
 import java.io.PrintWriter;

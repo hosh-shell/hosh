@@ -23,7 +23,7 @@
  */
 package hosh.modules.network;
 
-import hosh.spi.Todo;
+import hosh.doc.Todo;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;

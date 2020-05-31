@@ -23,7 +23,7 @@
  */
 package hosh.modules.filesystem;
 
-import hosh.spi.Bug;
+import hosh.doc.Bug;
 import hosh.spi.Ansi;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;

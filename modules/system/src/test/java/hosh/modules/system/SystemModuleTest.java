@@ -23,9 +23,9 @@
  */
 package hosh.modules.system;
 
-import hosh.spi.Description;
-import hosh.spi.Example;
-import hosh.spi.Examples;
+import hosh.doc.Description;
+import hosh.doc.Example;
+import hosh.doc.Examples;
 import hosh.modules.system.SystemModule.Benchmark;
 import hosh.modules.system.SystemModule.Benchmark.Accumulator;
 import hosh.modules.system.SystemModule.Capture;

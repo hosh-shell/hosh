@@ -23,7 +23,7 @@
  */
 package hosh.test.support;
 
-import hosh.spi.Todo;
+import hosh.doc.Todo;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;

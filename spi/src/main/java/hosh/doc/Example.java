@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi;
+package hosh.doc;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,13 +29,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Link to an existing bug.
+ * Used to produce user-facing documentation with 'help' built-in command.
  */
-@Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Bug {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface Example {
+
+	String command();
 
 	String description();
-
-	String issue();
 }

@@ -26,7 +26,7 @@ package hosh.runtime;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
-import hosh.spi.Todo;
+import hosh.doc.Todo;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 

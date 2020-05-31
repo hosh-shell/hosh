@@ -1,4 +1,3 @@
-
 /*
  * MIT License
  *
@@ -30,4 +29,5 @@ module hosh.spi {
 	requires jline.terminal;
 
 	exports hosh.spi;
+	exports hosh.doc;
 }

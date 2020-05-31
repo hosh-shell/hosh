@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi;
+package hosh.doc;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

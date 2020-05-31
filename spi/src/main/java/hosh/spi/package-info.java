@@ -22,6 +22,6 @@
  * SOFTWARE.
  */
 /**
- * Public API exposed to modules and to the internal packages.
+ * Public API exposed to modules and to the runtime packages.
  */
 package hosh.spi;

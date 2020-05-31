@@ -23,12 +23,12 @@
  */
 package hosh.modules.filesystem;
 
-import hosh.spi.Bug;
-import hosh.spi.Description;
-import hosh.spi.Example;
-import hosh.spi.Examples;
-import hosh.spi.Experimental;
-import hosh.spi.Todo;
+import hosh.doc.Bug;
+import hosh.doc.Description;
+import hosh.doc.Example;
+import hosh.doc.Examples;
+import hosh.doc.Experimental;
+import hosh.doc.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;

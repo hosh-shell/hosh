@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi;
+package hosh.doc;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,11 +29,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This is used to produce user-facing documentation.
+ * Automatically generate user-facing documentation via 'help' command.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Examples {
+public @interface Description {
 
-	Example[] value();
+	String value();
 }
