@@ -169,6 +169,7 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
+					<argLine>--add-exports java.base/jdk.internal.misc=hosh.runtime</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
