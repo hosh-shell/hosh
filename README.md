@@ -33,11 +33,11 @@ Logging events will be persisted in `$HOME/.hosh.log`.
 
 ### Docker support
 
-Preliminary docker support using [adoptopenjdk](https://adoptopenjdk.net/):
+Build a release with docker:
 
-`$ ./mvnw -Pdocker clean verify`
-
-`$ docker run -it $(docker image ls hosh --quiet  | head -n 1)`
+- `$ cat ~/.github/hosh_packages.txt | docker login https://docker.pkg.github.com -u $USERNAME --password-stdin`
+- `$ ./mvnw clean verify # uberjar ready at main/target/`
+- `docker build -t docker.pkg.github.com/hosh-shell/hosh/hosh:$VERSION .`
 
 ### Windows 7 UAC
 
