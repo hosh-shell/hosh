@@ -1,4 +1,4 @@
-# HOSH
+# Hosh
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/dfa1/hosh/workflows/CI/badge.svg)](https://github.com/dfa1/hosh/actions?query=workflow%3ACI) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dfa1_hosh&metric=alert_status)](https://sonarcloud.io/dashboard?id=dfa1_hosh)
  [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dfa1_hosh&metric=coverage)](https://sonarcloud.io/dashboard?id=dfa1_hosh)
@@ -6,12 +6,12 @@
 
 ## Main features
 
-Hosh is an experimental shell written in Java, featuring:
+Hosh is an experimental shell, featuring:
 
 - **portability**¹
-    - works out-of-the-box in Windows, MacOS, Linux
     - written in Java 11, distributed as [Uber-JAR](https://imagej.net/Uber-JAR)
-- **usability as first class citizen** (much more design and work is needed in this area)
+    - works out-of-the-box in Windows, MacOS, Linux
+- **usability as first class citizen**²
     - sorting with [alphanum](http://davekoelle.com/alphanum.html)
     - ANSI colors by default
     - errors always colored in red
@@ -19,10 +19,10 @@ Hosh is an experimental shell written in Java, featuring:
     - [better history by default](https://sanctum.geek.nz/arabesque/better-bash-history/)
        - record timestamps for each command (see `history` command)
        - `HISTCONTROL=ignoredups`
-       - no limits
        - append to history is incremental and shared between all sessions
+       - no limits
 - **pipelines** built around schema-less records:
-    - built-in commands produce records with well defined keys
+    - built-in commands produce records with well-defined keys
     - interoperability with external commands is achieved by using single-key records
     - `lines pom.xml | enumerate | take 10`
 - **grouping commands**, with before/after behavior
@@ -35,7 +35,7 @@ Hosh is an experimental shell written in Java, featuring:
     - fitness functions from *Evolutionary Architecture* ISBN-13: 978-1491986363)
 
 ¹ it is not intended to conform to IEEE POSIX P1003.2/ISO 9945.2 Shell and Tools standard
-
+² much more design and work is needed in this area
 ## Examples
 
 ### Sorting
@@ -76,7 +76,6 @@ eee 1MB
 ```
 
 Schema is same of `walk`.
-
 
 ### Parsing
 
@@ -123,9 +122,6 @@ To recursively remove all `.class` files in `target`:
 - Zsh https://zsh.org
 - Elvish https://elv.sh
 - Fish https://fishshell.com
-
-## Similar projects
-
 - rust https://github.com/nushell/nushell
 - scala https://ammonite.io
 - kotlin https://github.com/holgerbrandl/kscript
