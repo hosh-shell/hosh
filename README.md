@@ -39,15 +39,3 @@ Build a release with docker:
 - `$ ./mvnw clean verify # uberjar ready at main/target/`
 - `docker build -t docker.pkg.github.com/hosh-shell/hosh/hosh:$VERSION .`
 
-### Windows 7 UAC
-
-If any test fails with "java.nio.file.FileSystemException: A required privilege is not held by the client."
-then:
-
-- run **secpol.msc**
-- go to Security Settings|Local Policies|User Rights Assignment|Create symbolic links
-- add your user name.
-- restart your session.
-
-(see https://stackoverflow.com/a/24353758)
-

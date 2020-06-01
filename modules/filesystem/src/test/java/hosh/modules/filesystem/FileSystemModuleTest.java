@@ -33,6 +33,7 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
+import hosh.test.support.IgnoreWindowsUACExceptions;
 import hosh.test.support.RecordMatcher;
 import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.Nested;
@@ -70,6 +71,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
+	@ExtendWith(IgnoreWindowsUACExceptions.class)
 	public class ListFilesTest {
 
 		@RegisterExtension
@@ -705,6 +707,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
+	@ExtendWith(IgnoreWindowsUACExceptions.class)
 	public class WalkTest {
 
 		@RegisterExtension
@@ -787,11 +790,11 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void resolveSymlinks() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFolder = temporaryFolder.newFolder("folder");
 			File newFile = temporaryFolder.newFile(newFolder, "file.txt");
 			File symlink = new File(temporaryFolder.toFile(), "symlink");
 			Files.createSymbolicLink(symlink.toPath(), newFolder.toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath()); // previous method could fail by UAC and Mockito will throw UnnecessaryStubbingException
 			ExitStatus exitStatus = sut.run(List.of("symlink"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -928,6 +931,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
+	@ExtendWith(IgnoreWindowsUACExceptions.class)
 	public class SymlinkTest {
 
 		@RegisterExtension
@@ -1018,6 +1022,7 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
+	@ExtendWith(IgnoreWindowsUACExceptions.class)
 	public class ResolveTest {
 
 		@RegisterExtension
@@ -1071,9 +1076,9 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void symlink() throws IOException {
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			Files.createSymbolicLink(Path.of(temporaryFolder.toFile().getAbsolutePath(), "link"), newFile.toPath());
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("link"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();

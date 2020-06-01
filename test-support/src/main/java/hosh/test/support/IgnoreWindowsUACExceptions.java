@@ -21,16 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module hosh.test.support {
-	requires hosh.spi;
+package hosh.test.support;
 
-	requires org.assertj.core;
-	requires org.junit.jupiter.api;
-	requires org.junit.jupiter.params;
-	requires org.mockito;
+import hosh.spi.LoggerFactory;
 
-	requires com.tngtech.archunit;
-	requires com.tngtech.archunit.junit5.api;
-	requires java.logging;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
+
+/**
+ * Ignores some UAC exceptions on Windows.
+ */
+public class IgnoreWindowsUACExceptions implements TestExecutionExceptionHandler {
+
+	private final Logger logger = LoggerFactory.forEnclosingClass();
+
+	@Override
+	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
+		if (isUAC(throwable) || isUAC(throwable.getCause())) {
+			logger.log(Level.WARNING, "ignoring UAC exception, please check", throwable);
+			return;
+		}
+		throw throwable;
+	}
+
+	private boolean isUAC(Throwable throwable) {
+		return throwable.getMessage().contains("A required privilege is not held by the client.");
+	}
 }
