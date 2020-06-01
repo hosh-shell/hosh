@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>dfa1</groupId>
+	<groupId>hosh</groupId>
 	<artifactId>hosh-parent</artifactId>
 	<packaging>pom</packaging>
 	<version>0.1.1-SNAPSHOT</version>
-	<url>https://github.com/dfa1/hosh</url>
+	<url>https://hosh-shell.github.io</url>
 	<description>The Human Oriented SHell</description>
 	<inceptionYear>2018</inceptionYear>
 	<licenses>
@@ -17,7 +18,7 @@
 	</licenses>
 	<developers>
 		<developer>
-			<id>dfa</id>
+			<id>dfa1</id>
 			<name>Davide Angelocola</name>
 			<email>davide.angelocola+hosh@gmail.com</email>
 			<url>https://dfa1.github.io</url>
