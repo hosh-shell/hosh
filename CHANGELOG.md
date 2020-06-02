@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+- changed groupId in maven
+
+### Fixed
+- fix #265: raspberry pi 4 support
+
 ## [0.1.0] - 2020-05-31
 
 ### Added
