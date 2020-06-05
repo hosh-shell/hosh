@@ -232,12 +232,12 @@ public class HoshIT {
 	@Test
 	public void pipelineWriteToExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
-			"cwd | git cat-file --batch" //
+			"echo some_random_hash | git cat-file --batch" //
 		);
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		int exitCode = hosh.waitFor();
 		String output = consumeOutput(hosh);
-		assertThat(output).containsOnlyOnce("missing");
+		assertThat(output).isEqualTo("some_random_hash missing");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
@@ -267,7 +267,7 @@ public class HoshIT {
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
-	public void pipelinesDontExpandVariables() throws Exception {
+	public void pipelinesDoNotExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
 			"echo ${OS_ENV_VARIABLE} | take 1"//
 		);
@@ -280,7 +280,7 @@ public class HoshIT {
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
-	public void wrappersDontExpandVariables() throws Exception {
+	public void wrappersDoNotExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
 			"withTime { echo ${OS_ENV_VARIABLE} } "//
 		);
