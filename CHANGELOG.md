@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - changed groupId in maven
+- `sum`: supports size and numeric values
 
 ### Fixed
 - fix #265: raspberry pi 4 support

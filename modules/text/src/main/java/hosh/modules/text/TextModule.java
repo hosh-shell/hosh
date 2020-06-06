@@ -216,9 +216,9 @@ public class TextModule implements Module {
 
 		private Value trim(Value value) {
 			return value.unwrap(String.class)
-				       .map(String::trim)
-				       .map(Values::ofText)
-				       .orElse(value);
+				.map(String::trim)
+				.map(Values::ofText)
+				.orElse(value);
 		}
 	}
 
@@ -587,10 +587,10 @@ public class TextModule implements Module {
 		}
 	}
 
-	@Experimental(description = "implementation works only for 'humanized size' values (i.e. cannot be used for numeric)")
-	@Description("calculate sum of size")
+	@Description("calculate sum")
 	@Examples({
-		@Example(command = "ls /tmp | sum size", description = "calculate size of /tmp directory (non-recursively)")
+		@Example(command = "ls /tmp | sum size", description = "calculate size of /tmp directory (non-recursively)"),
+		@Example(command = "walk /tmp | sum size", description = "calculate size of /tmp directory (recursively)")
 	})
 	public static class Sum implements Command {
 
@@ -601,14 +601,19 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
-			long sum = 0;
+			Optional<Value> result = Optional.empty();
 			for (Record record : InputChannel.iterate(in)) {
-				sum += record
-					       .value(key)
-					       .flatMap(v -> v.unwrap(Long.class))
-					       .orElse(0L);
+				Optional<Value> value = record.value(key);
+				if (value.isEmpty()) {
+					continue;
+				}
+				if (result.isEmpty()) {
+					result = value;
+				} else {
+					result = result.flatMap(v -> v.merge(value.get()));
+				}
 			}
-			out.send(Records.singleton(key, Values.ofSize(sum)));
+			out.send(Records.singleton(key, result.orElse(Values.none())));
 			return ExitStatus.success();
 		}
 	}
@@ -666,8 +671,8 @@ public class TextModule implements Module {
 		private void sendHeader(Collection<Key> keys, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			String format = keys.stream()
-				                .map(this::formatterFor)
-				                .collect(Collectors.joining());
+				.map(this::formatterFor)
+				.collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
 			out.send(Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText(header), Ansi.Style.FG_CYAN)));
 		}

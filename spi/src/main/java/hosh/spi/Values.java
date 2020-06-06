@@ -223,6 +223,15 @@ public class Values {
 			}
 			return Optional.empty();
 		}
+
+		@Override
+		public Optional<Value> merge(Value value) {
+			if (value instanceof SizeValue) {
+				SizeValue that = (SizeValue) value;
+				return Optional.of(new SizeValue(that.bytes + this.bytes));
+			}
+			return Optional.empty();
+		}
 	}
 
 	static final class NumericValue implements Value {
@@ -277,6 +286,14 @@ public class Values {
 			}
 			if (type == Long.class) {
 				return (Optional<T>) Optional.of(number);
+			}
+			return Optional.empty();
+		}
+		@Override
+		public Optional<Value> merge(Value value) {
+			if (value instanceof NumericValue) {
+				NumericValue that = (NumericValue) value;
+				return Optional.of(new NumericValue(that.number + this.number));
 			}
 			return Optional.empty();
 		}

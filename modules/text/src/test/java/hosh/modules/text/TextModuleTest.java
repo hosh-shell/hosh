@@ -278,7 +278,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(0)));
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -290,19 +290,31 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(0)));
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKey() {
+		public void matchingKeyWithSizeValue() {
 			Record record = Records.singleton(Keys.SIZE, Values.ofSize(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(2)));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyWithNumericValue() {
+			Record record = Records.singleton(Keys.COUNT, Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("count"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.COUNT, Values.ofNumeric(2)));
 			then(err).shouldHaveNoInteractions();
 		}
 	}

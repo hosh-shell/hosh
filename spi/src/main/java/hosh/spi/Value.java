@@ -33,4 +33,9 @@ public interface Value extends Comparable<Value>, Printable {
 	default <T> Optional<T> unwrap(Class<T> type) {
 		return Optional.empty();
 	}
+
+	default Optional<Value> merge(Value value) {
+		return Optional.empty();
+	}
+
 }
