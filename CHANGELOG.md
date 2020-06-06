@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `freq`: new command to replace pattern 'sort | uniq -c | sort -rn'
+  (see example examples/visitors.hosh)
+
 ### Changed
 - changed groupId in maven
 - `sum`: supports size and numeric values
