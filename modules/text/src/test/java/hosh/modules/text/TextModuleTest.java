@@ -23,7 +23,6 @@
  */
 package hosh.modules.text;
 
-import hosh.modules.text.TextModule;
 import hosh.modules.text.TextModule.Count;
 import hosh.modules.text.TextModule.Distinct;
 import hosh.modules.text.TextModule.Drop;
@@ -389,6 +388,20 @@ public class TextModuleTest {
 			then(out).should().send(RecordMatcher.of(Keys.VALUE, Values.ofText("aaa"), Keys.COUNT, Values.ofNumeric(2)));
 			then(err).shouldHaveNoInteractions();
 		}
+
+		// an important corner case: counting "none" as any other value
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyWithNone() {
+			Record record = Records.singleton(Keys.TEXT, Values.none());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.VALUE, Values.none(), Keys.COUNT, Values.ofNumeric(1)));
+			then(err).shouldHaveNoInteractions();
+		}
+
 	}
 
 	@Nested
@@ -506,10 +519,10 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(Records.builder()
-					.entry(Keys.of("1"), Values.ofText("a"))
-					.entry(Keys.of("2"), Values.ofText("b"))
-					.entry(Keys.of("3"), Values.ofText("c"))
-					.build());
+				.entry(Keys.of("1"), Values.ofText("a"))
+				.entry(Keys.of("2"), Values.ofText("b"))
+				.entry(Keys.of("3"), Values.ofText("c"))
+				.build());
 			then(err).shouldHaveNoInteractions();
 		}
 	}
@@ -764,10 +777,10 @@ public class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(
-					Records.builder()
-							.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
-							.entry(Keys.TEXT, Values.ofText("some data"))
-							.build());
+				Records.builder()
+					.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
+					.entry(Keys.TEXT, Values.ofText("some data"))
+					.build());
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -1365,8 +1378,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-					Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         whatever  "), Ansi.Style.BG_BLUE)));
+				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
+				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         whatever  "), Ansi.Style.BG_BLUE)));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1380,8 +1393,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-					Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-					Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          whatever  "), Ansi.Style.BG_BLUE)));
+				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
+				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          whatever  "), Ansi.Style.BG_BLUE)));
 		}
 
 		@Test
