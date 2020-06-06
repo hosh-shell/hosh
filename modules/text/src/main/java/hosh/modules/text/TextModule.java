@@ -623,9 +623,6 @@ public class TextModule implements Module {
 	@Examples({
 		@Example(command = "lines files.txt | freq text", description = "replaces 'sort file.txt | uniq -c | sort -rn' in UNIX"),
 	})
-	// inspired by:
-	// - https://github.com/koraa/huniq
-	// - https://github.com/bitfield/script#a-real-world-example
 	public static class Freq implements Command {
 
 		@Override
