@@ -41,3 +41,6 @@ Build a release with docker:
 - `$ ./mvnw clean verify # uberjar ready at main/target/`
 - `docker build -t docker.pkg.github.com/hosh-shell/hosh/hosh:$VERSION .`
 
+## Sponsors
+
+[![JetBrains](https://raw.githubusercontent.com/JetBrains/logos/master/web/jetbrains/jetbrains-variant-2.svg)](https://www.jetbrains.com/?from=hosh)
