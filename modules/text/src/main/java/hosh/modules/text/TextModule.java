@@ -51,10 +51,12 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -80,6 +82,7 @@ public class TextModule implements Module {
 		registry.registerCommand("sort", Sort::new);
 		registry.registerCommand("take", Take::new);
 		registry.registerCommand("drop", Drop::new);
+		registry.registerCommand("last", Last::new);
 		registry.registerCommand("rand", Rand::new);
 		registry.registerCommand("count", Count::new);
 		registry.registerCommand("sum", Sum::new);
@@ -544,6 +547,46 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Description("keep last n records")
+	@Examples({
+		@Example(command = "lines file.txt | last 1", description = "output only last line of 'file.txt'")
+	})
+	public static class Last implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
+				return ExitStatus.error();
+			}
+			long n = Long.parseLong(args.get(0));
+			if (n < 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 1")));
+				return ExitStatus.error();
+			}
+			Queue<Record> queue = keepLastRecords(in, n);
+			output(out, queue);
+			return ExitStatus.success();
+		}
+
+		private void output(OutputChannel out, Queue<Record> queue) {
+			for (Record record : queue) {
+				out.send(record);
+			}
+		}
+
+		private Queue<Record> keepLastRecords(InputChannel in, long n) {
+			Queue<Record> queue = new LinkedList<>();
+			for (Record record : InputChannel.iterate(in)) {
+				queue.add(record);
+				if (queue.size() > n) {
+					queue.remove();
+				}
+			}
+			return queue;
+		}
+	}
+
 	@Description("create an infinite sequence of random numbers, remember to always limit it with '| take n'")
 	@Examples({
 		@Example(command = "rand | enumerate | take 3", description = "create 3 random records")
@@ -633,7 +676,7 @@ public class TextModule implements Module {
 			}
 			Key key = Keys.of(args.get(0));
 			Map<Value, Long> countByValue = countByValue(in, key);
-			print(out, countByValue);
+			output(out, countByValue);
 			return ExitStatus.success();
 		}
 
@@ -646,7 +689,7 @@ public class TextModule implements Module {
 			return result;
 		}
 
-		private void print(OutputChannel out, Map<Value, Long> countByValue) {
+		private void output(OutputChannel out, Map<Value, Long> countByValue) {
 			for (var kv : countByValue.entrySet()) {
 				Record record = Records.builder()
 					.entry(Keys.VALUE, kv.getKey())

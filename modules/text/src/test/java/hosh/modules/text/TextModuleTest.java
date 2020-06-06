@@ -929,6 +929,79 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
+	public class LastTest {
+
+		@Mock
+		private InputChannel in;
+
+		@Mock
+		private OutputChannel out;
+
+		@Mock
+		private OutputChannel err;
+
+		@InjectMocks
+		private TextModule.Last sut;
+
+		@Test
+		public void lastNoArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
+		}
+
+		@Test
+		public void lastOneInvalidArg() {
+			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("parameter must be >= 1")));
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void lastOneWithOneRecord() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void lastOneWithMultipleRecords() {
+			Record data1 = Records.singleton(Keys.TEXT, Values.ofText("data 1"));
+			Record data2 = Records.singleton(Keys.TEXT, Values.ofText("data 2"));
+			given(in.recv()).willReturn(Optional.of(data1), Optional.of(data2), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(data2);
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void lastTwoWithOneRecord() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("2"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
+		}
+
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
 	public class FilterTest {
 
 		@Mock
