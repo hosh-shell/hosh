@@ -83,6 +83,7 @@ public class TextModule implements Module {
 		registry.registerCommand("rand", Rand::new);
 		registry.registerCommand("count", Count::new);
 		registry.registerCommand("sum", Sum::new);
+		registry.registerCommand("freq", Freq::new);
 		registry.registerCommand("table", Table::new);
 	}
 
@@ -621,7 +622,6 @@ public class TextModule implements Module {
 	@Description("calculate frequency of values")
 	@Examples({
 		@Example(command = "lines files.txt | freq text", description = "replaces 'sort file.txt | uniq -c | sort -rn' in UNIX"),
-
 	})
 	public static class Freq implements Command {
 
@@ -641,7 +641,7 @@ public class TextModule implements Module {
 			Map<Value, Long> result = new HashMap<>();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key)
-					.ifPresent(value1 -> result.compute(value1, (k, v) -> v == null ? 0 : v + 1));
+					.ifPresent(value -> result.compute(value, (k, count) -> count == null ? 0 : count + 1));
 			}
 			return result;
 		}
