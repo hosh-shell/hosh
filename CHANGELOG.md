@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `freq`: new command to replace pattern 'sort | uniq -c | sort -rn'
   (see example examples/visitors.hosh)
 - `last`: new command similar to 'tail -n'
+- `max`: calculate max, works for any value (e.g. timestamp, numeric, strings)
+- `min`: calculate min, works for any value (e.g. timestamp, numeric, strings)
 
 ### Changed
 - changed groupId in maven
