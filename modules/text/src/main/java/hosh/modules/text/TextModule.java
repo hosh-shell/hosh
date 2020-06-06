@@ -728,7 +728,7 @@ public class TextModule implements Module {
 					if (min == null) {
 						min = current;
 					} else {
-						min = comparator.compare(current, min) < 0 ? current: min;
+						min = comparator.compare(current, min) < 0 ? current : min;
 					}
 				}
 			}
@@ -763,7 +763,7 @@ public class TextModule implements Module {
 					if (max == null) {
 						max = current;
 					} else {
-						max = comparator.compare(current, max) > 0 ? current: max;
+						max = comparator.compare(current, max) > 0 ? current : max;
 					}
 				}
 			}
@@ -772,7 +772,6 @@ public class TextModule implements Module {
 		}
 
 	}
-
 
 	@Description("create a nicely formatted table with keys a columns")
 	@Examples({
