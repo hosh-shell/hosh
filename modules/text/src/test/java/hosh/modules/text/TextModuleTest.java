@@ -476,6 +476,19 @@ public class TextModuleTest {
 			then(err).shouldHaveNoInteractions();
 		}
 
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyTwoRecordsWithNone() {
+			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
+			Record record2 = Records.singleton(Keys.INDEX, Values.none());
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.ofNumeric(10)));
+			then(err).shouldHaveNoInteractions();
+		}
+
 	}
 
 	@Nested
@@ -542,6 +555,19 @@ public class TextModuleTest {
 		public void matchingKeyTwoRecords() {
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.ofNumeric(-10));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.ofNumeric(10)));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyTwoRecordsWithNone() {
+			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
+			Record record2 = Records.singleton(Keys.INDEX, Values.none());
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();

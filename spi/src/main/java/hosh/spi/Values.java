@@ -578,6 +578,10 @@ public class Values {
 			return new NoneLastComparator(comparator);
 		}
 
+		public static Comparator<Value> noneFirst(Comparator<Value> comparator) {
+			return new NoneFirstComparator(comparator);
+		}
+
 		static class AlphaNumericStringComparator implements Comparator<String> {
 
 			private static final Pattern CHUNK = Pattern.compile("(\\d+)|(\\D+)");
@@ -631,6 +635,27 @@ public class Values {
 				}
 			}
 		}
+
+		static class NoneFirstComparator implements Comparator<Value> {
+
+			private final Comparator<Value> inner;
+
+			private NoneFirstComparator(Comparator<Value> inner) {
+				this.inner = inner;
+			}
+
+			@Override
+			public int compare(Value a, Value b) {
+				if (a instanceof None) {
+					return (b instanceof None) ? 0 : -1;
+				} else if (b instanceof None) {
+					return 1;
+				} else {
+					return inner.compare(a, b);
+				}
+			}
+		}
+
 
 	}
 }

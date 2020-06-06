@@ -717,7 +717,8 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
-			Value min = null;
+			Comparator<Value> comparator = Values.Comparators.noneLast(Comparator.naturalOrder());
+			Value min = Values.none();
 			for (Record record : InputChannel.iterate(in)) {
 				Optional<Value> optionalValue = record.value(key);
 				if (optionalValue.isPresent()) {
@@ -725,12 +726,11 @@ public class TextModule implements Module {
 					if (min == null) {
 						min = current;
 					} else {
-						min = current.compareTo(min) < 0 ? current : min;
+						min = comparator.compare(current, min) < 0 ? current: min;
 					}
 				}
-
 			}
-			out.send(Records.singleton(Keys.of("min"), min == null ? Values.none() : min));
+			out.send(Records.singleton(Keys.of("min"), min));
 			return ExitStatus.success();
 		}
 
@@ -750,7 +750,8 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
-			Value max = null;
+			Value max = Values.none();
+			Comparator<Value> comparator = Values.Comparators.noneFirst(Comparator.naturalOrder());
 			for (Record record : InputChannel.iterate(in)) {
 				Optional<Value> optionalValue = record.value(key);
 				if (optionalValue.isPresent()) {
@@ -758,12 +759,11 @@ public class TextModule implements Module {
 					if (max == null) {
 						max = current;
 					} else {
-						max = current.compareTo(max) > 0 ? current : max;
+						max = comparator.compare(current, max) > 0 ? current: max;
 					}
 				}
-
 			}
-			out.send(Records.singleton(Keys.of("max"), max == null ? Values.none() : max));
+			out.send(Records.singleton(Keys.of("max"), max));
 			return ExitStatus.success();
 		}
 
