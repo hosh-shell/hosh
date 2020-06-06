@@ -435,7 +435,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.none()));
+			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -447,7 +447,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.none()));
+			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -459,7 +459,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.ofNumeric(1)));
+			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.ofNumeric(1)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -472,7 +472,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.ofNumeric(-10)));
+			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.ofNumeric(-10)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -485,7 +485,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.ofNumeric(10)));
+			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.ofNumeric(10)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -522,7 +522,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.none()));
+			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -534,7 +534,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.none()));
+			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -546,7 +546,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.ofNumeric(1)));
+			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.ofNumeric(1)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -559,7 +559,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.ofNumeric(10)));
+			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.ofNumeric(10)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -572,7 +572,7 @@ public class TextModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
-			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.ofNumeric(10)));
+			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.ofNumeric(10)));
 			then(err).shouldHaveNoInteractions();
 		}
 

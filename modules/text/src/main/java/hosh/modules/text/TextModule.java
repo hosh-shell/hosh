@@ -710,6 +710,8 @@ public class TextModule implements Module {
 	})
 	public static class Min implements Command {
 
+		public static final Key MIN = Keys.of("min");
+
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
@@ -730,7 +732,7 @@ public class TextModule implements Module {
 					}
 				}
 			}
-			out.send(Records.singleton(Keys.of("min"), min));
+			out.send(Records.singleton(MIN, min));
 			return ExitStatus.success();
 		}
 
@@ -742,6 +744,8 @@ public class TextModule implements Module {
 		@Example(command = "ps | max pid", description = "calculate max pid"),
 	})
 	public static class Max implements Command {
+
+		public static final Key MAX = Keys.of("max");
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
@@ -763,7 +767,7 @@ public class TextModule implements Module {
 					}
 				}
 			}
-			out.send(Records.singleton(Keys.of("max"), max));
+			out.send(Records.singleton(MAX, max));
 			return ExitStatus.success();
 		}
 
