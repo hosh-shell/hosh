@@ -27,6 +27,7 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
+import hosh.doc.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
@@ -87,6 +88,8 @@ public class TextModule implements Module {
 		registry.registerCommand("count", Count::new);
 		registry.registerCommand("sum", Sum::new);
 		registry.registerCommand("freq", Freq::new);
+		registry.registerCommand("min", Min::new);
+		registry.registerCommand("max", Max::new);
 		registry.registerCommand("table", Table::new);
 	}
 
@@ -700,6 +703,72 @@ public class TextModule implements Module {
 		}
 
 	}
+
+	@Description("calculate min of value")
+	@Examples({
+		@Example(command = "ps | min timestamp", description = "calculate minimum timestamp"),
+	})
+	public static class Min implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: min key")));
+				return ExitStatus.error();
+			}
+			Key key = Keys.of(args.get(0));
+			Value min = null;
+			for (Record record : InputChannel.iterate(in)) {
+				Optional<Value> optionalValue = record.value(key);
+				if (optionalValue.isPresent()) {
+					Value current = optionalValue.get();
+					if (min == null) {
+						min = current;
+					} else {
+						min = current.compareTo(min) < 0 ? current : min;
+					}
+				}
+
+			}
+			out.send(Records.singleton(Keys.of("min"), min == null ? Values.none() : min));
+			return ExitStatus.success();
+		}
+
+	}
+
+	@Todo(description = "share implementation with min")
+	@Description("calculate max of value")
+	@Examples({
+		@Example(command = "ps | max pid", description = "calculate max pid"),
+	})
+	public static class Max implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: max key")));
+				return ExitStatus.error();
+			}
+			Key key = Keys.of(args.get(0));
+			Value max = null;
+			for (Record record : InputChannel.iterate(in)) {
+				Optional<Value> optionalValue = record.value(key);
+				if (optionalValue.isPresent()) {
+					Value current = optionalValue.get();
+					if (max == null) {
+						max = current;
+					} else {
+						max = current.compareTo(max) > 0 ? current : max;
+					}
+				}
+
+			}
+			out.send(Records.singleton(Keys.of("max"), max == null ? Values.none() : max));
+			return ExitStatus.success();
+		}
+
+	}
+
 
 	@Description("create a nicely formatted table with keys a columns")
 	@Examples({

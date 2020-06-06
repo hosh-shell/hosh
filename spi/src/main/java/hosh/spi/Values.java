@@ -558,7 +558,6 @@ public class Values {
 		}
 	}
 
-	@Experimental(description = "new API")
 	public static class Comparators {
 
 		private Comparators() {

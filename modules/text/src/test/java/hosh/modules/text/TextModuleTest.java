@@ -406,6 +406,155 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
+	public class MinTest {
+
+		@Mock
+		private InputChannel in;
+
+		@Mock
+		private OutputChannel out;
+
+		@Mock
+		private OutputChannel err;
+
+		@InjectMocks
+		private TextModule.Min sut;
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: min key")));
+		}
+
+		@Test
+		public void empty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.none()));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void nonMatchingKey() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.none()));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyOneRecord() {
+			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.ofNumeric(1)));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyTwoRecords() {
+			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
+			Record record2 = Records.singleton(Keys.INDEX, Values.ofNumeric(-10));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("min"), Values.ofNumeric(-10)));
+			then(err).shouldHaveNoInteractions();
+		}
+
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class MaxTest {
+
+		@Mock
+		private InputChannel in;
+
+		@Mock
+		private OutputChannel out;
+
+		@Mock
+		private OutputChannel err;
+
+		@InjectMocks
+		private TextModule.Max sut;
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: max key")));
+		}
+
+		@Test
+		public void empty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.none()));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void nonMatchingKey() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.none()));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyOneRecord() {
+			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.ofNumeric(1)));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyTwoRecords() {
+			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
+			Record record2 = Records.singleton(Keys.INDEX, Values.ofNumeric(-10));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.of("max"), Values.ofNumeric(10)));
+			then(err).shouldHaveNoInteractions();
+		}
+
+	}
+
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
 	public class SelectTest {
 
 		@Mock
