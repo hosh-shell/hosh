@@ -644,7 +644,7 @@ public class TextModule implements Module {
 			Map<Value, Long> result = new HashMap<>();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key)
-					.ifPresent(value -> result.compute(value, (k, count) -> count == null ? 0 : count + 1));
+					.ifPresent(value -> result.compute(value, (k, count) -> count == null ? 1 : count + 1));
 			}
 			return result;
 		}

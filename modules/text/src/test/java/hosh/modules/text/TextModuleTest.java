@@ -368,9 +368,9 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKey() {
+		public void matchingKeyOneRecord() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
-			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
@@ -378,6 +378,17 @@ public class TextModuleTest {
 			then(err).shouldHaveNoInteractions();
 		}
 
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKeyTwoRecords() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.VALUE, Values.ofText("aaa"), Keys.COUNT, Values.ofNumeric(2)));
+			then(err).shouldHaveNoInteractions();
+		}
 	}
 
 	@Nested
