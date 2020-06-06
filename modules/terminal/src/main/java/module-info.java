@@ -23,6 +23,5 @@
  */
 module hosh.modules.terminal {
 	requires hosh.spi;
-	requires java.logging;
 	requires jline.terminal;
 }

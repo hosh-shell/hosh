@@ -24,6 +24,5 @@
 
 module hosh.modules.history {
 	requires hosh.spi;
-	requires java.logging;
 	requires jline.reader;
 }
