@@ -618,6 +618,46 @@ public class TextModule implements Module {
 		}
 	}
 
+	@Description("calculate frequency of values")
+	@Examples({
+		@Example(command = "lines files.txt | freq text", description = "replaces 'sort file.txt | uniq -c | sort -rn' in UNIX"),
+
+	})
+	public static class Freq implements Command {
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: freq key")));
+				return ExitStatus.error();
+			}
+			Key key = Keys.of(args.get(0));
+			Map<Value, Long> countByValue = countByValue(in, key);
+			print(out, countByValue);
+			return ExitStatus.success();
+		}
+
+		private Map<Value, Long> countByValue(InputChannel in, Key key) {
+			Map<Value, Long> result = new HashMap<>();
+			for (Record record : InputChannel.iterate(in)) {
+				record.value(key)
+					.ifPresent(value1 -> result.compute(value1, (k, v) -> v == null ? 0 : v + 1));
+			}
+			return result;
+		}
+
+		private void print(OutputChannel out, Map<Value, Long> countByValue) {
+			for (var kv : countByValue.entrySet()) {
+				Record record = Records.builder()
+					.entry(Keys.VALUE, kv.getKey())
+					.entry(Keys.COUNT, Values.ofNumeric(kv.getValue()))
+					.build();
+				out.send(record);
+			}
+		}
+
+	}
+
 	@Description("create a nicely formatted table with keys a columns")
 	@Examples({
 		@Example(command = "rand | enumerate | take 3 | table", description = "output a nicely formatted table")

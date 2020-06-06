@@ -321,6 +321,67 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
+	public class FreqTest {
+
+		@Mock
+		private InputChannel in;
+
+		@Mock
+		private OutputChannel out;
+
+		@Mock
+		private OutputChannel err;
+
+		@InjectMocks
+		private TextModule.Freq sut;
+
+		@Test
+		public void noArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: freq key")));
+		}
+
+		@Test
+		public void empty() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void nonMatchingKey() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void matchingKey() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.VALUE, Values.ofText("aaa"), Keys.COUNT, Values.ofNumeric(1)));
+			then(err).shouldHaveNoInteractions();
+		}
+
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
 	public class SelectTest {
 
 		@Mock
