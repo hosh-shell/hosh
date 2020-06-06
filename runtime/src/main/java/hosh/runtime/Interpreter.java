@@ -23,7 +23,7 @@
  */
 package hosh.runtime;
 
-import jfr.CommandExecution;
+import hosh.runtime.jfr.CommandExecution;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;

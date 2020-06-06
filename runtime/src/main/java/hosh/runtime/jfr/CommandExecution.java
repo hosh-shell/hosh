@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package jfr;
+package hosh.runtime.jfr;
 
 import jdk.jfr.Category;
 import jdk.jfr.Event;
