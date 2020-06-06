@@ -945,7 +945,6 @@ public class TextModuleTest {
 
 		@Test
 		public void lastNoArgs() {
-			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -955,7 +954,6 @@ public class TextModuleTest {
 
 		@Test
 		public void lastOneInvalidArg() {
-			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -987,6 +985,19 @@ public class TextModuleTest {
 			then(out).should().send(data2);
 			then(err).shouldHaveNoInteractions();
 		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void lastTwoWithOneRecord() {
+			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
+			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("2"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(record);
+			then(err).shouldHaveNoInteractions();
+		}
+
 	}
 
 	@Nested
