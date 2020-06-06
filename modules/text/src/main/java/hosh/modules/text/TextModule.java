@@ -564,6 +564,18 @@ public class TextModule implements Module {
 				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 1")));
 				return ExitStatus.error();
 			}
+			Queue<Record> queue = keepLastRecords(in, n);
+			output(out, queue);
+			return ExitStatus.success();
+		}
+
+		private void output(OutputChannel out, Queue<Record> queue) {
+			for (Record record : queue) {
+				out.send(record);
+			}
+		}
+
+		private Queue<Record> keepLastRecords(InputChannel in, long n) {
 			Queue<Record> queue = new LinkedList<>();
 			for (Record record : InputChannel.iterate(in)) {
 				queue.add(record);
@@ -571,10 +583,7 @@ public class TextModule implements Module {
 					queue.remove();
 				}
 			}
-			for (Record record : queue) {
-				out.send(record);
-			}
-			return ExitStatus.success();
+			return queue;
 		}
 	}
 
@@ -667,7 +676,7 @@ public class TextModule implements Module {
 			}
 			Key key = Keys.of(args.get(0));
 			Map<Value, Long> countByValue = countByValue(in, key);
-			print(out, countByValue);
+			output(out, countByValue);
 			return ExitStatus.success();
 		}
 
@@ -680,7 +689,7 @@ public class TextModule implements Module {
 			return result;
 		}
 
-		private void print(OutputChannel out, Map<Value, Long> countByValue) {
+		private void output(OutputChannel out, Map<Value, Long> countByValue) {
 			for (var kv : countByValue.entrySet()) {
 				Record record = Records.builder()
 					.entry(Keys.VALUE, kv.getKey())
