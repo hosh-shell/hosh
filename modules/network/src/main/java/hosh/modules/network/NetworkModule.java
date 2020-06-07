@@ -124,7 +124,7 @@ public class NetworkModule implements Module {
 	@Examples({
 		@Example(command = "http https://git.io/v9MjZ | take 10", description = "take first 10 lines of https://git.io/v9MjZ ")
 	})
-	@Todo(description = "support additional methods (e.g. POST, DELETE), set headers, inspect response headers, integration tests (httpbin?)")
+	@Todo(description = "support additional methods (e.g. POST, DELETE), set headers, gzip support, etc")
 	public static class Http implements Command {
 
 		private Requestor requestor = new DefaultRequestor();

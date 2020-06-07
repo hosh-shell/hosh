@@ -23,10 +23,13 @@
  */
 package hosh.runtime;
 
+import hosh.doc.Todo;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+@Todo(description = "use java.lang.module.ModuleDescriptor.Version")
 public class VersionLoader {
 
 	private VersionLoader() {
