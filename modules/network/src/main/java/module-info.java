@@ -24,5 +24,6 @@
 
 module hosh.modules.network {
 	requires hosh.spi;
+	requires java.logging;
 	requires java.net.http;
 }

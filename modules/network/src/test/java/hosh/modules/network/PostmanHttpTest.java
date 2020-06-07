@@ -26,6 +26,7 @@ package hosh.modules.network;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import jakarta.json.Json;
@@ -43,6 +44,8 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static hosh.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.then;
@@ -103,9 +106,12 @@ public class PostmanHttpTest {
 	// private helpers
 	private static class JsonHelpers {
 
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 		public static JsonObject parse(Record record) {
 			JsonReaderFactory readerFactory = Json.createReaderFactory(Map.of());
 			String body = record.value(Keys.TEXT).flatMap(x -> x.unwrap(String.class)).orElseThrow();
+			LOGGER.log(Level.INFO, () -> String.format("body is: '%s'", body));
 			return readerFactory.createReader(new StringReader(body)).readObject();
 		}
 	}
