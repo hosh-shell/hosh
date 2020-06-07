@@ -23,32 +23,20 @@
  */
 package hosh.modules.network;
 
-import hosh.doc.Todo;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
-import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.Values;
-import hosh.test.support.WithThread;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
-import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static hosh.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 /**
@@ -56,7 +44,6 @@ import static org.mockito.BDDMockito.then;
  */
 @ExtendWith(MockitoExtension.class)
 public class PostmanHttpTest {
-
 
 	@Mock
 	private InputChannel in;
