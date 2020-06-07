@@ -25,19 +25,28 @@ package hosh.modules.network;
 
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
+import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReaderFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.StringReader;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import static hosh.test.support.ExitStatusAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests against postman-echo.
@@ -54,20 +63,50 @@ public class PostmanHttpTest {
 	@Mock
 	private OutputChannel err;
 
+	@Captor
+	private ArgumentCaptor<Record> body;
+
 	@InjectMocks
 	private NetworkModule.Http sut;
 
 	@Test
 	public void getOk() {
 		// Given
-		URI uri = URI.create("https://postman-echo.com/get");
+		URI uri = URI.create("https://postman-echo.com/get?param=1");
 		// When
 		ExitStatus exitStatus = sut.run(List.of(uri.toString()), in, out, err);
 		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
-		then(out).should().send(any());
+		then(out).should().send(body.capture());
 		then(err).shouldHaveNoInteractions();
+		JsonObject result = JsonHelpers.parse(body.getValue());
+		assertThat(result.getJsonString("url").getString()).isEqualTo("https://postman-echo.com/get?param=1");
+		assertThat(result.getJsonObject("headers").getJsonString("user-agent").getString()).isEqualTo("Hosh");
 	}
 
+	@Test
+	public void get404() {
+		// Given
+		URI uri = URI.create("https://postman-echo.com/status/404");
+		// When
+		ExitStatus exitStatus = sut.run(List.of(uri.toString()), in, out, err);
+		// Then
+		assertThat(exitStatus).isSuccess();
+		then(in).shouldHaveNoInteractions();
+		then(out).should().send(body.capture());
+		then(err).shouldHaveNoInteractions();
+		JsonObject result = JsonHelpers.parse(body.getValue());
+		assertThat(result.getJsonNumber("status").intValue()).isEqualTo(404);
+	}
+
+	// private helpers
+	private static class JsonHelpers {
+
+		public static JsonObject parse(Record record) {
+			JsonReaderFactory readerFactory = Json.createReaderFactory(Map.of());
+			String body = record.value(Keys.TEXT).flatMap(x -> x.unwrap(String.class)).orElseThrow();
+			return readerFactory.createReader(new StringReader(body)).readObject();
+		}
+	}
 }
