@@ -129,7 +129,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
+				err.send(Errors.usage("env"));
 				return ExitStatus.error();
 			}
 			Map<String, String> variables = state.getVariables();
@@ -172,11 +172,11 @@ public class SystemModule implements Module {
 						state.setExit(true);
 						return exitStatus.get();
 					} else {
-						err.send(Records.singleton(Keys.ERROR, Values.ofText("not a valid exit status: " + arg)));
+						err.send(Errors.message("not a valid exit status: %s", arg));
 						return ExitStatus.error();
 					}
 				default:
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+					err.send(Errors.usage("exit [value]"));
 					return ExitStatus.error();
 			}
 		}
@@ -234,7 +234,7 @@ public class SystemModule implements Module {
 				}
 				return ExitStatus.success();
 			} else {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+				err.send(Errors.usage("help [command]"));
 				return ExitStatus.error();
 			}
 		}
