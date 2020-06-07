@@ -299,7 +299,7 @@ public class Compiler {
 		}
 	}
 
-	interface Resolvable {
+	public interface Resolvable {
 
 		// resolve or throw
 		String resolve(State state);
