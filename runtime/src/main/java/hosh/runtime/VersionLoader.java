@@ -23,13 +23,10 @@
  */
 package hosh.runtime;
 
-import hosh.doc.Todo;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@Todo(description = "use java.lang.module.ModuleDescriptor.Version")
 public class VersionLoader {
 
 	private VersionLoader() {
@@ -39,7 +36,7 @@ public class VersionLoader {
 		try (InputStream is = VersionLoader.class.getResourceAsStream("/git.properties")) {
 			Properties properties = new Properties();
 			properties.load(is);
-			return String.format("%s", properties.getProperty("git.commit.id.describe"));
+			return properties.getProperty("git.commit.id.describe");
 		}
 	}
 }

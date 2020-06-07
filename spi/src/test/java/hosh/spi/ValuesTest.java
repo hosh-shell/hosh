@@ -446,8 +446,8 @@ public class ValuesTest {
 				Values.ofInstant(Instant.ofEpochMilli(100)),
 				Values.ofInstant(Instant.ofEpochMilli(-100)),
 				Values.ofInstant(Instant.ofEpochMilli(0)))
-				                     .sorted()
-				                     .collect(Collectors.toList());
+				.sorted()
+				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 				Values.ofInstant(Instant.ofEpochMilli(-100)),
 				Values.ofInstant(Instant.ofEpochMilli(0)),
@@ -460,8 +460,8 @@ public class ValuesTest {
 				Values.ofNumeric(1),
 				Values.ofNumeric(-1),
 				Values.ofNumeric(0))
-				                     .sorted()
-				                     .collect(Collectors.toList());
+				.sorted()
+				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 				Values.ofNumeric(-1),
 				Values.ofNumeric(0),
@@ -474,8 +474,8 @@ public class ValuesTest {
 				Values.ofText("a2"),
 				Values.ofText("a10"),
 				Values.ofText("a1"))
-				                     .sorted()
-				                     .collect(Collectors.toList());
+				.sorted()
+				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 				Values.ofText("a1"),
 				Values.ofText("a2"),
@@ -488,8 +488,8 @@ public class ValuesTest {
 				Values.ofSize(1),
 				Values.ofSize(2),
 				Values.ofSize(3))
-				                     .sorted()
-				                     .collect(Collectors.toList());
+				.sorted()
+				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 				Values.ofSize(1),
 				Values.ofSize(2),
@@ -503,8 +503,8 @@ public class ValuesTest {
 				Values.ofPath(Paths.get("a1")),
 				Values.ofPath(Paths.get("a20")),
 				Values.ofPath(Paths.get("a2")))
-				                     .sorted()
-				                     .collect(Collectors.toList());
+				.sorted()
+				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 				Values.ofPath(Paths.get("a1")),
 				Values.ofPath(Paths.get("a2")),
@@ -517,8 +517,8 @@ public class ValuesTest {
 			List<Value> sorted = Stream.of(
 				Values.ofDuration(Duration.ofMillis(1)),
 				Values.ofDuration(Duration.ofMillis(2)))
-				                     .sorted()
-				                     .collect(Collectors.toList());
+				.sorted()
+				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
 				Values.ofDuration(Duration.ofMillis(1)),
 				Values.ofDuration(Duration.ofMillis(2)));
@@ -598,28 +598,44 @@ public class ValuesTest {
 			}
 		}
 
-
 		@Nested
 		public class NoneLastTest {
 
+			Comparator<Value> sut = Values.Comparators.noneLast(Comparator.naturalOrder());
+
 			@Test
 			public void noneLast() {
-				List<Value> sorted = Stream.of(
+				List<Value> values = Stream.of(
 					Values.ofNumeric(1),
 					Values.ofNumeric(-1),
 					Values.none(),
-					Values.ofNumeric(0))
-					                     .sorted(Values.Comparators.noneLast(Comparator.naturalOrder()))
-					                     .collect(Collectors.toList());
-				assertThat(sorted).containsExactly(
-					Values.ofNumeric(-1),
-					Values.ofNumeric(0),
+					Values.ofNumeric(0)
+				).collect(Collectors.toList());
+
+				values.sort(sut);
+
+				assertThat(values).last().isEqualTo(Values.none());
+			}
+		}
+
+		@Nested
+		public class NoneFirstTest {
+
+			Comparator<Value> sut = Values.Comparators.noneFirst(Comparator.naturalOrder());
+
+			@Test
+			public void noneFirst() {
+				List<Value> values = Stream.of(
 					Values.ofNumeric(1),
-					Values.none()
-				);
+					Values.ofNumeric(-1),
+					Values.none(),
+					Values.ofNumeric(0)
+				).collect(Collectors.toList());
+
+				values.sort(sut);
+
+				assertThat(values).first().isEqualTo(Values.none());
 			}
 		}
 	}
-
-
 }
