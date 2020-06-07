@@ -83,7 +83,7 @@ public class NetworkModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: network")));
 		}
 	}
 

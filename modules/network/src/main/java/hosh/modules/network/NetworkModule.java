@@ -27,16 +27,8 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Todo;
-import hosh.spi.Command;
-import hosh.spi.CommandRegistry;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
+import hosh.spi.*;
 import hosh.spi.Module;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.Values;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -72,7 +64,7 @@ public class NetworkModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Errors.usage("network"));
 				return ExitStatus.error();
 			}
 			try {
@@ -137,7 +129,7 @@ public class NetworkModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: http URL")));
+				err.send(Errors.usage("http URL"));
 				return ExitStatus.error();
 			}
 			HttpRequest request = HttpRequest.newBuilder()

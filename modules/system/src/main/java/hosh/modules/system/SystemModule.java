@@ -27,22 +27,9 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
+import hosh.spi.*;
 import hosh.spi.Ansi.Style;
-import hosh.spi.Command;
-import hosh.spi.CommandRegistry;
-import hosh.spi.CommandWrapper;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Key;
-import hosh.spi.Keys;
-import hosh.spi.LineReaderAware;
 import hosh.spi.Module;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.Values;
 import org.jline.reader.LineReader;
 
 import java.io.IOException;
@@ -606,12 +593,12 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: input VARIABLE")));
+				err.send(Errors.usage("input VARIABLE"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
 			if (!VARIABLE.matcher(key).matches()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			Optional<String> read = input();
@@ -655,12 +642,12 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret VARIABLE")));
+				err.send(Errors.usage("secret VARIABLE"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
 			if (!VARIABLE.matcher(key).matches()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			Optional<String> read = secret();
@@ -697,13 +684,13 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
+				err.send(Errors.usage("capture VARNAME"));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
 			String key = args.get(0);
 			if (!VARIABLE.matcher(key).matches()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			StringWriter result = new StringWriter();
@@ -733,7 +720,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() <= 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
+				err.send(Errors.usage("open filename [WRITE|APPEND|...]"));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
@@ -753,7 +740,7 @@ public class SystemModule implements Module {
 			return args
 				       .stream()
 				       .skip(1)
-				       .map(arg -> parseOption(arg))
+				       .map(this::parseOption)
 				       .toArray(OpenOption[]::new);
 		}
 
