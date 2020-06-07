@@ -91,6 +91,7 @@ public class NetworkModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	public class HttpTest {
 
+		@SuppressWarnings("unused") // used to restore interrupted flag
 		@RegisterExtension
 		public final WithThread withThread = new WithThread();
 
