@@ -4,7 +4,8 @@
  [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dfa1_hosh&metric=coverage)](https://sonarcloud.io/dashboard?id=dfa1_hosh)
 
 Experimental shell, written in Java 11.
-Website: https://hosh-shell.github.io  
+
+Website: https://hosh-shell.github.io
 
 ## Development
 
