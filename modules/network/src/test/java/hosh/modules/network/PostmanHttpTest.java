@@ -75,7 +75,7 @@ public class PostmanHttpTest {
 	@Test
 	public void getOk() {
 		// Given
-		URI uri = URI.create("https://postman-echo.com/get?param=1");
+		URI uri = URI.create("https://postman-echo.com/get?param=42");
 		// When
 		ExitStatus exitStatus = sut.run(List.of(uri.toString()), in, out, err);
 		// Then
@@ -84,7 +84,7 @@ public class PostmanHttpTest {
 		then(out).should().send(body.capture());
 		then(err).shouldHaveNoInteractions();
 		JsonObject result = JsonHelpers.parse(body.getValue());
-		assertThat(result.getJsonString("url").getString()).isEqualTo("https://postman-echo.com/get?param=1");
+		assertThat(result.getJsonObject("args").getString("param")).isEqualTo("42");
 		assertThat(result.getJsonObject("headers").getJsonString("user-agent").getString()).isEqualTo("Hosh");
 	}
 
