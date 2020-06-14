@@ -156,7 +156,7 @@ public class NetworkModule implements Module {
 				return ExitStatus.success();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
+				err.send(Errors.message("interrupted"));
 				return ExitStatus.error();
 			}
 		}
