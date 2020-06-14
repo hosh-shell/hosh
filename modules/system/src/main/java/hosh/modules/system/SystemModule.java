@@ -279,7 +279,7 @@ public class SystemModule implements Module {
 				return ExitStatus.success();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
+				err.send(Errors.message("interrupted"));
 				return ExitStatus.error();
 			}
 		}
@@ -402,18 +402,18 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			if (!args.get(0).matches("[0-9]+")) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("not a valid pid: " + args.get(0))));
+				err.send(Errors.message("not a valid pid: %s", args.get(0)));
 				return ExitStatus.error();
 			}
 			long pid = Long.parseLong(args.get(0));
 			Optional<ProcessHandle> process = processLookup.of(pid);
 			if (process.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("cannot find pid: " + pid)));
+				err.send(Errors.message("cannot find pid: %s", pid));
 				return ExitStatus.error();
 			}
 			boolean destroyed = process.get().destroy();
 			if (!destroyed) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("cannot destroy pid: " + pid)));
+				err.send(Errors.message("cannot destroy pid: %s", pid));
 				return ExitStatus.error();
 			}
 			return ExitStatus.success();
