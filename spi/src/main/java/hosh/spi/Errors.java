@@ -1,6 +1,13 @@
 package hosh.spi;
 
+import hosh.doc.Experimental;
+
+/**
+ * Factory methods for common errors.
+ */
+@Experimental(description = "")
 public class Errors {
+
 	private Errors() {
 	}
 

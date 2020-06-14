@@ -23,6 +23,8 @@
  */
 package hosh.spi;
 
+import hosh.doc.Todo;
+
 import java.util.List;
 
 /**
@@ -31,6 +33,7 @@ import java.util.List;
  */
 public interface CommandWrapper<T> extends Command {
 
+	@Todo(description = "only way to communicate error is to throw exception, maybe Optional is better?")
 	T before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err);
 
 	void after(T resource, InputChannel in, OutputChannel out, OutputChannel err);

@@ -33,14 +33,15 @@ import hosh.spi.Ansi;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
 import hosh.spi.CommandWrapper;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
-import hosh.spi.Module;
 import hosh.spi.LoggerFactory;
+import hosh.spi.Module;
 import hosh.spi.OutputChannel;
-import hosh.spi.Records;
 import hosh.spi.Record;
+import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Value;
@@ -66,6 +67,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,7 +114,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() > 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected at most 1 argument")));
+				err.send(Errors.usage("ls [path]"));
 				return ExitStatus.error();
 			}
 			final Path cwd = state.getCwd();
@@ -134,10 +136,10 @@ public class FileSystemModule implements Module {
 				}
 				return ExitStatus.success();
 			} catch (NotDirectoryException e) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("not a directory: " + e.getMessage())));
+				err.send(Errors.message("not a directory: %s", e.getMessage()));
 				return ExitStatus.error();
 			} catch (AccessDeniedException e) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + e.getMessage())));
+				err.send(Errors.message("access denied: %s",  e.getMessage()));
 				return ExitStatus.error();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -174,7 +176,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
+				err.send(Errors.usage("cwd"));
 				return ExitStatus.error();
 			}
 			out.send(Records.singleton(Keys.PATH, Values.ofPath(state.getCwd())));
@@ -199,12 +201,12 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
+				err.send(Errors.usage("cd path"));
 				return ExitStatus.error();
 			}
 			Path newCwd = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			if (!Files.isDirectory(newCwd)) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
+				err.send(Errors.message("not a directory"));
 				return ExitStatus.error();
 			}
 			state.setCwd(newCwd);
@@ -228,12 +230,12 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one path argument")));
+				err.send(Errors.usage("lines path"));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 			if (!Files.isRegularFile(source)) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("not readable file")));
+				err.send(Errors.message("not readable file"));
 				return ExitStatus.error();
 			}
 			try (Stream<String> lines = Files.lines(source, StandardCharsets.UTF_8)) {
@@ -262,17 +264,17 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+				err.send(Errors.usage("walk path"));
 				return ExitStatus.error();
 			}
 			try {
 				Path target = followSymlinksRecursively(resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0))));
 				if (!Files.exists(target)) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("not found")));
+					err.send(Errors.message("not found"));
 					return ExitStatus.error();
 				}
 				if (!Files.isDirectory(target)) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
+					err.send(Errors.usage("not a directory"));
 					return ExitStatus.error();
 				}
 				Files.walkFileTree(target, new VisitCallback(out));
@@ -337,7 +339,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+				err.send(Errors.usage("glob pattern"));
 				return ExitStatus.error();
 			}
 			String pattern = args.get(0);
@@ -347,10 +349,7 @@ public class FileSystemModule implements Module {
 					.flatMap(v -> v.unwrap(Path.class))
 					.map(Path::getFileName)
 					.filter(pathMatcher::matches)
-					.ifPresent(p -> {
-							out.send(record);
-						}
-					);
+					.ifPresent(p -> out.send(record)); // side effect
 			}
 			return ExitStatus.success();
 		}
@@ -373,7 +372,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
+				err.send(Errors.usage("cp source target"));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -497,7 +496,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: probe file")));
+				err.send(Errors.usage("probe file"));
 				return ExitStatus.error();
 			}
 			Path file = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -531,7 +530,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: symlink source target")));
+				err.send(Errors.usage("symlink source target"));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -561,7 +560,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: hardlink source target")));
+				err.send(Errors.usage("hardlink source target"));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -575,6 +574,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@Todo(description = "add tests for regular files and directories")
 	@Description("resolve to canonical absolute path")
 	@Examples({
 		@Example(command = "resolve ./symlink", description = "resolve symlink to the absolute path"),
@@ -591,7 +591,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: resolve file")));
+				err.send(Errors.usage("resolve file"));
 				return ExitStatus.error();
 			}
 			try {
@@ -606,7 +606,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Description("watch for filesystem change in the given path")
+	@Description("watch for filesystem change in the given directory")
 	@Examples({
 		@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
 	})
@@ -625,7 +625,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
+				err.send(Errors.usage("watch directory"));
 				return ExitStatus.error();
 			}
 			Path dir = state.getCwd();
@@ -673,7 +673,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Experimental(description = "naive and ugly implementation (e.g. sleep(200) and output on err)")
+	@Experimental(description = "still using busy wait, explore better approaches here")
 	@Description("execute inner block after successfully locking file")
 	@Examples({
 		@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
@@ -681,9 +681,9 @@ public class FileSystemModule implements Module {
 	public static class WithLock implements CommandWrapper<WithLock.LockResource>, StateAware {
 
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+		private static final Duration BUSY_WAIT = Duration.ofMillis(200);
 
 		private State state;
-
 		@Override
 		public void setState(State state) {
 			this.state = state;
@@ -697,10 +697,7 @@ public class FileSystemModule implements Module {
 			try {
 				Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 				RandomAccessFile randomAccessFile = new RandomAccessFile(path.toFile(), "rw");
-				while (randomAccessFile.getChannel().tryLock() == null) {
-					Thread.sleep(200);
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("failed to acquire lock")));
-				}
+				busyWaitForResource(err, randomAccessFile);
 				return new LockResource(randomAccessFile, path);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -710,11 +707,18 @@ public class FileSystemModule implements Module {
 			}
 		}
 
+		private void busyWaitForResource(OutputChannel err, RandomAccessFile randomAccessFile) throws IOException, InterruptedException {
+			while (randomAccessFile.getChannel().tryLock() == null) {
+				Thread.sleep(BUSY_WAIT.toMillis());
+				err.send(Errors.message("failed to acquire lock, retry in %sms", BUSY_WAIT.toMillis()));
+			}
+		}
+
 		@Override
 		public void after(LockResource resource, InputChannel in, OutputChannel out, OutputChannel err) {
 			try {
 				resource.randomAccessFile.close();
-				Files.delete(resource.path);
+				Files.delete(resource.getPath());
 			} catch (IOException e) {
 				LOGGER.log(Level.INFO, "caught exception", e);
 				err.send(Records.singleton(Keys.ERROR, Values.ofText(e.getMessage())));
@@ -726,7 +730,7 @@ public class FileSystemModule implements Module {
 			return false;
 		}
 
-		public static class LockResource {
+		private static class LockResource {
 
 			private final RandomAccessFile randomAccessFile;
 
