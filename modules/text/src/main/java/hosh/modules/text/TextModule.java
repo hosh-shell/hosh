@@ -29,7 +29,6 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Ansi;
-import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
@@ -788,14 +787,12 @@ public class TextModule implements Module {
 
 		private void outputTable(OutputChannel out, List<Record> records, Map<Key, Integer> paddings) {
 			boolean headerSent = false;
-			int i = 0;
 			for (Record record : records) {
 				if (!headerSent) {
 					sendHeader(paddings, record.keys(), out);
 					headerSent = true;
 				}
-				sendRow(i, paddings, record, out);
-				i += 1;
+				sendRow(paddings, record, out);
 			}
 		}
 
@@ -808,7 +805,6 @@ public class TextModule implements Module {
 					result.compute(entry.getKey(), (k, v) -> v == null ? length : Math.max(v, length));
 				}
 			}
-			System.out.println(result);
 			return result;
 		}
 
@@ -831,7 +827,7 @@ public class TextModule implements Module {
 			return records;
 		}
 
-		private void sendRow(int i, Map<Key, Integer> paddings, Record record, OutputChannel out) {
+		private void sendRow(Map<Key, Integer> paddings, Record record, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			StringBuilder formatter = new StringBuilder();
 			Collection<Record.Entry> entries = record.entries();
@@ -844,11 +840,7 @@ public class TextModule implements Module {
 				formattedValues.add(writer.toString());
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
-			out.send(Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText(row), alternateColor(i))));
-		}
-
-		private Style alternateColor(int i) {
-			return i % 2 == 0 ? Ansi.Style.BG_WHITE : Ansi.Style.BG_BLUE;
+			out.send(Records.singleton(Keys.of("row"), Values.ofText(row)));
 		}
 
 		private String formatterFor(int length) {
