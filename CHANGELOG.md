@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `http` integration tests (https://postman-echo.com)
 
 ### Fixed
+- `probe`: fix exit status when content type cannot be determined 
 - minor fixes
    ignoring UAC errors in test on windows
    stability of integration tests

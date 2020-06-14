@@ -505,7 +505,7 @@ public class FileSystemModule implements Module {
 				String contentType = Files.probeContentType(file);
 				if (contentType == null) {
 					err.send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
-					return ExitStatus.success();
+					return ExitStatus.error();
 				}
 				out.send(Records.singleton(Keys.of("contenttype"), Values.ofText(contentType)));
 				return ExitStatus.success();
