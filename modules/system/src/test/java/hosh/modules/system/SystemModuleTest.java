@@ -418,7 +418,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sleep [duration|duration unit]")));
 		}
 
 		@Test
@@ -427,7 +427,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sleep [duration]")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sleep [duration|duration unit]")));
 		}
 
 		@Test

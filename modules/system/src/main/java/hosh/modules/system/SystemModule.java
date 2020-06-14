@@ -213,13 +213,13 @@ public class SystemModule implements Module {
 				String commandName = args.get(0);
 				Supplier<Command> commandSupplier = state.getCommands().get(commandName);
 				if (commandSupplier == null) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("command not found: " + commandName)));
+					err.send(Errors.message("command not found: %s", commandName));
 					return ExitStatus.error();
 				}
 				Class<? extends Command> commandClass = commandSupplier.get().getClass();
 				Description builtIn = commandClass.getAnnotation(Description.class);
 				if (builtIn == null) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
+					err.send(Errors.message("no help for command: %s", commandName));
 					return ExitStatus.error();
 				}
 				out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(commandName + " - " + builtIn.value()), Style.BOLD)));
@@ -251,10 +251,6 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.isEmpty()) {
-				err.send(Errors.usage("sleep [duration]"));
-				return ExitStatus.error();
-			}
 			OptionalLong amount;
 			Optional<ChronoUnit> unit;
 			if (args.size() == 1) {
@@ -266,15 +262,15 @@ public class SystemModule implements Module {
 				amount = parseLong(arg);
 				unit = parseUnit(args.get(1).toLowerCase());
 			} else {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+				err.send(Errors.usage("sleep [duration|duration unit]"));
 				return ExitStatus.error();
 			}
 			if (amount.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: " + args.get(0))));
+				err.send(Errors.message("invalid amount: %s", args.get(0)));
 				return ExitStatus.error();
 			}
 			if (unit.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid unit: " + args.get(1))));
+				err.send(Errors.message("invalid unit: %s",  args.get(1)));
 				return ExitStatus.error();
 			}
 			try {
