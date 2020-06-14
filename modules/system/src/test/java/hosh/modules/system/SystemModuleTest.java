@@ -148,7 +148,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).hasExitCode(1);
 			then(state).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: exit [value]")));
 			then(out).shouldHaveNoInteractions();
 		}
 	}
@@ -203,7 +203,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: env")));
 		}
 	}
 
@@ -305,7 +305,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: help [command]")));
 		}
 
 		@Description("/bin/true replacement")
