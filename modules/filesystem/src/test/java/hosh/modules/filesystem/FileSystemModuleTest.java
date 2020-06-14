@@ -24,6 +24,7 @@
 package hosh.modules.filesystem;
 
 import hosh.doc.Bug;
+import hosh.modules.filesystem.FileSystemModule.WithLock.LockResource;
 import hosh.spi.Ansi;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -1111,12 +1112,11 @@ public class FileSystemModuleTest {
 
 		@Test
 		public void noArgs() {
-			assertThatThrownBy(() -> sut.before(List.of(), in, out, err))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("expecting file name");
+			Optional<LockResource> maybeResource = sut.before(List.of(), in, out, err);
+			assertThat(maybeResource).isEmpty();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: withLock file { ... }")));
 		}
 
 		@Test
@@ -1133,9 +1133,10 @@ public class FileSystemModuleTest {
 		public void lock() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File lockFile = temporaryFolder.newFile("file.txt");
-			FileSystemModule.WithLock.LockResource resource = sut.before(List.of("file.txt"), in, out, err);
-			assertThat(resource).isNotNull();
+			Optional<LockResource> maybeResource = sut.before(List.of("file.txt"), in, out, err);
+			assertThat(maybeResource).isPresent();
 			// under same JVM tryLock throws exception
+			LockResource resource = maybeResource.get();
 			assertThatThrownBy(() -> resource.getRandomAccessFile().getChannel().tryLock())
 				.isInstanceOf(OverlappingFileLockException.class);
 			sut.after(resource, in, out, err);

@@ -37,6 +37,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -78,41 +79,46 @@ public class DefaultCommandWrapperTest {
 	public void callsBeforeAndAfterWhenStatementCompletesNormally() {
 		Object resource = new Object();
 		List<String> args = List.of();
-		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
+		given(commandWrapper.before(args, in, out, err)).willReturn(Optional.of(resource));
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.success());
 		ExitStatus exitStatus = sut.run(args, in, out, err);
+		assertThat(exitStatus).isSuccess();
 		then(commandWrapper).should().before(args, in, out, err);
 		then(commandWrapper).should().after(resource, in, out, err);
-		assertThat(exitStatus).isEqualTo(ExitStatus.success());
+		then(commandWrapper).should().retry(resource, in, out, err);
+		then(commandWrapper).shouldHaveNoMoreInteractions();
 	}
 
 	@Test
 	public void callsBeforeAndAfterWhenStatementThrows() {
 		Object resource = new Object();
 		List<String> args = List.of();
-		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
+		given(commandWrapper.before(args, in, out, err)).willReturn(Optional.of(resource));
 		given(interpreter.eval(statement, in, out, err)).willThrow(NullPointerException.class);
 		assertThatThrownBy(() -> sut.run(args, in, out, err))
 			.isInstanceOf(NullPointerException.class);
 		then(commandWrapper).should().before(args, in, out, err);
 		then(commandWrapper).should().after(resource, in, out, err);
+		then(commandWrapper).shouldHaveNoMoreInteractions();
 	}
 
 	@Test
 	public void keepRetryingAndReturnsLastExitStatus() {
 		Object resource = new Object();
 		List<String> args = List.of();
-		given(commandWrapper.before(args, in, out, err)).willReturn(resource);
+		given(commandWrapper.before(args, in, out, err)).willReturn(Optional.of(resource));
 		given(commandWrapper.retry(resource, in, out, err)).willReturn(true, false);
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.success(), ExitStatus.error());
 		ExitStatus exitStatus = sut.run(args, in, out, err);
 		assertThat(exitStatus).isError();
+		then(commandWrapper).should().before(args, in, out, err);
+		then(commandWrapper).should().after(resource, in, out, err);
 		then(commandWrapper).should(Mockito.times(2)).retry(resource, in, out, err);
+		then(commandWrapper).shouldHaveNoMoreInteractions();
 	}
 
 	@Test
 	public void asString() {
-		assertThat(sut)
-			.hasToString("DefaultCommandWrapper[nested=statement,commandWrapper=commandWrapper]");
+		assertThat(sut).hasToString("DefaultCommandWrapper[nested=statement,commandWrapper=commandWrapper]");
 	}
 }

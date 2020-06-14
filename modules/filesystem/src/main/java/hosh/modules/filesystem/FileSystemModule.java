@@ -69,6 +69,7 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -686,21 +687,24 @@ public class FileSystemModule implements Module {
 		private static final Duration BUSY_WAIT = Duration.ofMillis(200);
 
 		private State state;
+
 		@Override
 		public void setState(State state) {
 			this.state = state;
 		}
 
 		@Override
-		public LockResource before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public Optional<LockResource> before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				throw new IllegalArgumentException("expecting file name");
+				err.send(Errors.usage("withLock file { ... }"));
+				return Optional.empty();
 			}
 			try {
 				Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
 				RandomAccessFile randomAccessFile = new RandomAccessFile(path.toFile(), "rw");
 				busyWaitForResource(err, randomAccessFile);
-				return new LockResource(randomAccessFile, path);
+				LockResource lockResource = new LockResource(randomAccessFile, path);
+				return Optional.of(lockResource);
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			} catch (InterruptedException e) {

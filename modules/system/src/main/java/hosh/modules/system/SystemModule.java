@@ -331,8 +331,8 @@ public class SystemModule implements Module {
 	public static class WithTime implements CommandWrapper<Long> {
 
 		@Override
-		public Long before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			return System.nanoTime();
+		public Optional<Long> before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			return Optional.of(System.nanoTime());
 		}
 
 		@Override
@@ -391,6 +391,7 @@ public class SystemModule implements Module {
 
 		private ProcessLookup processLookup = ProcessHandle::of;
 
+		@SuppressWarnings("unused") // used by @InjectMock
 		public void setProcessLookup(ProcessLookup processLookup) {
 			this.processLookup = processLookup;
 		}
@@ -445,14 +446,20 @@ public class SystemModule implements Module {
 		public static final Key AVERAGE = Keys.of("average");
 
 		@Override
-		public Accumulator before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public Optional<Accumulator> before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				throw new IllegalArgumentException("requires one integer arg");
+				err.send(Errors.usage("benchmark number { ... }"));
+				return Optional.empty();
 			}
 			int repeat = Integer.parseInt(args.get(0));
+
+			if (repeat <= 0) {
+				err.send(Errors.message("number must be >= 0"));
+				return Optional.empty();
+			}
 			Accumulator accumulator = new Accumulator(repeat);
 			accumulator.start();
-			return accumulator;
+			return Optional.of(accumulator);
 		}
 
 		@Override
@@ -460,7 +467,7 @@ public class SystemModule implements Module {
 			Duration best = resource.results.stream().min(Comparator.naturalOrder()).orElse(Duration.ZERO);
 			Duration worst = resource.results.stream().max(Comparator.naturalOrder()).orElse(Duration.ZERO);
 			int runs = resource.results.size();
-			Duration avg = runs == 0 ? Duration.ZERO : resource.results.stream().reduce(Duration.ZERO, (acc, d) -> acc.plus(d)).dividedBy(runs);
+			Duration avg = runs == 0 ? Duration.ZERO : resource.results.stream().reduce(Duration.ZERO, Duration::plus).dividedBy(runs);
 			out.send(Records.builder()
 				         .entry(Keys.COUNT, Values.ofNumeric(runs))
 				         .entry(BEST, Values.ofDuration(best))
@@ -484,9 +491,6 @@ public class SystemModule implements Module {
 			private long nanoTime;
 
 			public Accumulator(int repeat) {
-				if (repeat <= 0) {
-					throw new IllegalArgumentException("repeat must be > 0");
-				}
 				this.repeat = repeat;
 				this.results = new ArrayList<>(repeat);
 			}

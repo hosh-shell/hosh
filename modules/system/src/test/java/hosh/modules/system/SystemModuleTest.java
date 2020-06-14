@@ -621,7 +621,9 @@ public class SystemModuleTest {
 		@Test
 		public void calculations() {
 			List<String> args = List.of("1");
-			Accumulator accumulator = sut.before(args, in, out, err);
+			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
+			assertThat(maybeAccumulator).isPresent();
+			Accumulator accumulator = maybeAccumulator.get();
 			accumulator.getResults().add(Duration.ofMillis(20));
 			accumulator.getResults().add(Duration.ofMillis(10));
 			sut.after(accumulator, in, out, err);
@@ -639,7 +641,9 @@ public class SystemModuleTest {
 		@Test
 		public void avoidDivideByZero() {
 			List<String> args = List.of("1");
-			Accumulator accumulator = sut.before(args, in, out, err);
+			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
+			assertThat(maybeAccumulator).isPresent();
+			Accumulator accumulator = maybeAccumulator.get();
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
@@ -655,32 +659,38 @@ public class SystemModuleTest {
 		@Test
 		public void oneArg() {
 			List<String> args = List.of("1");
-			Accumulator accumulator = sut.before(args, in, out, err);
+			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
+			assertThat(maybeAccumulator).isPresent();
+			Accumulator accumulator = maybeAccumulator.get();
 			boolean retry = sut.retry(accumulator, in, out, err);
 			assertThat(retry).isFalse();
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(Mockito.any());
+			then(out).should().send(Mockito.any()); // weak test
 			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
-		public void zeroArgs() {
+		public void noArgs() {
 			List<String> args = List.of();
-			assertThatThrownBy(() -> sut.before(args, in, out, err))
-				.hasMessage("requires one integer arg")
-				.isInstanceOf(IllegalArgumentException.class);
+			Optional<Accumulator> maybeResource = sut.before(args, in, out, err);
+			assertThat(maybeResource).isEmpty();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: benchmark number { ... }")));
 		}
 
 		@Test
 		public void zeroArg() {
 			List<String> args = List.of("0");
-			assertThatThrownBy(() -> sut.before(args, in, out, err))
-				.hasMessage("repeat must be > 0")
-				.isInstanceOf(IllegalArgumentException.class);
+			Optional<Accumulator> maybeResource = sut.before(args, in, out, err);
+			assertThat(maybeResource).isEmpty();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("number must be >= 0")));
 		}
 
-		@Test
+		@Test // IMHO: this test should not exists (run is a design error)
 		public void runIsMarkedAsError() {
 			assertThatThrownBy(() -> sut.run(Collections.emptyList(), in, out, err))
 				.isInstanceOf(UnsupportedOperationException.class);
@@ -705,8 +715,9 @@ public class SystemModuleTest {
 
 		@Test
 		public void usage() {
-			Long resource = sut.before(Collections.emptyList(), in, out, err);
-			sut.after(resource, in, out, err);
+			Optional<Long> maybeResource = sut.before(Collections.emptyList(), in, out, err);
+			assertThat(maybeResource).isPresent();
+			sut.after(maybeResource.get(), in, out, err);
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Mockito.any());
 			then(err).shouldHaveNoInteractions();
@@ -714,8 +725,10 @@ public class SystemModuleTest {
 
 		@Test
 		public void retryIsNotSupported() {
-			Long resource = sut.before(Collections.emptyList(), in, out, err);
-			assertThat(sut.retry(resource, in, out, err)).isFalse();
+			Optional<Long> maybeResource = sut.before(Collections.emptyList(), in, out, err);
+			assertThat(maybeResource).isPresent();
+			boolean result = sut.retry(maybeResource.get(), in, out, err);
+			assertThat(result).isFalse();
 		}
 
 		@Test
