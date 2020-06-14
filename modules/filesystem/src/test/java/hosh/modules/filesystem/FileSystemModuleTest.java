@@ -885,7 +885,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: glob pattern")));
 		}
 
 		@SuppressWarnings("unchecked")

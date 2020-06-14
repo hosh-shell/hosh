@@ -403,7 +403,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
+				err.send(Errors.usage("mv source target"));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -434,7 +434,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: rm target")));
+				err.send(Errors.usage("rm target"));
 				return ExitStatus.error();
 			}
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -456,7 +456,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: partitions")));
+				err.send(Errors.usage("partitions"));
 				return ExitStatus.error();
 			}
 			for (FileStore store : FileSystems.getDefault().getFileStores()) {
@@ -503,7 +503,7 @@ public class FileSystemModule implements Module {
 			try {
 				String contentType = Files.probeContentType(file);
 				if (contentType == null) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
+					err.send(Errors.message("content type cannot be determined"));
 					return ExitStatus.error();
 				}
 				out.send(Records.singleton(Keys.of("contenttype"), Values.ofText(contentType)));
@@ -730,7 +730,7 @@ public class FileSystemModule implements Module {
 			return false;
 		}
 
-		private static class LockResource {
+		static class LockResource {
 
 			private final RandomAccessFile randomAccessFile;
 
