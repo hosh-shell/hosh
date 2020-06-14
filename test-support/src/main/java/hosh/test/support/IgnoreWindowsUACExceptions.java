@@ -32,7 +32,10 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
 /**
- * Ignores some UAC exceptions on Windows.
+ * Special exception handler to ignore UAC exceptions on Windows.
+ *
+ * This is a workaround for local builds on Windows: by now on Github this
+ * privilege is always held.
  */
 public class IgnoreWindowsUACExceptions implements TestExecutionExceptionHandler {
 
@@ -48,6 +51,13 @@ public class IgnoreWindowsUACExceptions implements TestExecutionExceptionHandler
 	}
 
 	private boolean isUAC(Throwable throwable) {
-		return throwable.getMessage().contains("A required privilege is not held by the client.");
+		if (throwable == null) {
+			return false;
+		}
+		String message = throwable.getMessage();
+		if (message == null) {
+			return false;
+		}
+		return message.contains("A required privilege is not held by the client.");
 	}
 }
