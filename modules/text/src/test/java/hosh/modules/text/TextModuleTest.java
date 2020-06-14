@@ -109,7 +109,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: rand")));
 		}
 
 	}
@@ -146,7 +146,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: trim key")));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -724,7 +724,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: regex key regex")));
 		}
 
 		@Test
@@ -733,7 +733,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: regex key regex")));
 		}
 
 		@Test
@@ -817,7 +817,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: schema")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -878,7 +878,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: count")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -918,7 +918,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: enumerate")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -965,7 +965,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: timestamp")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -1016,7 +1016,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: drop number")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -1026,7 +1026,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("number must be >= 0")));
 		}
 	}
 
@@ -1101,7 +1101,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("number must be >= 0")));
 		}
 
 		@Test
@@ -1110,7 +1110,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: take number")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -1137,7 +1137,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("expected 1 parameter")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: last number")));
 		}
 
 		@Test
@@ -1146,7 +1146,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("parameter must be >= 1")));
+			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("number must be >= 1")));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1234,7 +1234,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: filter key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -1244,7 +1244,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: filter key regex")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -1354,7 +1354,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("must be asc or desc")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("must be 'asc' or 'desc'")));
 			then(out).shouldHaveNoMoreInteractions();
 		}
 
@@ -1364,7 +1364,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("use 'sort key' or 'sort [asc|desc] key'")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sort [asc|desc] key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -1374,7 +1374,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("too many args")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sort [asc|desc] key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -1446,7 +1446,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: distinct key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -1518,7 +1518,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: duplicated key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -1578,7 +1578,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: table")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

@@ -45,7 +45,7 @@ public class Errors {
 		return Records.singleton(Keys.ERROR, Values.ofText(String.format(fmt, args)));
 	}
 
-	@Todo(description = "adding more details (e.g. file or directory, help, etc)")
+	@Todo(description = "adding more details (e.g. enum with type of arguments)")
 	public static Record usage(String usage) {
 		return Records.singleton(Keys.ERROR, Values.ofText("usage: " + usage));
 	}
