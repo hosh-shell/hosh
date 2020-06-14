@@ -274,7 +274,7 @@ public class FileSystemModule implements Module {
 					return ExitStatus.error();
 				}
 				if (!Files.isDirectory(target)) {
-					err.send(Errors.usage("not a directory"));
+					err.send(Errors.message("not a directory"));
 					return ExitStatus.error();
 				}
 				Files.walkFileTree(target, new VisitCallback(out));
