@@ -53,14 +53,14 @@ public class FileSystemCompleter implements Completer {
 		if (line.word().endsWith(File.separator)) {
 			listCandidates(path, p -> p, candidates);
 		} else if (path.isAbsolute()) {
-			listCandidates(parent(path), p -> p.toAbsolutePath(), candidates);
+			listCandidates(parent(path), Path::toAbsolutePath, candidates);
 		} else if (path.getParent() != null) {
 			Path resolved = state.getCwd().resolve(path.getParent());
 			int from = state.getCwd().getNameCount();
 			int to = resolved.getNameCount() + 1;
 			listCandidates(resolved, p -> p.subpath(from, to), candidates);
 		} else {
-			listCandidates(state.getCwd(), p -> p.getFileName(), candidates);
+			listCandidates(state.getCwd(), Path::getFileName, candidates);
 		}
 	}
 

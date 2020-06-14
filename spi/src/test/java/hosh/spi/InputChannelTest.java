@@ -71,9 +71,7 @@ public class InputChannelTest {
 	public void throwsNoSuchElementsWhenConsumed() {
 		given(in.recv()).willReturn(Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
-		assertThatThrownBy(() -> {
-			iterable.iterator().next();
-		}).isInstanceOf(NoSuchElementException.class);
+		assertThatThrownBy(() -> iterable.iterator().next()).isInstanceOf(NoSuchElementException.class);
 	}
 
 	@SuppressWarnings("unchecked")

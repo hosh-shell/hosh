@@ -106,9 +106,7 @@ public class FileSystemCompleterTest {
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
 			.isNotEmpty()
-			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isNotBlank();
-			});
+			.allSatisfy(candidate -> assertThat(candidate.value()).isNotBlank());
 	}
 
 	@EnabledOnOs(OS.WINDOWS)
@@ -120,9 +118,7 @@ public class FileSystemCompleterTest {
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
 			.isNotEmpty()
-			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isNotBlank();
-			});
+			.allSatisfy(candidate -> assertThat(candidate.value()).isNotBlank());
 	}
 
 	@Test

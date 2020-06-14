@@ -75,9 +75,7 @@ public class PipelineChannelTest {
 			Optional<Record> recv1 = sut.recv();
 			assertThat(recv1).contains(record);
 		});
-		Future<?> send = withExecutor.submit(() -> {
-			sut.send(record);
-		});
+		Future<?> send = withExecutor.submit(() -> sut.send(record));
 		recv.get();
 		send.get();
 	}

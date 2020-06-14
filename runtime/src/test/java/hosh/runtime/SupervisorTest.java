@@ -69,16 +69,16 @@ public class SupervisorTest {
 
 	@Test
 	public void allSubmitInSuccess() throws ExecutionException {
-		sut.submit(() -> ExitStatus.success());
-		sut.submit(() -> ExitStatus.success());
+		sut.submit(ExitStatus::success);
+		sut.submit(ExitStatus::success);
 		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
 	public void oneSubmitInError() throws ExecutionException {
-		sut.submit(() -> ExitStatus.success());
-		sut.submit(() -> ExitStatus.error());
+		sut.submit(ExitStatus::success);
+		sut.submit(ExitStatus::error);
 		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isError();
 	}

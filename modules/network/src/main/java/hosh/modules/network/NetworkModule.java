@@ -149,9 +149,7 @@ public class NetworkModule implements Module {
 			try {
 				HttpResponse<Stream<String>> response = requestor.send(request);
 				try (Stream<String> body = response.body()) {
-					body.forEach(line -> {
-						out.send(Records.singleton(Keys.TEXT, Values.ofText(line)));
-					});
+					body.forEach(line -> out.send(Records.singleton(Keys.TEXT, Values.ofText(line))));
 				}
 				return ExitStatus.success();
 			} catch (InterruptedException e) {

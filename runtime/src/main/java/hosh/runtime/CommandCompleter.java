@@ -76,7 +76,7 @@ public class CommandCompleter implements Completer {
 	private void executableInPath(Path dir, List<Candidate> candidates, Set<String> builtinOverrides) {
 		try (Stream<Path> list = Files.list(dir)) {
 			list
-				.filter(p -> Files.isExecutable(p))
+				.filter(Files::isExecutable)
 				.map(p -> toCandidate(p, builtinOverrides))
 				.forEach(candidates::add);
 		} catch (IOException e) {

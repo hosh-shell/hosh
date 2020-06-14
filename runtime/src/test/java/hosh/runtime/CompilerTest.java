@@ -92,9 +92,7 @@ public class CompilerTest {
 		Program program = sut.compile("ls | count");
 		assertThat(program.getStatements())
 			.hasSize(1)
-			.first().satisfies(statement -> {
-			assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class);
-		});
+			.first().satisfies(statement -> assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class));
 	}
 
 	@Test
@@ -122,9 +120,7 @@ public class CompilerTest {
 			assertThat(statement.getCommand()).isSameAs(command);
 			assertThat(statement.getArguments())
 				.hasSize(1)
-				.first().satisfies(arg -> {
-				assertThat(arg).isInstanceOf(Compiler.Constant.class);
-			});
+				.first().satisfies(arg -> assertThat(arg).isInstanceOf(Compiler.Constant.class));
 		});
 	}
 
@@ -138,9 +134,7 @@ public class CompilerTest {
 			assertThat(statement.getCommand()).isSameAs(command);
 			assertThat(statement.getArguments())
 				.hasSize(1)
-				.first().satisfies(arg -> {
-				assertThat(arg).isInstanceOf(Compiler.Variable.class);
-			});
+				.first().satisfies(arg -> assertThat(arg).isInstanceOf(Compiler.Variable.class));
 		});
 	}
 
@@ -154,9 +148,7 @@ public class CompilerTest {
 			assertThat(statement.getCommand()).isSameAs(command);
 			assertThat(statement.getArguments())
 				.hasSize(1)
-				.first().satisfies(arg -> {
-				assertThat(arg).isInstanceOf(Compiler.VariableOrFallback.class);
-			});
+				.first().satisfies(arg -> assertThat(arg).isInstanceOf(Compiler.VariableOrFallback.class));
 
 		});
 	}
@@ -226,9 +218,7 @@ public class CompilerTest {
 		Program program = sut.compile("withTime { withTime { git push } }");
 		assertThat(program.getStatements())
 			.hasSize(1)
-			.first().satisfies(statement -> {
-			assertThat(statement.getCommand()).isInstanceOf(DefaultCommandWrapper.class);
-		});
+			.first().satisfies(statement -> assertThat(statement.getCommand()).isInstanceOf(DefaultCommandWrapper.class));
 	}
 
 	@Test
@@ -289,10 +279,8 @@ public class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
 		Program program = sut.compile("${JAVA_HOME}/bin/java");
 		assertThat(program.getStatements()).hasSize(1)
-			.first().satisfies(statement -> {
-			assertThat(statement.getArguments())
-				.hasSize(0);
-		});
+			.first().satisfies(statement -> assertThat(statement.getArguments())
+				.hasSize(0));
 	}
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/112")
@@ -370,13 +358,9 @@ public class CompilerTest {
 				assertThat(statement.getArguments()).isEmpty();
 				assertThat(statement.getCommand())
 					.asInstanceOf(InstanceOfAssertFactories.type(PipelineCommand.class))
-					.satisfies(pipelineCommand -> {
-						assertThat(pipelineCommand.getConsumer().getCommand())
-							.asInstanceOf(InstanceOfAssertFactories.type(LambdaCommand.class))
-							.satisfies(lambdaCommand -> {
-								assertThat(lambdaCommand.getKey()).isEqualTo("path");
-							});
-					});
+					.satisfies(pipelineCommand -> assertThat(pipelineCommand.getConsumer().getCommand())
+						.asInstanceOf(InstanceOfAssertFactories.type(LambdaCommand.class))
+						.satisfies(lambdaCommand -> assertThat(lambdaCommand.getKey()).isEqualTo("path")));
 			});
 	}
 

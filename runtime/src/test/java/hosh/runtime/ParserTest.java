@@ -35,7 +35,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ParserTest {
@@ -49,17 +48,13 @@ public class ParserTest {
 
 	@Test
 	public void lexerError() {
-		assertThatThrownBy(() -> {
-			sut.parse("!");
-		}).isInstanceOf(ParseError.class)
+		assertThatThrownBy(() -> sut.parse("!")).isInstanceOf(ParseError.class)
 			.hasMessage("line 1:0: token recognition error at: '!'");
 	}
 
 	@Test
 	public void refuseSpaceInsideVariableExpansion() {
-		assertThatThrownBy(() -> {
-			sut.parse("${ EXECUTABLE }");
-		}).isInstanceOf(ParseError.class)
+		assertThatThrownBy(() -> sut.parse("${ EXECUTABLE }")).isInstanceOf(ParseError.class)
 			.hasMessage("line 1:0: token recognition error at: '${ '");
 	}
 
