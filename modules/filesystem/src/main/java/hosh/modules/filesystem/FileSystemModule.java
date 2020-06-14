@@ -114,7 +114,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() > 1) {
-				err.send(Errors.usage("ls [path]"));
+				err.send(Errors.usage("ls [directory]"));
 				return ExitStatus.error();
 			}
 			final Path cwd = state.getCwd();
@@ -201,7 +201,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Errors.usage("cd path"));
+				err.send(Errors.usage("cd directory"));
 				return ExitStatus.error();
 			}
 			Path newCwd = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -230,7 +230,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Errors.usage("lines path"));
+				err.send(Errors.usage("lines file"));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -264,7 +264,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Errors.usage("walk path"));
+				err.send(Errors.usage("walk directory"));
 				return ExitStatus.error();
 			}
 			try {
@@ -355,6 +355,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@Todo(description = "test 'cp file directory'")
 	@Description("copy file")
 	@Examples({
 		@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
@@ -372,7 +373,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Errors.usage("cp source target"));
+				err.send(Errors.usage("cp file file"));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -386,6 +387,7 @@ public class FileSystemModule implements Module {
 		}
 	}
 
+	@Todo(description = "test 'mv file directory'")
 	@Description("move file")
 	@Examples({
 		@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
@@ -403,7 +405,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Errors.usage("mv source target"));
+				err.send(Errors.usage("mv file file"));
 				return ExitStatus.error();
 			}
 			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
@@ -434,7 +436,7 @@ public class FileSystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Errors.usage("rm target"));
+				err.send(Errors.usage("rm file"));
 				return ExitStatus.error();
 			}
 			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));

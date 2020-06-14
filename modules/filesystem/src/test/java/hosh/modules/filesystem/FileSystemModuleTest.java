@@ -98,7 +98,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected at most 1 argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: list [path]")));
 		}
 
 		@Test
