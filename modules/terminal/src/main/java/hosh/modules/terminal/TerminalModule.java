@@ -28,6 +28,7 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -66,6 +67,10 @@ public class TerminalModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (!args.isEmpty()) {
+				err.send(Errors.usage("dump"));
+				return ExitStatus.error();
+			}
 			Attributes attributes = terminal.getAttributes();
 			out.send(Records
 				         .builder()
@@ -96,7 +101,7 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
+				err.send(Errors.usage("clear"));
 				return ExitStatus.error();
 			}
 			terminal.puts(InfoCmp.Capability.clear_screen);
@@ -121,7 +126,7 @@ public class TerminalModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
+				err.send(Errors.usage("bell"));
 				return ExitStatus.error();
 			}
 			terminal.puts(InfoCmp.Capability.bell);

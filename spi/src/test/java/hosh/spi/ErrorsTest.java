@@ -23,25 +23,23 @@
  */
 package hosh.spi;
 
-import hosh.doc.Todo;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * A command specialization that allows to run code before and after another
- * command.
- */
-public interface CommandWrapper<T> extends Command {
+class ErrorsTest {
 
-	@Todo(description = "only way to communicate error is to throw exception, maybe Optional is better?")
-	T before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err);
+	@Test
+	void exceptionWithoutMessage() {
+		Exception npe = new NullPointerException();
+		Record result = Errors.message(npe);
+		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("(no message)")));
+	}
 
-	void after(T resource, InputChannel in, OutputChannel out, OutputChannel err);
-
-	boolean retry(T resource, InputChannel in, OutputChannel out, OutputChannel err);
-
-	@Override
-	default ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-		throw new UnsupportedOperationException("a suitable implementation will be provided by the compiler");
+	@Test
+	void exceptionWithMessage() {
+		Exception npe = new IllegalArgumentException("whatever");
+		Record result = Errors.message(npe);
+		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("whatever")));
 	}
 }

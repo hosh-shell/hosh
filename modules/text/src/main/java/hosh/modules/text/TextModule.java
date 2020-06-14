@@ -32,6 +32,7 @@ import hosh.spi.Ansi;
 import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Key;
@@ -124,7 +125,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: split key regex")));
+				err.send(Errors.usage("split key regex"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -165,7 +166,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: join separator")));
+				err.send(Errors.usage("join separator"));
 				return ExitStatus.error();
 			}
 			String sep = args.get(0);
@@ -198,7 +199,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 argument")));
+				err.send(Errors.usage("trim key"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -238,7 +239,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments")));
+				err.send(Errors.usage("regex key regex"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -283,7 +284,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Errors.usage("schema"));
 				return ExitStatus.error();
 			}
 			for (Record record : InputChannel.iterate(in)) {
@@ -303,7 +304,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 2 arguments: key regex")));
+				err.send(Errors.usage("filter key regex"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -330,7 +331,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Errors.usage("enumerate"));
 				return ExitStatus.error();
 			}
 			long index = 1;
@@ -357,7 +358,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Errors.usage("timestamp"));
 				return ExitStatus.error();
 			}
 			for (Record record : InputChannel.iterate(in)) {
@@ -376,7 +377,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+				err.send(Errors.usage("distinct key"));
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
@@ -402,7 +403,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter: key")));
+				err.send(Errors.usage("duplicated key"));
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
@@ -429,12 +430,8 @@ public class TextModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() == 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("use 'sort key' or 'sort [asc|desc] key'")));
-				return ExitStatus.error();
-			}
-			if (args.size() > 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("too many args")));
+			if (args.size() == 0 || args.size() > 2) {
+				err.send(Errors.usage("sort [asc|desc] key"));
 				return ExitStatus.error();
 			}
 			String direction;
@@ -445,7 +442,7 @@ public class TextModule implements Module {
 			} else {
 				Optional<String> validate = validate(args.get(0));
 				if (validate.isEmpty()) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("must be asc or desc")));
+					err.send(Errors.message("must be 'asc' or 'desc'"));
 					return ExitStatus.error();
 				}
 				direction = validate.get();
@@ -503,12 +500,12 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
+				err.send(Errors.usage("take number"));
 				return ExitStatus.error();
 			}
 			long take = Long.parseLong(args.get(0));
 			if (take < 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+				err.send(Errors.message("number must be >= 0"));
 				return ExitStatus.error();
 			}
 			for (Record record : InputChannel.iterate(in)) {
@@ -531,12 +528,12 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
+				err.send(Errors.usage("drop number"));
 				return ExitStatus.error();
 			}
 			long drop = Long.parseLong(args.get(0));
 			if (drop < 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 0")));
+				err.send(Errors.message("number must be >= 0"));
 				return ExitStatus.error();
 			}
 			for (Record record : InputChannel.iterate(in)) {
@@ -559,12 +556,12 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 1 parameter")));
+				err.send(Errors.usage("last number"));
 				return ExitStatus.error();
 			}
 			long n = Long.parseLong(args.get(0));
 			if (n < 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("parameter must be >= 1")));
+				err.send(Errors.message("number must be >= 1"));
 				return ExitStatus.error();
 			}
 			Queue<Record> queue = keepLastRecords(in, n);
@@ -600,7 +597,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Errors.usage("rand"));
 				return ExitStatus.error();
 			}
 			Random random = ThreadLocalRandom.current();
@@ -622,7 +619,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Errors.usage("count"));
 				return ExitStatus.error();
 			}
 			long count = 0;
@@ -644,7 +641,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: sum key")));
+				err.send(Errors.usage("sum key"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -674,7 +671,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: freq key")));
+				err.send(Errors.usage("freq key"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -715,7 +712,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: min key")));
+				err.send(Errors.usage("min key"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -750,7 +747,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: max key")));
+				err.send(Errors.usage("max key"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
@@ -785,7 +782,7 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expected 0 arguments")));
+				err.send(Errors.usage("table"));
 				return ExitStatus.error();
 			}
 			boolean headerSent = false;

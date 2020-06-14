@@ -23,25 +23,34 @@
  */
 package hosh.spi;
 
+import hosh.doc.Experimental;
 import hosh.doc.Todo;
 
-import java.util.List;
+import java.util.Objects;
 
 /**
- * A command specialization that allows to run code before and after another
- * command.
+ * Factory methods for common errors.
  */
-public interface CommandWrapper<T> extends Command {
+@Experimental(description = "")
+public class Errors {
 
-	@Todo(description = "only way to communicate error is to throw exception, maybe Optional is better?")
-	T before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err);
-
-	void after(T resource, InputChannel in, OutputChannel out, OutputChannel err);
-
-	boolean retry(T resource, InputChannel in, OutputChannel out, OutputChannel err);
-
-	@Override
-	default ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-		throw new UnsupportedOperationException("a suitable implementation will be provided by the compiler");
+	/**
+	 * Extract message from exception. If not present use "(no message)".
+	 */
+	public static Record message(Exception e) {
+		return Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)")));
 	}
+
+	public static Record message(String fmt, Object... args) {
+		return Records.singleton(Keys.ERROR, Values.ofText(String.format(fmt, args)));
+	}
+
+	@Todo(description = "adding more details (e.g. enum with type of arguments)")
+	public static Record usage(String usage) {
+		return Records.singleton(Keys.ERROR, Values.ofText("usage: " + usage));
+	}
+
+	private Errors() {
+	}
+
 }

@@ -86,10 +86,10 @@ public class TerminalModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(terminal).shouldHaveNoMoreInteractions();
+			then(terminal).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: clear")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -129,10 +129,10 @@ public class TerminalModuleTest {
 		public void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
-			then(terminal).shouldHaveNoMoreInteractions();
+			then(terminal).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: bell")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}
@@ -150,7 +150,7 @@ public class TerminalModuleTest {
 		@Mock
 		private OutputChannel err;
 
-		@Mock(stubOnly = true)
+		@Mock
 		private Terminal terminal;
 
 		@InjectMocks
@@ -163,8 +163,20 @@ public class TerminalModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(Mockito.any());
+			then(out).should().send(Mockito.any()); // this test is weak
 			then(err).shouldHaveNoMoreInteractions();
 		}
+
+		@Test
+		public void oneArg() {
+			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(terminal).shouldHaveNoInteractions();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: dump")));
+			then(err).shouldHaveNoMoreInteractions();
+		}
+
 	}
 }

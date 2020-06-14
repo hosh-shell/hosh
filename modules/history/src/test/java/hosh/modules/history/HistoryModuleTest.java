@@ -49,7 +49,7 @@ public class HistoryModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class NetworkTest {
+	public class ListHistoryTest {
 
 		@Mock
 		private InputChannel in;
@@ -100,7 +100,7 @@ public class HistoryModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("no arguments expected")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: history")));
 		}
 	}
 }

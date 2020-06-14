@@ -31,6 +31,7 @@ import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
 import hosh.spi.CommandWrapper;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Key;
@@ -72,7 +73,7 @@ import java.util.regex.Pattern;
 
 public class SystemModule implements Module {
 
-	// keep in sync with HoshParser.g4
+	// please keep in sync with HoshParser.g4
 	private static final Pattern VARIABLE = Pattern.compile("[A-Za-z_\\-]+");
 
 	@Override
@@ -128,7 +129,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
+				err.send(Errors.usage("env"));
 				return ExitStatus.error();
 			}
 			Map<String, String> variables = state.getVariables();
@@ -171,11 +172,11 @@ public class SystemModule implements Module {
 						state.setExit(true);
 						return exitStatus.get();
 					} else {
-						err.send(Records.singleton(Keys.ERROR, Values.ofText("not a valid exit status: " + arg)));
+						err.send(Errors.message("not a valid exit status: %s", arg));
 						return ExitStatus.error();
 					}
 				default:
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+					err.send(Errors.usage("exit [value]"));
 					return ExitStatus.error();
 			}
 		}
@@ -212,13 +213,13 @@ public class SystemModule implements Module {
 				String commandName = args.get(0);
 				Supplier<Command> commandSupplier = state.getCommands().get(commandName);
 				if (commandSupplier == null) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("command not found: " + commandName)));
+					err.send(Errors.message("command not found: %s", commandName));
 					return ExitStatus.error();
 				}
 				Class<? extends Command> commandClass = commandSupplier.get().getClass();
 				Description builtIn = commandClass.getAnnotation(Description.class);
 				if (builtIn == null) {
-					err.send(Records.singleton(Keys.ERROR, Values.ofText("no help for command: " + commandName)));
+					err.send(Errors.message("no help for command: %s", commandName));
 					return ExitStatus.error();
 				}
 				out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(commandName + " - " + builtIn.value()), Style.BOLD)));
@@ -233,7 +234,7 @@ public class SystemModule implements Module {
 				}
 				return ExitStatus.success();
 			} else {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+				err.send(Errors.usage("help [command]"));
 				return ExitStatus.error();
 			}
 		}
@@ -243,15 +244,13 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "sleep 1 second", description = "suspend execution for 1 second"),
 		@Example(command = "sleep 1000", description = "suspend execution for 1000 millis"),
+		@Example(command = "sleep PT1M", description = "suspend execution for 1 minute (using ISO 8601)"),
+
 	})
 	public static class Sleep implements Command {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("missing duration")));
-				return ExitStatus.error();
-			}
 			OptionalLong amount;
 			Optional<ChronoUnit> unit;
 			if (args.size() == 1) {
@@ -263,15 +262,15 @@ public class SystemModule implements Module {
 				amount = parseLong(arg);
 				unit = parseUnit(args.get(1).toLowerCase());
 			} else {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("too many arguments")));
+				err.send(Errors.usage("sleep [duration|duration unit]"));
 				return ExitStatus.error();
 			}
 			if (amount.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: " + args.get(0))));
+				err.send(Errors.message("invalid amount: %s", args.get(0)));
 				return ExitStatus.error();
 			}
 			if (unit.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid unit: " + args.get(1))));
+				err.send(Errors.message("invalid unit: %s",  args.get(1)));
 				return ExitStatus.error();
 			}
 			try {
@@ -280,7 +279,7 @@ public class SystemModule implements Module {
 				return ExitStatus.success();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
+				err.send(Errors.message("interrupted"));
 				return ExitStatus.error();
 			}
 		}
@@ -358,7 +357,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting zero arguments")));
+				err.send(Errors.usage("ps"));
 				return ExitStatus.error();
 			}
 			ProcessHandle.allProcesses().forEach(process -> {
@@ -399,22 +398,22 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+				err.send(Errors.usage("kill process"));
 				return ExitStatus.error();
 			}
 			if (!args.get(0).matches("[0-9]+")) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("not a valid pid: " + args.get(0))));
+				err.send(Errors.message("not a valid pid: %s", args.get(0)));
 				return ExitStatus.error();
 			}
 			long pid = Long.parseLong(args.get(0));
 			Optional<ProcessHandle> process = processLookup.of(pid);
 			if (process.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("cannot find pid: " + pid)));
+				err.send(Errors.message("cannot find pid: %s", pid));
 				return ExitStatus.error();
 			}
 			boolean destroyed = process.get().destroy();
 			if (!destroyed) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("cannot destroy pid: " + pid)));
+				err.send(Errors.message("cannot destroy pid: %s", pid));
 				return ExitStatus.error();
 			}
 			return ExitStatus.success();
@@ -544,13 +543,13 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
+				err.send(Errors.usage("set variable value"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
 			String value = args.get(1);
 			if (!VARIABLE.matcher(key).matches()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			state.getVariables().put(key, value);
@@ -574,7 +573,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("requires 1 argument: key")));
+				err.send(Errors.usage("unset variable"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
@@ -585,7 +584,7 @@ public class SystemModule implements Module {
 
 	@Description("Read a string from standard input and assign result to variable. The trailing newline is stripped.")
 	@Examples({
-		@Example(command = "input FOO", description = "save string read to variable 'FOO'"),
+		@Example(command = "input FILE", description = "save string read to variable 'FILE'"),
 	})
 	public static class Input implements Command, StateAware, LineReaderAware {
 
@@ -606,12 +605,12 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: input VARIABLE")));
+				err.send(Errors.usage("input variable"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
 			if (!VARIABLE.matcher(key).matches()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			Optional<String> read = input();
@@ -631,7 +630,6 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Experimental(description = "probably should be merged with input? not sure about name")
 	@Description("Read a string from standard input in a secure way and assign result to variable. The trailing newline is stripped.")
 	@Examples({
 		@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
@@ -655,12 +653,12 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret VARIABLE")));
+				err.send(Errors.usage("secret variable"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
 			if (!VARIABLE.matcher(key).matches()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			Optional<String> read = secret();
@@ -697,13 +695,13 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
+				err.send(Errors.usage("capture variable"));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
 			String key = args.get(0);
 			if (!VARIABLE.matcher(key).matches()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			StringWriter result = new StringWriter();
@@ -733,7 +731,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() <= 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
+				err.send(Errors.usage("open file [WRITE|APPEND|...]"));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
@@ -753,7 +751,7 @@ public class SystemModule implements Module {
 			return args
 				       .stream()
 				       .skip(1)
-				       .map(arg -> parseOption(arg))
+				       .map(this::parseOption)
 				       .toArray(OpenOption[]::new);
 		}
 

@@ -42,6 +42,7 @@ import hosh.runtime.ReplReader;
 import hosh.runtime.VariableExpansionCompleter;
 import hosh.runtime.VersionLoader;
 import hosh.spi.Ansi;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
@@ -72,7 +73,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.logging.FileHandler;
@@ -210,7 +210,7 @@ public class Hosh {
 			return interpreter.eval(program, out, err);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "caught exception", e);
-			err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+			err.send(Errors.message(e));
 			return ExitStatus.error();
 		}
 	}
@@ -259,7 +259,7 @@ public class Hosh {
 				}
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, String.format("caught exception for input: '%s'", line.get()), e);
-				err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+				err.send(Errors.message(e));
 			}
 		}
 		return ExitStatus.success();

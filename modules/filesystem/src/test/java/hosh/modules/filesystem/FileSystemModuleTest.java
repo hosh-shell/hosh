@@ -98,7 +98,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expected at most 1 argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: ls [directory]")));
 		}
 
 		@Test
@@ -303,7 +303,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cd directory")));
 		}
 
 		@Test
@@ -312,7 +312,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument (directory)")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cd directory")));
 		}
 
 		@Test
@@ -388,7 +388,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting no arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cwd")));
 			then(out).shouldHaveNoInteractions();
 		}
 	}
@@ -470,7 +470,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one path argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: lines file")));
 			then(out).shouldHaveNoInteractions();
 		}
 	}
@@ -503,7 +503,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cp file file")));
 		}
 
 		@Test
@@ -512,7 +512,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cp file file")));
 		}
 
 		@Test
@@ -573,7 +573,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: mv file file")));
 		}
 
 		@Test
@@ -582,7 +582,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: source target")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: mv file file")));
 		}
 
 		@Test
@@ -643,7 +643,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: rm target")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: rm file")));
 		}
 
 		@Test
@@ -733,7 +733,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: walk directory")));
 			then(out).shouldHaveNoInteractions();
 		}
 
@@ -885,7 +885,7 @@ public class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: glob pattern")));
 		}
 
 		@SuppressWarnings("unchecked")

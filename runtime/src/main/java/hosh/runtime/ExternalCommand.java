@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -96,7 +97,7 @@ class ExternalCommand implements Command, StateAware {
 			return ExitStatus.of(exitCode);
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, "caught exception", e);
-			err.send(Records.singleton(Keys.ERROR, Values.ofText(e.getMessage())));
+			err.send(Errors.message(e));
 			return ExitStatus.error();
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();

@@ -25,17 +25,16 @@ package hosh.runtime;
 
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Key;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
-import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Value;
-import hosh.spi.Values;
 
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +71,7 @@ class LambdaCommand implements Command, InterpreterAware, StateAware {
 		for (Record record : InputChannel.iterate(in)) {
 			Optional<Value> lambdaParameter = record.value(internedKey);
 			if (lambdaParameter.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText(String.format("missing key '%s'", key))));
+				err.send(Errors.message("missing key '%s'", key));
 				return ExitStatus.error();
 			}
 			Value value = lambdaParameter.orElseThrow(IllegalArgumentException::new);
