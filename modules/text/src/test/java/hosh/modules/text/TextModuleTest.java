@@ -1553,8 +1553,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         whatever  "), Ansi.Style.BG_BLUE)));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count   text     "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, Values.ofText("2         whatever  ")));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1568,8 +1568,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          whatever  "), Ansi.Style.BG_BLUE)));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, Values.ofText("          whatever  ")));
 		}
 
 		@Test
@@ -1582,11 +1582,5 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
-		@Test
-		public void a( ) {
-			System.out.println(String.format("'%-9s'", ""));
-			System.out.println(String.format("'%-9s'", "a"));
-
-		}
 	}
 }

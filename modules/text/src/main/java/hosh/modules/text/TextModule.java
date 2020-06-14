@@ -861,7 +861,7 @@ public class TextModule implements Module {
 				.map(this::formatterFor)
 				.collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
-			out.send(Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
+			out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 		}
 	}
 }

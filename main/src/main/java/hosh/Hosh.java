@@ -251,7 +251,7 @@ public class Hosh {
 				break;
 			}
 			try {
-				Program program = compiler.compile(line.get());
+				Program program = compiler.compile(autoTable(line.get()));
 				ExitStatus exitStatus = interpreter.eval(program, out, err);
 				if (state.isExit()) {
 					return exitStatus;
@@ -262,6 +262,10 @@ public class Hosh {
 			}
 		}
 		return ExitStatus.success();
+	}
+
+	private static String autoTable(String line) {
+		return line + " | table";
 	}
 
 	private static void welcome(OutputChannel out, String version) {
