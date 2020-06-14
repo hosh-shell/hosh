@@ -24,7 +24,17 @@
 package hosh.runtime;
 
 import hosh.doc.Todo;
-import hosh.spi.*;
+import hosh.spi.Command;
+import hosh.spi.Errors;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Key;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.State;
+import hosh.spi.StateAware;
+import hosh.spi.Value;
 
 import java.util.HashMap;
 import java.util.List;
