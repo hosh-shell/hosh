@@ -723,7 +723,7 @@ public class FileSystemModule implements Module {
 				Files.delete(resource.getPath());
 			} catch (IOException e) {
 				LOGGER.log(Level.INFO, "caught exception", e);
-				err.send(Records.singleton(Keys.ERROR, Values.ofText(e.getMessage())));
+				err.send(Errors.message(e));
 			}
 		}
 

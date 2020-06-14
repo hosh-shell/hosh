@@ -42,6 +42,7 @@ import hosh.runtime.ReplReader;
 import hosh.runtime.VariableExpansionCompleter;
 import hosh.runtime.VersionLoader;
 import hosh.spi.Ansi;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
@@ -210,7 +211,7 @@ public class Hosh {
 			return interpreter.eval(program, out, err);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "caught exception", e);
-			err.send(Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)"))));
+			err.send(Errors.message(e));
 			return ExitStatus.error();
 		}
 	}
