@@ -43,7 +43,6 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -186,7 +185,7 @@ public class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(newFolder.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(ArgumentMatchers.any());
+			then(out).should().send(Mockito.any());
 			then(err).shouldHaveNoMoreInteractions();
 		}
 

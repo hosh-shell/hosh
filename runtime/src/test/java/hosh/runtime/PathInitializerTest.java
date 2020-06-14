@@ -23,7 +23,6 @@
  */
 package hosh.runtime;
 
-import hosh.runtime.PathInitializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;

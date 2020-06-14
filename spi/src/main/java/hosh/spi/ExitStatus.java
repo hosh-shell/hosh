@@ -65,7 +65,7 @@ public class ExitStatus {
 	}
 
 	public boolean isError() {
-		return !isSuccess();
+		return value != 0;
 	}
 
 	public int value() {

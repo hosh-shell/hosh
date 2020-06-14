@@ -522,15 +522,12 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			for (Record record : InputChannel.iterate(in)) {
-				drop(record);
+			for (Record ignored : InputChannel.iterate(in)) {
+				// do nothing
 			}
 			return ExitStatus.success();
 		}
 
-		private void drop(@SuppressWarnings("unused") Record record) {
-			// no-op
-		}
 	}
 
 	@Description("create or update a variable binding")

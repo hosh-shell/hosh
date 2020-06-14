@@ -210,9 +210,9 @@ public class TextModule implements Module {
 			List<Entry> entries = record.entries();
 			for (Entry entry : entries) {
 				if (entry.getKey().equals(key)) {
-					builder.entry(key, trim(entry.getValue()));
+					builder = builder.entry(key, trim(entry.getValue()));
 				} else {
-					builder.entry(entry);
+					builder = builder.entry(entry);
 				}
 			}
 			return builder.build();

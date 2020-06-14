@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.Recognizer;
  */
 public class Parser {
 
-	public HoshParser.ProgramContext parse(String input) {
+	HoshParser.ProgramContext parse(String input) {
 		HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
 		lexer.removeErrorListeners();
 		lexer.addErrorListener(new CustomErrorListener());
@@ -60,7 +60,7 @@ public class Parser {
 
 		@Override
 		public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
-		                        String msg, RecognitionException e) {
+								String msg, RecognitionException e) {
 			throw new ParseError(String.format("line %s:%s: %s", line, charPositionInLine, msg));
 		}
 	}

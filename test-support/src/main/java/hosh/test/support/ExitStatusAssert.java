@@ -38,14 +38,14 @@ public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatu
 
 	public void isSuccess() {
 		isNotNull();
-		if (!actual.isSuccess()) {
+		if (actual.isError()) {
 			failWithMessage("expected success but was error");
 		}
 	}
 
 	public void isError() {
 		isNotNull();
-		if (!actual.isError()) {
+		if (actual.isSuccess()) {
 			failWithMessage("expected error but was success");
 		}
 	}
