@@ -49,7 +49,7 @@ public class HistoryModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class NetworkTest {
+	public class ListHistoryTest {
 
 		@Mock
 		private InputChannel in;
