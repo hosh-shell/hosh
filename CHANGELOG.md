@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `last`: new command similar to 'tail -n'
 - `max`, `min`: calculate max and min value, works for any value (e.g. timestamp, numeric, strings)
 - `sum`: supports size and numeric values
+- `confirm`: ask a question and wait for user confirmation
 
 ### Changed
 - changed `groupId` in maven

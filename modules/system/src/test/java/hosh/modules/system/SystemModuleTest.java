@@ -47,6 +47,7 @@ import hosh.modules.system.SystemModule.UnsetVariable;
 import hosh.modules.system.SystemModule.WithTime;
 import hosh.spi.Ansi;
 import hosh.spi.Command;
+import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -60,6 +61,7 @@ import hosh.test.support.TemporaryFolder;
 import hosh.test.support.WithThread;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
+import org.jline.reader.UserInterruptException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,6 +69,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -87,6 +90,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.AdditionalMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static hosh.test.support.ExitStatusAssert.assertThat;
@@ -518,7 +523,7 @@ public class SystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should(Mockito.atLeastOnce()).send(Mockito.any());
+			then(out).should(Mockito.atLeastOnce()).send(any());
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -666,7 +671,7 @@ public class SystemModuleTest {
 			assertThat(retry).isFalse();
 			sut.after(accumulator, in, out, err);
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(Mockito.any()); // weak test
+			then(out).should().send(any()); // weak test
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -719,7 +724,7 @@ public class SystemModuleTest {
 			assertThat(maybeResource).isPresent();
 			sut.after(maybeResource.get(), in, out, err);
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(Mockito.any());
+			then(out).should().send(any());
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -1229,7 +1234,7 @@ public class SystemModuleTest {
 
 		@Test
 		public void emptyInput() {
-			given(lineReader.readLine(Mockito.eq("input> "))).willThrow(new EndOfFileException("simulated"));
+			given(lineReader.readLine(Mockito.eq('\0'))).willThrow(new EndOfFileException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1237,5 +1242,88 @@ public class SystemModuleTest {
 			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).isEmpty();
 		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	public class ConfirmTest {
+
+		@Mock(stubOnly = true)
+		private LineReader lineReader;
+
+		@Mock
+		private InputChannel in;
+
+		@Mock
+		private OutputChannel out;
+
+		@Mock
+		private OutputChannel err;
+
+		@InjectMocks
+		private SystemModule.Confirm sut;
+
+		@Test
+		public void zeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: confirm message")));
+		}
+
+		@ValueSource(strings = {"yes", "YES", "y", "Y"})
+		@ParameterizedTest
+		public void yes(String answer) {
+			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
+			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@ValueSource(strings = {"no", "NO", "n", "N"})
+		@ParameterizedTest
+		public void no(String answer) {
+			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
+			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@ValueSource(strings = {"xx", "aaa", "", "1", "0"})
+		@ParameterizedTest
+		public void invalid(String answer) {
+			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
+			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Errors.message("invalid answer"));
+		}
+
+		@Test
+		public void userInterrupt() {
+			given(lineReader.readLine("question (Y/N)? ")).willThrow(new UserInterruptException("simulated"));
+			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		public void endOfFile() {
+			given(lineReader.readLine("question (Y/N)? ")).willThrow(new EndOfFileException("simulated"));
+			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
 	}
 }

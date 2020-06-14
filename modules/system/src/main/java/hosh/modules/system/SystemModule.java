@@ -44,7 +44,9 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Values;
+import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
+import org.jline.reader.UserInterruptException;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -93,6 +95,7 @@ public class SystemModule implements Module {
 		registry.registerCommand("unset", UnsetVariable::new);
 		registry.registerCommand("input", Input::new);
 		registry.registerCommand("secret", Secret::new);
+		registry.registerCommand("confirm", Confirm::new);
 		registry.registerCommand("capture", Capture::new);
 		registry.registerCommand("open", Open::new);
 	}
@@ -628,7 +631,7 @@ public class SystemModule implements Module {
 		private Optional<String> input() {
 			try {
 				return Optional.of(lineReader.readLine("input> "));
-			} catch (Exception e) {
+			} catch (UserInterruptException | EndOfFileException e) {
 				return Optional.empty();
 			}
 		}
@@ -665,7 +668,7 @@ public class SystemModule implements Module {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
-			Optional<String> read = secret();
+			Optional<String> read = readSecret();
 			if (read.isEmpty()) {
 				return ExitStatus.error();
 			}
@@ -673,14 +676,60 @@ public class SystemModule implements Module {
 			return ExitStatus.success();
 		}
 
-		private Optional<String> secret() {
+		private Optional<String> readSecret() {
 			try {
+				// '\0' means "noecho"
 				return Optional.of(lineReader.readLine('\0'));
-			} catch (Exception e) {
+			} catch (UserInterruptException | EndOfFileException e) {
 				return Optional.empty();
 			}
 		}
 	}
+
+	@Description("Ask a question and wait for a user confirmation (Y/N)")
+	@Examples({
+		@Example(command = "confirm 'continue?'", description = "display question then wait for user input"),
+	})
+	public static class Confirm implements Command, LineReaderAware {
+
+		private LineReader lineReader;
+
+		@Override
+		public void setLineReader(LineReader lineReader) {
+			this.lineReader = lineReader;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Errors.usage("confirm message"));
+				return ExitStatus.error();
+			}
+			String message = args.get(0);
+			Optional<String> maybeAnswer = readAnswer(message + " (Y/N)? ");
+			if (maybeAnswer.isEmpty()) {
+				return ExitStatus.error();
+			}
+			String answer = maybeAnswer.get();
+			if (answer.equalsIgnoreCase("y") || answer.equalsIgnoreCase("yes")) {
+				return ExitStatus.success();
+			} else if (answer.equalsIgnoreCase("n") || answer.equalsIgnoreCase("no")) {
+				return ExitStatus.error();
+			} else {
+				err.send(Errors.message("invalid answer"));
+				return ExitStatus.error();
+			}
+		}
+
+		private Optional<String> readAnswer(String prompt) {
+			try {
+				return Optional.of(lineReader.readLine(prompt));
+			} catch (UserInterruptException | EndOfFileException e) {
+				return Optional.empty();
+			}
+		}
+	}
+
 
 	@Description("capture output of a command into a variable")
 	@Examples({
