@@ -767,7 +767,7 @@ public class TextModule implements Module {
 	}
 
 	@Experimental(description = "this is just a proof of concept")
-	@Description("create a nicely formatted table with keys a columns")
+	@Description("create a nicely formatted table with keys as columns")
 	@Examples({
 		@Example(command = "rand | enumerate | take 3 | table", description = "output a nicely formatted table")
 	})
@@ -801,8 +801,8 @@ public class TextModule implements Module {
 			for (Record record : records) {
 				for (Record.Entry entry : record.entries()) {
 					String formattedValue = valueAsString(entry.getValue());
-					int length = lengthFor(formattedValue);
-					result.compute(entry.getKey(), (k, v) -> v == null ? length : Math.max(v, length));
+					int valueLength = lengthFor(formattedValue);
+					result.compute(entry.getKey(), (k, v) -> v == null ? padding(k.name().length(), valueLength) : padding(v, valueLength));
 				}
 			}
 			return result;
@@ -816,8 +816,12 @@ public class TextModule implements Module {
 			return writer.toString();
 		}
 
+		private int padding(int a, int b) {
+			return Math.max(a, b) + 2;
+		}
+
 		private int lengthFor(String value) {
-			return dropAnsi(value).length() + 2;
+			return dropAnsi(value).length();
 		}
 
 		// dropping ansi escape codes, otherwise we could over estimate length

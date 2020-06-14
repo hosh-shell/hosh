@@ -1544,7 +1544,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void table() {
+		public void tableWithColumnLongerThanValues() {
 			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -1553,8 +1553,23 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count   text     "), Ansi.Style.FG_MAGENTA)),
-				Records.singleton(Keys.TEXT, Values.ofText("2         whatever  ")));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      whatever  ")));
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void tableWithColumnShorterThanValues() {
+			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("aa")).build();
+			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(2)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactly(
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text  "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      aa    ")));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1568,8 +1583,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_MAGENTA)),
-				Records.singleton(Keys.TEXT, Values.ofText("          whatever  ")));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
 		}
 
 		@Test
