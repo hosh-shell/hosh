@@ -816,10 +816,15 @@ public class TextModule implements Module {
 		}
 
 		private int lengthFor(String value) {
-			return value.length() + 3;
+			return dropAnsi(value).length() + 2;
 		}
 
-		// consuming all records here... it could be a problem for big columns
+		// dropping ansi escape codes, otherwise we could over estimate length
+		private String dropAnsi(String maybeAnsi) {
+			return maybeAnsi.replaceAll("\u001b\\[[0-9]+m", "");
+		}
+
+		// consuming all records here... it could be a problem for big output
 		private List<Record> accumulate(InputChannel in) {
 			List<Record> records = new LinkedList<>();
 			for (Record record : InputChannel.iterate(in)) {
