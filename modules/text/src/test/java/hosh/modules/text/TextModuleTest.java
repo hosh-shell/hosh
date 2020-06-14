@@ -1326,7 +1326,7 @@ public class TextModuleTest {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(List.of("asc", "name"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("name", "asc"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1340,7 +1340,7 @@ public class TextModuleTest {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
-			ExitStatus exitStatus = sut.run(List.of("desc", "name"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("name", "desc"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1364,7 +1364,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sort [asc|desc] key")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sort key [asc|desc]")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -1374,7 +1374,7 @@ public class TextModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sort [asc|desc] key")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sort key [asc|desc]")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 	}

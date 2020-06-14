@@ -46,8 +46,8 @@ public class Errors {
 	}
 
 	@Todo(description = "adding more details (e.g. enum with type of arguments)")
-	public static Record usage(String usage) {
-		return Records.singleton(Keys.ERROR, Values.ofText("usage: " + usage));
+	public static Record usage(String fmt, Object... args) {
+		return message("usage: " + fmt, args);
 	}
 
 	private Errors() {

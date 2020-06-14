@@ -18,7 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - changed `groupId` in maven
    dfa1 -> `hosh`
-- `http` integration tests (https://postman-echo.com)
+- `http`: integration tests (https://postman-echo.com)
+- `sort`: consistent order of arguments
+    `key` is mandatory and always in first position 
+    `asc`, `desc` are optional and always in second position
 
 ### Fixed
 - `probe`: fix exit status when content type cannot be determined 

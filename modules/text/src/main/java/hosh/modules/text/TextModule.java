@@ -423,30 +423,32 @@ public class TextModule implements Module {
 	@Description("sort records according to the specified key")
 	@Examples({
 		@Example(command = "lines file.txt | sort text", description = "sort lines in 'file.txt' in ascending order"),
-		@Example(command = "lines file.txt | sort desc text", description = "sort lines in 'file.txt' in descending order"),
-		@Example(command = "lines file.txt | sort asc text", description = "sort lines in 'file.txt' in ascending order")
+		@Example(command = "lines file.txt | sort text desc", description = "sort lines in 'file.txt' in descending order"),
+		@Example(command = "lines file.txt | sort text asc", description = "sort lines in 'file.txt' in ascending order")
 	})
 	public static class Sort implements Command {
+
+		private static final String ASC = "asc";
+		private static final String DESC = "desc";
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() == 0 || args.size() > 2) {
-				err.send(Errors.usage("sort [asc|desc] key"));
+				err.send(Errors.usage("sort key [%s|%s]", ASC, DESC));
 				return ExitStatus.error();
 			}
 			String direction;
-			Key key;
+			Key key = Keys.of(args.get(0));
 			if (args.size() == 1) {
-				direction = "asc";
-				key = Keys.of(args.get(0));
-			} else {
-				Optional<String> validate = validate(args.get(0));
+				direction = ASC;
+			} else { // implies size == 2
+				String order = args.get(1);
+				Optional<String> validate = validate(order);
 				if (validate.isEmpty()) {
-					err.send(Errors.message("must be 'asc' or 'desc'"));
+					err.send(Errors.message("must be '%s' or '%s'", ASC, DESC));
 					return ExitStatus.error();
 				}
 				direction = validate.get();
-				key = Keys.of(args.get(1));
 			}
 			List<Record> records = new ArrayList<>();
 			accumulate(in, records);
@@ -456,9 +458,9 @@ public class TextModule implements Module {
 		}
 
 		private Optional<String> validate(String s) {
-			if ("asc".equals(s)) {
+			if (ASC.equals(s)) {
 				return Optional.of(s);
-			} else if ("desc".equals(s)) {
+			} else if (DESC.equals(s)) {
 				return Optional.of(s);
 			} else {
 				return Optional.empty();
@@ -473,7 +475,7 @@ public class TextModule implements Module {
 
 		private Comparator<Record> order(Key key, String direction) {
 			Comparator<Record> comparator = Comparator.comparing(record -> record.value(key).orElse(Values.none()), Values.Comparators.noneLast(Comparator.naturalOrder()));
-			if (direction.equals("desc")) {
+			if (direction.equals(DESC)) {
 				return comparator.reversed();
 			} else {
 				return comparator;
