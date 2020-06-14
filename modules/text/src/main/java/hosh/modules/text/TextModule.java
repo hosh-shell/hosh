@@ -105,11 +105,9 @@ public class TextModule implements Module {
 			List<Key> keys = args.stream().map(Keys::of).collect(Collectors.toUnmodifiableList());
 			for (Record record : InputChannel.iterate(in)) {
 				Records.Builder builder = Records.builder();
-				keys.forEach(k -> {
-					record.value(k).ifPresent(v -> {
-						builder.entry(k, v);
-					});
-				});
+				for (Key k : keys) {
+					record.value(k).ifPresent(v -> builder.entry(k, v)); // side effect
+				}
 				out.send(builder.build());
 			}
 			return ExitStatus.success();
@@ -134,9 +132,7 @@ public class TextModule implements Module {
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key)
 					.flatMap(v -> v.unwrap(String.class))
-					.ifPresent(str -> {
-						out.send(split(pattern, str, cachedKeys));
-					});
+					.ifPresent(str -> out.send(split(pattern, str, cachedKeys))); // side effect
 			}
 			return ExitStatus.success();
 		}
@@ -314,9 +310,7 @@ public class TextModule implements Module {
 				record.value(key)
 					.flatMap(v -> v.unwrap(String.class))
 					.filter(s -> pattern.matcher(s).matches())
-					.ifPresent(v -> {
-						out.send(record);
-					});
+					.ifPresent(v -> out.send(record)); // side effect
 			}
 			return ExitStatus.success();
 		}
@@ -351,6 +345,7 @@ public class TextModule implements Module {
 
 		private Clock clock = Clock.systemUTC();
 
+		@SuppressWarnings("unused") // used by @InjectMocks
 		public void setClock(Clock clock) {
 			this.clock = clock;
 		}
@@ -625,7 +620,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			long count = 0;
-			for (Record record : InputChannel.iterate(in)) {
+			for (Record ignored : InputChannel.iterate(in)) {
 				count += 1;
 			}
 			out.send(Records.singleton(Keys.COUNT, Values.ofNumeric(count)));

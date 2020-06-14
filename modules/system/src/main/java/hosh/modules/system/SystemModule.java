@@ -620,15 +620,15 @@ public class SystemModule implements Module {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
-			Optional<String> read = input();
-			if (read.isEmpty()) {
+			Optional<String> maybeInput = readInput();
+			if (maybeInput.isEmpty()) {
 				return ExitStatus.error();
 			}
-			state.getVariables().put(key, read.get());
+			state.getVariables().put(key, maybeInput.get());
 			return ExitStatus.success();
 		}
 
-		private Optional<String> input() {
+		private Optional<String> readInput() {
 			try {
 				return Optional.of(lineReader.readLine("input> "));
 			} catch (UserInterruptException | EndOfFileException e) {
