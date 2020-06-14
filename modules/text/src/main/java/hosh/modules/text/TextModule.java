@@ -780,8 +780,8 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			List<Record> records = accumulate(in);
-			Map<Key, Integer> paddings = calculateLongestValuePerColumn(records);
-			outputTable(out, records, paddings);
+			Map<Key, Integer> longestValueByColumn = calculateLongestValueByColumn(records);
+			outputTable(out, records, longestValueByColumn);
 			return ExitStatus.success();
 		}
 
@@ -796,7 +796,7 @@ public class TextModule implements Module {
 			}
 		}
 
-		private Map<Key, Integer> calculateLongestValuePerColumn(List<Record> records) {
+		private Map<Key, Integer> calculateLongestValueByColumn(List<Record> records) {
 			Map<Key, Integer> result = new HashMap<>();
 			for (Record record : records) {
 				for (Record.Entry entry : record.entries()) {
@@ -819,6 +819,7 @@ public class TextModule implements Module {
 			return value.length() + 3;
 		}
 
+		// consuming all records here... it could be a problem for big columns
 		private List<Record> accumulate(InputChannel in) {
 			List<Record> records = new LinkedList<>();
 			for (Record record : InputChannel.iterate(in)) {
@@ -841,17 +842,17 @@ public class TextModule implements Module {
 				formattedValues.add(formattedValue);
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
-			out.send(Records.singleton(Keys.of("row"), Values.ofText(row)));
+			out.send(Records.singleton(Keys.TEXT, Values.ofText(row)));
 		}
 
 		private String formatterFor(int length) {
 			return String.format("%%-%ds", length);
 		}
 
-		private void sendHeader(Map<Key, Integer> paddings, Collection<Key> keys, OutputChannel out) {
+		private void sendHeader(Map<Key, Integer> longestValueByColumn, Collection<Key> keys, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			String format = keys.stream()
-				.map(paddings::get)
+				.map(longestValueByColumn::get)
 				.map(this::formatterFor)
 				.collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
