@@ -1581,5 +1581,12 @@ public class TextModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: table")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
+
+		@Test
+		public void a( ) {
+			System.out.println(String.format("'%-9s'", ""));
+			System.out.println(String.format("'%-9s'", "a"));
+
+		}
 	}
 }

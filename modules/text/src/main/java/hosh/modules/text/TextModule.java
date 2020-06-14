@@ -780,7 +780,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			List<Record> records = accumulate(in);
-			Map<Key, Integer> paddings = calculatePaddings(records);
+			Map<Key, Integer> paddings = calculateLongestValuePerColumn(records);
 			outputTable(out, records, paddings);
 			return ExitStatus.success();
 		}
@@ -796,27 +796,27 @@ public class TextModule implements Module {
 			}
 		}
 
-		private Map<Key, Integer> calculatePaddings(List<Record> records) {
+		private Map<Key, Integer> calculateLongestValuePerColumn(List<Record> records) {
 			Map<Key, Integer> result = new HashMap<>();
 			for (Record record : records) {
 				for (Record.Entry entry : record.entries()) {
-					String value = toString(entry);
-					int length = lengthFor(value);
+					String formattedValue = valueAsString(entry.getValue());
+					int length = lengthFor(formattedValue);
 					result.compute(entry.getKey(), (k, v) -> v == null ? length : Math.max(v, length));
 				}
 			}
 			return result;
 		}
 
-		private String toString(Entry entry) {
+		private String valueAsString(Value value) {
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);
-			entry.getValue().print(printWriter, Locale.getDefault());
+			value.print(printWriter, Locale.getDefault());
 			return writer.toString();
 		}
 
 		private int lengthFor(String value) {
-			return Ansi.drop(value).length() + 1;
+			return value.length() + 3;
 		}
 
 		private List<Record> accumulate(InputChannel in) {
@@ -827,7 +827,7 @@ public class TextModule implements Module {
 			return records;
 		}
 
-		private void sendRow(Map<Key, Integer> paddings, Record record, OutputChannel out) {
+		private void sendRow(Map<Key, Integer> longestValueByColumn, Record record, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			StringBuilder formatter = new StringBuilder();
 			Collection<Record.Entry> entries = record.entries();
@@ -835,9 +835,10 @@ public class TextModule implements Module {
 			for (Record.Entry entry : entries) {
 				StringWriter writer = new StringWriter();
 				PrintWriter printWriter = new PrintWriter(writer);
-				formatter.append(formatterFor(paddings.get(entry.getKey())));
+				formatter.append(formatterFor(longestValueByColumn.get(entry.getKey())));
 				entry.getValue().print(printWriter, locale);
-				formattedValues.add(writer.toString());
+				String formattedValue = writer.toString();
+				formattedValues.add(formattedValue);
 			}
 			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
 			out.send(Records.singleton(Keys.of("row"), Values.ofText(row)));
@@ -854,7 +855,7 @@ public class TextModule implements Module {
 				.map(this::formatterFor)
 				.collect(Collectors.joining());
 			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
-			out.send(Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText(header), Ansi.Style.FG_CYAN)));
+			out.send(Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 		}
 	}
 }
