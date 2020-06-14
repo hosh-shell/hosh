@@ -427,7 +427,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("missing duration")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sleep [duration]")));
 		}
 
 		@Test
@@ -528,7 +528,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting zero arguments")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: ps")));
 		}
 	}
 
@@ -750,7 +750,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set variable value")));
 		}
 
 		@Test
@@ -759,7 +759,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set variable value")));
 		}
 
 		@Test
@@ -819,7 +819,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("requires 1 argument: key")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: unset variable")));
 		}
 
 		@Test
@@ -872,7 +872,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: kill process")));
 		}
 
 		@Test
@@ -942,7 +942,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture VARNAME")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture variable")));
 		}
 
 		@Test
@@ -1023,7 +1023,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: open file [WRITE|APPEND|...]")));
 		}
 
 		@Test
@@ -1032,7 +1032,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: open filename [WRITE|APPEND|...]")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: open file [WRITE|APPEND|...]")));
 		}
 
 		@Test
@@ -1128,7 +1128,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: input VARIABLE")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: input variable")));
 		}
 
 		@Test
@@ -1191,7 +1191,7 @@ public class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret VARIABLE")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret variable")));
 		}
 
 		@Test

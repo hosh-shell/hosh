@@ -73,7 +73,7 @@ import java.util.regex.Pattern;
 
 public class SystemModule implements Module {
 
-	// keep in sync with HoshParser.g4
+	// please keep in sync with HoshParser.g4
 	private static final Pattern VARIABLE = Pattern.compile("[A-Za-z_\\-]+");
 
 	@Override
@@ -244,13 +244,15 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "sleep 1 second", description = "suspend execution for 1 second"),
 		@Example(command = "sleep 1000", description = "suspend execution for 1000 millis"),
+		@Example(command = "sleep PT1M", description = "suspend execution for 1 minute (using ISO 8601)"),
+
 	})
 	public static class Sleep implements Command {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.isEmpty()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("missing duration")));
+				err.send(Errors.usage("sleep [duration]"));
 				return ExitStatus.error();
 			}
 			OptionalLong amount;
@@ -359,7 +361,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting zero arguments")));
+				err.send(Errors.usage("ps"));
 				return ExitStatus.error();
 			}
 			ProcessHandle.allProcesses().forEach(process -> {
@@ -400,7 +402,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("expecting one argument")));
+				err.send(Errors.usage("kill process"));
 				return ExitStatus.error();
 			}
 			if (!args.get(0).matches("[0-9]+")) {
@@ -545,13 +547,13 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: set name value")));
+				err.send(Errors.usage("set variable value"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
 			String value = args.get(1);
 			if (!VARIABLE.matcher(key).matches()) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			state.getVariables().put(key, value);
@@ -575,7 +577,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Records.singleton(Keys.ERROR, Values.ofText("requires 1 argument: key")));
+				err.send(Errors.usage("unset variable"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
@@ -586,7 +588,7 @@ public class SystemModule implements Module {
 
 	@Description("Read a string from standard input and assign result to variable. The trailing newline is stripped.")
 	@Examples({
-		@Example(command = "input FOO", description = "save string read to variable 'FOO'"),
+		@Example(command = "input FILE", description = "save string read to variable 'FILE'"),
 	})
 	public static class Input implements Command, StateAware, LineReaderAware {
 
@@ -607,7 +609,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Errors.usage("input VARIABLE"));
+				err.send(Errors.usage("input variable"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
@@ -632,7 +634,6 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Experimental(description = "probably should be merged with input? not sure about name")
 	@Description("Read a string from standard input in a secure way and assign result to variable. The trailing newline is stripped.")
 	@Examples({
 		@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
@@ -656,7 +657,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Errors.usage("secret VARIABLE"));
+				err.send(Errors.usage("secret variable"));
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
@@ -698,7 +699,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
-				err.send(Errors.usage("capture VARNAME"));
+				err.send(Errors.usage("capture variable"));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
@@ -734,7 +735,7 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() <= 2) {
-				err.send(Errors.usage("open filename [WRITE|APPEND|...]"));
+				err.send(Errors.usage("open file [WRITE|APPEND|...]"));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
