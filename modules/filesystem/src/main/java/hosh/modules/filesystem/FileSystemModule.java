@@ -54,6 +54,7 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -67,6 +68,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -267,7 +269,7 @@ public class FileSystemModule implements Module {
 					err.send(Errors.message("not a directory"));
 					return ExitStatus.error();
 				}
-				Files.walkFileTree(target, new VisitCallback(out));
+				Files.walkFileTree(target, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new VisitCallback(out, err));
 				return ExitStatus.success();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -279,9 +281,11 @@ public class FileSystemModule implements Module {
 			private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 			private final OutputChannel out;
+			private final OutputChannel err;
 
-			public VisitCallback(OutputChannel out) {
+			public VisitCallback(OutputChannel out, OutputChannel err) {
 				this.out = out;
+				this.err = err;
 			}
 
 			@Override
@@ -302,7 +306,8 @@ public class FileSystemModule implements Module {
 			@Override
 			public FileVisitResult visitFileFailed(Path file, IOException exc) {
 				LOGGER.log(Level.SEVERE, "error while visiting: " + file, exc);
-				return FileVisitResult.TERMINATE;
+				err.send(Errors.message(exc));
+				return FileVisitResult.CONTINUE;
 			}
 
 			@Override

@@ -16,8 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `sum`: supports size and numeric values
 - `confirm`: ask a question and wait for user confirmation
 - `ls`: adding creation, modification and last access time
-- `ls`: removing ANSI coloring
-    (to be reimplemented later)
+- `ls`: removing ANSI coloring (to be reimplemented later)
+- `walk`:
+    - follow symlinks by default
+    - revert 'fail fast' error handling
 
 ### Changed
 - changed `groupId` in maven
