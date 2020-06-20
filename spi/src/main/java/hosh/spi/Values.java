@@ -30,11 +30,14 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -400,7 +403,8 @@ public class Values {
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			printWriter.append(instant.truncatedTo(ChronoUnit.SECONDS).toString());
+			LocalDateTime localDateTime = LocalDateTime.ofInstant(instant.truncatedTo(ChronoUnit.SECONDS), TimeZone.getDefault().toZoneId());
+			printWriter.append(localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 		}
 
 		@Override
