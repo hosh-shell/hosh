@@ -106,7 +106,6 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 
 		@Override
 		public synchronized Throwable fillInStackTrace() {
-			// this is really control-flow exception, no need for stacktrace
 			return this;
 		}
 	}

@@ -24,7 +24,6 @@
 package hosh;
 
 import hosh.runtime.BootstrapBuiltins;
-import hosh.runtime.CancellableChannel;
 import hosh.runtime.CommandCompleter;
 import hosh.runtime.CommandResolver;
 import hosh.runtime.CommandResolvers;
@@ -161,8 +160,8 @@ public class Hosh {
 		bootstrap.registerAllBuiltins(state);
 		CommandResolver commandResolver = CommandResolvers.builtinsThenExternal(state);
 		Compiler compiler = new Compiler(commandResolver);
-		OutputChannel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
-		OutputChannel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
+		OutputChannel out = new ConsoleChannel(terminal, Ansi.Style.NONE);
+		OutputChannel err = new ConsoleChannel(terminal, Ansi.Style.FG_RED);
 		Interpreter interpreter = new Interpreter(state, injector);
 		CommandLine commandLine;
 		Options options = createOptions();
