@@ -48,7 +48,7 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
-import hosh.test.support.RecordMatcher;
+import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.WithThread;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -66,7 +66,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import static hosh.test.support.ExitStatusAssert.assertThat;
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;

@@ -34,7 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.concurrent.ExecutionException;
 
-import static hosh.test.support.ExitStatusAssert.assertThat;
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class SupervisorTest {

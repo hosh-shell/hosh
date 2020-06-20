@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static hosh.test.support.ExitStatusAssert.assertThat;
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.then;
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -23,8 +23,6 @@
  */
 package hosh.test.support;
 
-import hosh.spi.LoggerFactory;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +37,7 @@ import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
  */
 public class IgnoreWindowsUACExceptions implements TestExecutionExceptionHandler {
 
-	private final Logger logger = LoggerFactory.forEnclosingClass();
+	private final Logger logger = Logger.getLogger(IgnoreWindowsUACExceptions.class.getCanonicalName());
 
 	@Override
 	public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {

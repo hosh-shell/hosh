@@ -10,11 +10,6 @@
 	<artifactId>hosh-test-support</artifactId>
 	<dependencies>
 		<dependency>
-			<groupId>hosh</groupId>
-			<artifactId>hosh-spi</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 			<version>3.16.1</version>

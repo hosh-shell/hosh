@@ -32,22 +32,20 @@ import java.util.TimeZone;
 
 public class WithTimeZone implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
-	private final TimeZone wanted;
-
 	private TimeZone backup;
-
-	public WithTimeZone(TimeZone wanted) {
-		this.wanted = wanted;
-	}
 
 	@Override
 	public void beforeTestExecution(ExtensionContext context) {
 		backup = TimeZone.getDefault();
-		TimeZone.setDefault(wanted);
 	}
 
 	@Override
 	public void afterTestExecution(ExtensionContext context) {
 		TimeZone.setDefault(backup);
 	}
+
+	public void changeTo(TimeZone wanted) {
+		TimeZone.setDefault(wanted);
+	}
+
 }
