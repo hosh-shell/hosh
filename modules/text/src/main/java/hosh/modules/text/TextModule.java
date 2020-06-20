@@ -824,7 +824,7 @@ public class TextModule implements Module {
 			return dropAnsi(value).length();
 		}
 
-		// dropping ansi escape codes, otherwise we could over estimate length
+		// dropping ansi escape codes, otherwise length is overestimated
 		private String dropAnsi(String maybeAnsi) {
 			return maybeAnsi.replaceAll("\u001b\\[[0-9]+m", "");
 		}
