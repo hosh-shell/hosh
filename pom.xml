@@ -40,7 +40,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<modules>
+		<module>test-support</module>
 		<module>spi</module>
+		<module>spi-test-support</module>
 		<module>modules/system</module>
 		<module>modules/text</module>
 		<module>modules/history</module>
@@ -48,7 +50,6 @@
 		<module>modules/terminal</module>
 		<module>modules/filesystem</module>
 		<module>runtime</module>
-		<module>test-support</module>
 		<module>main</module>
 	</modules>
 	<dependencies>

@@ -23,10 +23,12 @@
  */
 package hosh.spi;
 
+import hosh.test.support.WithTimeZone;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -43,6 +45,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -137,13 +140,17 @@ public class ValuesTest {
 	@ExtendWith(MockitoExtension.class)
 	public class InstantValueTest {
 
+		@RegisterExtension
+		WithTimeZone withTimeZone = new WithTimeZone();
+
 		@Mock
-		private PrintWriter printWriter;
+		PrintWriter printWriter;
 
 		@Test
 		public void append() {
+			withTimeZone.changeTo(TimeZone.getTimeZone("Europe/Zurich"));
 			Values.ofInstant(Instant.EPOCH).print(printWriter, Locale.ENGLISH);
-			then(printWriter).should().append("1970-01-01T00:00:00Z");
+			then(printWriter).should().append("1970-01-01T01:00:00");
 		}
 
 		@Test
@@ -601,7 +608,7 @@ public class ValuesTest {
 		@Nested
 		public class NoneLastTest {
 
-			Comparator<Value> sut = Values.Comparators.noneLast(Comparator.naturalOrder());
+			private final Comparator<Value> sut = Values.Comparators.noneLast(Comparator.naturalOrder());
 
 			@Test
 			public void noneLast() {

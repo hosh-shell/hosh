@@ -29,7 +29,6 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Ansi;
-import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
@@ -37,6 +36,7 @@ import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Key;
 import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
 import hosh.spi.Module;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
@@ -62,6 +62,8 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -767,14 +769,17 @@ public class TextModule implements Module {
 
 	}
 
-	@Description("create a nicely formatted table with keys a columns")
+	@Experimental(description = "this is just a proof of concept")
+	@Description("create a nicely formatted table with keys as columns")
 	@Examples({
 		@Example(command = "rand | enumerate | take 3 | table", description = "output a nicely formatted table")
 	})
-	@Experimental(description = "this is just a proof of concept", issue = "https://github.com/dfa1/hosh/issues/139")
 	public static class Table implements Command {
 
-		private int i = 0;
+		// distance between columns
+		private static final int PADDING = 2 ;
+
+		private final Logger logger = LoggerFactory.forEnclosingClass();
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
@@ -782,18 +787,67 @@ public class TextModule implements Module {
 				err.send(Errors.usage("table"));
 				return ExitStatus.error();
 			}
-			boolean headerSent = false;
-			for (Record record : InputChannel.iterate(in)) {
-				if (!headerSent) {
-					sendHeader(record.keys(), out);
-					headerSent = true;
-				}
-				sendRow(record, out);
-			}
+			List<Record> records = accumulate(in);
+			Map<Key, Integer> paddings = calculatePaddings(records);
+			outputTable(out, records, paddings);
 			return ExitStatus.success();
 		}
 
-		private void sendRow(Record record, OutputChannel out) {
+		private void outputTable(OutputChannel out, List<Record> records, Map<Key, Integer> paddings) {
+			boolean headerSent = false;
+			for (Record record : records) {
+				if (!headerSent) {
+					sendHeader(paddings, record.keys(), out);
+					headerSent = true;
+				}
+				sendRow(paddings, record, out);
+			}
+		}
+
+		private Map<Key, Integer> calculatePaddings(List<Record> records) {
+			Map<Key, Integer> maxLengthPerColumn = new HashMap<>();
+			for (Record record : records) {
+				for (Record.Entry entry : record.entries()) {
+					String formattedValue = valueAsString(entry.getValue());
+					int valueLength = lengthFor(formattedValue);
+					maxLengthPerColumn.compute(entry.getKey(), (k, v) -> v == null ? Math.max(k.name().length(), valueLength) : Math.max(v, valueLength));
+				}
+			}
+			Map<Key, Integer> result = new HashMap<>();
+			for (var kv : maxLengthPerColumn.entrySet()) {
+				result.put(kv.getKey(), kv.getValue() + PADDING);
+			}
+			logger.log(Level.FINE, "paddings = " + maxLengthPerColumn);
+			return result;
+		}
+
+		// there are at least 3 or 4 variants of this method
+		private String valueAsString(Value value) {
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			value.print(printWriter, Locale.getDefault());
+			return writer.toString();
+		}
+
+		private int lengthFor(String value) {
+			return dropAnsi(value).length();
+		}
+
+		// dropping ansi escape codes, otherwise length is overestimated
+		private String dropAnsi(String maybeAnsi) {
+			return maybeAnsi.replaceAll("\u001b\\[[0-9]+m", "");
+		}
+
+		// consuming all records here... it could be a problem for big output
+		private List<Record> accumulate(InputChannel in) {
+			List<Record> records = new LinkedList<>();
+			for (Record record : InputChannel.iterate(in)) {
+				records.add(record);
+			}
+			return records;
+		}
+
+		private void sendRow(Map<Key, Integer> paddings, Record record, OutputChannel out) {
 			Locale locale = Locale.getDefault();
 			StringBuilder formatter = new StringBuilder();
 			Collection<Record.Entry> entries = record.entries();
@@ -801,36 +855,27 @@ public class TextModule implements Module {
 			for (Record.Entry entry : entries) {
 				StringWriter writer = new StringWriter();
 				PrintWriter printWriter = new PrintWriter(writer);
-				formatter.append(formatterFor(entry.getKey()));
+				formatter.append(formatterFor(paddings.get(entry.getKey())));
 				entry.getValue().print(printWriter, locale);
-				formattedValues.add(writer.toString());
+				String formattedValue = writer.toString();
+				formattedValues.add(formattedValue);
 			}
-			String row = String.format(locale, formatter.toString(), formattedValues.toArray());
-			out.send(Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText(row), alternateColor())));
+			String row = String.format(formatter.toString(), formattedValues.toArray());
+			out.send(Records.singleton(Keys.TEXT, Values.ofText(row)));
 		}
 
-		private Style alternateColor() {
-			return ++i % 2 == 0 ? Ansi.Style.BG_WHITE : Ansi.Style.BG_BLUE;
+		private String formatterFor(int length) {
+			return String.format("%%-%ds", length);
 		}
 
-		private String formatterFor(Key key) {
-			return String.format("%%-%ds", paddings.getOrDefault(key, 10));
-		}
-
-		private void sendHeader(Collection<Key> keys, OutputChannel out) {
-			Locale locale = Locale.getDefault();
+		private void sendHeader(Map<Key, Integer> paddings, Collection<Key> keys, OutputChannel out) {
 			String format = keys.stream()
+				.map(paddings::get)
 				.map(this::formatterFor)
 				.collect(Collectors.joining());
-			String header = String.format(locale, format, keys.stream().map(Key::name).toArray());
-			out.send(Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText(header), Ansi.Style.FG_CYAN)));
+			String header = String.format(format, keys.stream().map(Key::name).toArray());
+			logger.log(Level.FINE, "format = " + format);
+			out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 		}
-
-		private final Map<Key, Integer> paddings = Map.of(
-			Keys.NAME, 30,
-			Keys.PATH, 30,
-			Keys.SIZE, 10,
-			Keys.TIMESTAMP, 30,
-			Keys.of("hwaddress"), 20);
 	}
 }

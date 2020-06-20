@@ -34,7 +34,7 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
 import hosh.test.support.IgnoreWindowsUACExceptions;
-import hosh.test.support.RecordMatcher;
+import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -64,7 +64,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
-import static hosh.test.support.ExitStatusAssert.assertThat;
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 public class FileSystemModuleTest {
 

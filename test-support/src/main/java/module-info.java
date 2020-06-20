@@ -22,15 +22,14 @@
  * SOFTWARE.
  */
 module hosh.test.support {
-	requires hosh.spi;
+	requires java.logging;
 
 	requires org.assertj.core;
 	requires org.junit.jupiter.api;
-	requires org.junit.jupiter.params;
 	requires org.mockito;
 
 	requires com.tngtech.archunit;
 	requires com.tngtech.archunit.junit5.api;
-	requires java.logging;
+	requires org.junit.jupiter.params;
 
 }

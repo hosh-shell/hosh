@@ -21,15 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi;
+package hosh.spi.test.support;
 
-import hosh.doc.Todo;
+import hosh.spi.ExitStatus;
+import org.assertj.core.api.AbstractAssert;
 
-import java.io.PrintWriter;
-import java.util.Locale;
+public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatus> {
 
-@Todo(description = "fluent interface to configure separator, new line, etc")
-public interface Printable {
+	public static ExitStatusAssert assertThat(ExitStatus actual) {
+		return new ExitStatusAssert(actual);
+	}
 
-	void print(PrintWriter printWriter, Locale locale);
+	private ExitStatusAssert(ExitStatus actual) {
+		super(actual, ExitStatusAssert.class);
+	}
+
+	public void isSuccess() {
+		isNotNull();
+		if (actual.isError()) {
+			failWithMessage("expected success but was error");
+		}
+	}
+
+	public void isError() {
+		isNotNull();
+		if (actual.isSuccess()) {
+			failWithMessage("expected error but was success");
+		}
+	}
+
+	public void hasExitCode(int expectedCode) {
+		isNotNull();
+		if (expectedCode != actual.value()) {
+			failWithMessage("expected %d but as %d", expectedCode,  actual.value());
+		}
+	}
 }

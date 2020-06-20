@@ -26,19 +26,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    dfa1 -> `hosh`
 - `http`: integration tests (https://postman-echo.com)
 - `sort`: consistent order of arguments
-    `key` is mandatory and always in first position
-    `asc`, `desc` are optional and always in second position
+    - `key` is mandatory and always in first position
+    - `asc`, `desc` are optional and always in second position
+- `table`: improving output
 
 ### Fixed
 - `probe`: fix exit status when content type cannot be determined
 - minor fixes
-   ignoring UAC errors in test on windows
-   stability of integration tests
+   - ignoring UAC errors in test on windows
+   - stability of integration tests
 
 ## [v0.1.0] - 2020-05-31
 
 ### Added
 - sign jar file with GPG when deploy on github
+- `ls`: adding mtime, atime and ctime
 
 ### Changed
 - introducing Java modules

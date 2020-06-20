@@ -41,7 +41,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
-import static hosh.test.support.ExitStatusAssert.assertThat;
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 

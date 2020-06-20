@@ -45,7 +45,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static hosh.test.support.ExitStatusAssert.assertThat;
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 

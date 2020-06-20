@@ -21,39 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.test.support;
+module hosh.spi.test.support {
+	requires hosh.spi;
 
-import hosh.spi.ExitStatus;
-import org.assertj.core.api.AbstractAssert;
+	requires org.assertj.core;
+	requires org.mockito;
 
-public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatus> {
-
-	public static ExitStatusAssert assertThat(ExitStatus actual) {
-		return new ExitStatusAssert(actual);
-	}
-
-	private ExitStatusAssert(ExitStatus actual) {
-		super(actual, ExitStatusAssert.class);
-	}
-
-	public void isSuccess() {
-		isNotNull();
-		if (actual.isError()) {
-			failWithMessage("expected success but was error");
-		}
-	}
-
-	public void isError() {
-		isNotNull();
-		if (actual.isSuccess()) {
-			failWithMessage("expected error but was success");
-		}
-	}
-
-	public void hasExitCode(int expectedCode) {
-		isNotNull();
-		if (expectedCode != actual.value()) {
-			failWithMessage("expected %d but as %d", expectedCode,  actual.value());
-		}
-	}
 }

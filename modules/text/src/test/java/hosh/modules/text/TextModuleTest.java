@@ -48,7 +48,7 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
-import hosh.test.support.RecordMatcher;
+import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.WithThread;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -66,7 +66,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import static hosh.test.support.ExitStatusAssert.assertThat;
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -1542,9 +1542,19 @@ public class TextModuleTest {
 		@Captor
 		private ArgumentCaptor<Record> records;
 
+		@Test
+		public void tableWithNoRecords() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
 		@SuppressWarnings("unchecked")
 		@Test
-		public void table() {
+		public void tableWithColumnLongerThanValues() {
 			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -1553,8 +1563,23 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("2         whatever  "), Ansi.Style.BG_BLUE)));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      whatever  ")));
+		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		public void tableWithColumnShorterThanValues() {
+			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("aa")).build();
+			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoMoreInteractions();
+			then(out).should(times(2)).send(records.capture());
+			assertThat(records.getAllValues()).containsExactly(
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text  "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      aa    ")));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1568,8 +1593,8 @@ public class TextModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).should(times(2)).send(records.capture());
 			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.of("header"), Values.withStyle(Values.ofText("count     text      "), Ansi.Style.FG_CYAN)),
-				Records.singleton(Keys.of("row"), Values.withStyle(Values.ofText("          whatever  "), Ansi.Style.BG_BLUE)));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
 		}
 
 		@Test
@@ -1581,5 +1606,6 @@ public class TextModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: table")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
+
 	}
 }

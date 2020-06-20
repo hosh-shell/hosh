@@ -49,4 +49,5 @@ public class AnsiTest {
 		Ansi.Style.FG_RED.disable(pw);
 		assertThat(out).hasToString("\u001b[31m\u001b[39m");
 	}
+
 }
