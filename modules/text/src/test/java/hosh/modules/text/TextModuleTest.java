@@ -1542,6 +1542,16 @@ public class TextModuleTest {
 		@Captor
 		private ArgumentCaptor<Record> records;
 
+		@Test
+		public void tableWithNoRecords() {
+			given(in.recv()).willReturn(Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
 		@SuppressWarnings("unchecked")
 		@Test
 		public void tableWithColumnLongerThanValues() {
