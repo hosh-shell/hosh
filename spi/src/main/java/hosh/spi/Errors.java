@@ -31,7 +31,6 @@ import java.util.Objects;
 /**
  * Factory methods for common errors.
  */
-@Experimental(description = "")
 public class Errors {
 
 	/**

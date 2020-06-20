@@ -223,26 +223,20 @@ public class Hosh {
 	}
 
 	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter, Injector injector,
-	                               OutputChannel out, OutputChannel err, Logger logger) {
-		String historyEnabled = System.getenv().getOrDefault(Environment.HOSH_HISTORY, "true");
-		History history;
-		if (Boolean.parseBoolean(historyEnabled)) {
-			history = new DefaultHistory();
-		} else {
-			history = new DisabledHistory();
-		}
+								   OutputChannel out, OutputChannel err, Logger logger) {
+		History history = provideHistory();
 		injector.setHistory(history);
 		LineReader lineReader = LineReaderBuilder
-			                        .builder()
-			                        .appName("hosh")
-			                        .history(history)
-			                        .variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh_history"))
-			                        .completer(new AggregateCompleter(
-				                        new CommandCompleter(state),
-				                        new FileSystemCompleter(state),
-				                        new VariableExpansionCompleter(state)))
-			                        .terminal(terminal)
-			                        .build();
+			.builder()
+			.appName("hosh")
+			.history(history)
+			.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh_history"))
+			.completer(new AggregateCompleter(
+				new CommandCompleter(state),
+				new FileSystemCompleter(state),
+				new VariableExpansionCompleter(state)))
+			.terminal(terminal)
+			.build();
 		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);
 		while (true) {
@@ -262,6 +256,15 @@ public class Hosh {
 			}
 		}
 		return ExitStatus.success();
+	}
+
+	private static History provideHistory() {
+		String historyEnabled = System.getenv().getOrDefault(Environment.HOSH_HISTORY, "true");
+		if (Boolean.parseBoolean(historyEnabled)) {
+			return new DefaultHistory();
+		} else {
+			return new DisabledHistory();
+		}
 	}
 
 	private static void welcome(OutputChannel out, String version) {
