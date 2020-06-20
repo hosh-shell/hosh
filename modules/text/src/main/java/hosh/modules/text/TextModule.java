@@ -866,7 +866,6 @@ public class TextModule implements Module {
 
 		private void sendHeader(Map<Key, Integer> paddings, Collection<Key> keys, OutputChannel out) {
 			logger.log(Level.FINE, "paddings = " + paddings);
-
 			String format = keys.stream()
 				.map(paddings::get)
 				.map(this::formatterFor)

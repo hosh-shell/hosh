@@ -54,7 +54,7 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 	@Override
 	public Optional<Record> recv() {
 		try {
-			LOGGER.finer("waiting for record... ");
+			LOGGER.finer("waiting for record...");
 			Record record = queue.take();
 			if (record == poisonPill) {
 				LOGGER.finer("got poison pill");
