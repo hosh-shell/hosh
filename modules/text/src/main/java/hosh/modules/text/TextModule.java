@@ -776,6 +776,9 @@ public class TextModule implements Module {
 	})
 	public static class Table implements Command {
 
+		// distance between columns
+		private static final int PADDING = 2 ;
+
 		private final Logger logger = LoggerFactory.forEnclosingClass();
 
 		@Override
@@ -802,14 +805,19 @@ public class TextModule implements Module {
 		}
 
 		private Map<Key, Integer> calculatePaddings(List<Record> records) {
-			Map<Key, Integer> result = new HashMap<>();
+			Map<Key, Integer> maxLengthPerColumn = new HashMap<>();
 			for (Record record : records) {
 				for (Record.Entry entry : record.entries()) {
 					String formattedValue = valueAsString(entry.getValue());
 					int valueLength = lengthFor(formattedValue);
-					result.compute(entry.getKey(), (k, v) -> v == null ? padding(k.name().length(), valueLength) : padding(v, valueLength));
+					maxLengthPerColumn.compute(entry.getKey(), (k, v) -> v == null ? Math.max(k.name().length(), valueLength) : Math.max(v, valueLength));
 				}
 			}
+			Map<Key, Integer> result = new HashMap<>();
+			for (var kv : maxLengthPerColumn.entrySet()) {
+				result.put(kv.getKey(), kv.getValue() + PADDING);
+			}
+			logger.log(Level.FINE, "paddings = " + maxLengthPerColumn);
 			return result;
 		}
 
@@ -819,10 +827,6 @@ public class TextModule implements Module {
 			PrintWriter printWriter = new PrintWriter(writer);
 			value.print(printWriter, Locale.getDefault());
 			return writer.toString();
-		}
-
-		private int padding(int a, int b) {
-			return Math.max(a, b) + 2;
 		}
 
 		private int lengthFor(String value) {
@@ -865,7 +869,6 @@ public class TextModule implements Module {
 		}
 
 		private void sendHeader(Map<Key, Integer> paddings, Collection<Key> keys, OutputChannel out) {
-			logger.log(Level.FINE, "paddings = " + paddings);
 			String format = keys.stream()
 				.map(paddings::get)
 				.map(this::formatterFor)

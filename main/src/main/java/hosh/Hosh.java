@@ -264,6 +264,7 @@ public class Hosh {
 		return ExitStatus.success();
 	}
 
+	// present everything as table in interactive shell
 	private static String autoTable(String line) {
 		return line + " | table";
 	}
