@@ -36,6 +36,7 @@ import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Key;
 import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
 import hosh.spi.Module;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
@@ -61,6 +62,8 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -773,6 +776,8 @@ public class TextModule implements Module {
 	})
 	public static class Table implements Command {
 
+		private final Logger logger = LoggerFactory.forEnclosingClass();
+
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
@@ -860,11 +865,14 @@ public class TextModule implements Module {
 		}
 
 		private void sendHeader(Map<Key, Integer> paddings, Collection<Key> keys, OutputChannel out) {
+			logger.log(Level.FINE, "paddings = " + paddings);
+
 			String format = keys.stream()
 				.map(paddings::get)
 				.map(this::formatterFor)
 				.collect(Collectors.joining());
 			String header = String.format(format, keys.stream().map(Key::name).toArray());
+			logger.log(Level.FINE, "format = " + format);
 			out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 		}
 	}
