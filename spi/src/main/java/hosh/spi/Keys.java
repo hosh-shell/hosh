@@ -105,7 +105,7 @@ public class Keys {
 
 	/**
 	 * Last modification time of a file (see {@link BasicFileAttributes#lastModifiedTime()}.
- 	 */
+	 */
 	public static final Key MODIFIED = Keys.of("modified");
 
 	/**

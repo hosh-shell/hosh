@@ -23,6 +23,8 @@
  */
 package hosh.spi;
 
+import hosh.doc.Experimental;
+
 import java.util.Optional;
 
 /**
@@ -34,6 +36,7 @@ public interface Value extends Comparable<Value>, Printable {
 		return Optional.empty();
 	}
 
+	@Experimental(description = "right now this is basically add()")
 	default Optional<Value> merge(Value value) {
 		return Optional.empty();
 	}

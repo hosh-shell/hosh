@@ -776,8 +776,7 @@ public class TextModule implements Module {
 	})
 	public static class Table implements Command {
 
-		// distance between columns
-		private static final int PADDING = 2 ;
+		private static final int COLUMN_PADDING = 2 ;
 
 		private final Logger logger = LoggerFactory.forEnclosingClass();
 
@@ -815,7 +814,7 @@ public class TextModule implements Module {
 			}
 			Map<Key, Integer> result = new HashMap<>();
 			for (var kv : maxLengthPerColumn.entrySet()) {
-				result.put(kv.getKey(), kv.getValue() + PADDING);
+				result.put(kv.getKey(), kv.getValue() + COLUMN_PADDING);
 			}
 			logger.log(Level.FINE, "paddings = " + maxLengthPerColumn);
 			return result;
