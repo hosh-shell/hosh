@@ -47,10 +47,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Display records in a table automatically (for interactive shell only).
+ *
+ * All records are buffered (within a predefined size) to be able to determine the longest value for each key.
+ * On buffer overflow all records are sent directly to the next channel.
+ *
+ * NB: implementation must be thread-safe since while end() is running, send() could be called.
+ */
 public class AutoTableChannel implements OutputChannel {
 
 	private static final int COLUMN_PADDING = 2;
-	private static final int OVERFLOW = 10_000;
+	private static final int OVERFLOW = 1_000;
 
 	private final Logger logger = LoggerFactory.forEnclosingClass();
 	private final OutputChannel outputChannel;
