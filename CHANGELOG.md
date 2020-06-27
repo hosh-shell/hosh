@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `sort`: consistent order of arguments
     - `key` is mandatory and always in first position
     - `asc`, `desc` are optional and always in second position
-- `table`: improving output
+- `table`: merged as "autotable" in interactive mode
 
 ### Fixed
 - `probe`: fix exit status when content type cannot be determined

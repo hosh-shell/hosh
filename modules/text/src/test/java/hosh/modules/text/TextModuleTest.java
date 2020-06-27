@@ -36,11 +36,9 @@ import hosh.modules.text.TextModule.Select;
 import hosh.modules.text.TextModule.Sort;
 import hosh.modules.text.TextModule.Split;
 import hosh.modules.text.TextModule.Sum;
-import hosh.modules.text.TextModule.Table;
 import hosh.modules.text.TextModule.Take;
 import hosh.modules.text.TextModule.Timestamp;
 import hosh.modules.text.TextModule.Trim;
-import hosh.spi.Ansi;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -1523,89 +1521,4 @@ public class TextModuleTest {
 		}
 	}
 
-	@Nested
-	@ExtendWith(MockitoExtension.class)
-	public class TableTest {
-
-		@Mock
-		private InputChannel in;
-
-		@Mock
-		private OutputChannel out;
-
-		@Mock
-		private OutputChannel err;
-
-		@InjectMocks
-		private Table sut;
-
-		@Captor
-		private ArgumentCaptor<Record> records;
-
-		@Test
-		public void tableWithNoRecords() {
-			given(in.recv()).willReturn(Optional.empty());
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).shouldHaveNoInteractions();
-		}
-
-		@SuppressWarnings("unchecked")
-		@Test
-		public void tableWithColumnLongerThanValues() {
-			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
-			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveNoMoreInteractions();
-			then(out).should(times(2)).send(records.capture());
-			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
-				Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      whatever  ")));
-		}
-
-		@SuppressWarnings("unchecked")
-		@Test
-		public void tableWithColumnShorterThanValues() {
-			Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("aa")).build();
-			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveNoMoreInteractions();
-			then(out).should(times(2)).send(records.capture());
-			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text  "), Ansi.Style.FG_MAGENTA)),
-				Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      aa    ")));
-		}
-
-		@SuppressWarnings("unchecked")
-		@Test
-		public void tableWithNone() {
-			Record record1 = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
-			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveNoMoreInteractions();
-			then(err).shouldHaveNoMoreInteractions();
-			then(out).should(times(2)).send(records.capture());
-			assertThat(records.getAllValues()).containsExactly(
-				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
-				Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
-		}
-
-		@Test
-		public void nonZeroArgs() {
-			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
-			assertThat(exitStatus).isError();
-			then(in).shouldHaveNoMoreInteractions();
-			then(out).shouldHaveNoMoreInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: table")));
-			then(err).shouldHaveNoMoreInteractions();
-		}
-
-	}
 }

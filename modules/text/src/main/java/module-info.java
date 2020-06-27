@@ -23,5 +23,4 @@
  */
 module hosh.modules.text {
 	requires hosh.spi;
-	requires java.logging;
 }
