@@ -57,8 +57,8 @@ import java.util.stream.Collectors;
  */
 public class AutoTableChannel implements OutputChannel {
 
-	private static final int COLUMN_PADDING = 2;
-	private static final int OVERFLOW = 1_000;
+	public static final int COLUMN_PADDING = 2;
+	public static final int OVERFLOW = 1_000;
 
 	private final Logger logger = LoggerFactory.forEnclosingClass();
 	private final OutputChannel outputChannel;

@@ -39,6 +39,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -90,6 +91,39 @@ class AutoTableChannelTest {
 		Assertions.assertThat(records.getAllValues()).containsExactly(
 			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
 			Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
+	}
+
+	@Test
+	public void nonOverflow() {
+		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
+		for (int i = 0; i < AutoTableChannel.OVERFLOW - 1; i++) {
+			sut.send(record);
+		}
+		then(out).should(never()).send(records.capture());
+		sut.end();
+		then(out).should(times(AutoTableChannel.OVERFLOW)).send(records.capture());
+		Assertions.assertThat(records.getAllValues()).containsOnly(
+			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
+			Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
+	}
+
+	@Test
+	public void overflow() {
+		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
+		for (int i = 0; i < AutoTableChannel.OVERFLOW + 2; i++) {
+			sut.send(record);
+		}
+		then(out).should(times(AutoTableChannel.OVERFLOW + 1)).send(records.capture());
+		sut.end();
+		then(out).shouldHaveNoMoreInteractions();
+	}
+
+	@Test
+	public void sendAfterEnd() {
+		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
+		sut.end();
+		sut.send(record);
+		then(out).shouldHaveNoMoreInteractions();
 	}
 
 }
