@@ -50,26 +50,39 @@ import java.util.stream.Collectors;
 public class AutoTableChannel implements OutputChannel {
 
 	private static final int COLUMN_PADDING = 2;
+	private static final int OVERFLOW = 100;
 
 	private final Logger logger = LoggerFactory.forEnclosingClass();
-
 	private final OutputChannel outputChannel;
 	private final List<Record> records;
+	private boolean overflow;
 
 	public AutoTableChannel(OutputChannel outputChannel) {
 		this.outputChannel = outputChannel;
 		this.records = new ArrayList<>();
+		this.overflow = false;
 	}
 
 	@Override
 	public void send(Record record) {
+		if (overflow) {
+			outputChannel.send(record);
+			return;
+		}
 		records.add(record);
+		if (records.size() > OVERFLOW) {
+			records.stream().forEach(outputChannel::send);
+			records.clear();
+		}
 	}
 
 	public void end() {
-		Map<Key, Integer> paddings = calculatePaddings(records);
-		outputTable(outputChannel, records, paddings);
-		records.clear();
+		if (!overflow) {
+			Map<Key, Integer> paddings = calculatePaddings(records);
+			outputTable(outputChannel, records, paddings);
+			records.clear();
+		}
+		overflow = false;
 	}
 
 	private void outputTable(OutputChannel out, List<Record> records, Map<Key, Integer> paddings) {
