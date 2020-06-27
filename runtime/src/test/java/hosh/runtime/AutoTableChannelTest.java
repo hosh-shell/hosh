@@ -110,10 +110,10 @@ class AutoTableChannelTest {
 	@Test
 	public void overflow() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
-		for (int i = 0; i < AutoTableChannel.OVERFLOW + 2; i++) {
+		for (int i = 0; i < AutoTableChannel.OVERFLOW + 3; i++) {
 			sut.send(record);
 		}
-		then(out).should(times(AutoTableChannel.OVERFLOW + 1)).send(records.capture());
+		then(out).should(times(AutoTableChannel.OVERFLOW + 2)).send(records.capture());
 		sut.end();
 		then(out).shouldHaveNoMoreInteractions();
 	}
