@@ -151,15 +151,6 @@ public class AutoTableChannel implements OutputChannel {
 		return maybeAnsi.replaceAll("\u001b\\[[0-9]+m", "");
 	}
 
-	// consuming all records here... it could be a problem for big output
-	private List<Record> accumulate(InputChannel in) {
-		List<Record> records = new LinkedList<>();
-		for (Record record : InputChannel.iterate(in)) {
-			records.add(record);
-		}
-		return records;
-	}
-
 	private void sendRow(Map<Key, Integer> paddings, Record record, OutputChannel out) {
 		Locale locale = Locale.getDefault();
 		StringBuilder formatter = new StringBuilder();
@@ -190,6 +181,5 @@ public class AutoTableChannel implements OutputChannel {
 		logger.log(Level.FINE, "format = " + format);
 		out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 	}
-
 
 }
