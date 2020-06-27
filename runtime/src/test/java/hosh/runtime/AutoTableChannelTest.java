@@ -61,8 +61,8 @@ class AutoTableChannelTest {
 
 	@Test
 	public void tableWithColumnLongerThanValues() {
-		Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
-		sut.send(record1);
+		Record record = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
+		sut.send(record);
 		sut.end();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
@@ -72,8 +72,8 @@ class AutoTableChannelTest {
 
 	@Test
 	public void tableWithColumnShorterThanValues() {
-		Record record1 = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("aa")).build();
-		sut.send(record1);
+		Record record = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("aa")).build();
+		sut.send(record);
 		sut.end();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
@@ -83,8 +83,8 @@ class AutoTableChannelTest {
 
 	@Test
 	public void tableWithNone() {
-		Record record1 = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
-		sut.send(record1);
+		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
+		sut.send(record);
 		sut.end();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
