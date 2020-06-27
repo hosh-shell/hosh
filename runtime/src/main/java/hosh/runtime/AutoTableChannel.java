@@ -78,14 +78,13 @@ public class AutoTableChannel implements OutputChannel {
 			outputChannel.send(record);
 			return;
 		}
-		if (records.size() > OVERFLOW) {
-			logger.info("autotable: overflow after " + OVERFLOW);
+		records.add(record);
+		if (records.size() >= OVERFLOW) {
+			logger.info("autotable: overflow after " + records.size());
 			overflow = true;
 			// flush and clear our buffer
 			records.forEach(outputChannel::send);
-			return;
 		}
-		records.add(record);
 	}
 
 	public void end() {
