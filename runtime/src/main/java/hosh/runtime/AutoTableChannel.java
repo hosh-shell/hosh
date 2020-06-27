@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 public class AutoTableChannel implements OutputChannel {
 
 	private static final int COLUMN_PADDING = 2;
-	private static final int OVERFLOW = 100;
+	private static final int OVERFLOW = 10_000;
 
 	private final Logger logger = LoggerFactory.forEnclosingClass();
 	private final OutputChannel outputChannel;
@@ -66,14 +66,18 @@ public class AutoTableChannel implements OutputChannel {
 	@Override
 	public void send(Record record) {
 		if (overflow) {
+			// overflow already happened: short circuit
 			outputChannel.send(record);
 			return;
 		}
-		records.add(record);
 		if (records.size() > OVERFLOW) {
+			logger.info("autotable: overflow after " + OVERFLOW);
+			overflow = true;
+			// flush and clear our buffer
 			records.stream().forEach(outputChannel::send);
 			records.clear();
 		}
+		records.add(record);
 	}
 
 	public void end() {
