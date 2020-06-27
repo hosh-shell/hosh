@@ -24,7 +24,6 @@
 package hosh.runtime;
 
 import hosh.spi.Ansi;
-import hosh.spi.InputChannel;
 import hosh.spi.Key;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
@@ -39,10 +38,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -62,12 +62,12 @@ public class AutoTableChannel implements OutputChannel {
 
 	private final Logger logger = LoggerFactory.forEnclosingClass();
 	private final OutputChannel outputChannel;
-	private final List<Record> records;
+	private final Queue<Record> records;
 	private volatile boolean overflow;
 
 	public AutoTableChannel(OutputChannel outputChannel) {
 		this.outputChannel = outputChannel;
-		this.records = new ArrayList<>();
+		this.records = new ConcurrentLinkedDeque<>();
 		this.overflow = false;
 	}
 
@@ -82,7 +82,7 @@ public class AutoTableChannel implements OutputChannel {
 			logger.info("autotable: overflow after " + OVERFLOW);
 			overflow = true;
 			// flush and clear our buffer
-			records.stream().forEach(outputChannel::send);
+			records.forEach(outputChannel::send);
 			return;
 		}
 		records.add(record);
@@ -98,7 +98,7 @@ public class AutoTableChannel implements OutputChannel {
 		overflow = false;
 	}
 
-	private void outputTable(OutputChannel out, List<Record> records, Map<Key, Integer> paddings) {
+	private void outputTable(OutputChannel out, Iterable<Record> records, Map<Key, Integer> paddings) {
 		boolean headerSent = false;
 		for (Record record : records) {
 			if (!headerSent) {
@@ -109,7 +109,7 @@ public class AutoTableChannel implements OutputChannel {
 		}
 	}
 
-	private Map<Key, Integer> calculatePaddings(List<Record> records) {
+	private Map<Key, Integer> calculatePaddings(Iterable<Record> records) {
 		Map<Key, Integer> maxLengthPerColumn = new HashMap<>();
 		for (Record record : records) {
 			for (Record.Entry entry : record.entries()) {
