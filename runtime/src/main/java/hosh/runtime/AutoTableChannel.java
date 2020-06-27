@@ -64,21 +64,15 @@ public class AutoTableChannel implements OutputChannel {
 	private final OutputChannel outputChannel;
 	private final List<Record> records;
 	private volatile boolean overflow;
-	private volatile boolean ended;
 
 	public AutoTableChannel(OutputChannel outputChannel) {
 		this.outputChannel = outputChannel;
 		this.records = new ArrayList<>();
 		this.overflow = false;
-		this.ended = false;
 	}
 
 	@Override
 	public void send(Record record) {
-		if (ended) {
-			// avoiding concurrent modification of "records" during when end is called before overflow
-			return;
-		}
 		if (overflow) {
 			// overflow already happened: short circuit
 			outputChannel.send(record);
@@ -95,7 +89,6 @@ public class AutoTableChannel implements OutputChannel {
 	}
 
 	public void end() {
-		ended = true;
 		logger.info("autotable: end with overflow=" + overflow);
 		if (!overflow) {
 			Map<Key, Integer> paddings = calculatePaddings(records);
@@ -103,7 +96,6 @@ public class AutoTableChannel implements OutputChannel {
 		}
 		records.clear();
 		overflow = false;
-		ended = false;
 	}
 
 	private void outputTable(OutputChannel out, List<Record> records, Map<Key, Integer> paddings) {

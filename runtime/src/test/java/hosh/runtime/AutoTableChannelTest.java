@@ -118,12 +118,4 @@ class AutoTableChannelTest {
 		then(out).shouldHaveNoMoreInteractions();
 	}
 
-	@Test
-	public void sendAfterEnd() {
-		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
-		sut.end();
-		sut.send(record);
-		then(out).shouldHaveNoMoreInteractions();
-	}
-
 }
