@@ -23,6 +23,7 @@
  */
 package hosh;
 
+import hosh.runtime.AutoTableChannel;
 import hosh.runtime.BootstrapBuiltins;
 import hosh.runtime.CancellableChannel;
 import hosh.runtime.CommandCompleter;
@@ -240,6 +241,7 @@ public class Hosh {
 			.build();
 		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);
+		AutoTableChannel autoTableChannel = new AutoTableChannel(out);
 		while (true) {
 			Optional<String> line = reader.read();
 			if (line.isEmpty()) {
@@ -247,7 +249,8 @@ public class Hosh {
 			}
 			try {
 				Program program = compiler.compile(line.get());
-				ExitStatus exitStatus = interpreter.eval(program, out, err);
+				ExitStatus exitStatus = interpreter.eval(program, autoTableChannel, err);
+				autoTableChannel.end();
 				if (state.isExit()) {
 					return exitStatus;
 				}
