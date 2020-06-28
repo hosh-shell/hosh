@@ -41,36 +41,36 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-public class SequenceCommandTest {
+class SequenceCommandTest {
 
 	@Mock(stubOnly = true)
-	private InputChannel in;
+	InputChannel in;
 
 	@Mock(stubOnly = true)
-	private OutputChannel out;
+	OutputChannel out;
 
 	@Mock(stubOnly = true)
-	private OutputChannel err;
+	OutputChannel err;
 
 	@Mock(stubOnly = true)
-	private Statement first;
+	Statement first;
 
 	@Mock(stubOnly = true)
-	private Statement second;
+	Statement second;
 
 	@Mock
-	private Interpreter interpreter;
+	Interpreter interpreter;
 
-	private SequenceCommand sut;
+	SequenceCommand sut;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		sut = new SequenceCommand(first, second);
 		sut.setInterpreter(interpreter);
 	}
 
 	@Test
-	public void happyPath() {
+	void happyPath() {
 		doReturn(ExitStatus.success()).when(interpreter).eval(first, in, out, err);
 		doReturn(ExitStatus.success()).when(interpreter).eval(second, in, out, err);
 		ExitStatus result = sut.run(List.of(), in, out, err);
@@ -78,7 +78,7 @@ public class SequenceCommandTest {
 	}
 
 	@Test
-	public void haltOnFirstError() {
+	void haltOnFirstError() {
 		doReturn(ExitStatus.of(42)).when(interpreter).eval(first, in, out, err);
 		ExitStatus result = sut.run(List.of(), in, out, err);
 		then(interpreter).should(Mockito.never()).eval(second, in, out, err);

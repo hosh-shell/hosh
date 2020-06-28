@@ -41,22 +41,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class HoshFormatterTest {
+class HoshFormatterTest {
 
 	@RegisterExtension
-	public final WithThread withThread = new WithThread();
+	final WithThread withThread = new WithThread();
 
 	@RegisterExtension
-	public final WithTimeZone withTimeZone = new WithTimeZone();
+	final WithTimeZone withTimeZone = new WithTimeZone();
 
 	@Mock(stubOnly = true)
-	private LogRecord logRecord;
+	LogRecord logRecord;
 
 	@InjectMocks
-	private HoshFormatter sut;
+	HoshFormatter sut;
 
 	@Test
-	public void severeWithStacktrace() {
+	void severeWithStacktrace() {
 		withTimeZone.changeTo(TimeZone.getTimeZone("Etc/GMT+8"));
 		withThread.renameTo("main");
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
@@ -69,7 +69,7 @@ public class HoshFormatterTest {
 	}
 
 	@Test
-	public void info() {
+	void info() {
 		withTimeZone.changeTo(TimeZone.getTimeZone("Etc/GMT+8"));
 		withThread.renameTo("main");
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
@@ -80,7 +80,7 @@ public class HoshFormatterTest {
 	}
 
 	@Test
-	public void skipThreadNameForHttpClient() {
+	void skipThreadNameForHttpClient() {
 		withTimeZone.changeTo(TimeZone.getTimeZone("Etc/GMT+8"));
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
 		given(logRecord.getLevel()).willReturn(Level.INFO);

@@ -46,22 +46,22 @@ import static org.mockito.Mockito.times;
 class AutoTableChannelTest {
 
 	@Mock
-	private OutputChannel out;
+	OutputChannel out;
 
 	@InjectMocks
-	private AutoTableChannel sut;
+	AutoTableChannel sut;
 
 	@Captor
-	private ArgumentCaptor<Record> records;
+	ArgumentCaptor<Record> records;
 
 	@Test
-	public void tableWithNoRecords() {
+	void tableWithNoRecords() {
 		sut.end();
 		then(out).shouldHaveNoInteractions();
 	}
 
 	@Test
-	public void tableWithColumnLongerThanValues() {
+	void tableWithColumnLongerThanValues() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		sut.send(record);
 		sut.end();
@@ -72,7 +72,7 @@ class AutoTableChannelTest {
 	}
 
 	@Test
-	public void tableWithColumnShorterThanValues() {
+	void tableWithColumnShorterThanValues() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("aa")).build();
 		sut.send(record);
 		sut.end();
@@ -83,7 +83,7 @@ class AutoTableChannelTest {
 	}
 
 	@Test
-	public void tableWithNone() {
+	void tableWithNone() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		sut.send(record);
 		sut.end();
@@ -94,7 +94,7 @@ class AutoTableChannelTest {
 	}
 
 	@Test
-	public void nonOverflow() {
+	void nonOverflow() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		for (int i = 1; i < AutoTableChannel.OVERFLOW; i++) {
 			sut.send(record);
@@ -108,7 +108,7 @@ class AutoTableChannelTest {
 	}
 
 	@Test
-	public void overflow() {
+	void overflow() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		for (int i = 1; i <= AutoTableChannel.OVERFLOW + 1; i++) {
 			sut.send(record);

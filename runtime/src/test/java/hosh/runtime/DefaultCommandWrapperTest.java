@@ -46,37 +46,37 @@ import static org.mockito.BDDMockito.then;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class DefaultCommandWrapperTest {
+class DefaultCommandWrapperTest {
 
 	@Mock(stubOnly = true)
-	private InputChannel in;
+	InputChannel in;
 
 	@Mock(stubOnly = true)
-	private OutputChannel out;
+	OutputChannel out;
 
 	@Mock(stubOnly = true)
-	private OutputChannel err;
+	OutputChannel err;
 
 	@Mock(stubOnly = true)
-	private Statement statement;
+	Statement statement;
 
 	@Mock(stubOnly = true)
-	private Interpreter interpreter;
+	Interpreter interpreter;
 
 	@Mock
-	private CommandWrapper<Object> commandWrapper;
+	CommandWrapper<Object> commandWrapper;
 
 	@InjectMocks
-	private DefaultCommandWrapper<Object> sut;
+	DefaultCommandWrapper<Object> sut;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		sut = new DefaultCommandWrapper<>(statement, commandWrapper);
 		sut.setInterpreter(interpreter);
 	}
 
 	@Test
-	public void callsBeforeAndAfterWhenStatementCompletesNormally() {
+	void callsBeforeAndAfterWhenStatementCompletesNormally() {
 		Object resource = new Object();
 		List<String> args = List.of();
 		given(commandWrapper.before(args, in, out, err)).willReturn(Optional.of(resource));
@@ -90,7 +90,7 @@ public class DefaultCommandWrapperTest {
 	}
 
 	@Test
-	public void callsBeforeAndAfterWhenStatementThrows() {
+	void callsBeforeAndAfterWhenStatementThrows() {
 		Object resource = new Object();
 		List<String> args = List.of();
 		given(commandWrapper.before(args, in, out, err)).willReturn(Optional.of(resource));
@@ -103,7 +103,7 @@ public class DefaultCommandWrapperTest {
 	}
 
 	@Test
-	public void keepRetryingAndReturnsLastExitStatus() {
+	void keepRetryingAndReturnsLastExitStatus() {
 		Object resource = new Object();
 		List<String> args = List.of();
 		given(commandWrapper.before(args, in, out, err)).willReturn(Optional.of(resource));
@@ -118,7 +118,7 @@ public class DefaultCommandWrapperTest {
 	}
 
 	@Test
-	public void asString() {
+	void asString() {
 		assertThat(sut).hasToString("DefaultCommandWrapper[nested=statement,commandWrapper=commandWrapper]");
 	}
 }

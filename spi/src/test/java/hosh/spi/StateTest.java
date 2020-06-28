@@ -30,15 +30,15 @@ import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class StateTest {
+class StateTest {
 
 	@Test
-	public void asString() {
+	void asString() {
 		assertThat(new State()).hasToString("State[cwd='null',path=[],variables={},commands={}]");
 	}
 
 	@Test
-	public void cwdIsAlwaysAbsolute() {
+	void cwdIsAlwaysAbsolute() {
 		State sut = new State();
 		Path path = Paths.get(".");
 		assertThat(path).isRelative();

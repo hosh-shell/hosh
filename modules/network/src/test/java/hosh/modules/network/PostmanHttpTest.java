@@ -55,25 +55,25 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration tests against postman-echo.
  */
 @ExtendWith(MockitoExtension.class)
-public class PostmanHttpTest {
+class PostmanHttpTest {
 
 	@Mock
-	private InputChannel in;
+	InputChannel in;
 
 	@Mock
-	private OutputChannel out;
+	OutputChannel out;
 
 	@Mock
-	private OutputChannel err;
+	OutputChannel err;
 
 	@Captor
-	private ArgumentCaptor<Record> body;
+	ArgumentCaptor<Record> body;
 
 	@InjectMocks
-	private NetworkModule.Http sut;
+	NetworkModule.Http sut;
 
 	@Test
-	public void getOk() {
+	void getOk() {
 		// Given
 		URI uri = URI.create("https://postman-echo.com/get?param=42");
 		// When
@@ -89,7 +89,7 @@ public class PostmanHttpTest {
 	}
 
 	@Test
-	public void get404() {
+	void get404() {
 		// Given
 		URI uri = URI.create("https://postman-echo.com/status/404");
 		// When
@@ -103,12 +103,12 @@ public class PostmanHttpTest {
 		assertThat(result.getJsonNumber("status").intValue()).isEqualTo(404);
 	}
 
-	// private helpers
-	private static class JsonHelpers {
+	// helpers
+	static class JsonHelpers {
 
-		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+		static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
-		public static JsonObject parse(Record record) {
+		static JsonObject parse(Record record) {
 			JsonReaderFactory readerFactory = Json.createReaderFactory(Map.of());
 			String body = record.value(Keys.TEXT).flatMap(x -> x.unwrap(String.class)).orElseThrow();
 			LOGGER.log(Level.INFO, () -> String.format("body is: '%s'", body));

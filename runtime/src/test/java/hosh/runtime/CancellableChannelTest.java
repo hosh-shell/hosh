@@ -39,28 +39,28 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-public class CancellableChannelTest {
+class CancellableChannelTest {
 
 	@RegisterExtension
-	public final WithThread withThread = new WithThread();
+	final WithThread withThread = new WithThread();
 
 	@Mock(stubOnly = true)
-	private Record record;
+	Record record;
 
 	@Mock
-	private OutputChannel channel;
+	OutputChannel channel;
 
 	@InjectMocks
-	private CancellableChannel sut;
+	CancellableChannel sut;
 
 	@Test
-	public void send() {
+	void send() {
 		sut.send(record);
 		then(channel).should().send(record);
 	}
 
 	@Test
-	public void sendInterrupted() {
+	void sendInterrupted() {
 		withThread.interrupt();
 		assertThatThrownBy(() -> sut.send(record))
 			.hasMessage("interrupted")

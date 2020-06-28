@@ -36,16 +36,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class InputChannelTest {
+class InputChannelTest {
 
 	@Mock(stubOnly = true)
-	private InputChannel in;
+	InputChannel in;
 
 	@Mock(stubOnly = true)
-	private Record record;
+	Record record;
 
 	@Test
-	public void empty() {
+	void empty() {
 		given(in.recv()).willReturn(Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		assertThat(iterable).isEmpty();
@@ -53,7 +53,7 @@ public class InputChannelTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void oneRecord() {
+	void oneRecord() {
 		given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		assertThat(iterable).containsExactly(record);
@@ -61,14 +61,14 @@ public class InputChannelTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void twoRecords() {
+	void twoRecords() {
 		given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		assertThat(iterable).containsExactly(record, record);
 	}
 
 	@Test
-	public void throwsNoSuchElementsWhenConsumed() {
+	void throwsNoSuchElementsWhenConsumed() {
 		given(in.recv()).willReturn(Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		assertThatThrownBy(() -> iterable.iterator().next()).isInstanceOf(NoSuchElementException.class);
@@ -76,7 +76,7 @@ public class InputChannelTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void iterationTerminatesOnFirstEmptyResult() {
+	void iterationTerminatesOnFirstEmptyResult() {
 		given(in.recv()).willReturn(Optional.empty(), Optional.of(record));
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		assertThat(iterable).isEmpty();

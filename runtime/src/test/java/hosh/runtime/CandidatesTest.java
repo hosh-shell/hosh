@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CandidatesTest {
+class CandidatesTest {
 
 	@Test
-	public void incomplete() {
+	void incomplete() {
 		Candidate incomplete = Candidates.incomplete("file");
 		assertThat(incomplete.value()).isEqualTo("file");
 		assertThat(incomplete.complete()).isFalse();
@@ -39,7 +39,7 @@ public class CandidatesTest {
 	}
 
 	@Test
-	public void complete() {
+	void complete() {
 		Candidate complete = Candidates.complete("file");
 		assertThat(complete.value()).isEqualTo("file");
 		assertThat(complete.complete()).isTrue();
@@ -47,7 +47,7 @@ public class CandidatesTest {
 	}
 
 	@Test
-	public void completeWithDescription() {
+	void completeWithDescription() {
 		Candidate complete = Candidates.completeWithDescription("file", "external command");
 		assertThat(complete.value()).isEqualTo("file");
 		assertThat(complete.complete()).isTrue();

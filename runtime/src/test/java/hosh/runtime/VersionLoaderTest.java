@@ -29,10 +29,10 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class VersionLoaderTest {
+class VersionLoaderTest {
 
 	@Test
-	public void readVersion() throws IOException {
+	void readVersion() throws IOException {
 		String readVersion = VersionLoader.loadVersion();
 		assertThat(readVersion).isNotBlank();
 	}

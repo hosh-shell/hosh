@@ -42,24 +42,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-public class InjectorTest {
+class InjectorTest {
 
 	@Mock(stubOnly = true)
-	private History history;
+	History history;
 
 	@Mock(stubOnly = true)
-	private LineReader lineReader;
+	LineReader lineReader;
 
 	@Mock(stubOnly = true)
-	private State state;
+	State state;
 
 	@Mock(stubOnly = true)
-	private Terminal terminal;
+	Terminal terminal;
 
-	private Injector sut;
+	Injector sut;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		sut = new Injector();
 		sut.setHistory(history);
 		sut.setLineReader(lineReader);
@@ -68,49 +68,49 @@ public class InjectorTest {
 	}
 
 	@Test
-	public void injectNothing() {
+	void injectNothing() {
 		Command command = Mockito.mock(Command.class);
 		sut.injectDeps(command);
 		then(command).shouldHaveNoInteractions();
 	}
 
 	@Test
-	public void injectHistory() {
+	void injectHistory() {
 		HistoryAwareCommand command = Mockito.mock(HistoryAwareCommand.class);
 		sut.injectDeps(command);
 		then(command).should().setHistory(history);
 	}
 
 	@Test
-	public void injectLineReaderWare() {
+	void injectLineReaderWare() {
 		LineReaderAwareCommand command = Mockito.mock(LineReaderAwareCommand.class);
 		sut.injectDeps(command);
 		then(command).should().setLineReader(lineReader);
 	}
 
 	@Test
-	public void injectState() {
+	void injectState() {
 		StateAwareCommand command = Mockito.mock(StateAwareCommand.class);
 		sut.injectDeps(command);
 		then(command).should().setState(state);
 	}
 
 	@Test
-	public void injectTerminal() {
+	void injectTerminal() {
 		TerminalAwareCommand command = Mockito.mock(TerminalAwareCommand.class);
 		sut.injectDeps(command);
 		then(command).should().setTerminal(terminal);
 	}
 
-	public interface HistoryAwareCommand extends Command, HistoryAware {
+	interface HistoryAwareCommand extends Command, HistoryAware {
 	}
 
-	public interface LineReaderAwareCommand extends Command, LineReaderAware {
+	interface LineReaderAwareCommand extends Command, LineReaderAware {
 	}
 
-	public interface StateAwareCommand extends Command, StateAware {
+	interface StateAwareCommand extends Command, StateAware {
 	}
 
-	public interface TerminalAwareCommand extends Command, TerminalAware {
+	interface TerminalAwareCommand extends Command, TerminalAware {
 	}
 }

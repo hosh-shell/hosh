@@ -38,42 +38,42 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
-public class SimpleCommandRegistryTest {
+class SimpleCommandRegistryTest {
 
 	@Mock(stubOnly = true)
-	private Command command;
+	Command command;
 
 	@Mock(stubOnly = true)
-	private Command anotherCommand;
+	Command anotherCommand;
 
 	@Spy
-	private final State state = new State();
+	final State state = new State();
 
 	@InjectMocks
-	private SimpleCommandRegistry sut;
+	SimpleCommandRegistry sut;
 
 	@Test
-	public void oneCommand() {
+	void oneCommand() {
 		sut.registerCommand("foo", () -> command);
 		assertThat(state.getCommands()).containsKey("foo");
 	}
 
 	@Test
-	public void oneCommandWithAlias() {
+	void oneCommandWithAlias() {
 		sut.registerCommand("foo", () -> command);
 		sut.registerCommand("bar", () -> command);
 		assertThat(state.getCommands()).containsKeys("foo", "bar");
 	}
 
 	@Test
-	public void twoDifferentCommands() {
+	void twoDifferentCommands() {
 		sut.registerCommand("foo", () -> command);
 		sut.registerCommand("bar", () -> anotherCommand);
 		assertThat(state.getCommands()).containsKeys("foo", "bar");
 	}
 
 	@Test
-	public void twoTimesSameCommand() {
+	void twoTimesSameCommand() {
 		Supplier<Command> supplier = () -> command;
 		assertThatThrownBy(() -> {
 			sut.registerCommand("foo", supplier);

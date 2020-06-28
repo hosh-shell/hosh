@@ -94,29 +94,29 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
-public class SystemModuleTest {
+class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ExitTest {
+	class ExitTest {
 
 		@Spy
-		private final State state = new State();
+		final State state = new State();
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Exit sut;
+		Exit sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).hasExitCode(0);
 			assertThat(state.isExit()).isTrue();
@@ -126,7 +126,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneValidArg() {
+		void oneValidArg() {
 			ExitStatus exitStatus = sut.run(List.of("21"), in, out, err);
 			assertThat(exitStatus).hasExitCode(21);
 			assertThat(state.isExit()).isTrue();
@@ -136,7 +136,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneInvalidArg() {
+		void oneInvalidArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
 			then(state).shouldHaveNoInteractions();
@@ -146,7 +146,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void twoArgs() {
+		void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("1", "2"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
 			then(state).shouldHaveNoInteractions();
@@ -158,28 +158,28 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class EnvTest {
+	class EnvTest {
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Captor
-		private ArgumentCaptor<Record> records;
+		ArgumentCaptor<Record> records;
 
 		@InjectMocks
-		private Env sut;
+		Env sut;
 
 		@Test
-		public void noArgsWithNoEnvVariables() {
+		void noArgsWithNoEnvVariables() {
 			given(state.getVariables()).willReturn(Collections.emptyMap());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -189,7 +189,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void noArgsWithSomeEnvVariables() {
+		void noArgsWithSomeEnvVariables() {
 			given(state.getVariables()).willReturn(Map.of("HOSH_VERSION", "1.0"));
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -201,7 +201,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -212,28 +212,28 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class HelpTest {
+	class HelpTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Captor
-		private ArgumentCaptor<Record> records;
+		ArgumentCaptor<Record> records;
 
 		@InjectMocks
-		private Help sut;
+		Help sut;
 
 		@Test
-		public void specificCommandWithExamples() {
+		void specificCommandWithExamples() {
 			given(state.getCommands()).willReturn(Map.of("true", True::new));
 			ExitStatus exitStatus = sut.run(List.of("true"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -248,7 +248,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void specificCommandWithoutExamples() {
+		void specificCommandWithoutExamples() {
 			given(state.getCommands()).willReturn(Map.of("false", False::new));
 			ExitStatus exitStatus = sut.run(List.of("false"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -263,7 +263,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void commandNotFound() {
+		void commandNotFound() {
 			ExitStatus exitStatus = sut.run(List.of("test"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -272,7 +272,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void commandWithoutHelpAnnotation() {
+		void commandWithoutHelpAnnotation() {
 			given(state.getCommands()).willReturn(Map.of("*", Star::new));
 			ExitStatus exitStatus = sut.run(List.of("*"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -282,7 +282,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void listAllCommands() {
+		void listAllCommands() {
 			given(state.getCommands()).willReturn(Map.of("true", True::new));
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -293,7 +293,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void listNoCommands() {
+		void listNoCommands() {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -303,7 +303,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void twoArgs() {
+		void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("test", "aaa"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -315,7 +315,7 @@ public class SystemModuleTest {
 		@Examples({
 			@Example(command = "true", description = "returns exit success")
 		})
-		private class True implements Command {
+		class True implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
@@ -324,7 +324,7 @@ public class SystemModuleTest {
 		}
 
 		@Description("/bin/false replacement")
-		private class False implements Command {
+		class False implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
@@ -333,7 +333,7 @@ public class SystemModuleTest {
 		}
 
 		// no help and no examples
-		private class Star implements Command {
+		class Star implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
@@ -344,22 +344,22 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class EchoTest {
+	class EchoTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Echo sut;
+		Echo sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -368,7 +368,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -377,7 +377,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void twoArgs() {
+		void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("a", "b"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -388,25 +388,25 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SleepTest {
+	class SleepTest {
 
 		@RegisterExtension
-		public final WithThread withThread = new WithThread();
+		final WithThread withThread = new WithThread();
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Sleep sut;
+		Sleep sut;
 
 		@Test
-		public void interrupts() {
+		void interrupts() {
 			withThread.interrupt();
 			ExitStatus exitStatus = sut.run(List.of("1000"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -416,7 +416,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void tooManyArgs() {
+		void tooManyArgs() {
 			ExitStatus exitStatus = sut.run(List.of("1", "seconds", "extra"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -425,7 +425,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -434,7 +434,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArgNumber() {
+		void oneArgNumber() {
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -443,7 +443,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArgNotNumber() {
+		void oneArgNotNumber() {
 			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -452,7 +452,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void twoArgsAmountNotValid() {
+		void twoArgsAmountNotValid() {
 			ExitStatus exitStatus = sut.run(List.of("a", "b"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -461,7 +461,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void twoArgsUnitNotValid() {
+		void twoArgsUnitNotValid() {
 			ExitStatus exitStatus = sut.run(List.of("1", "asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -471,7 +471,7 @@ public class SystemModuleTest {
 
 		@ValueSource(strings = {"nanos", "micros", "millis", "seconds", "minutes", "hours"})
 		@ParameterizedTest
-		public void sleepWithValidUnitDuration(String unit) {
+		void sleepWithValidUnitDuration(String unit) {
 			ExitStatus exitStatus = sut.run(List.of("0", unit), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -481,7 +481,7 @@ public class SystemModuleTest {
 
 		@ValueSource(strings = {"PT0M", "PT0S"})
 		@ParameterizedTest
-		public void sleepWithValidIso8601(String iso8601Spec) {
+		void sleepWithValidIso8601(String iso8601Spec) {
 			ExitStatus exitStatus = sut.run(List.of(iso8601Spec), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -490,7 +490,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void sleepWithInvalidIso8601() {
+		void sleepWithInvalidIso8601() {
 			ExitStatus exitStatus = sut.run(List.of("PTM"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -502,22 +502,22 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ProcessListTest {
+	class ProcessListTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private ProcessList sut;
+		ProcessList sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -526,7 +526,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArgNumber() {
+		void oneArgNumber() {
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -537,22 +537,22 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ErrTest {
+	class ErrTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Err sut;
+		Err sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			assertThatThrownBy(() -> sut.run(List.of(), in, out, err))
 				.hasMessage("please do not report: this is a simulated error")
 				.isInstanceOf(NullPointerException.class)
@@ -566,25 +566,25 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SinkTest {
+	class SinkTest {
 
 		@Mock(stubOnly = true)
-		private Record record;
+		Record record;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Sink sut;
+		Sink sut;
 
 		@Test
-		public void consumeEmpty() {
+		void consumeEmpty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -595,7 +595,7 @@ public class SystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void consumeAll() {
+		void consumeAll() {
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -607,22 +607,22 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class BenchmarkTest {
+	class BenchmarkTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Benchmark sut;
+		Benchmark sut;
 
 		@Test
-		public void calculations() {
+		void calculations() {
 			List<String> args = List.of("1");
 			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
 			assertThat(maybeAccumulator).isPresent();
@@ -642,7 +642,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void avoidDivideByZero() {
+		void avoidDivideByZero() {
 			List<String> args = List.of("1");
 			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
 			assertThat(maybeAccumulator).isPresent();
@@ -660,7 +660,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			List<String> args = List.of("1");
 			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
 			assertThat(maybeAccumulator).isPresent();
@@ -674,7 +674,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			List<String> args = List.of();
 			Optional<Accumulator> maybeResource = sut.before(args, in, out, err);
 			assertThat(maybeResource).isEmpty();
@@ -684,7 +684,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void zeroArg() {
+		void zeroArg() {
 			List<String> args = List.of("0");
 			Optional<Accumulator> maybeResource = sut.before(args, in, out, err);
 			assertThat(maybeResource).isEmpty();
@@ -694,7 +694,7 @@ public class SystemModuleTest {
 		}
 
 		@Test // IMHO: this test should not exists (run is a design error)
-		public void runIsMarkedAsError() {
+		void runIsMarkedAsError() {
 			assertThatThrownBy(() -> sut.run(Collections.emptyList(), in, out, err))
 				.isInstanceOf(UnsupportedOperationException.class);
 		}
@@ -702,22 +702,22 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class WithTimeTest {
+	class WithTimeTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private WithTime sut;
+		WithTime sut;
 
 		@Test
-		public void usage() {
+		void usage() {
 			Optional<Long> maybeResource = sut.before(Collections.emptyList(), in, out, err);
 			assertThat(maybeResource).isPresent();
 			sut.after(maybeResource.get(), in, out, err);
@@ -727,7 +727,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void retryIsNotSupported() {
+		void retryIsNotSupported() {
 			Optional<Long> maybeResource = sut.before(Collections.emptyList(), in, out, err);
 			assertThat(maybeResource).isPresent();
 			boolean result = sut.retry(maybeResource.get(), in, out, err);
@@ -735,7 +735,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void runIsMarkedAsError() {
+		void runIsMarkedAsError() {
 			assertThatThrownBy(() -> sut.run(Collections.emptyList(), in, out, err))
 				.isInstanceOf(UnsupportedOperationException.class);
 		}
@@ -743,25 +743,25 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SetVariableTest {
+	class SetVariableTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Spy
-		private final State state = new State();
+		final State state = new State();
 
 		@InjectMocks
-		private SetVariable sut;
+		SetVariable sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -770,7 +770,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -779,7 +779,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void createNewVariable() {
+		void createNewVariable() {
 			ExitStatus exitStatus = sut.run(List.of("FOO", "bar"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -789,7 +789,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void updatesExistingVariable() {
+		void updatesExistingVariable() {
 			state.getVariables().put("FOO", "baz");
 			ExitStatus exitStatus = sut.run(List.of("FOO", "baz"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -800,7 +800,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void invalidVariableName() {
+		void invalidVariableName() {
 			ExitStatus exitStatus = sut.run(List.of("${", "baz"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -812,25 +812,25 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class UnsetVariableTest {
+	class UnsetVariableTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Spy
-		private final State state = new State();
+		final State state = new State();
 
 		@InjectMocks
-		private UnsetVariable sut;
+		UnsetVariable sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -839,7 +839,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void removesExistingBinding() {
+		void removesExistingBinding() {
 			state.getVariables().put("FOO", "BAR");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -850,7 +850,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void doesNothingWhenNotExistingBinding() {
+		void doesNothingWhenNotExistingBinding() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -862,28 +862,28 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class KillProcessTest {
+	class KillProcessTest {
 
 		@Mock(stubOnly = true)
-		private ProcessHandle processHandle;
+		ProcessHandle processHandle;
 
 		@Mock(stubOnly = true)
-		private ProcessLookup processLookup;
+		ProcessLookup processLookup;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private KillProcess sut;
+		KillProcess sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -892,7 +892,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void nonNumericPid() {
+		void nonNumericPid() {
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -901,7 +901,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void numericPidOfNotExistingProcess() {
+		void numericPidOfNotExistingProcess() {
 			given(processLookup.of(42L)).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -911,7 +911,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void numericPidOfExistingProcessWithDestroyFailure() {
+		void numericPidOfExistingProcessWithDestroyFailure() {
 			given(processLookup.of(42L)).willReturn(Optional.of(processHandle));
 			given(processHandle.destroy()).willReturn(false);
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
@@ -922,7 +922,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void numericPidOfExistingProcessWithDestroySuccess() {
+		void numericPidOfExistingProcessWithDestroySuccess() {
 			given(processLookup.of(42L)).willReturn(Optional.of(processHandle));
 			given(processHandle.destroy()).willReturn(true);
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
@@ -935,25 +935,25 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class CaptureTest {
+	class CaptureTest {
 
 		@Spy
-		private final State state = new State();
+		final State state = new State();
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Capture sut;
+		Capture sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -962,7 +962,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void invalidVariableName() {
+		void invalidVariableName() {
 			ExitStatus exitStatus = sut.run(List.of("$AAA"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -971,7 +971,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void emptyCapture() {
+		void emptyCapture() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -983,7 +983,7 @@ public class SystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void oneLine() {
+		void oneLine() {
 			given(in.recv()).willReturn(
 				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 				Optional.empty());
@@ -997,7 +997,7 @@ public class SystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoLines() {
+		void twoLines() {
 			given(in.recv()).willReturn(
 				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
@@ -1013,28 +1013,28 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class OpenTest {
+	class OpenTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Open sut;
+		Open sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1043,7 +1043,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void oneArgs() {
+		void oneArgs() {
 			ExitStatus exitStatus = sut.run(List.of("filename"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1052,7 +1052,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void emptyCapture() throws IOException {
+		void emptyCapture() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
@@ -1066,7 +1066,7 @@ public class SystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void oneLine() throws IOException {
+		void oneLine() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(
 				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
@@ -1082,7 +1082,7 @@ public class SystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoLines() throws IOException {
+		void twoLines() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(
 				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
@@ -1099,7 +1099,7 @@ public class SystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void appendExisting() throws IOException {
+		void appendExisting() throws IOException {
 			Path file = temporaryFolder.newFile("filename").toPath();
 			Files.write(file, List.of("existing line"), StandardCharsets.UTF_8);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
@@ -1118,28 +1118,28 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class InputTest {
+	class InputTest {
 
 		@Mock(stubOnly = true)
-		private LineReader lineReader;
+		LineReader lineReader;
 
 		@Spy
-		private final State state = new State();
+		final State state = new State();
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Input sut;
+		Input sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1148,7 +1148,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void invalidVariableName() {
+		void invalidVariableName() {
 			ExitStatus exitStatus = sut.run(List.of("$"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1157,7 +1157,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void inputNonEmptyString() {
+		void inputNonEmptyString() {
 			given(lineReader.readLine(Mockito.eq("input> "))).willReturn("1");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -1168,7 +1168,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void emptyInput() {
+		void emptyInput() {
 			given(lineReader.readLine(Mockito.eq("input> "))).willThrow(new EndOfFileException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -1181,28 +1181,28 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SecretTest {
+	class SecretTest {
 
 		@Mock(stubOnly = true)
-		private LineReader lineReader;
+		LineReader lineReader;
 
 		@Spy
-		private final State state = new State();
+		final State state = new State();
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Secret sut;
+		Secret sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1211,7 +1211,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void invalidVariableName() {
+		void invalidVariableName() {
 			ExitStatus exitStatus = sut.run(List.of("$"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1220,7 +1220,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void inputNonEmptyString() {
+		void inputNonEmptyString() {
 			given(lineReader.readLine(Mockito.eq('\0'))).willReturn("1");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -1231,7 +1231,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void emptyInput() {
+		void emptyInput() {
 			given(lineReader.readLine(Mockito.eq('\0'))).willThrow(new EndOfFileException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -1244,25 +1244,25 @@ public class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ConfirmTest {
+	class ConfirmTest {
 
 		@Mock(stubOnly = true)
-		private LineReader lineReader;
+		LineReader lineReader;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private SystemModule.Confirm sut;
+		SystemModule.Confirm sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1272,7 +1272,7 @@ public class SystemModuleTest {
 
 		@ValueSource(strings = {"yes", "YES", "y", "Y"})
 		@ParameterizedTest
-		public void yes(String answer) {
+		void yes(String answer) {
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -1283,7 +1283,7 @@ public class SystemModuleTest {
 
 		@ValueSource(strings = {"no", "NO", "n", "N"})
 		@ParameterizedTest
-		public void no(String answer) {
+		void no(String answer) {
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -1294,7 +1294,7 @@ public class SystemModuleTest {
 
 		@ValueSource(strings = {"xx", "aaa", "", "1", "0"})
 		@ParameterizedTest
-		public void invalid(String answer) {
+		void invalid(String answer) {
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -1304,7 +1304,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void userInterrupt() {
+		void userInterrupt() {
 			given(lineReader.readLine("question (Y/N)? ")).willThrow(new UserInterruptException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -1314,7 +1314,7 @@ public class SystemModuleTest {
 		}
 
 		@Test
-		public void endOfFile() {
+		void endOfFile() {
 			given(lineReader.readLine("question (Y/N)? ")).willThrow(new EndOfFileException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
 			assertThat(exitStatus).isError();

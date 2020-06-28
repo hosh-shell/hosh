@@ -37,27 +37,27 @@ import java.util.concurrent.ExecutionException;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class SupervisorTest {
+class SupervisorTest {
 
 	@RegisterExtension
-	public final WithThread withThread = new WithThread();
+	final WithThread withThread = new WithThread();
 
 	@InjectMocks
-	private Supervisor sut;
+	Supervisor sut;
 
 	@AfterEach
-	public void cleanup() {
+	void cleanup() {
 		sut.close();
 	}
 
 	@Test
-	public void noSubmit() throws ExecutionException {
+	void noSubmit() throws ExecutionException {
 		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
-	public void handleInterruptions() throws ExecutionException {
+	void handleInterruptions() throws ExecutionException {
 		sut.submit(() -> {
 			Thread.sleep(10_000);
 			return ExitStatus.success();
@@ -68,7 +68,7 @@ public class SupervisorTest {
 	}
 
 	@Test
-	public void allSubmitInSuccess() throws ExecutionException {
+	void allSubmitInSuccess() throws ExecutionException {
 		sut.submit(ExitStatus::success);
 		sut.submit(ExitStatus::success);
 		ExitStatus exitStatus = sut.waitForAll();
@@ -76,7 +76,7 @@ public class SupervisorTest {
 	}
 
 	@Test
-	public void oneSubmitInError() throws ExecutionException {
+	void oneSubmitInError() throws ExecutionException {
 		sut.submit(ExitStatus::success);
 		sut.submit(ExitStatus::error);
 		ExitStatus exitStatus = sut.waitForAll();

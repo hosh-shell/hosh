@@ -30,10 +30,10 @@ import java.io.StringWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AnsiTest {
+class AnsiTest {
 
 	@Test
-	public void none() {
+	void none() {
 		StringWriter out = new StringWriter();
 		PrintWriter pw = new PrintWriter(out);
 		Ansi.Style.NONE.enable(pw);
@@ -42,7 +42,7 @@ public class AnsiTest {
 	}
 
 	@Test
-	public void redForeground() {
+	void redForeground() {
 		StringWriter out = new StringWriter();
 		PrintWriter pw = new PrintWriter(out);
 		Ansi.Style.FG_RED.enable(pw);

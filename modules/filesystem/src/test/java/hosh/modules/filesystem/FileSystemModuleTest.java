@@ -33,8 +33,8 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
-import hosh.test.support.IgnoreWindowsUACExceptions;
 import hosh.spi.test.support.RecordMatcher;
+import hosh.test.support.IgnoreWindowsUACExceptions;
 import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -59,40 +59,40 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
-import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
-public class FileSystemModuleTest {
+class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
 	@ExtendWith(IgnoreWindowsUACExceptions.class)
-	public class ListFilesTest {
+	class ListFilesTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.ListFiles sut;
+		FileSystemModule.ListFiles sut;
 
 		@Test
-		public void errorTwoOrMoreArgs() {
+		void errorTwoOrMoreArgs() {
 			ExitStatus exitStatus = sut.run(List.of("dir1", "dir2"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -101,7 +101,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void zeroArgsWithEmptyDirectory() {
+		void zeroArgsWithEmptyDirectory() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -111,7 +111,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void zeroArgsWithOneDirectory() throws IOException {
+		void zeroArgsWithOneDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			temporaryFolder.newFolder("dir");
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -125,7 +125,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void zeroArgsWithOneFile() throws IOException {
+		void zeroArgsWithOneFile() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			temporaryFolder.newFile("file");
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -138,7 +138,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void zeroArgsWithOneSymlink() throws IOException {
+		void zeroArgsWithOneSymlink() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path file = temporaryFolder.newFile("file").toPath();
 			Files.createSymbolicLink(Paths.get(state.getCwd().toString(), "link"), file);
@@ -156,7 +156,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArgWithRelativeFile() throws IOException {
+		void oneArgWithRelativeFile() throws IOException {
 			Path file = temporaryFolder.newFile().toPath();
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of(file.getFileName().toString()), in, out, err);
@@ -167,7 +167,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArgWithEmptyDirectory() throws IOException {
+		void oneArgWithEmptyDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.newFolder().toPath());
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -177,7 +177,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArgWithNonEmptyDirectory() throws IOException {
+		void oneArgWithNonEmptyDirectory() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Files.createFile(new File(newFolder, "aaa").toPath());
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
@@ -189,7 +189,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArgReferringToCwd() throws IOException {
+		void oneArgReferringToCwd() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Files.createFile(new File(newFolder, "aaa").toPath());
 			given(state.getCwd()).willReturn(newFolder.toPath());
@@ -203,7 +203,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArgAbsoluteFile() throws IOException {
+		void oneArgAbsoluteFile() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Path path = Files.createFile(new File(newFolder, "aaa").toPath()).toAbsolutePath();
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
@@ -215,7 +215,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArgAbsoluteDir() throws IOException {
+		void oneArgAbsoluteDir() throws IOException {
 			File newFolder = temporaryFolder.newFolder();
 			Files.createFile(new File(newFolder, "aaa").toPath());
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
@@ -229,7 +229,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void listDot() throws IOException {
+		void listDot() throws IOException {
 			temporaryFolder.newFile("aaa");
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
@@ -243,7 +243,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void listDotDot() throws IOException {
+		void listDotDot() throws IOException {
 			File cwd = temporaryFolder.newFolder("aaa");
 			given(state.getCwd()).willReturn(cwd.toPath().toAbsolutePath());
 			ExitStatus exitStatus = sut.run(List.of(".."), in, out, err);
@@ -260,9 +260,9 @@ public class FileSystemModuleTest {
 		@DisabledOnOs(OS.WINDOWS) // File.setReadable() fails on windows
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test
-		public void accessDenied() {
+		void accessDenied() {
 			File cwd = temporaryFolder.toFile();
-			assertThat(cwd.exists()).isTrue();
+			assertThat(cwd).exists();
 			assertThat(cwd.setReadable(false, true)).isTrue();
 			assertThat(cwd.setExecutable(false, true)).isTrue();
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
@@ -276,28 +276,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ChangeDirectoryTest {
+	class ChangeDirectoryTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.ChangeDirectory sut;
+		FileSystemModule.ChangeDirectory sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -306,7 +306,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void twoArgs() {
+		void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("asd", "asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -315,7 +315,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneDirectoryRelativeArgument() throws IOException {
+		void oneDirectoryRelativeArgument() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFolder = temporaryFolder.newFolder("dir");
 			ExitStatus exitStatus = sut.run(List.of("dir"), in, out, err);
@@ -327,7 +327,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneDirectoryAbsoluteArgument() throws IOException {
+		void oneDirectoryAbsoluteArgument() throws IOException {
 			File newFolder = temporaryFolder.newFolder("dir");
 			ExitStatus exitStatus = sut.run(List.of(newFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -338,7 +338,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneFileArgument() throws IOException {
+		void oneFileArgument() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
@@ -352,28 +352,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class CurrentWorkingDirectoryTest {
+	class CurrentWorkingDirectoryTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.CurrentWorkingDirectory sut;
+		FileSystemModule.CurrentWorkingDirectory sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -383,7 +383,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -394,28 +394,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class LinesTest {
+	class LinesTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Lines sut;
+		FileSystemModule.Lines sut;
 
 		@Test
-		public void emptyFile() throws IOException {
+		void emptyFile() throws IOException {
 			File newFile = temporaryFolder.newFile("data.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -425,7 +425,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void nonEmptyFile() throws IOException {
+		void nonEmptyFile() throws IOException {
 			File newFile = temporaryFolder.newFile("data.txt");
 			try (FileWriter writer = new FileWriter(newFile, StandardCharsets.UTF_8)) {
 				writer.write("a 1\n");
@@ -441,7 +441,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void nonEmptyFileInCwd() throws IOException {
+		void nonEmptyFileInCwd() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("data.txt");
 			try (FileWriter writer = new FileWriter(newFile, StandardCharsets.UTF_8)) {
@@ -456,7 +456,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void directory() {
+		void directory() {
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -465,7 +465,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -476,28 +476,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class CopyTest {
+	class CopyTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Copy sut;
+		FileSystemModule.Copy sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -506,7 +506,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -515,7 +515,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void copyRelativeToRelative() throws IOException {
+		void copyRelativeToRelative() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File source = temporaryFolder.newFile("source.txt");
 			File target = temporaryFolder.newFile("target.txt");
@@ -530,7 +530,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void copyAbsoluteToAbsolute() throws IOException {
+		void copyAbsoluteToAbsolute() throws IOException {
 			File source = temporaryFolder.newFile("source.txt").getAbsoluteFile();
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			assertThat(target.delete()).isTrue();
@@ -546,28 +546,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class MoveTest {
+	class MoveTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Move sut;
+		FileSystemModule.Move sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -576,7 +576,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -585,7 +585,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void moveRelativeToRelative() throws IOException {
+		void moveRelativeToRelative() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File source = temporaryFolder.newFile("source.txt");
 			File target = temporaryFolder.newFile("target.txt");
@@ -600,7 +600,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void moveAbsoluteToAbsolute() throws IOException {
+		void moveAbsoluteToAbsolute() throws IOException {
 			File source = temporaryFolder.newFile("source.txt").getAbsoluteFile();
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			assertThat(target.delete()).isTrue();
@@ -616,28 +616,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class RemoveTest {
+	class RemoveTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Remove sut;
+		FileSystemModule.Remove sut;
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -646,7 +646,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void removeRelative() throws IOException {
+		void removeRelative() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			ExitStatus exitStatus = sut.run(List.of(target.getName()), in, out, err);
@@ -658,7 +658,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void removeAbsolute() throws IOException {
+		void removeAbsolute() throws IOException {
 			File target = temporaryFolder.newFile("target.txt").getAbsoluteFile();
 			ExitStatus exitStatus = sut.run(List.of(target.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -671,22 +671,22 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class PartitionsTest {
+	class PartitionsTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Partitions sut;
+		FileSystemModule.Partitions sut;
 
 		@Test
-		public void listAllPartitions() {
+		void listAllPartitions() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -695,7 +695,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void tooManyArgs() {
+		void tooManyArgs() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -707,28 +707,28 @@ public class FileSystemModuleTest {
 	@Nested
 	@ExtendWith(MockitoExtension.class)
 	@ExtendWith(IgnoreWindowsUACExceptions.class)
-	public class WalkTest {
+	class WalkTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Walk sut;
+		FileSystemModule.Walk sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -737,7 +737,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void emptyRelativeDirectory() {
+		void emptyRelativeDirectory() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -747,7 +747,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void nonEmptyRelativeDirectory() throws IOException {
+		void nonEmptyRelativeDirectory() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
@@ -758,7 +758,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void nonExistentRelativeDirectory() {
+		void nonExistentRelativeDirectory() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus exitStatus = sut.run(List.of("path"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -768,7 +768,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void nonEmptyAbsoluteDirectory() throws IOException {
+		void nonEmptyAbsoluteDirectory() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -778,7 +778,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void absoluteFile() throws IOException {
+		void absoluteFile() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
 			assertThat(exitStatus).isError();
@@ -788,7 +788,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void resolveSymlinks() throws IOException {
+		void resolveSymlinks() throws IOException {
 			File newFolder = temporaryFolder.newFolder("folder");
 			File newFile = temporaryFolder.newFile(newFolder, "file.txt");
 			File symlink = new File(temporaryFolder.toFile(), "symlink");
@@ -804,28 +804,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ProbeTest {
+	class ProbeTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Probe sut;
+		FileSystemModule.Probe sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -834,7 +834,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void probeKnown() throws IOException {
+		void probeKnown() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
@@ -845,7 +845,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void probeUnknown() throws IOException {
+		void probeUnknown() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.ppp");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
@@ -858,28 +858,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class GlobTest {
+	class GlobTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Glob sut;
+		FileSystemModule.Glob sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -889,7 +889,7 @@ public class FileSystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchRelativePath() {
+		void matchRelativePath() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
@@ -902,7 +902,7 @@ public class FileSystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchAbsolutePath() {
+		void matchAbsolutePath() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("/tmp/file.java")));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
@@ -915,7 +915,7 @@ public class FileSystemModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void noMatch() {
+		void noMatch() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
@@ -931,28 +931,28 @@ public class FileSystemModuleTest {
 	@Nested
 	@ExtendWith(MockitoExtension.class)
 	@ExtendWith(IgnoreWindowsUACExceptions.class)
-	public class SymlinkTest {
+	class SymlinkTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Symlink sut;
+		FileSystemModule.Symlink sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -961,7 +961,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void symlinkFile() throws IOException {
+		void symlinkFile() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName(), "link"), in, out, err);
@@ -976,28 +976,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class HardlinkTest {
+	class HardlinkTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Hardlink sut;
+		FileSystemModule.Hardlink sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1006,7 +1006,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void symlinkFile() throws IOException {
+		void symlinkFile() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName(), "link"), in, out, err);
@@ -1022,28 +1022,28 @@ public class FileSystemModuleTest {
 	@Nested
 	@ExtendWith(MockitoExtension.class)
 	@ExtendWith(IgnoreWindowsUACExceptions.class)
-	public class ResolveTest {
+	class ResolveTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.Resolve sut;
+		FileSystemModule.Resolve sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1052,7 +1052,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void regularRelative() throws IOException {
+		void regularRelative() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of("file.txt"), in, out, err);
@@ -1063,7 +1063,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void regularAbsolute() throws IOException {
+		void regularAbsolute() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File newFile = temporaryFolder.newFile("file.txt");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getAbsolutePath()), in, out, err);
@@ -1074,7 +1074,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void symlink() throws IOException {
+		void symlink() throws IOException {
 			File newFile = temporaryFolder.newFile("file.txt");
 			Files.createSymbolicLink(Path.of(temporaryFolder.toFile().getAbsolutePath(), "link"), newFile.toPath());
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
@@ -1088,28 +1088,28 @@ public class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class WithLockTest {
+	class WithLockTest {
 
 		@RegisterExtension
-		public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
-		private State state;
+		State state;
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private FileSystemModule.WithLock sut;
+		FileSystemModule.WithLock sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			Optional<LockResource> maybeResource = sut.before(List.of(), in, out, err);
 			assertThat(maybeResource).isEmpty();
 			then(in).shouldHaveNoInteractions();
@@ -1118,7 +1118,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void wrongFile() {
+		void wrongFile() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			assertThatThrownBy(() -> sut.before(List.of("../missing_directory/file.txt"), in, out, err))
 				.isInstanceOf(UncheckedIOException.class);
@@ -1128,7 +1128,7 @@ public class FileSystemModuleTest {
 		}
 
 		@Test
-		public void lock() throws IOException {
+		void lock() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			File lockFile = temporaryFolder.newFile("file.txt");
 			Optional<LockResource> maybeResource = sut.before(List.of("file.txt"), in, out, err);

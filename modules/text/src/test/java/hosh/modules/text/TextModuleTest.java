@@ -70,29 +70,29 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-public class TextModuleTest {
+class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class RandTest {
+	class RandTest {
 
 		@RegisterExtension
-		public final WithThread withThread = new WithThread();
+		final WithThread withThread = new WithThread();
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private TextModule.Rand sut;
+		TextModule.Rand sut;
 
 		@Test // not a very good test, just checking if rand can be interrupted
-		public void interrupt() {
+		void interrupt() {
 			withThread.interrupt();
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -102,7 +102,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -114,22 +114,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class TrimTest {
+	class TrimTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Trim sut;
+		Trim sut;
 
 		@Test
-		public void empty() {
+		void empty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -139,7 +139,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -149,7 +149,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void trimMissingKey() {
+		void trimMissingKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("  abc  "));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.ERROR.name()), in, out, err);
@@ -161,7 +161,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void trimKey() {
+		void trimKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("  abc  "));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
@@ -173,7 +173,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void trimKeyOfDifferentType() {
+		void trimKeyOfDifferentType() {
 			Record record = Records.singleton(Keys.COUNT, Values.ofInstant(Instant.EPOCH));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name()), in, out, err);
@@ -186,22 +186,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class JoinTest {
+	class JoinTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Join sut;
+		Join sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -210,7 +210,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void empty() {
+		void empty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -221,7 +221,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void oneValue() {
+		void oneValue() {
 			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
@@ -233,7 +233,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoValues() {
+		void twoValues() {
 			Record record = Records.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.NAME, Values.ofNumeric(2)).build();
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
@@ -246,22 +246,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SumTest {
+	class SumTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Sum sut;
+		Sum sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -270,7 +270,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void empty() {
+		void empty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -281,7 +281,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void nonMatchingKey() {
+		void nonMatchingKey() {
 			Record record = Records.singleton(Keys.INDEX, Values.ofSize(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
@@ -293,7 +293,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyWithSizeValue() {
+		void matchingKeyWithSizeValue() {
 			Record record = Records.singleton(Keys.SIZE, Values.ofSize(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
@@ -305,7 +305,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyWithNumericValue() {
+		void matchingKeyWithNumericValue() {
 			Record record = Records.singleton(Keys.COUNT, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("count"), in, out, err);
@@ -318,22 +318,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class FreqTest {
+	class FreqTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private TextModule.Freq sut;
+		TextModule.Freq sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -342,7 +342,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void empty() {
+		void empty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -353,7 +353,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void nonMatchingKey() {
+		void nonMatchingKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
@@ -365,7 +365,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyOneRecord() {
+		void matchingKeyOneRecord() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
@@ -377,7 +377,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyTwoRecords() {
+		void matchingKeyTwoRecords() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
@@ -390,7 +390,7 @@ public class TextModuleTest {
 		// an important corner case: counting "none" as any other value
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyWithNone() {
+		void matchingKeyWithNone() {
 			Record record = Records.singleton(Keys.TEXT, Values.none());
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
@@ -404,22 +404,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class MinTest {
+	class MinTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private TextModule.Min sut;
+		TextModule.Min sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -428,7 +428,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void empty() {
+		void empty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -439,7 +439,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void nonMatchingKey() {
+		void nonMatchingKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
@@ -451,7 +451,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyOneRecord() {
+		void matchingKeyOneRecord() {
 			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
@@ -463,7 +463,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyTwoRecords() {
+		void matchingKeyTwoRecords() {
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.ofNumeric(-10));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -476,7 +476,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyTwoRecordsWithNone() {
+		void matchingKeyTwoRecordsWithNone() {
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.none());
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -491,22 +491,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class MaxTest {
+	class MaxTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private TextModule.Max sut;
+		TextModule.Max sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -515,7 +515,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void empty() {
+		void empty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -526,7 +526,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void nonMatchingKey() {
+		void nonMatchingKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
@@ -538,7 +538,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyOneRecord() {
+		void matchingKeyOneRecord() {
 			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
@@ -550,7 +550,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyTwoRecords() {
+		void matchingKeyTwoRecords() {
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.ofNumeric(-10));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -563,7 +563,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void matchingKeyTwoRecordsWithNone() {
+		void matchingKeyTwoRecordsWithNone() {
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.none());
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -579,22 +579,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SelectTest {
+	class SelectTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Select sut;
+		Select sut;
 
 		@Test
-		public void empty() {
+		void empty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name()), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -605,7 +605,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.NAME, Values.ofNumeric(1))), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -616,7 +616,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void oneArgKeepKey() {
+		void oneArgKeepKey() {
 			Record record = Records.singleton(Keys.NAME, Values.ofText("foo"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.NAME.name()), in, out, err);
@@ -628,7 +628,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoArgsIgnoreMissingKeys() {
+		void twoArgsIgnoreMissingKeys() {
 			Record record = Records.singleton(Keys.NAME, Values.ofText("foo"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.NAME.name(), Keys.COUNT.name()), in, out, err);
@@ -641,22 +641,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SplitTest {
+	class SplitTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Split sut;
+		Split sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -665,7 +665,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -674,7 +674,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void twoArgsNoInput() {
+		void twoArgsNoInput() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), " "), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -685,7 +685,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoArgsMatching() {
+		void twoArgsMatching() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("a b c"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), " "), in, out, err);
@@ -702,22 +702,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class RegexTest {
+	class RegexTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Regex sut;
+		Regex sut;
 
 		@Test
-		public void zeroArg() {
+		void zeroArg() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -726,7 +726,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -735,7 +735,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void twoArgsNoInput() {
+		void twoArgsNoInput() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -746,7 +746,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoArgsNonMatching() {
+		void twoArgsNonMatching() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText(""));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
@@ -758,7 +758,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoArgsMatching() {
+		void twoArgsMatching() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("1"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\d+)"), in, out, err);
@@ -770,7 +770,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoArgsMissingKey() {
+		void twoArgsMissingKey() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("1"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name(), "(?<id>\\d+)"), in, out, err);
@@ -783,23 +783,23 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SchemaTest {
+	class SchemaTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Schema sut;
+		Schema sut;
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void zeroArg() {
+		void zeroArg() {
 			Record record = Records.singleton(Keys.COUNT, null).append(Keys.INDEX, null);
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -810,7 +810,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -822,23 +822,23 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class CountTest {
+	class CountTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Count sut;
+		Count sut;
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void twoRecords() {
+		void twoRecords() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -850,7 +850,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void oneRecord() {
+		void oneRecord() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -861,7 +861,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void zeroRecords() {
+		void zeroRecords() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -871,7 +871,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -883,23 +883,23 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class EnumerateTest {
+	class EnumerateTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Enumerate sut;
+		Enumerate sut;
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void zeroArg() {
+		void zeroArg() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -911,7 +911,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -923,26 +923,26 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class TimestampTest {
+	class TimestampTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Mock
-		private Clock clock;
+		Clock clock;
 
 		@InjectMocks
-		private Timestamp sut;
+		Timestamp sut;
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void zeroArg() {
+		void zeroArg() {
 			given(clock.instant()).willReturn(Instant.EPOCH);
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
@@ -958,7 +958,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -970,23 +970,23 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class DropTest {
+	class DropTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Drop sut;
+		Drop sut;
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void dropZero() {
+		void dropZero() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
@@ -998,7 +998,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void dropOne() {
+		void dropOne() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
@@ -1009,7 +1009,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1019,7 +1019,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void negativeArg() {
+		void negativeArg() {
 			ExitStatus exitStatus = sut.run(List.of("-1"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1030,22 +1030,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class TakeTest {
+	class TakeTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Take sut;
+		Take sut;
 
 		@Test
-		public void takeZero() {
+		void takeZero() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -1056,7 +1056,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void takeExactly() {
+		void takeExactly() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
@@ -1068,7 +1068,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void takeLess() {
+		void takeLess() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
@@ -1080,7 +1080,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void takeMore() {
+		void takeMore() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			Record record2 = Records.singleton(Keys.TEXT, Values.ofText("another value"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
@@ -1094,7 +1094,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void negativeArg() {
+		void negativeArg() {
 			ExitStatus exitStatus = sut.run(List.of("-1"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1103,7 +1103,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoInteractions();
@@ -1115,22 +1115,22 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class LastTest {
+	class LastTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private TextModule.Last sut;
+		TextModule.Last sut;
 
 		@Test
-		public void lastNoArgs() {
+		void lastNoArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1139,7 +1139,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void lastOneInvalidArg() {
+		void lastOneInvalidArg() {
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1149,7 +1149,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void lastOneWithOneRecord() {
+		void lastOneWithOneRecord() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
@@ -1161,7 +1161,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void lastOneWithMultipleRecords() {
+		void lastOneWithMultipleRecords() {
 			Record data1 = Records.singleton(Keys.TEXT, Values.ofText("data 1"));
 			Record data2 = Records.singleton(Keys.TEXT, Values.ofText("data 2"));
 			given(in.recv()).willReturn(Optional.of(data1), Optional.of(data2), Optional.empty());
@@ -1174,7 +1174,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void lastTwoWithOneRecord() {
+		void lastTwoWithOneRecord() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("2"), in, out, err);
@@ -1188,23 +1188,23 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class FilterTest {
+	class FilterTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Filter sut;
+		Filter sut;
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void printMatchingLines() {
+		void printMatchingLines() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), ".*string.*"), in, out, err);
@@ -1216,7 +1216,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void ignoreNonMatchingLines() {
+		void ignoreNonMatchingLines() {
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("key", ".*number.*"), in, out, err);
@@ -1227,7 +1227,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1237,7 +1237,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("key"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1249,25 +1249,25 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class SortTest {
+	class SortTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Captor
-		private ArgumentCaptor<Record> records;
+		ArgumentCaptor<Record> records;
 
 		@InjectMocks
-		private Sort sut;
+		Sort sut;
 
 		@Test
-		public void empty() {
+		void empty() {
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -1278,7 +1278,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void sortByExistingKey() {
+		void sortByExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1292,7 +1292,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void sortByExistingKeyNullLast() {
+		void sortByExistingKeyNullLast() {
 			Record record1 = Records.singleton(Keys.SIZE, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record3 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
@@ -1307,7 +1307,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void sortByNonExistingKey() {
+		void sortByNonExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
@@ -1320,7 +1320,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void sortAscByExistingKey() {
+		void sortAscByExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1334,7 +1334,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void sortDescByExistingKey() {
+		void sortDescByExistingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1347,7 +1347,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void invalidDirection() {
+		void invalidDirection() {
 			ExitStatus exitStatus = sut.run(List.of("ZZZ", "name"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -1357,7 +1357,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -1367,7 +1367,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void tooManyArgs() {
+		void tooManyArgs() {
 			ExitStatus exitStatus = sut.run(List.of("asc", "key", "aaa"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -1379,26 +1379,26 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class DistinctTest {
+	class DistinctTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Distinct sut;
+		Distinct sut;
 
 		@Captor
-		private ArgumentCaptor<Record> records;
+		ArgumentCaptor<Record> records;
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void missingKey() {
+		void missingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1412,7 +1412,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void distinctValues() {
+		void distinctValues() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1426,7 +1426,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void duplicatedValues() {
+		void duplicatedValues() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1439,7 +1439,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
@@ -1451,26 +1451,26 @@ public class TextModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class DuplicatedTest {
+	class DuplicatedTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private Duplicated sut;
+		Duplicated sut;
 
 		@Captor
-		private ArgumentCaptor<Record> records;
+		ArgumentCaptor<Record> records;
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void missingKey() {
+		void missingKey() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1484,7 +1484,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void distinctValues() {
+		void distinctValues() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1498,7 +1498,7 @@ public class TextModuleTest {
 
 		@SuppressWarnings("unchecked")
 		@Test
-		public void duplicatedValues() {
+		void duplicatedValues() {
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
@@ -1511,7 +1511,7 @@ public class TextModuleTest {
 		}
 
 		@Test
-		public void zeroArgs() {
+		void zeroArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();

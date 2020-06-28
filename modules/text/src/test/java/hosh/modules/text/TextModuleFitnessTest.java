@@ -27,6 +27,6 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import hosh.test.fitness.UnitTestsFitnessTest;
 
 @AnalyzeClasses(packagesOf = TextModule.class)
-public class TextModuleFitnessTest extends UnitTestsFitnessTest {
+class TextModuleFitnessTest extends UnitTestsFitnessTest {
 
 }

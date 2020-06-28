@@ -37,42 +37,42 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class ParserTest {
+class ParserTest {
 
-	private Parser sut;
+	Parser sut;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		sut = new Parser();
 	}
 
 	@Test
-	public void lexerError() {
+	void lexerError() {
 		assertThatThrownBy(() -> sut.parse("!")).isInstanceOf(ParseError.class)
 			.hasMessage("line 1:0: token recognition error at: '!'");
 	}
 
 	@Test
-	public void refuseSpaceInsideVariableExpansion() {
+	void refuseSpaceInsideVariableExpansion() {
 		assertThatThrownBy(() -> sut.parse("${ EXECUTABLE }")).isInstanceOf(ParseError.class)
 			.hasMessage("line 1:0: token recognition error at: '${ '");
 	}
 
 	@ParameterizedTest
 	@MethodSource("all")
-	public void valid(String line) {
+	void valid(String line) {
 		ProgramContext parse = sut.parse(line);
 		Assertions.assertThat(parse)
 			.as("valid")
 			.isNotNull();
 	}
 
-	private static Stream<String> all() {
+	static Stream<String> all() {
 		return Stream.of(commands(), newLines(), comments(), pipelines(), incompletePipelines())
 			       .flatMap(List::stream);
 	}
 
-	private static List<String> commands() {
+	static List<String> commands() {
 		return List.of(
 			"",
 			"/usr/bin/git; ls",
@@ -123,7 +123,7 @@ public class ParserTest {
 		);
 	}
 
-	private static List<String> newLines() {
+	static List<String> newLines() {
 		return List.of(
 			"\n",
 			"\n\n",
@@ -132,7 +132,7 @@ public class ParserTest {
 			"\n\r\n");
 	}
 
-	private static List<String> comments() {
+	static List<String> comments() {
 		return List.of(
 			"#\n",
 			"#\r\n",
@@ -144,7 +144,7 @@ public class ParserTest {
 			"benchmark { ls | sink } # comment");
 	}
 
-	private static List<String> pipelines() {
+	static List<String> pipelines() {
 		return List.of(
 			"env | sink",
 			"git config --list | sink",
@@ -164,7 +164,7 @@ public class ParserTest {
 	}
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "accepted by parser but rejected by the compiler")
-	private static List<String> incompletePipelines() {
+	static List<String> incompletePipelines() {
 		return List.of(
 			"ls | ",
 			"ls -a | ",

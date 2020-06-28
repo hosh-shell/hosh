@@ -57,10 +57,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Acceptance tests by spawning java -jar hosh.jar.
  */
-public class HoshIT {
+class HoshIT {
 
 	@RegisterExtension
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@AfterEach
 	void beforeEach(TestInfo testInfo) {
@@ -68,7 +68,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void initializeWithoutSystemEnv() throws Exception {
+	void initializeWithoutSystemEnv() throws Exception {
 		ProcessBuilder hoshBuilder = givenHoshProcessBuilder();
 		hoshBuilder.environment().clear();
 		Process hosh = hoshBuilder.start();
@@ -78,7 +78,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void interactiveEndOfFile() throws Exception {
+	void interactiveEndOfFile() throws Exception {
 		Process hosh = givenHoshProcess();
 		closeInput(hosh);
 		int exitCode = hosh.waitFor();
@@ -86,7 +86,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void interactiveScriptThenExit() throws Exception {
+	void interactiveScriptThenExit() throws Exception {
 		Process hosh = givenHoshProcess();
 		sendInput(hosh, "ls", "exit");
 		int exitCode = hosh.waitFor();
@@ -94,7 +94,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void interactiveExitSuccess() throws Exception {
+	void interactiveExitSuccess() throws Exception {
 		Process hosh = givenHoshProcess();
 		sendInput(hosh, "exit");
 		int exitCode = hosh.waitFor();
@@ -102,7 +102,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void interactiveExitFailure() throws Exception {
+	void interactiveExitFailure() throws Exception {
 		Process hosh = givenHoshProcess();
 		sendInput(hosh, "exit 42");
 		int exitCode = hosh.waitFor();
@@ -110,7 +110,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithCdAndCwd() throws Exception {
+	void scriptWithCdAndCwd() throws Exception {
 		Path scriptPath = givenScript(
 			"cd " + temporaryFolder.toPath().toAbsolutePath(),
 			"cwd"//
@@ -123,7 +123,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithOsVar() throws Exception {
+	void scriptWithOsVar() throws Exception {
 		Path scriptPath = givenScript(
 			"echo ${OS_ENV_VARIABLE}"//
 		);
@@ -135,7 +135,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithMissingOsVar() throws Exception {
+	void scriptWithMissingOsVar() throws Exception {
 		Path scriptPath = givenScript(
 			"echo ${OS_ENV_VARIABLE}"//
 		);
@@ -147,7 +147,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithMissingOsVarWithFallback() throws Exception {
+	void scriptWithMissingOsVarWithFallback() throws Exception {
 		Path scriptPath = givenScript(
 			"echo ${OS_ENV_VARIABLE!fallback}"//
 		);
@@ -159,7 +159,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithImplicitExit() throws Exception {
+	void scriptWithImplicitExit() throws Exception {
 		Path scriptPath = givenScript(
 			"echo hello"//
 		);
@@ -171,7 +171,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptWithExplicitExit() throws Exception {
+	void scriptWithExplicitExit() throws Exception {
 		Path scriptPath = givenScript(
 			"exit 1"//
 		);
@@ -181,7 +181,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void scriptParsedThenExecuted() throws Exception {
+	void scriptParsedThenExecuted() throws Exception {
 		Path scriptPath = givenScript(
 			"exit 0",
 			"AAAAB"//
@@ -194,7 +194,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void nonPipelineExternalCommand() throws Exception {
+	void nonPipelineExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
 			"git --version"//
 		);
@@ -206,7 +206,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void pipelineWithInternalCommand() throws Exception {
+	void pipelineWithInternalCommand() throws Exception {
 		Path scriptPath = givenScript(
 			"rand | take 1 | count"//
 		);
@@ -218,7 +218,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void pipelineReadFromExternalCommand() throws Exception {
+	void pipelineReadFromExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
 			"git --version | take 1 | count"//
 		);
@@ -230,7 +230,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void pipelineWriteToExternalCommand() throws Exception {
+	void pipelineWriteToExternalCommand() throws Exception {
 		Path scriptPath = givenScript(
 			"echo some_random_hash | git cat-file --batch" //
 		);
@@ -244,7 +244,7 @@ public class HoshIT {
 	@DisabledOnOs(OS.WINDOWS)
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/212")
 	@Test
-	public void pipelineWithMiddleExternalCommands() throws Exception {
+	void pipelineWithMiddleExternalCommands() throws Exception {
 		Path scriptPath = givenScript(
 			"git tag | wc -l | wc -l" //
 		);
@@ -256,7 +256,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void missingScript() throws Exception {
+	void missingScript() throws Exception {
 		Path scriptPath = Paths.get("missing.hosh");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		String output = consumeOutput(hosh);
@@ -267,7 +267,7 @@ public class HoshIT {
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
-	public void pipelinesDoNotExpandVariables() throws Exception {
+	void pipelinesDoNotExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
 			"echo ${OS_ENV_VARIABLE} | take 1"//
 		);
@@ -280,7 +280,7 @@ public class HoshIT {
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
-	public void wrappersDoNotExpandVariables() throws Exception {
+	void wrappersDoNotExpandVariables() throws Exception {
 		Path scriptPath = givenScript(
 			"withTime { echo ${OS_ENV_VARIABLE} } "//
 		);
@@ -292,7 +292,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void errorInSimpleCommand() throws Exception {
+	void errorInSimpleCommand() throws Exception {
 		Path scriptPath = givenScript(
 			"err"//
 		);
@@ -304,7 +304,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void errorInProducer() throws Exception {
+	void errorInProducer() throws Exception {
 		Path scriptPath = givenScript(
 			"err | ls"//
 		);
@@ -316,7 +316,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void errorInConsumer() throws Exception {
+	void errorInConsumer() throws Exception {
 		Path scriptPath = givenScript(
 			"ls | err"//
 		);
@@ -328,7 +328,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void consumerAndProducerBothInError() throws Exception {
+	void consumerAndProducerBothInError() throws Exception {
 		Path scriptPath = givenScript(
 			"err | err"//
 		);
@@ -340,7 +340,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void consumeInfiniteProducer() throws Exception {
+	void consumeInfiniteProducer() throws Exception {
 		Path scriptPath = givenScript(
 			"rand | take 100 | count"//
 		);
@@ -352,7 +352,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void benchmark() throws Exception {
+	void benchmark() throws Exception {
 		Path scriptPath = givenScript(
 			"benchmark 2 { rand | take 100 | count } "//
 		);
@@ -364,7 +364,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void unknownCommandInScript() throws Exception {
+	void unknownCommandInScript() throws Exception {
 		Path scriptPath = givenScript(
 			"FOOBAR"//
 		);
@@ -376,7 +376,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void unknownCommandInteractive() throws Exception {
+	void unknownCommandInteractive() throws Exception {
 		Process hosh = givenHoshProcess();
 		sendInput(hosh, "FOOBAR\nexit\n");
 		String output = consumeOutput(hosh);
@@ -387,7 +387,7 @@ public class HoshIT {
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/71")
 	@Test
-	public void commandWrapperCapturesOutput() throws Exception {
+	void commandWrapperCapturesOutput() throws Exception {
 		Path scriptPath = givenScript(
 			"benchmark 1 { cwd } | schema"//
 		);
@@ -399,7 +399,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void redirectOutputToVariable() throws Exception {
+	void redirectOutputToVariable() throws Exception {
 		Path scriptPath = givenScript(
 			"echo 'world' | capture WHO", // this is WHO=$(echo 'world')
 			"echo hello ${WHO}"//
@@ -412,7 +412,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void comments() throws Exception {
+	void comments() throws Exception {
 		Path scriptPath = givenScript(
 			"# echo 'hello'",
 			"# ls",
@@ -426,7 +426,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void sequence() throws Exception {
+	void sequence() throws Exception {
 		Path scriptPath = givenScript(
 			"echo a ; echo b"//
 		);
@@ -440,7 +440,7 @@ public class HoshIT {
 	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
-	public void interruptBuiltInCommand() throws Exception {
+	void interruptBuiltInCommand() throws Exception {
 		Path scriptPath = givenScript("rand");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		sendSigint(hosh);
@@ -451,7 +451,7 @@ public class HoshIT {
 	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
-	public void interruptExternalCommand() throws Exception {
+	void interruptExternalCommand() throws Exception {
 		Path scriptPath = givenScript("git cat-file --batch");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		sendSigint(hosh);
@@ -462,7 +462,7 @@ public class HoshIT {
 	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
-	public void interruptPipeline() throws Exception {
+	void interruptPipeline() throws Exception {
 		Path scriptPath = givenScript("rand | count");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		sendSigint(hosh);
@@ -473,7 +473,7 @@ public class HoshIT {
 	@DisabledOnOs(OS.WINDOWS)
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
-	public void interruptCommandWrapperWithPipeline() throws Exception {
+	void interruptCommandWrapperWithPipeline() throws Exception {
 		Path scriptPath = givenScript("benchmark 10000 { rand | take 10000 | count }");
 		Process hosh = givenHoshProcess(scriptPath.toString());
 		sendSigint(hosh);
@@ -482,7 +482,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void lambdaAfterGlobExpansion() throws Exception {
+	void lambdaAfterGlobExpansion() throws Exception {
 		Path path = givenFolder("A.class", "B.class", "C.java");
 		Path scriptPath = givenScript("walk " + path.toAbsolutePath() + " | glob '*.class' | { path -> rm ${path} }");
 		Process hosh = givenHoshProcess(scriptPath.toString());
@@ -496,7 +496,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void versionLongOption() throws Exception {
+	void versionLongOption() throws Exception {
 		Process hosh = givenHoshProcess("--version");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
@@ -505,7 +505,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void versionShortOption() throws Exception {
+	void versionShortOption() throws Exception {
 		Process hosh = givenHoshProcess("-v");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
@@ -514,7 +514,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void helpLongOption() throws Exception {
+	void helpLongOption() throws Exception {
 		Process hosh = givenHoshProcess("--help");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
@@ -523,7 +523,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void helpShortOption() throws Exception {
+	void helpShortOption() throws Exception {
 		Process hosh = givenHoshProcess("-h");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
@@ -532,7 +532,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void invalidOption() throws Exception {
+	void invalidOption() throws Exception {
 		Process hosh = givenHoshProcess("--blahblah");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
@@ -541,7 +541,7 @@ public class HoshIT {
 	}
 
 	@Test
-	public void tooManyScripts() throws Exception {
+	void tooManyScripts() throws Exception {
 		Process hosh = givenHoshProcess("aaa.hosh", "bbb.hosh");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
@@ -581,8 +581,8 @@ public class HoshIT {
 		cmd.addAll(List.of("-jar", "target/hosh.jar"));
 		cmd.addAll(List.of(args));
 		return new ProcessBuilder()
-			       .command(cmd)
-			       .redirectErrorStream(true);
+			.command(cmd)
+			.redirectErrorStream(true);
 	}
 
 	private String absoluteJavaBinary() {
@@ -595,14 +595,14 @@ public class HoshIT {
 
 	private List<String> propagateJacocoAgentInvocation() {
 		String[] arguments = ProcessHandle
-			                     .current()
-			                     .info()
-			                     .arguments()
-			                     .orElse(new String[0]);
+			.current()
+			.info()
+			.arguments()
+			.orElse(new String[0]);
 		return Stream.of(arguments)
-			       .filter(s -> s.contains("jacoco"))
-			       .limit(1)
-			       .collect(Collectors.toList());
+			.filter(s -> s.contains("jacoco"))
+			.limit(1)
+			.collect(Collectors.toList());
 	}
 
 	private String consumeOutput(Process hosh) throws IOException {
@@ -631,9 +631,9 @@ public class HoshIT {
 		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
 		assertThat(terminated).isFalse();
 		int waitFor = new ProcessBuilder()
-			              .command("kill", "-INT", Long.toString(hosh.pid()))
-			              .start()
-			              .waitFor();
+			.command("kill", "-INT", Long.toString(hosh.pid()))
+			.start()
+			.waitFor();
 		assertThat(waitFor).isEqualTo(0);
 	}
 }

@@ -60,35 +60,35 @@ import static org.mockito.Mockito.times;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class ExternalCommandTest {
+class ExternalCommandTest {
 
 	@RegisterExtension
-	public final TemporaryFolder folder = new TemporaryFolder();
+	final TemporaryFolder folder = new TemporaryFolder();
 
 	@Mock(stubOnly = true)
-	private State state;
+	State state;
 
 	@Mock(stubOnly = true)
-	private Process process;
+	Process process;
 
 	@Mock
-	private InputChannel in;
+	InputChannel in;
 
 	@Mock
-	private OutputChannel out;
+	OutputChannel out;
 
 	@Mock
-	private OutputChannel err;
+	OutputChannel err;
 
 	@Mock
-	private ProcessFactory processFactory;
+	ProcessFactory processFactory;
 
-	private Path executable;
+	Path executable;
 
-	private ExternalCommand sut;
+	ExternalCommand sut;
 
 	@BeforeEach
-	public void setup() throws IOException {
+	void setup() throws IOException {
 		executable = folder.newFile().toPath();
 		sut = new ExternalCommand(executable);
 		sut.setProcessFactory(processFactory);
@@ -96,7 +96,7 @@ public class ExternalCommandTest {
 	}
 
 	@Test
-	public void processNoArgs() throws Exception {
+	void processNoArgs() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
@@ -117,7 +117,7 @@ public class ExternalCommandTest {
 	}
 
 	@Test
-	public void processWithArgs() throws Exception {
+	void processWithArgs() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
@@ -138,7 +138,7 @@ public class ExternalCommandTest {
 	}
 
 	@Test
-	public void processExitsWithError() throws Exception {
+	void processExitsWithError() throws Exception {
 		given(process.waitFor()).willReturn(1);
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
@@ -159,7 +159,7 @@ public class ExternalCommandTest {
 	}
 
 	@Test
-	public void processException() throws Exception {
+	void processException() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willThrow(InterruptedException.class);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
@@ -180,7 +180,7 @@ public class ExternalCommandTest {
 	}
 
 	@Test
-	public void processSendRecordsToOut() throws Exception {
+	void processSendRecordsToOut() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
@@ -196,7 +196,7 @@ public class ExternalCommandTest {
 	}
 
 	@Test
-	public void processSendRecordsToErr() throws Exception {
+	void processSendRecordsToErr() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
@@ -213,7 +213,7 @@ public class ExternalCommandTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void processRecordsFromIn() throws Exception {
+	void processRecordsFromIn() throws Exception {
 		ByteArrayOutputStream value = new ByteArrayOutputStream();
 		given(in.recv()).willReturn(
 			Optional.of(Records.builder().entry(Keys.PATH, Values.ofText("aaa")).entry(Keys.SIZE, Values.ofNumeric(10)).build()),
@@ -234,7 +234,7 @@ public class ExternalCommandTest {
 	}
 
 	@Test
-	public void throwsIoException() throws Exception {
+	void throwsIoException() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willThrow(new IOException("simulated error"));
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());

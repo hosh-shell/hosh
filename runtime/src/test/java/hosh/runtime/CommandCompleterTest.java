@@ -46,28 +46,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class CommandCompleterTest {
+class CommandCompleterTest {
 
 	@RegisterExtension
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Mock(stubOnly = true)
-	private Command command;
+	Command command;
 
 	@Mock(stubOnly = true)
-	private State state;
+	State state;
 
 	@Mock(stubOnly = true)
-	private LineReader lineReader;
+	LineReader lineReader;
 
 	@Mock(stubOnly = true)
-	private ParsedLine line;
+	ParsedLine line;
 
 	@InjectMocks
-	private CommandCompleter sut;
+	CommandCompleter sut;
 
 	@Test
-	public void emptyPathAndNoBuiltins() {
+	void emptyPathAndNoBuiltins() {
 		given(state.getPath()).willReturn(List.of());
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
@@ -75,7 +75,7 @@ public class CommandCompleterTest {
 	}
 
 	@Test
-	public void builtin() {
+	void builtin() {
 		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
@@ -88,7 +88,7 @@ public class CommandCompleterTest {
 	}
 
 	@Test
-	public void builtinOverridesExternal() throws IOException {
+	void builtinOverridesExternal() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		File file = temporaryFolder.newFile("cmd");
 		assertThat(file.setExecutable(true, true)).isTrue();
@@ -104,7 +104,7 @@ public class CommandCompleterTest {
 	}
 
 	@Test
-	public void pathWithEmptyDir() {
+	void pathWithEmptyDir() {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
@@ -112,7 +112,7 @@ public class CommandCompleterTest {
 	}
 
 	@Test
-	public void pathWithExecutable() throws IOException {
+	void pathWithExecutable() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		File file = temporaryFolder.newFile("cmd");
 		assertThat(file.setExecutable(true, true)).isTrue();
@@ -127,7 +127,7 @@ public class CommandCompleterTest {
 	}
 
 	@Test
-	public void skipNonInPathDirectory() throws IOException {
+	void skipNonInPathDirectory() throws IOException {
 		File file = temporaryFolder.newFile();
 		given(state.getPath()).willReturn(List.of(file.toPath()));
 		List<Candidate> candidates = new ArrayList<>();
@@ -137,7 +137,7 @@ public class CommandCompleterTest {
 	}
 
 	@Test
-	public void ioErrorsAreIgnored() throws IOException {
+	void ioErrorsAreIgnored() throws IOException {
 		File bin = temporaryFolder.newFolder("bin");
 		bin.setExecutable(false);
 		bin.setReadable(false); // throws java.nio.file.AccessDeniedException

@@ -31,18 +31,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class NullChannelTest {
+class NullChannelTest {
 
 	@InjectMocks
-	private NullChannel sut;
+	NullChannel sut;
 
 	@Test
-	public void recv() {
+	void recv() {
 		assertThat(sut.recv()).isEmpty();
 	}
 
 	@Test
-	public void asString() {
+	void asString() {
 		assertThat(sut).hasToString("NullChannel[]");
 	}
 }

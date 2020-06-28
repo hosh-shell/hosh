@@ -49,29 +49,29 @@ import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-public class TerminalModuleTest {
+class TerminalModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ClearTest {
+	class ClearTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Mock
-		private Terminal terminal;
+		Terminal terminal;
 
 		@InjectMocks
-		private Clear sut;
+		Clear sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
@@ -83,7 +83,7 @@ public class TerminalModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoInteractions();
@@ -96,25 +96,25 @@ public class TerminalModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class BellTest {
+	class BellTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Mock
-		private Terminal terminal;
+		Terminal terminal;
 
 		@InjectMocks
-		private Bell sut;
+		Bell sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
@@ -126,7 +126,7 @@ public class TerminalModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoInteractions();
@@ -139,25 +139,25 @@ public class TerminalModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class DumpTest {
+	class DumpTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Mock
-		private Terminal terminal;
+		Terminal terminal;
 
 		@InjectMocks
-		private Dump sut;
+		Dump sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			given(terminal.getType()).willReturn("xterm");
 			given(terminal.getAttributes()).willReturn(new Attributes());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -168,7 +168,7 @@ public class TerminalModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoInteractions();

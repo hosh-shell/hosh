@@ -32,30 +32,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.quicktheories.QuickTheory.qt;
 import static org.quicktheories.generators.SourceDSL.strings;
 
-public class ExitStatusTest {
+class ExitStatusTest {
 
 	@Test
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(ExitStatus.class).verify();
 	}
 
 	@Test
-	public void asString() {
+	void asString() {
 		assertThat(ExitStatus.of(42)).hasToString("ExitStatus[value=42]");
 	}
 
 	@Test
-	public void success() {
+	void success() {
 		assertThat(ExitStatus.success().value()).isEqualTo(0);
 	}
 
 	@Test
-	public void error() {
+	void error() {
 		assertThat(ExitStatus.error().value()).isEqualTo(1);
 	}
 
 	@Test
-	public void validLiterals() {
+	void validLiterals() {
 		qt()
 			.forAll(strings().numeric())
 			.check(value -> {
@@ -65,7 +65,7 @@ public class ExitStatusTest {
 	}
 
 	@Test
-	public void invalidLiteral() {
+	void invalidLiteral() {
 		qt()
 			.forAll(strings().basicLatinAlphabet().ofLengthBetween(0, 10))
 			.assuming(value -> value.matches(".*[a-zA-Z].*"))

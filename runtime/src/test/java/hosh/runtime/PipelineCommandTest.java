@@ -45,36 +45,36 @@ import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.BDDMockito.willThrow;
 
 @ExtendWith(MockitoExtension.class)
-public class PipelineCommandTest {
+class PipelineCommandTest {
 
 	@Mock
-	private InputChannel in;
+	InputChannel in;
 
 	@Mock
-	private OutputChannel out;
+	OutputChannel out;
 
 	@Mock
-	private OutputChannel err;
+	OutputChannel err;
 
 	@Mock(stubOnly = true)
-	private Statement producer;
+	Statement producer;
 
 	@Mock(stubOnly = true)
-	private Statement consumer;
+	Statement consumer;
 
 	@Mock(stubOnly = true)
-	private Statement consumerProducer;
+	Statement consumerProducer;
 
 	@Mock(stubOnly = true)
-	private Command command;
+	Command command;
 
 	@Mock(stubOnly = true, lenient = true)
-	private Interpreter interpreter;
+	Interpreter interpreter;
 
-	private PipelineCommand sut;
+	PipelineCommand sut;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		sut = new PipelineCommand(producer, consumer);
@@ -82,7 +82,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void producerAndConsumerSuccess() {
+	void producerAndConsumerSuccess() {
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -93,7 +93,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void producerError() {
+	void producerError() {
 		willReturn(ExitStatus.error()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -104,7 +104,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void consumerError() {
+	void consumerError() {
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.error()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -115,7 +115,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void producerPoisonPill() {
+	void producerPoisonPill() {
 		willThrow(new ProducerPoisonPill()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -126,7 +126,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void consumerPoisonPill() {
+	void consumerPoisonPill() {
 		willThrow(new ProducerPoisonPill()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -137,7 +137,7 @@ public class PipelineCommandTest {
 	}
 
 	@Test
-	public void recursive() {
+	void recursive() {
 		PipelineCommand downStream = new PipelineCommand(producer, consumer);
 		downStream.setInterpreter(interpreter);
 		willReturn(downStream).given(consumerProducer).getCommand();

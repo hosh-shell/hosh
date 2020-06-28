@@ -45,32 +45,32 @@ import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-public class HistoryModuleTest {
+class HistoryModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class ListHistoryTest {
+	class ListHistoryTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Mock(stubOnly = true)
-		private History history;
+		History history;
 
 		@Mock(stubOnly = true)
-		private History.Entry entry;
+		History.Entry entry;
 
 		@InjectMocks
-		private HistoryModule.ListHistory sut;
+		HistoryModule.ListHistory sut;
 
 		@Test
-		public void noArgsEmptyHistory() {
+		void noArgsEmptyHistory() {
 			given(history.iterator()).willReturn(Collections.emptyListIterator());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
@@ -80,7 +80,7 @@ public class HistoryModuleTest {
 		}
 
 		@Test
-		public void noArgsWithHistory() {
+		void noArgsWithHistory() {
 			given(history.iterator()).willReturn(Collections.singletonList(entry).listIterator());
 			given(entry.time()).willReturn(Instant.EPOCH);
 			given(entry.line()).willReturn("cmd");
@@ -95,7 +95,7 @@ public class HistoryModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();

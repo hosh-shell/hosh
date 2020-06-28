@@ -49,6 +49,7 @@ public abstract class UnitTestsFitnessTest {
 		ArchRuleDefinition.methods().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Test")
 			.or().areDeclaredInClassesThat().haveSimpleNameEndingWith("IT")
 			.and().areNotPrivate()
+			.and().areNotStatic()
 			.should().beAnnotatedWith(Test.class)
 			.orShould().beAnnotatedWith(BeforeEach.class)
 			.orShould().beAnnotatedWith(AfterEach.class)

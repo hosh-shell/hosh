@@ -41,37 +41,37 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-public class ConsoleChannelTest {
+class ConsoleChannelTest {
 
 	@Mock(stubOnly = true)
-	private Terminal terminal;
+	Terminal terminal;
 
 	@Mock
-	private PrintWriter printWriter;
+	PrintWriter printWriter;
 
-	private ConsoleChannel sut;
+	ConsoleChannel sut;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		given(terminal.writer()).willReturn(printWriter);
 		sut = new ConsoleChannel(terminal, Ansi.Style.NONE);
 	}
 
 	@Test
-	public void empty() {
+	void empty() {
 		sut.send(Records.empty());
 		then(printWriter).should().append(System.lineSeparator());
 	}
 
 	@Test
-	public void oneValue() {
+	void oneValue() {
 		sut.send(Records.singleton(Keys.NAME, Values.ofText("foo")));
 		then(printWriter).should().append("foo");
 		then(printWriter).should().append(System.lineSeparator());
 	}
 
 	@Test
-	public void twoValues() {
+	void twoValues() {
 		sut.send(Records.builder().entry(Keys.NAME, Values.ofText("foo")).entry(Keys.VALUE, Values.ofText("bar")).build());
 		then(printWriter).should().append("foo");
 		then(printWriter).should().append(" ");
@@ -80,7 +80,7 @@ public class ConsoleChannelTest {
 	}
 
 	@Test
-	public void asString() {
+	void asString() {
 		assertThat(sut).hasToString("ConsoleChannel[style=NONE]");
 	}
 }

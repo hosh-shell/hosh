@@ -48,29 +48,29 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-public class CompilerTest {
+class CompilerTest {
 
 	@Mock(stubOnly = true)
-	private State state;
+	State state;
 
 	@Mock(stubOnly = true)
-	private Command command;
+	Command command;
 
 	@Mock(stubOnly = true)
-	private Command anotherCommand;
+	Command anotherCommand;
 
 	@Mock(stubOnly = true)
-	private CommandWrapper<?> commandWrapper;
+	CommandWrapper<?> commandWrapper;
 
 	@Mock(stubOnly = true)
-	private CommandResolver commandResolver;
+	CommandResolver commandResolver;
 
 	@InjectMocks
-	private Compiler sut;
+	Compiler sut;
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")
 	@Test
-	public void incompletePipeline() {
+	void incompletePipeline() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		assertThatThrownBy(() -> sut.compile("ls | take 2 | "))
 			.isInstanceOf(CompileError.class)
@@ -79,14 +79,14 @@ public class CompilerTest {
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/42", description = "rejected by the compiler")
 	@Test
-	public void extraBraces() {
+	void extraBraces() {
 		assertThatThrownBy(() -> sut.compile("withTime { ls } } "))
 			.isInstanceOf(CompileError.class)
 			.hasMessage("line 1: unnecessary closing '}'");
 	}
 
 	@Test
-	public void pipelineOfCommandsWithoutArguments() {
+	void pipelineOfCommandsWithoutArguments() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("count");
 		Program program = sut.compile("ls | count");
@@ -96,7 +96,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void pipelineOfCommandsWithArguments() {
+	void pipelineOfCommandsWithArguments() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("grep");
 		Program program = sut.compile("ls /home | grep /regex/");
@@ -111,7 +111,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWithConstant() {
+	void commandWithConstant() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
 		Program program = sut.compile("cd /tmp");
 		assertThat(program.getStatements())
@@ -125,7 +125,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWithVariable() {
+	void commandWithVariable() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
 		Program program = sut.compile("cd ${DIR}");
 		assertThat(program.getStatements())
@@ -139,7 +139,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWithVariableOrFallback() {
+	void commandWithVariableOrFallback() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
 		Program program = sut.compile("cd ${DIR!/tmp}");
 		assertThat(program.getStatements())
@@ -154,7 +154,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWithoutArguments() {
+	void commandWithoutArguments() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
 		Program program = sut.compile("env");
 		assertThat(program.getStatements())
@@ -166,7 +166,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWithArgument() {
+	void commandWithArgument() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
 		Program program = sut.compile("env --system");
 		assertThat(program.getStatements())
@@ -178,7 +178,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWithArguments() {
+	void commandWithArguments() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("git commit --amend");
 		assertThat(program.getStatements())
@@ -190,7 +190,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandNotRegisteredInAPipeline() {
+	void commandNotRegisteredInAPipeline() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
 		assertThatThrownBy(() -> sut.compile("env | env2"))
 			.isInstanceOf(CompileError.class)
@@ -198,7 +198,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void wrappedCommand() {
+	void wrappedCommand() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime -t -a { git push }");
@@ -212,7 +212,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void nestedWrappedCommands() {
+	void nestedWrappedCommands() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime { withTime { git push } }");
@@ -222,7 +222,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWrapperUsedAsCommand() {
+	void commandWrapperUsedAsCommand() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		assertThatThrownBy(() -> sut.compile("withTime"))
 			.isInstanceOf(CompileError.class)
@@ -230,7 +230,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void emptyCommandWrapper() {
+	void emptyCommandWrapper() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		assertThatThrownBy(() -> sut.compile("withTime { }"))
 			.isInstanceOf(CompileError.class)
@@ -238,7 +238,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandUsedAsCommandWrapper() {
+	void commandUsedAsCommandWrapper() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		assertThatThrownBy(() -> sut.compile("ls { grep pattern } "))
 			.isInstanceOf(CompileError.class)
@@ -246,7 +246,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void unknownCommand() {
+	void unknownCommand() {
 		doReturn(Optional.empty()).when(commandResolver).tryResolve("ls");
 		assertThatThrownBy(() -> sut.compile("ls { grep pattern }"))
 			.isInstanceOf(CompileError.class)
@@ -254,7 +254,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void commandWrapperAsProducer() {
+	void commandWrapperAsProducer() {
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("benchmark");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
@@ -275,7 +275,7 @@ public class CompilerTest {
 	@Disabled
 	@Bug(description = "command cannot be dynamic", issue = "https://github.com/dfa1/hosh/issues/63")
 	@Test
-	public void commandAsVariableExpansion() {
+	void commandAsVariableExpansion() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
 		Program program = sut.compile("${JAVA_HOME}/bin/java");
 		assertThat(program.getStatements()).hasSize(1)
@@ -285,7 +285,7 @@ public class CompilerTest {
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/112")
 	@Test
-	public void commentedOutCommandIsNotCompiled() {
+	void commentedOutCommandIsNotCompiled() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cmd");
 		Program program = sut.compile("cmd # ls /tmp");
 		assertThat(program.getStatements())
@@ -300,7 +300,7 @@ public class CompilerTest {
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/112")
 	@Test
-	public void commandAfterCommentBlock() {
+	void commandAfterCommentBlock() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cmd");
 		Program program = sut.compile("#\ncmd");
 		assertThat(program.getStatements())
@@ -312,7 +312,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void sequenceOfSimpleCommands() {
+	void sequenceOfSimpleCommands() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
 		Program program = sut.compile("ls /tmp; schema");
@@ -330,7 +330,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void sequenceOfPipelines() {
+	void sequenceOfPipelines() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
 		Program program = sut.compile("ls /tmp | schema; ls /tmp | schema");
@@ -345,7 +345,7 @@ public class CompilerTest {
 	}
 
 	@Test
-	public void lambda() {
+	void lambda() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("echo");
 		Program program = sut.compile("ls | { path -> echo ${path} }");
@@ -371,7 +371,7 @@ public class CompilerTest {
 	class Strings {
 
 		@Test
-		public void emptySingleQuotedString() {
+		void emptySingleQuotedString() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
 			Program program = sut.compile("echo ''");
 			assertThat(program.getStatements())
@@ -385,7 +385,7 @@ public class CompilerTest {
 		}
 
 		@Test
-		public void singleQuotedString() {
+		void singleQuotedString() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 			Program program = sut.compile("vim 'file with spaces'");
 			assertThat(program.getStatements())
@@ -399,7 +399,7 @@ public class CompilerTest {
 		}
 
 		@Test
-		public void singleQuotedStringWithVariables() {
+		void singleQuotedStringWithVariables() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 			Program program = sut.compile("git '${HOME}${BIN}'");
 			assertThat(program.getStatements())
@@ -414,7 +414,7 @@ public class CompilerTest {
 		}
 
 		@Test
-		public void emptyDoubleQuotedString() {
+		void emptyDoubleQuotedString() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 			Program program = sut.compile("vim \"\"");
 			assertThat(program.getStatements())
@@ -429,7 +429,7 @@ public class CompilerTest {
 		}
 
 		@Test
-		public void doubleQuotedString() {
+		void doubleQuotedString() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 			Program program = sut.compile("vim \"file with spaces\"");
 			assertThat(program.getStatements())
@@ -444,7 +444,7 @@ public class CompilerTest {
 		}
 
 		@Test
-		public void doubleQuotedStringWithVariable() {
+		void doubleQuotedStringWithVariable() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 			doReturn(Map.of("HOME", "/home/dfa")).when(state).getVariables();
 			Program program = sut.compile("ls \"${HOME}\"");
@@ -460,7 +460,7 @@ public class CompilerTest {
 		}
 
 		@Test
-		public void doubleQuotedStringWithVariables() {
+		void doubleQuotedStringWithVariables() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 			doReturn(Map.of("HOME", "/home/dfa", "BIN", "bin")).when(state).getVariables();
 			Program program = sut.compile("ls \"${HOME}/${BIN}\"");
@@ -476,7 +476,7 @@ public class CompilerTest {
 		}
 
 		@Test
-		public void doubleQuotedStringWithFallback() {
+		void doubleQuotedStringWithFallback() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 			doReturn(Map.of("HOME", "/home/dfa")).when(state).getVariables();
 			Program program = sut.compile("ls \"${HOME!/home}/${BIN!bin}\"");

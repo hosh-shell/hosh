@@ -49,27 +49,27 @@ import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-public class NetworkModuleTest {
+class NetworkModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class NetworkTest {
+	class NetworkTest {
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@InjectMocks
-		private NetworkModule.Network sut;
+		NetworkModule.Network sut;
 
 		@Todo(description = "this is a very bland test: let's try to consolidate this command before investing more")
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -78,7 +78,7 @@ public class NetworkModuleTest {
 		}
 
 		@Test
-		public void oneArg() {
+		void oneArg() {
 			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -89,32 +89,32 @@ public class NetworkModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	public class HttpTest {
+	class HttpTest {
 
 		@SuppressWarnings("unused") // used to restore interrupted flag
 		@RegisterExtension
-		public final WithThread withThread = new WithThread();
+		final WithThread withThread = new WithThread();
 
 		@Mock
-		private InputChannel in;
+		InputChannel in;
 
 		@Mock
-		private OutputChannel out;
+		OutputChannel out;
 
 		@Mock
-		private OutputChannel err;
+		OutputChannel err;
 
 		@Mock(stubOnly = true)
-		private NetworkModule.Http.Requestor requestor;
+		NetworkModule.Http.Requestor requestor;
 
 		@Mock(stubOnly = true)
-		private HttpResponse<Stream<String>> response;
+		HttpResponse<Stream<String>> response;
 
 		@InjectMocks
-		private NetworkModule.Http sut;
+		NetworkModule.Http sut;
 
 		@Test
-		public void noArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -123,7 +123,7 @@ public class NetworkModuleTest {
 		}
 
 		@Test
-		public void oneArg() throws InterruptedException {
+		void oneArg() throws InterruptedException {
 			given(requestor.send(Mockito.any())).willReturn(response);
 			given(response.body()).willReturn(Stream.of("line1"));
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
@@ -134,7 +134,7 @@ public class NetworkModuleTest {
 		}
 
 		@Test
-		public void interrupted() throws InterruptedException {
+		void interrupted() throws InterruptedException {
 			given(requestor.send(Mockito.any())).willThrow(new InterruptedException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
 			assertThat(exitStatus).isError();

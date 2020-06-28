@@ -47,25 +47,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class FileSystemCompleterTest {
+class FileSystemCompleterTest {
 
 	@RegisterExtension
-	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+	final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Mock(stubOnly = true)
-	private State state;
+	State state;
 
 	@Mock(stubOnly = true)
-	private LineReader lineReader;
+	LineReader lineReader;
 
 	@Mock(stubOnly = true)
-	private ParsedLine line;
+	ParsedLine line;
 
 	@InjectMocks
-	private FileSystemCompleter sut;
+	FileSystemCompleter sut;
 
 	@Test
-	public void emptyWordInEmptyDir() {
+	void emptyWordInEmptyDir() {
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
@@ -74,7 +74,7 @@ public class FileSystemCompleterTest {
 	}
 
 	@Test
-	public void nonEmptyWordInEmptyDir() {
+	void nonEmptyWordInEmptyDir() {
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("aaa");
 		List<Candidate> candidates = new ArrayList<>();
@@ -83,7 +83,7 @@ public class FileSystemCompleterTest {
 	}
 
 	@Test
-	public void emptyWordInNonEmptyDir() throws IOException {
+	void emptyWordInNonEmptyDir() throws IOException {
 		temporaryFolder.newFile("a");
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
@@ -99,7 +99,7 @@ public class FileSystemCompleterTest {
 
 	@DisabledOnOs(OS.WINDOWS)
 	@Test
-	public void rootDirUnix() {
+	void rootDirUnix() {
 		String rootDir = "/";
 		given(line.word()).willReturn(rootDir);
 		List<Candidate> candidates = new ArrayList<>();
@@ -111,7 +111,7 @@ public class FileSystemCompleterTest {
 
 	@EnabledOnOs(OS.WINDOWS)
 	@Test
-	public void rootDirWindows() {
+	void rootDirWindows() {
 		String rootDir = "c:\\";
 		given(line.word()).willReturn(rootDir);
 		List<Candidate> candidates = new ArrayList<>();
@@ -122,7 +122,7 @@ public class FileSystemCompleterTest {
 	}
 
 	@Test
-	public void absoluteDirWithoutEndingSeparator() throws IOException {
+	void absoluteDirWithoutEndingSeparator() throws IOException {
 		File dir = temporaryFolder.newFolder("dir");
 		File newFile = temporaryFolder.newFile(dir, "aaa");
 		given(line.word()).willReturn(newFile.getParent());
@@ -137,7 +137,7 @@ public class FileSystemCompleterTest {
 	}
 
 	@Test
-	public void absoluteDirWithEndingSeparator() throws IOException {
+	void absoluteDirWithEndingSeparator() throws IOException {
 		File dir = temporaryFolder.newFolder("dir");
 		File newFile = temporaryFolder.newFile(dir, "aaa");
 		given(line.word()).willReturn(newFile.getParent() + File.separator);
@@ -152,7 +152,7 @@ public class FileSystemCompleterTest {
 	}
 
 	@Test
-	public void partialMatchDirectory() throws IOException {
+	void partialMatchDirectory() throws IOException {
 		temporaryFolder.newFolder(temporaryFolder.newFolder("aaa"), "bbb");
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("aaa" + File.separator + "b");

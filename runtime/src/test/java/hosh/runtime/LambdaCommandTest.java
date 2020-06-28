@@ -49,30 +49,30 @@ import static org.mockito.BDDMockito.then;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class LambdaCommandTest {
+class LambdaCommandTest {
 
 	@Mock
-	private Interpreter interpreter;
+	Interpreter interpreter;
 
 	@Mock(stubOnly = true)
-	private Compiler.Statement statement;
+	Compiler.Statement statement;
 
 	@Mock
-	private InputChannel in;
+	InputChannel in;
 
 	@Mock
-	private OutputChannel out;
+	OutputChannel out;
 
 	@Mock
-	private OutputChannel err;
+	OutputChannel err;
 
 	@Mock
-	private State state;
+	State state;
 
-	private LambdaCommand sut;
+	LambdaCommand sut;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		sut = new LambdaCommand(statement, Keys.PATH.name());
 		sut.setState(state);
 		sut.setInterpreter(interpreter);
@@ -80,7 +80,7 @@ public class LambdaCommandTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void presentKeyWithInnerCommandSuccess() {
+	void presentKeyWithInnerCommandSuccess() {
 		Map<String, String> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.success());
@@ -97,7 +97,7 @@ public class LambdaCommandTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void presentKeyWithInnerCommandError() {
+	void presentKeyWithInnerCommandError() {
 		Map<String, String> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.error());
@@ -114,7 +114,7 @@ public class LambdaCommandTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void missingKey() {
+	void missingKey() {
 		Map<String, String> variables = new HashMap<>();
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.TEXT, Values.ofPath(Path.of("file")))), Optional.empty());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);

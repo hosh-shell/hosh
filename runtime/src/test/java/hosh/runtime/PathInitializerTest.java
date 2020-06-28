@@ -34,48 +34,48 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PathInitializerTest {
+class PathInitializerTest {
 
-	private PathInitializer sut;
+	PathInitializer sut;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		sut = new PathInitializer();
 	}
 
 	@Test
-	public void nullPathVariable() {
+	void nullPathVariable() {
 		List<Path> path = sut.initializePath(null);
 		assertThat(path).isEmpty();
 	}
 
 	@Test
-	public void emptyVariable() {
+	void emptyVariable() {
 		List<Path> path = sut.initializePath("");
 		assertThat(path).isEmpty();
 	}
 
 	@Test
-	public void pathVariableWithOneElement() {
+	void pathVariableWithOneElement() {
 		List<Path> path = sut.initializePath("/bin");
 		assertThat(path).containsExactly(Path.of("/bin"));
 	}
 
 	@Test
-	public void pathVariableWithTwoElements() {
+	void pathVariableWithTwoElements() {
 		List<Path> path = sut.initializePath("/bin" + File.pathSeparator + "/sbin");
 		assertThat(path).containsExactly(Path.of("/bin"), Path.of("/sbin"));
 	}
 
 	@Test
-	public void pathVariableWithEmptyElement() {
+	void pathVariableWithEmptyElement() {
 		List<Path> path = sut.initializePath("/bin" + File.pathSeparator + "   " + File.pathSeparator + "/sbin");
 		assertThat(path).containsExactly(Path.of("/bin"), Path.of("/sbin"));
 	}
 
 	@EnabledOnOs(OS.WINDOWS)
 	@Test
-	public void pathVariableWithTrailingSpace() {
+	void pathVariableWithTrailingSpace() {
 		List<Path> path = sut.initializePath("c:/Program Files "); // trailing space
 		assertThat(path).containsExactly(Path.of("c:/Program Files"));
 	}

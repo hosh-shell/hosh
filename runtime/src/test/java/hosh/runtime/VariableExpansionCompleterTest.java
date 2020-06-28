@@ -42,22 +42,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class VariableExpansionCompleterTest {
+class VariableExpansionCompleterTest {
 
 	@Mock(stubOnly = true)
-	private LineReader lineReader;
+	LineReader lineReader;
 
 	@Mock(stubOnly = true)
-	private ParsedLine parsedLine;
+	ParsedLine parsedLine;
 
 	@Spy
-	private final State state = new State();
+	final State state = new State();
 
 	@InjectMocks
-	private VariableExpansionCompleter sut;
+	VariableExpansionCompleter sut;
 
 	@Test
-	public void notInExpansion() {
+	void notInExpansion() {
 		given(parsedLine.word()).willReturn("a");
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
@@ -65,7 +65,7 @@ public class VariableExpansionCompleterTest {
 	}
 
 	@Test
-	public void inExpansionMatchingSingle() {
+	void inExpansionMatchingSingle() {
 		given(parsedLine.word()).willReturn("${");
 		given(state.getVariables()).willReturn(Map.of("FOO", "whatever"));
 		List<Candidate> candidates = new ArrayList<>();
@@ -79,7 +79,7 @@ public class VariableExpansionCompleterTest {
 	}
 
 	@Test
-	public void inExpansionMatchingMultiple() {
+	void inExpansionMatchingMultiple() {
 		given(parsedLine.word()).willReturn("${");
 		given(state.getVariables()).willReturn(Map.of("FOO", "whatever", "BAR", "whatever"));
 		List<Candidate> candidates = new ArrayList<>();

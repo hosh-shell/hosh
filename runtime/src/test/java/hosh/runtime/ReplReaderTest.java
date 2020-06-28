@@ -37,30 +37,30 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class ReplReaderTest {
+class ReplReaderTest {
 
 	@Mock(stubOnly = true)
-	private LineReader lineReader;
+	LineReader lineReader;
 
 	@Mock(stubOnly = true)
-	private Prompt prompt;
+	Prompt prompt;
 
-	private ReplReader sut;
+	ReplReader sut;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		sut = new ReplReader(prompt, lineReader);
 	}
 
 	@Test
-	public void oneLine() {
+	void oneLine() {
 		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willReturn("1");
 		assertThat(sut.read()).hasValue("1");
 	}
 
 	@Test
-	public void twoLines() {
+	void twoLines() {
 		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willReturn("1", "2");
 		assertThat(sut.read()).hasValue("1");
@@ -68,14 +68,14 @@ public class ReplReaderTest {
 	}
 
 	@Test
-	public void killsCurrentLineAtINT() {
+	void killsCurrentLineAtINT() {
 		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated INT"));
 		assertThat(sut.read()).hasValue("");
 	}
 
 	@Test
-	public void stopsAtEOF() {
+	void stopsAtEOF() {
 		given(prompt.compute()).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
 		assertThat(sut.read()).isEmpty();

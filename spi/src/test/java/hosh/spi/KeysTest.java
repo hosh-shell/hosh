@@ -30,37 +30,37 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class KeysTest {
+class KeysTest {
 
 	@Test
-	public void nullKey() {
+	void nullKey() {
 		assertThatThrownBy(() -> Keys.of(null))
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("name must be not null");
 	}
 
 	@Test
-	public void emptyKey() {
+	void emptyKey() {
 		assertThatThrownBy(() -> Keys.of(""))
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("name must be not blank");
 	}
 
 	@Test
-	public void asString() {
+	void asString() {
 		assertThat(Keys.of("name"))
 			.hasToString("Key['name']");
 	}
 
 	@Test
-	public void equalContract() {
+	void equalContract() {
 		EqualsVerifier.configure()
 			.forClass(StringKey.class)
 			.verify();
 	}
 
 	@Test
-	public void compareTo() {
+	void compareTo() {
 		Key a = Keys.of("name");
 		Key b = Keys.of("b");
 		assertThat(a).isEqualByComparingTo(a);

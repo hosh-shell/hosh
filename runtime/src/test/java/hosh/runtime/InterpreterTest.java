@@ -55,48 +55,48 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-public class InterpreterTest {
+class InterpreterTest {
 
 	@RegisterExtension
-	public final WithThread withThread = new WithThread();
+	final WithThread withThread = new WithThread();
 
 	@Mock(stubOnly = true)
-	private State state;
+	State state;
 
 	@Mock
-	private Injector injector;
+	Injector injector;
 
 	@Mock
-	private InputChannel in;
+	InputChannel in;
 
 	@Mock
-	private OutputChannel out;
+	OutputChannel out;
 
 	@Mock
-	private OutputChannel err;
+	OutputChannel err;
 
 	@Mock(stubOnly = true)
-	private Program program;
+	Program program;
 
 	@Mock(stubOnly = true)
-	private Statement statement;
+	Statement statement;
 
 	@Mock
-	private Command command;
+	Command command;
 
-	private final Map<String, String> variables = new HashMap<>();
+	final Map<String, String> variables = new HashMap<>();
 
-	private final List<Resolvable> args = new ArrayList<>();
+	final List<Resolvable> args = new ArrayList<>();
 
-	private Interpreter sut;
+	Interpreter sut;
 
 	@BeforeEach
-	public void setup() {
+	void setup() {
 		sut = new Interpreter(state, injector);
 	}
 
 	@Test
-	public void injectDependencies() {
+	void injectDependencies() {
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -107,7 +107,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void storeCommandExitStatus() {
+	void storeCommandExitStatus() {
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.of(2));
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -119,7 +119,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleCancellations() {
+	void handleCancellations() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 			.willThrow(new CancellationException("simulated cancellation"));
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -131,7 +131,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleExceptionWithoutMessage() {
+	void handleExceptionWithoutMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 			.willThrow(new NullPointerException());
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -144,7 +144,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void handleExceptionWithMessage() {
+	void handleExceptionWithMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 			.willThrow(new IllegalArgumentException("simulated error"));
 		given(program.getStatements()).willReturn(List.of(statement));
@@ -157,7 +157,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void constantArgument() {
+	void constantArgument() {
 		args.add(new Compiler.Constant("file"));
 		given(state.getVariables()).willReturn(variables);
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
@@ -169,7 +169,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void presentVariable() {
+	void presentVariable() {
 		args.add(new Compiler.Variable("VARIABLE"));
 		variables.put("VARIABLE", "1");
 		given(state.getVariables()).willReturn(variables);
@@ -186,7 +186,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void absentVariables() {
+	void absentVariables() {
 		args.add(new Compiler.Variable("VARIABLE"));
 		variables.put("VARIABLE", null);
 		given(state.getVariables()).willReturn(variables);
@@ -202,7 +202,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void setThreadNameWithArgs() {
+	void setThreadNameWithArgs() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Constant("-jar"), new Compiler.Constant("hosh.jar")));
@@ -213,7 +213,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void setThreadNameWithoutArgs() {
+	void setThreadNameWithoutArgs() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());

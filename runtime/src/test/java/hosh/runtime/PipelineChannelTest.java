@@ -40,19 +40,19 @@ import java.util.concurrent.Future;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class PipelineChannelTest {
+class PipelineChannelTest {
 
 	@RegisterExtension
-	public final WithThread withThread = new WithThread();
+	final WithThread withThread = new WithThread();
 
 	@RegisterExtension
-	public final WithExecutor withExecutor = new WithExecutor(Executors.newFixedThreadPool(2));
+	final WithExecutor withExecutor = new WithExecutor(Executors.newFixedThreadPool(2));
 
 	@Mock(stubOnly = true)
-	private Record record;
+	Record record;
 
 	@Test
-	public void stopConsumer() throws ExecutionException, InterruptedException {
+	void stopConsumer() throws ExecutionException, InterruptedException {
 		PipelineChannel sut = new PipelineChannel();
 		Future<?> recv = withExecutor.submit(() -> {
 			Optional<Record> recv1 = sut.recv();
@@ -69,7 +69,7 @@ public class PipelineChannelTest {
 	}
 
 	@Test
-	public void sendRecv() throws ExecutionException, InterruptedException {
+	void sendRecv() throws ExecutionException, InterruptedException {
 		PipelineChannel sut = new PipelineChannel();
 		Future<?> recv = withExecutor.submit(() -> {
 			Optional<Record> recv1 = sut.recv();
@@ -81,7 +81,7 @@ public class PipelineChannelTest {
 	}
 
 	@Test
-	public void sendInterrupted() {
+	void sendInterrupted() {
 		PipelineChannel sut = new PipelineChannel();
 		withThread.interrupt();
 		sut.send(record);
@@ -89,7 +89,7 @@ public class PipelineChannelTest {
 	}
 
 	@Test
-	public void recvInterrupted() {
+	void recvInterrupted() {
 		PipelineChannel sut = new PipelineChannel();
 		withThread.interrupt();
 		Optional<Record> recv = sut.recv();
