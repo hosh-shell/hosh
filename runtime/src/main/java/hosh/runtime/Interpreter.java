@@ -23,7 +23,6 @@
  */
 package hosh.runtime;
 
-import hosh.runtime.jfr.CommandExecution;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -101,13 +100,7 @@ public class Interpreter {
 		injector.injectDeps(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
-		CommandExecution commandExecution = new CommandExecution(statement.getDetails(), resolvedArguments.toString());
-		commandExecution.begin();
-		try {
-			return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
-		} finally {
-			commandExecution.commit();
-		}
+		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
 	}
 
 	private void injectInterpreter(Command command) {
