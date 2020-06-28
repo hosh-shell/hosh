@@ -37,6 +37,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<argLine></argLine> <!-- defined for when not running with jacoco -->
 	</properties>
 	<modules>
 		<module>test-support</module>
@@ -169,7 +170,7 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
-					<argLine>--add-exports java.base/jdk.internal.misc=hosh.runtime</argLine>
+					<argLine>@{argLine} --add-exports java.base/jdk.internal.misc=hosh.runtime</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -312,9 +313,11 @@
 			<id>sonar</id>
 			<properties>
 				<sonar.coverage.jacoco.xmlReportPaths>
-					target/site/jacoco/jacoco.xml,target/site/jacoco-it/jacoco.xml
+					${project.build.directory}/site/jacoco/jacoco.xml,${project.build.directory}/site/jacoco-it/jacoco.xml
 				</sonar.coverage.jacoco.xmlReportPaths>
-				<sonar.exclusions>target/generated-sources/**</sonar.exclusions>
+				<sonar.exclusions>
+					runtime/target/generated-sources/**,test-support/src/**,spi-test-support/src/**
+				</sonar.exclusions>
 			</properties>
 			<build>
 				<plugins>
@@ -333,7 +336,6 @@
 								<goals>
 									<goal>prepare-agent</goal>
 								</goals>
-								<phase>process-test-classes</phase>
 								<configuration>
 									<destFile>${sonar.jacoco.reportPath}</destFile>
 								</configuration>
@@ -343,7 +345,6 @@
 								<goals>
 									<goal>prepare-agent-integration</goal>
 								</goals>
-								<phase>pre-integration-test</phase>
 								<configuration>
 									<destFile>${sonar.jacoco.itReportPath}</destFile>
 								</configuration>
@@ -354,7 +355,6 @@
 									<goal>report</goal>
 									<goal>report-integration</goal>
 								</goals>
-								<phase>post-integration-test</phase>
 							</execution>
 						</executions>
 					</plugin>

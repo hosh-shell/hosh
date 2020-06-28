@@ -46,6 +46,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<argLine>
+						@{argLine}
 						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
 						--add-opens hosh.modules.network/hosh.modules.network=ALL-UNNAMED
 					</argLine>

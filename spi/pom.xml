@@ -22,6 +22,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>
+                        @{argLine}
                         --add-opens hosh.spi/hosh.spi=ALL-UNNAMED
                     </argLine>
                 </configuration>
