@@ -158,8 +158,6 @@
 						<arg>-Xlint:all</arg>
 						<arg>-Xlint:-requires-automatic</arg>
 						<arg>-Xpkginfo:always</arg>
-						<arg>--add-exports</arg>
-						<arg>java.base/jdk.internal.misc=hosh.runtime</arg>
 					</compilerArgs>
 				</configuration>
 			</plugin>
