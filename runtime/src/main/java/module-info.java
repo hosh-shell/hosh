@@ -25,7 +25,6 @@ module hosh.runtime {
 	requires hosh.spi;
 
 	requires java.logging;
-	requires jdk.jfr;
 
 	requires jline.reader;
 	requires jline.terminal;

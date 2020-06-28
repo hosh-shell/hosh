@@ -28,7 +28,7 @@ package hosh.runtime;
  * {@link DefaultCommandWrapper}.
  * <p>
  * This is an implementation detail and should be never exposed to the outside
- * (hosh.hosh.spi or modules).
+ * (hosh.spi or modules).
  */
 public interface InterpreterAware {
 

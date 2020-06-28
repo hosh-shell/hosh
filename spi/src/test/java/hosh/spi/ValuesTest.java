@@ -141,6 +141,7 @@ class ValuesTest {
 	class InstantValueTest {
 
 		@RegisterExtension
+		final
 		WithTimeZone withTimeZone = new WithTimeZone();
 
 		@Mock
@@ -628,7 +629,7 @@ class ValuesTest {
 		@Nested
 		class NoneFirstTest {
 
-			Comparator<Value> sut = Values.Comparators.noneFirst(Comparator.naturalOrder());
+			final Comparator<Value> sut = Values.Comparators.noneFirst(Comparator.naturalOrder());
 
 			@Test
 			void noneFirst() {

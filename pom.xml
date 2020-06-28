@@ -37,7 +37,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<argLine></argLine> <!-- defined for when not running with jacoco -->
+		<argLine/> <!-- defined for when not running with jacoco -->
 	</properties>
 	<modules>
 		<module>test-support</module>

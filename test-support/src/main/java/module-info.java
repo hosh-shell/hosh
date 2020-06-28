@@ -24,7 +24,6 @@
 module hosh.test.support {
 	requires java.logging;
 
-	requires org.assertj.core;
 	requires org.junit.jupiter.api;
 	requires org.mockito;
 
