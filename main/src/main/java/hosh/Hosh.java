@@ -35,6 +35,7 @@ import hosh.runtime.ConsoleChannel;
 import hosh.runtime.DisabledHistory;
 import hosh.runtime.FileSystemCompleter;
 import hosh.runtime.HoshFormatter;
+import hosh.runtime.HoshHighlighter;
 import hosh.runtime.Injector;
 import hosh.runtime.Interpreter;
 import hosh.runtime.PathInitializer;
@@ -238,6 +239,7 @@ public class Hosh {
 				new FileSystemCompleter(state),
 				new VariableExpansionCompleter(state)))
 			.terminal(terminal)
+			.highlighter(new HoshHighlighter(compiler))
 			.build();
 		Prompt prompt = new Prompt();
 		ReplReader reader = new ReplReader(prompt, lineReader);

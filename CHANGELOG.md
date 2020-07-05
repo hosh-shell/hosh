@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- (preview feature) hosh interprets the command line as it is typed and uses syntax highlighting to provide feedback to the user.
+  Potential errors, that are marked in bold red, include:
+    + any syntax error
+    + invalid commands (both built-in as well as external)
+
+### Changed
+### Fixed
+
 ## [v0.1.1] - 2020-06-27
 
 ### Added
