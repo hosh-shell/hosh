@@ -92,10 +92,10 @@ public class Supervisor implements AutoCloseable {
 
 	private ExitStatus deriveExitStatus(List<ExitStatus> results) {
 		return results
-			       .stream()
-			       .filter(ExitStatus::isError)
-			       .findFirst()
-			       .orElse(ExitStatus.success());
+			.stream()
+			.filter(ExitStatus::isError)
+			.findFirst()
+			.orElse(ExitStatus.success());
 	}
 
 	private List<ExitStatus> waitForCompletion() throws InterruptedException, ExecutionException {
@@ -116,13 +116,15 @@ public class Supervisor implements AutoCloseable {
 	private void cancelFuturesOnSigint() {
 		if (handleSignals) {
 			LOGGER.fine("register INT signal handler");
-			jdk.internal.misc.Signal.handle(INT, sig -> {
-				LOGGER.info("got INT signal");
-				futures.forEach(future -> {
-					LOGGER.finer(() -> String.format("cancelling future %s", future));
-					future.cancel(true);
-				});
-			});
+			jdk.internal.misc.Signal.handle(INT, this::cancelFutures);
+		}
+	}
+
+	private void cancelFutures(Signal signal) {
+		LOGGER.info(() -> String.format("got %s signal", signal));
+		for (Future<ExitStatus> future : futures) {
+			LOGGER.finer(() -> String.format("cancelling future %s", future));
+			future.cancel(true);
 		}
 	}
 
