@@ -43,16 +43,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * Display records in a table automatically (for interactive shell only).
- *
+ * <p>
  * All records are buffered (within a predefined size) to be able to determine the longest value for each key.
  * On buffer overflow all records are sent directly to the next channel.
- *
+ * <p>
  * NB: implementation must be thread-safe since while end() is running, send() could be called.
  */
 public class AutoTableChannel implements OutputChannel {
@@ -80,7 +79,7 @@ public class AutoTableChannel implements OutputChannel {
 		}
 		records.add(record);
 		if (records.size() >= OVERFLOW) {
-			logger.info("autotable: overflow after " + records.size());
+			logger.info(() -> "autotable: overflow after " + records.size());
 			overflow = true;
 			// flush and clear our buffer
 			records.forEach(outputChannel::send);
@@ -88,7 +87,7 @@ public class AutoTableChannel implements OutputChannel {
 	}
 
 	public void end() {
-		logger.info("autotable: end with overflow=" + overflow);
+		logger.info(() -> "autotable: end with overflow=" + overflow);
 		if (!overflow) {
 			Map<Key, Integer> paddings = calculatePaddings(records);
 			outputTable(outputChannel, records, paddings);
@@ -121,7 +120,7 @@ public class AutoTableChannel implements OutputChannel {
 		for (var kv : maxLengthPerColumn.entrySet()) {
 			result.put(kv.getKey(), kv.getValue() + COLUMN_PADDING);
 		}
-		logger.log(Level.FINE, "paddings = " + maxLengthPerColumn);
+		logger.info(() -> "paddings = " + maxLengthPerColumn);
 		return result;
 	}
 
@@ -169,7 +168,6 @@ public class AutoTableChannel implements OutputChannel {
 			.map(this::formatterFor)
 			.collect(Collectors.joining());
 		String header = String.format(format, keys.stream().map(Key::name).toArray());
-		logger.log(Level.FINE, "format = " + format);
 		out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 	}
 
