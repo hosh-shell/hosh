@@ -83,6 +83,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -142,11 +143,32 @@ class SystemModuleTest {
 
 		@Test
 		void showOneArg() {
-			ExitStatus exitStatus = sut.run(List.of("show anotherArg"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("show", "anotherArg"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path show")));
+		}
+
+		@Test
+		void clearZeroArg() {
+			Path sbin = Paths.get("/sbin");
+			Path bin = Paths.get("/bin");
+			state.setPath(new ArrayList<>(List.of(sbin, bin)));
+			ExitStatus exitStatus = sut.run(List.of("clear"), in, out, err);
+			assertThat(exitStatus).hasExitCode(0);
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+			assertThat(state.getPath()).isEmpty();
+		}
+
+		@Test
+		void clearOneArg() {
+			ExitStatus exitStatus = sut.run(List.of("clear", "anotherArg"), in, out, err);
+			assertThat(exitStatus).hasExitCode(1);
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path clear")));
 		}
 
 	}
