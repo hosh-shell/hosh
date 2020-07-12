@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Potential errors, that are marked in bold red, include:
     + any syntax error
     + invalid commands (both built-in as well as external)
+- `path`: new command to avoid text-based manipulation of PATH variable
+    + `path show` to show all elements of current PATH
+    + `path clear` to remove all elements of current PATH
+    + `path append /usr/local/bin` to add `/usr/local/bin` as last element of current PATH
+    + `path prepend /usr/local/bin` to add `/usr/local/bin` as first element of current PATH
 
 ### Changed
 ### Fixed

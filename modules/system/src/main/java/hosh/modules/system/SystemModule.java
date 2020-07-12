@@ -57,7 +57,6 @@ import java.lang.ProcessHandle.Info;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
@@ -80,6 +79,7 @@ public class SystemModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("path", Path::new);
 		registry.registerCommand("echo", Echo::new);
 		registry.registerCommand("env", Env::new);
 		registry.registerCommand("exit", Exit::new);
@@ -98,6 +98,76 @@ public class SystemModule implements Module {
 		registry.registerCommand("confirm", Confirm::new);
 		registry.registerCommand("capture", Capture::new);
 		registry.registerCommand("open", Open::new);
+	}
+
+	@Description("PATH manipulation")
+	@Examples({
+		@Example(command = "path show", description = "show path"),
+	})
+	public static class Path implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.isEmpty()) {
+				err.send(Errors.usage("path [show|clear|append path|prepend path]"));
+				return ExitStatus.error();
+			}
+			String command = args.get(0);
+			switch (command) {
+				case "show": {
+					if (args.size() != 1) {
+						err.send(Errors.usage("path show"));
+						return ExitStatus.error();
+					}
+					for (var path : state.getPath()) {
+						out.send(Records.singleton(Keys.PATH, Values.ofPath(path)));
+					}
+					return ExitStatus.success();
+				}
+
+				case "clear": {
+					if (args.size() != 1) {
+						err.send(Errors.usage("path clear"));
+						return ExitStatus.error();
+					}
+
+					state.getPath().clear();
+					return ExitStatus.success();
+				}
+
+				case "append": {
+					if (args.size() != 2) {
+						err.send(Errors.usage("path append path"));
+						return ExitStatus.error();
+					}
+					var path = Paths.get(args.get(1));
+					state.getPath().add(path);
+					return ExitStatus.success();
+				}
+
+				case "prepend": {
+					if (args.size() != 2) {
+						err.send(Errors.usage("path prepend path"));
+						return ExitStatus.error();
+					}
+					var path = Paths.get(args.get(1));
+					state.getPath().add(0, path);
+					return ExitStatus.success();
+				}
+
+				default: {
+					err.send(Errors.usage("path [show|clear|append path|prepend path]"));
+					return ExitStatus.error();
+				}
+			}
+		}
 	}
 
 	@Description("write arguments to output")
@@ -138,9 +208,9 @@ public class SystemModule implements Module {
 			Map<String, String> variables = state.getVariables();
 			for (var entry : variables.entrySet()) {
 				Record record = Records.builder()
-					                .entry(Keys.NAME, Values.ofText(entry.getKey()))
-					                .entry(Keys.VALUE, Values.ofText(entry.getValue()))
-					                .build();
+					.entry(Keys.NAME, Values.ofText(entry.getKey()))
+					.entry(Keys.VALUE, Values.ofText(entry.getValue()))
+					.build();
 				out.send(record);
 			}
 			return ExitStatus.success();
@@ -206,9 +276,9 @@ public class SystemModule implements Module {
 					Description description = entry.getValue().get().getClass().getAnnotation(Description.class);
 					String name = entry.getKey();
 					Record record = Records.builder()
-						                .entry(Keys.NAME, Values.ofText(name))
-						                .entry(Keys.DESCRIPTION, Values.ofText(description.value()))
-						                .build();
+						.entry(Keys.NAME, Values.ofText(name))
+						.entry(Keys.DESCRIPTION, Values.ofText(description.value()))
+						.build();
 					out.send(record);
 				}
 				return ExitStatus.success();
@@ -273,7 +343,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			if (unit.isEmpty()) {
-				err.send(Errors.message("invalid unit: %s",  args.get(1)));
+				err.send(Errors.message("invalid unit: %s", args.get(1)));
 				return ExitStatus.error();
 			}
 			try {
@@ -366,12 +436,12 @@ public class SystemModule implements Module {
 			ProcessHandle.allProcesses().forEach(process -> {
 				Info info = process.info();
 				Record result = Records.builder()
-					                .entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
-					                .entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
-					                .entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
-					                .entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
-					                .entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
-					                .build();
+					.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
+					.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
+					.entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
+					.entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
+					.entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
+					.build();
 				out.send(result);
 			});
 			return ExitStatus.success();
@@ -472,11 +542,11 @@ public class SystemModule implements Module {
 			int runs = resource.results.size();
 			Duration avg = runs == 0 ? Duration.ZERO : resource.results.stream().reduce(Duration.ZERO, Duration::plus).dividedBy(runs);
 			out.send(Records.builder()
-				         .entry(Keys.COUNT, Values.ofNumeric(runs))
-				         .entry(BEST, Values.ofDuration(best))
-				         .entry(WORST, Values.ofDuration(worst))
-				         .entry(AVERAGE, Values.ofDuration(avg))
-				         .build());
+				.entry(Keys.COUNT, Values.ofNumeric(runs))
+				.entry(BEST, Values.ofDuration(best))
+				.entry(WORST, Values.ofDuration(worst))
+				.entry(AVERAGE, Values.ofDuration(avg))
+				.build());
 		}
 
 		@Override
@@ -523,9 +593,13 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			for (Record ignored : InputChannel.iterate(in)) {
-				// do nothing
+				blackHole(ignored);
 			}
 			return ExitStatus.success();
+		}
+
+		@SuppressWarnings("unused")
+		private void blackHole(Record ignored) { // NOSONAR: by design
 		}
 
 	}
@@ -785,7 +859,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
-			Path path = state.getCwd().resolve(Paths.get(args.get(0)));
+			var path = state.getCwd().resolve(Paths.get(args.get(0)));
 			try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
 				for (Record incoming : InputChannel.iterate(in)) {
 					incoming.print(pw, locale);
@@ -799,10 +873,10 @@ public class SystemModule implements Module {
 
 		private OpenOption[] toOpenOptions(List<String> args) {
 			return args
-				       .stream()
-				       .skip(1)
-				       .map(this::parseOption)
-				       .toArray(OpenOption[]::new);
+				.stream()
+				.skip(1)
+				.map(this::parseOption)
+				.toArray(OpenOption[]::new);
 		}
 
 		private OpenOption parseOption(String arg) {

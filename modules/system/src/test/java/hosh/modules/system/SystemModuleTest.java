@@ -70,6 +70,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -82,6 +83,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +97,139 @@ import static org.mockito.BDDMockito.then;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 class SystemModuleTest {
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	class PathTest {
+
+		@Spy
+		final State state = new State();
+
+		@Mock
+		InputChannel in;
+
+		@Mock
+		OutputChannel out;
+
+		@Mock
+		OutputChannel err;
+
+		@InjectMocks
+		SystemModule.Path sut;
+
+		@Test
+		void noSubCommand() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path [show|clear|append path|prepend path]")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void unknownSubCommand() {
+			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path [show|clear|append path|prepend path]")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void showZeroArg() {
+			Path sbin = Paths.get("/sbin");
+			Path bin = Paths.get("/bin");
+			given(state.getPath()).willReturn(List.of(sbin, bin));
+			ExitStatus exitStatus = sut.run(List.of("show"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			InOrder inOrder = Mockito.inOrder(out); // order of paths is important!
+			then(out).should(inOrder).send(Records.singleton(Keys.PATH, Values.ofPath(sbin)));
+			then(out).should(inOrder).send(Records.singleton(Keys.PATH, Values.ofPath(bin)));
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void showOneArg() {
+			ExitStatus exitStatus = sut.run(List.of("show", "anotherArg"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path show")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void clearZeroArg() {
+			Path sbin = Paths.get("/sbin");
+			Path bin = Paths.get("/bin");
+			state.setPath(new ArrayList<>(List.of(sbin, bin)));
+			ExitStatus exitStatus = sut.run(List.of("clear"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+			assertThat(state.getPath()).isEmpty();
+		}
+
+		@Test
+		void clearOneArg() {
+			ExitStatus exitStatus = sut.run(List.of("clear", "anotherArg"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path clear")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void appendOneArg() {
+			Path bin = Paths.get("/bin");
+			state.setPath(new ArrayList<>(List.of(bin)));
+			ExitStatus exitStatus = sut.run(List.of("append", "/usr/local/bin"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+			assertThat(state.getPath()).containsExactly(bin, Path.of("/usr/local/bin"));
+		}
+
+		@Test
+		void appendZeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of("append"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path append path")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void prependOneArg() {
+			Path bin = Paths.get("/bin");
+			state.setPath(new ArrayList<>(List.of(bin)));
+			ExitStatus exitStatus = sut.run(List.of("prepend", "/usr/local/bin"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+			assertThat(state.getPath()).containsExactly(Path.of("/usr/local/bin"), bin);
+		}
+
+		@Test
+		void prependZeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of("prepend"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path prepend path")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+	}
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
@@ -147,7 +282,7 @@ class SystemModuleTest {
 
 		@Test
 		void twoArgs() {
-			ExitStatus exitStatus = sut.run(List.of("1", "2"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("asd", "fgh"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
 			then(state).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
