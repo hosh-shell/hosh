@@ -155,7 +155,7 @@ public class SystemModule implements Module {
 
 				case "prepend": {
 					if (args.size() != 2) {
-						err.send(Errors.usage("path append path"));
+						err.send(Errors.usage("path prepend path"));
 						return ExitStatus.error();
 					}
 					var path = Paths.get(args.get(1));

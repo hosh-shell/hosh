@@ -70,6 +70,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -95,6 +96,60 @@ import static org.mockito.BDDMockito.then;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 class SystemModuleTest {
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	class PathTest {
+
+		@Spy
+		final State state = new State();
+
+		@Mock
+		InputChannel in;
+
+		@Mock
+		OutputChannel out;
+
+		@Mock
+		OutputChannel err;
+
+		@InjectMocks
+		SystemModule.Path sut;
+
+		@Test
+		void noArgs() {
+			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			assertThat(exitStatus).hasExitCode(1);
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path [show|clear|append path|prepend path]")));
+		}
+
+		@Test
+		void showZeroArg() {
+			Path sbin = Paths.get("/sbin");
+			Path bin = Paths.get("/bin");
+			given(state.getPath()).willReturn(List.of(sbin, bin));
+			ExitStatus exitStatus = sut.run(List.of("show"), in, out, err);
+			assertThat(exitStatus).hasExitCode(0);
+			then(in).shouldHaveNoInteractions();
+			InOrder inOrder = Mockito.inOrder(out); // order of paths is important!
+			then(out).should(inOrder).send(Records.singleton(Keys.PATH, Values.ofPath(sbin)));
+			then(out).should(inOrder).send(Records.singleton(Keys.PATH, Values.ofPath(bin)));
+			then(out).shouldHaveNoMoreInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void showOneArg() {
+			ExitStatus exitStatus = sut.run(List.of("show anotherArg"), in, out, err);
+			assertThat(exitStatus).hasExitCode(1);
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path show")));
+		}
+
+	}
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
