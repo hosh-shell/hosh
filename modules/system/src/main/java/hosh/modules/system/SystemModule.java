@@ -100,7 +100,6 @@ public class SystemModule implements Module {
 		registry.registerCommand("open", Open::new);
 	}
 
-
 	@Description("PATH manipulation")
 	@Examples({
 		@Example(command = "path show", description = "show path"),

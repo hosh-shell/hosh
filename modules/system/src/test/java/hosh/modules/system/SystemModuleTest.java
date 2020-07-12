@@ -118,12 +118,23 @@ class SystemModuleTest {
 		SystemModule.Path sut;
 
 		@Test
-		void noArgs() {
+		void noSubCommand() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
-			assertThat(exitStatus).hasExitCode(1);
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path [show|clear|append path|prepend path]")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void unknownSubCommand() {
+			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path [show|clear|append path|prepend path]")));
+			then(state).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -132,7 +143,7 @@ class SystemModuleTest {
 			Path bin = Paths.get("/bin");
 			given(state.getPath()).willReturn(List.of(sbin, bin));
 			ExitStatus exitStatus = sut.run(List.of("show"), in, out, err);
-			assertThat(exitStatus).hasExitCode(0);
+			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			InOrder inOrder = Mockito.inOrder(out); // order of paths is important!
 			then(out).should(inOrder).send(Records.singleton(Keys.PATH, Values.ofPath(sbin)));
@@ -144,10 +155,11 @@ class SystemModuleTest {
 		@Test
 		void showOneArg() {
 			ExitStatus exitStatus = sut.run(List.of("show", "anotherArg"), in, out, err);
-			assertThat(exitStatus).hasExitCode(1);
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path show")));
+			then(state).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -156,7 +168,8 @@ class SystemModuleTest {
 			Path bin = Paths.get("/bin");
 			state.setPath(new ArrayList<>(List.of(sbin, bin)));
 			ExitStatus exitStatus = sut.run(List.of("clear"), in, out, err);
-			assertThat(exitStatus).hasExitCode(0);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
 			assertThat(state.getPath()).isEmpty();
@@ -165,10 +178,55 @@ class SystemModuleTest {
 		@Test
 		void clearOneArg() {
 			ExitStatus exitStatus = sut.run(List.of("clear", "anotherArg"), in, out, err);
-			assertThat(exitStatus).hasExitCode(1);
+			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path clear")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void appendOneArg() {
+			Path bin = Paths.get("/bin");
+			state.setPath(new ArrayList<>(List.of(bin)));
+			ExitStatus exitStatus = sut.run(List.of("append", "/usr/local/bin"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+			assertThat(state.getPath()).containsExactly(bin, Path.of("/usr/local/bin"));
+		}
+
+		@Test
+		void appendZeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of("append"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path append path")));
+			then(state).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void prependOneArg() {
+			Path bin = Paths.get("/bin");
+			state.setPath(new ArrayList<>(List.of(bin)));
+			ExitStatus exitStatus = sut.run(List.of("prepend", "/usr/local/bin"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+			assertThat(state.getPath()).containsExactly(Path.of("/usr/local/bin"), bin);
+		}
+
+		@Test
+		void prependZeroArgs() {
+			ExitStatus exitStatus = sut.run(List.of("prepend"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path prepend path")));
+			then(state).shouldHaveNoInteractions();
 		}
 
 	}
@@ -224,7 +282,7 @@ class SystemModuleTest {
 
 		@Test
 		void twoArgs() {
-			ExitStatus exitStatus = sut.run(List.of("1", "2"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("asd", "fgh"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
 			then(state).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
