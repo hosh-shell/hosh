@@ -79,6 +79,7 @@ public class SystemModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("path", Path::new);
 		registry.registerCommand("echo", Echo::new);
 		registry.registerCommand("env", Env::new);
 		registry.registerCommand("exit", Exit::new);
@@ -115,11 +116,59 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			Record record = Records.singleton(Keys.VALUE, Values.ofText(String.join(" ", args)));
-			out.send(record);
-			return ExitStatus.success();
-		}
+			if (args.isEmpty()) {
+				err.send(Errors.usage("path [show|clear|append path|prepend path]"));
+				return ExitStatus.error();
+			}
+			String command = args.get(0);
+			switch (command) {
+				case "show": {
+					if (args.size() != 1) {
+						err.send(Errors.usage("path show"));
+						return ExitStatus.error();
+					}
+					for (var path : state.getPath()) {
+						out.send(Records.singleton(Keys.PATH, Values.ofPath(path)));
+					}
+					return ExitStatus.success();
+				}
 
+				case "clear": {
+					if (args.size() != 1) {
+						err.send(Errors.usage("path clear"));
+						return ExitStatus.error();
+					}
+
+					state.getPath().clear();
+					return ExitStatus.success();
+				}
+
+				case "append": {
+					if (args.size() != 2) {
+						err.send(Errors.usage("path append path"));
+						return ExitStatus.error();
+					}
+					var path = Paths.get(args.get(1));
+					state.getPath().add(path);
+					return ExitStatus.success();
+				}
+
+				case "prepend": {
+					if (args.size() != 2) {
+						err.send(Errors.usage("path append path"));
+						return ExitStatus.error();
+					}
+					var path = Paths.get(args.get(1));
+					state.getPath().add(0, path);
+					return ExitStatus.success();
+				}
+
+				default: {
+					err.send(Errors.usage("path [show|clear|append path|prepend path]"));
+					return ExitStatus.error();
+				}
+			}
+		}
 	}
 
 	@Description("write arguments to output")
