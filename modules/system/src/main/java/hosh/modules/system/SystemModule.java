@@ -594,9 +594,13 @@ public class SystemModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			for (Record ignored : InputChannel.iterate(in)) {
-				// do nothing
+				blackHole(ignored);
 			}
 			return ExitStatus.success();
+		}
+
+		@SuppressWarnings("unused")
+		private void blackHole(Record ignored) { // NOSONAR: by design
 		}
 
 	}
@@ -856,7 +860,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
-			Path path = state.getCwd().resolve(Paths.get(args.get(0)));
+			var path = state.getCwd().resolve(Paths.get(args.get(0)));
 			try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
 				for (Record incoming : InputChannel.iterate(in)) {
 					incoming.print(pw, locale);
