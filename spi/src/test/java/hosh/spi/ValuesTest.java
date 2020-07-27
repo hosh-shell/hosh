@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -95,6 +96,12 @@ class ValuesTest {
 		@Test
 		void unwrap() {
 			assertThat(Values.none().unwrap(Object.class)).isEmpty();
+		}
+
+		@Test
+		void merge() {
+			assertThat(Values.none().merge(Values.ofText("a"))).isNotEmpty();
+			assertThat(Values.none().merge(Values.none())).isEmpty();
 		}
 	}
 
@@ -643,6 +650,33 @@ class ValuesTest {
 				values.sort(sut);
 
 				assertThat(values).first().isEqualTo(Values.none());
+			}
+		}
+
+		@Nested
+		class MergeTest {
+
+			@Test
+			void mergeNumericValues() {
+				var none = Values.none();
+				var num = Values.ofNumeric(1);
+
+				assertThat(none.merge(none)).isEmpty();
+				assertThat(num.merge(num)).hasValue(Values.ofNumeric(2));
+				assertThat(none.merge(num)).hasValue(num);
+				assertThat(num.merge(none)).hasValue(num);
+			}
+
+
+			@Test
+			void mergeSizeValues() {
+				var none = Values.none();
+				var size = Values.ofSize(1);
+
+				assertThat(none.merge(none)).isEmpty();
+				assertThat(size.merge(size)).hasValue(Values.ofSize(2));
+				assertThat(none.merge(size)).hasValue(size);
+				assertThat(size.merge(none)).hasValue(size);
 			}
 		}
 	}

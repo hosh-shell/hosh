@@ -232,7 +232,7 @@ public class Values {
 				SizeValue that = (SizeValue) value;
 				return Optional.of(new SizeValue(that.bytes + this.bytes));
 			}
-			return Optional.empty();
+			return value.merge(this);
 		}
 	}
 
@@ -297,8 +297,7 @@ public class Values {
 				NumericValue that = (NumericValue) value;
 				return Optional.of(new NumericValue(that.number + this.number));
 			}
-			return Optional.empty();
-		}
+			return value.merge(this);		}
 	}
 
 	static final class None implements Value {
@@ -330,6 +329,15 @@ public class Values {
 			} else {
 				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
 			}
+		}
+
+		@Override
+		public Optional<Value> merge(Value value) {
+			// artificially translating None to Optional.empty()
+			if (value instanceof None) {
+				return Optional.empty();
+			}
+			return Optional.of(value);
 		}
 	}
 

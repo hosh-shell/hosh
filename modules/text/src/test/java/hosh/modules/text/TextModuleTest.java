@@ -314,6 +314,19 @@ class TextModuleTest {
 			then(out).should().send(RecordMatcher.of(Keys.COUNT, Values.ofNumeric(2)));
 			then(err).shouldHaveNoInteractions();
 		}
+
+		@SuppressWarnings("unchecked")
+		@Test
+		void matchingKeyWithSizeValueAndNone() {
+			Record record1 = Records.singleton(Keys.SIZE, Values.none());
+			Record record2 = Records.singleton(Keys.SIZE, Values.ofSize(1));
+			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			assertThat(exitStatus).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(1)));
+			then(err).shouldHaveNoInteractions();
+		}
 	}
 
 	@Nested
