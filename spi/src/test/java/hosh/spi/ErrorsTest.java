@@ -42,4 +42,16 @@ class ErrorsTest {
 		Record result = Errors.message(npe);
 		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("whatever")));
 	}
+
+	@Test
+	void messageFormat() {
+		Record result = Errors.message("value is %d", 1);
+		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("value is 1")));
+	}
+
+	@Test
+	void usage() {
+		Record result = Errors.usage("cmd [option]");
+		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("usage: cmd [option]")));
+	}
 }

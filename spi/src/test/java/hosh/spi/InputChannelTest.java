@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -71,7 +72,9 @@ class InputChannelTest {
 	void throwsNoSuchElementsWhenConsumed() {
 		given(in.recv()).willReturn(Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
-		assertThatThrownBy(() -> iterable.iterator().next()).isInstanceOf(NoSuchElementException.class);
+		Iterator<Record> iterator = iterable.iterator();
+		assertThatThrownBy(() -> iterator.next())
+			.isInstanceOf(NoSuchElementException.class);
 	}
 
 	@SuppressWarnings("unchecked")

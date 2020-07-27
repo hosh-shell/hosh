@@ -135,7 +135,7 @@ public class Values {
 				TextValue that = (TextValue) obj;
 				return BY_TEXT_ALPHA_NUM.compare(this.value, that.value);
 			} else {
-				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+				return cannotCompare(this, obj);
 			}
 		}
 
@@ -213,9 +213,10 @@ public class Values {
 				SizeValue that = (SizeValue) obj;
 				return Long.compare(this.bytes, that.bytes);
 			} else {
-				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+				return cannotCompare(this, obj);
 			}
 		}
+
 
 		@SuppressWarnings("unchecked")
 		@Override
@@ -276,7 +277,7 @@ public class Values {
 				NumericValue that = (NumericValue) obj;
 				return Long.compare(this.number, that.number);
 			} else {
-				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+				return cannotCompare(this, obj);
 			}
 		}
 
@@ -291,13 +292,15 @@ public class Values {
 			}
 			return Optional.empty();
 		}
+
 		@Override
 		public Optional<Value> merge(Value value) {
 			if (value instanceof NumericValue) {
 				NumericValue that = (NumericValue) value;
 				return Optional.of(new NumericValue(that.number + this.number));
 			}
-			return value.merge(this);		}
+			return value.merge(this);
+		}
 	}
 
 	static final class None implements Value {
@@ -327,7 +330,7 @@ public class Values {
 			if (obj instanceof None) {
 				return 0;
 			} else {
-				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+				return cannotCompare(this, obj);
 			}
 		}
 
@@ -358,7 +361,7 @@ public class Values {
 				DurationValue that = (DurationValue) obj;
 				return this.duration.compareTo(that.duration);
 			} else {
-				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+				return cannotCompare(this, obj);
 			}
 		}
 
@@ -405,7 +408,7 @@ public class Values {
 				InstantValue that = (InstantValue) obj;
 				return this.instant.compareTo(that.instant);
 			} else {
-				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+				return cannotCompare(this, obj);
 			}
 		}
 
@@ -492,7 +495,7 @@ public class Values {
 				PathValue that = (PathValue) obj;
 				return BY_PATH_ALPHANUM.compare(this.path, that.path);
 			} else {
-				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+				return cannotCompare(this, obj);
 			}
 		}
 	}
@@ -551,7 +554,7 @@ public class Values {
 				StyledValue that = (StyledValue) obj;
 				return BY_VALUE_AND_STYLE.compare(this, that);
 			} else {
-				throw new IllegalArgumentException("cannot compare " + this + " to " + obj);
+				return cannotCompare(this, obj);
 			}
 		}
 
@@ -668,4 +671,10 @@ public class Values {
 		}
 
 	}
+
+	// generic error for compareTo, when types are not compatible
+	private static int cannotCompare(Value a, Value b) {
+		throw new IllegalArgumentException("cannot compare " + a + " with " + b);
+	}
+
 }

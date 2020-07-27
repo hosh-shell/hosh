@@ -45,7 +45,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,9 +75,11 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.none().compareTo(Values.ofText("2")))
+			Value a = Values.none();
+			Value b = Values.ofText("2");
+			assertThatThrownBy(() -> a.compareTo(b))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare None to Text[2]");
+				.hasMessage("cannot compare None with Text[2]");
 		}
 
 		@Test
@@ -137,9 +138,11 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.ofDuration(Duration.ofHours(1)).compareTo(Values.ofText("2")))
+			Value a = Values.ofDuration(Duration.ofHours(1));
+			Value b = Values.ofText("2");
+			assertThatThrownBy(() -> a.compareTo(b))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Duration[PT1H] to Text[2]");
+				.hasMessage("cannot compare Duration[PT1H] with Text[2]");
 		}
 	}
 
@@ -180,9 +183,11 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.ofInstant(Instant.EPOCH).compareTo(Values.ofText("2")))
+			Value a = Values.ofInstant(Instant.EPOCH);
+			Value b = Values.ofText("2");
+			assertThatThrownBy(() -> a.compareTo(b))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Instant[1970-01-01T00:00:00Z] to Text[2]");
+				.hasMessage("cannot compare Instant[1970-01-01T00:00:00Z] with Text[2]");
 		}
 	}
 
@@ -219,9 +224,11 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.ofText("2").compareTo(Values.ofDuration(Duration.ofHours(1))))
+			Value a = Values.ofText("2");
+			Value b = Values.ofDuration(Duration.ofHours(1));
+			assertThatThrownBy(() -> a.compareTo(b))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Text[2] to Duration[PT1H]");
+				.hasMessage("cannot compare Text[2] with Duration[PT1H]");
 		}
 
 		@Test
@@ -271,9 +278,11 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.ofNumeric(42).compareTo(Values.ofText("2")))
+			Value a = Values.ofNumeric(42);
+			Value b = Values.ofText("2");
+			assertThatThrownBy(() -> a.compareTo(b))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Numeric[42] to Text[2]");
+				.hasMessage("cannot compare Numeric[42] with Text[2]");
 		}
 
 		@Test
@@ -349,9 +358,11 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.ofSize(1000).compareTo(Values.ofText("2")))
+			Value a = Values.ofSize(1000);
+			Value b = Values.ofText("2");
+			assertThatThrownBy(() -> a.compareTo(b))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Size[1000B] to Text[2]");
+				.hasMessage("cannot compare Size[1000B] with Text[2]");
 		}
 
 		@Test
@@ -387,9 +398,11 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.ofPath(Paths.get("file")).compareTo(Values.ofText("2")))
+			Value a = Values.ofPath(Paths.get("file"));
+			Value b = Values.ofText("2");
+			assertThatThrownBy(() -> a.compareTo(b))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Path[file] to Text[2]");
+				.hasMessage("cannot compare Path[file] with Text[2]");
 		}
 
 		@Test
@@ -410,7 +423,7 @@ class ValuesTest {
 			PrintWriter printWriter = new PrintWriter(writer);
 			Value value = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
 			value.print(printWriter, Locale.getDefault());
-			assertThat(writer.toString()).isEqualTo("\u001B[44m1\u001B[49m");
+			assertThat(writer).hasToString("\u001B[44m1\u001B[49m");
 		}
 
 		@Test
@@ -422,16 +435,19 @@ class ValuesTest {
 
 		@Test
 		void nullStyle() {
-			assertThatThrownBy(() -> Values.withStyle(Values.ofText("aaa"), null))
+			Value text = Values.ofText("text");
+			assertThatThrownBy(() -> Values.withStyle(text, null))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("style cannot be null");
 		}
 
 		@Test
 		void compareToAnotherValueType() {
-			assertThatThrownBy(() -> Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE).compareTo(Values.ofText("2")))
+			Value a = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
+			Value b = Values.ofText("2");
+			assertThatThrownBy(() -> a.compareTo(b))
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare StyledValue[value=Numeric[1],style='BG_BLUE'] to Text[2]");
+				.hasMessage("cannot compare StyledValue[value=Numeric[1],style='BG_BLUE'] with Text[2]");
 		}
 
 		@Test
@@ -625,9 +641,7 @@ class ValuesTest {
 					Values.ofNumeric(-1),
 					Values.none(),
 					Values.ofNumeric(0)
-				).collect(Collectors.toList());
-
-				values.sort(sut);
+				).sorted(sut).collect(Collectors.toList());
 
 				assertThat(values).last().isEqualTo(Values.none());
 			}
@@ -645,9 +659,7 @@ class ValuesTest {
 					Values.ofNumeric(-1),
 					Values.none(),
 					Values.ofNumeric(0)
-				).collect(Collectors.toList());
-
-				values.sort(sut);
+				).sorted(sut).collect(Collectors.toList());
 
 				assertThat(values).first().isEqualTo(Values.none());
 			}

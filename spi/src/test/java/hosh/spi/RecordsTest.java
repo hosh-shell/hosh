@@ -36,7 +36,7 @@ class RecordsTest {
 		Record b = Records.singleton(Keys.NAME, Values.ofText("a"));
 		assertThat(a).isEqualTo(b);
 		assertThat(a).hasSameHashCodeAs(b);
-		assertThat(a.toString()).isEqualTo(b.toString());
+		assertThat(a).hasToString(b.toString());
 	}
 
 	@Test
@@ -59,11 +59,11 @@ class RecordsTest {
 	@Test
 	void asString() {
 		Record a = Records.empty();
-		assertThat(a.toString()).isEqualTo("Record[data={}]");
+		assertThat(a).hasToString("Record[data={}]");
 		Record b = a.append(Keys.SIZE, Values.ofSize(10));
-		assertThat(b.toString()).isEqualTo("Record[data={Key['size']=Size[10B]}]");
+		assertThat(b).hasToString("Record[data={Key['size']=Size[10B]}]");
 		Record c = b.append(Keys.NAME, Values.ofText("foo"));
-		assertThat(c.toString()).isEqualTo("Record[data={Key['size']=Size[10B],Key['name']=Text[foo]}]");
+		assertThat(c).hasToString("Record[data={Key['size']=Size[10B],Key['name']=Text[foo]}]");
 	}
 
 	@Test
@@ -135,10 +135,13 @@ class RecordsTest {
 
 	@Test
 	void singleton() {
-		Record a = Records.singleton(Keys.NAME, Values.none());
+		Value name = Values.ofText("a name");
+		Record a = Records.singleton(Keys.NAME, name);
 		assertThat(a.keys()).containsExactly(Keys.NAME);
-		assertThat(a.values()).containsExactly(Values.none());
-		assertThat(a.entries()).containsExactly(new Record.Entry(Keys.NAME, Values.none()));
+		assertThat(a.values()).containsExactly(name);
+		assertThat(a.entries()).containsExactly(new Record.Entry(Keys.NAME, name));
+		assertThat(a.value(Keys.NAME)).isPresent().hasValue(name);
+		assertThat(a.value(Keys.COUNT)).isNotPresent();
 	}
 
 	@Test
@@ -156,4 +159,13 @@ class RecordsTest {
 		assertThat(entry.getKey()).isEqualTo(Keys.NAME);
 		assertThat(entry.getValue()).isEqualTo(Values.none());
 	}
+
+	@Test
+	void prependAndAppend() {
+		Record a = Records.empty();
+		Value text = Values.ofText("some text");
+		assertThat(a.prepend(Keys.TEXT, text)).isEqualTo(a.append(Keys.TEXT, text));
+		assertThat(a.append(Keys.TEXT, text)).isEqualTo(a.prepend(Keys.TEXT, text));
+	}
+
 }
