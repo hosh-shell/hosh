@@ -38,6 +38,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<argLine/> <!-- defined for when not running with jacoco -->
+		<version.jline>3.16.0</version.jline>
 	</properties>
 	<modules>
 		<module>test-support</module>
@@ -61,18 +62,18 @@
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal</artifactId>
-			<version>3.14.1</version>
+			<version>${version.jline}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-terminal-jna</artifactId>
-			<version>3.14.1</version>
+			<version>${version.jline}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jline</groupId>
 			<artifactId>jline-reader</artifactId>
-			<version>3.14.1</version>
+			<version>${version.jline}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>

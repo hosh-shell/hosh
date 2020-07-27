@@ -25,8 +25,8 @@
 module hosh.spi {
 	requires java.logging;
 
-	requires jline.reader;
-	requires jline.terminal;
+	requires org.jline.reader;
+	requires org.jline.terminal;
 
 	exports hosh.spi;
 	exports hosh.doc;

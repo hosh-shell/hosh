@@ -26,8 +26,8 @@ module hosh.runtime {
 
 	requires java.logging;
 
-	requires jline.reader;
-	requires jline.terminal;
+	requires org.jline.reader;
+	requires org.jline.terminal;
 
 	requires org.antlr.antlr4.runtime;
 
