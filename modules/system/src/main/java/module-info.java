@@ -23,5 +23,5 @@
  */
 module hosh.modules.system {
 	requires hosh.spi;
-	requires jline.reader;
+	requires org.jline.reader;
 }

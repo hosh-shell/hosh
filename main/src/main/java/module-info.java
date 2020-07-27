@@ -28,6 +28,6 @@ module hosh {
 	requires hosh.spi;
 
 	requires commons.cli;
-	requires jline.reader;
-	requires jline.terminal;
+	requires org.jline.reader;
+	requires org.jline.terminal;
 }
