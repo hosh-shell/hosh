@@ -4,7 +4,7 @@
 	<groupId>hosh</groupId>
 	<artifactId>hosh-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1.2-SNAPSHOT</version>
+	<version>0.1.2</version>
 	<url>https://hosh-shell.github.io</url>
 	<description>The Human Oriented SHell</description>
 	<inceptionYear>2018</inceptionYear>
@@ -26,7 +26,7 @@
 	</developers>
 	<scm>
 		<developerConnection>scm:git:.</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v0.1.2</tag>
 	</scm>
 	<distributionManagement>
 		<repository>
@@ -37,7 +37,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<argLine/> <!-- defined for when not running with jacoco -->
+		<argLine /> <!-- defined for when not running with jacoco -->
 		<version.jline>3.16.0</version.jline>
 	</properties>
 	<modules>
