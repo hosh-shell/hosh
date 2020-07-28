@@ -311,8 +311,11 @@
 		<profile>
 			<id>sonar</id>
 			<properties>
+				<!--suppress UnresolvedMavenProperty -->
 				<sonar.coverage.jacoco.xmlReportPaths>
-					${project.build.directory}/site/jacoco/jacoco.xml,${project.build.directory}/site/jacoco-it/jacoco.xml
+					${project.build.directory}/site/jacoco/jacoco.xml,
+					${project.build.directory}/site/jacoco-it/jacoco.xml,
+					${maven.multiModuleProjectDirectory}/main/target/site/jacoco-aggregate/jacoco.xml
 				</sonar.coverage.jacoco.xmlReportPaths>
 				<sonar.exclusions>
 					runtime/target/generated-sources/**,test-support/src/**,spi-test-support/src/**
@@ -350,9 +353,11 @@
 							</execution>
 							<execution>
 								<id>report</id>
+								<phase>verify</phase>
 								<goals>
 									<goal>report</goal>
 									<goal>report-integration</goal>
+									<goal>report-aggregate</goal>
 								</goals>
 							</execution>
 						</executions>
