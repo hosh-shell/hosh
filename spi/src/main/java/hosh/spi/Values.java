@@ -33,6 +33,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
@@ -89,6 +90,15 @@ public class Values {
 
 	public static Value withStyle(Value value, Ansi.Style style) {
 		return new StyledValue(value, style);
+	}
+
+	/**
+	 * Used to represent array of bytes, encoded as hexadecimal and separated by ':' by default.
+	 *
+	 * NB: it will be used to represent also message digest such as md5 and sha1.
+	 */
+	public static Value ofBytes(byte[] bytes) {
+		return new BytesValue(bytes);
 	}
 
 	static final class TextValue implements Value {
@@ -497,6 +507,59 @@ public class Values {
 			} else {
 				return cannotCompare(this, obj);
 			}
+		}
+	}
+
+	static class BytesValue implements Value {
+
+		private final byte[] bytes;
+
+		public BytesValue(byte[] bytes) {
+			if (bytes == null) {
+				throw new IllegalArgumentException("bytes cannot be null");
+			}
+
+			this.bytes = bytes;
+		}
+
+		@Override
+		public void print(PrintWriter printWriter, Locale locale) {
+			StringBuilder sb = new StringBuilder();
+			for (var b : bytes) {
+				sb.append(String.format("%02x", b));
+				sb.append(':');
+			}
+			sb.setLength(sb.length() - 1); // kill last ':'
+			printWriter.print(sb);
+		}
+
+		@Override
+		public int compareTo(Value o) {
+			if (o instanceof BytesValue) {
+				BytesValue that = (BytesValue) o;
+				return Arrays.compare(this.bytes, that.bytes);
+			}
+			return cannotCompare(this, o);
+		}
+
+		@Override
+		public final boolean equals(Object obj) {
+			if (obj instanceof BytesValue) {
+				BytesValue that = (BytesValue) obj;
+				return Arrays.equals(this.bytes, that.bytes);
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public final int hashCode() {
+			return Arrays.hashCode(bytes);
+		}
+
+		@Override
+		public String toString() {
+			return String.format("Bytes[%s]", Arrays.toString(bytes));
 		}
 	}
 

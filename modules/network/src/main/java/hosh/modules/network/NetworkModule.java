@@ -37,6 +37,7 @@ import hosh.spi.Module;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
+import hosh.spi.Value;
 import hosh.spi.Values;
 
 import java.io.IOException;
@@ -50,7 +51,6 @@ import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -80,15 +80,15 @@ public class NetworkModule implements Module {
 				while (iterator.hasNext()) {
 					NetworkInterface ni = iterator.next();
 					Record record = Records
-						                .builder()
-						                .entry(Keys.of("alias"), Values.ofText(ni.getDisplayName()))
-						                .entry(Keys.of("up"), Values.ofText(ni.isUp() ? "yes" : "no"))
-						                .entry(Keys.of("loopback"), Values.ofText(ni.isLoopback() ? "yes" : "no"))
-						                .entry(Keys.of("virtual"), Values.ofText(ni.isVirtual() ? "yes" : "no"))
-						                .entry(Keys.of("mtu"), Values.ofNumeric(ni.getMTU()))
-						                .entry(Keys.of("hwaddress"), Values.ofText(formatHex(ni.getHardwareAddress())))
-						                .entry(Keys.of("address"), Values.ofText(formatInterfaceAddress(ni)))
-						                .build();
+						.builder()
+						.entry(Keys.of("alias"), Values.ofText(ni.getDisplayName()))
+						.entry(Keys.of("up"), Values.ofText(ni.isUp() ? "yes" : "no"))
+						.entry(Keys.of("loopback"), Values.ofText(ni.isLoopback() ? "yes" : "no"))
+						.entry(Keys.of("virtual"), Values.ofText(ni.isVirtual() ? "yes" : "no"))
+						.entry(Keys.of("mtu"), Values.ofNumeric(ni.getMTU()))
+						.entry(Keys.of("hwaddress"), hwAddress(ni.getHardwareAddress()))
+						.entry(Keys.of("address"), firstAddress(ni))
+						.build();
 					out.send(record);
 				}
 				return ExitStatus.success();
@@ -97,27 +97,24 @@ public class NetworkModule implements Module {
 			}
 		}
 
-		private String formatInterfaceAddress(NetworkInterface ni) {
-			var interfaceAddresses = ni.getInterfaceAddresses();
-			if (interfaceAddresses.isEmpty()) {
-				return "";
+		private Value hwAddress(byte[] hardwareAddress) {
+			if (hardwareAddress == null) {
+				return Values.none();
+			} else {
+				return Values.ofBytes(hardwareAddress);
 			}
-			return interfaceAddresses.get(0).getAddress().getHostAddress();
 		}
 
-		private String formatHex(byte[] bytes) throws IOException {
-			try (Formatter formatter = new Formatter()) {
-				if (bytes != null) {
-					for (int i = 0; i < bytes.length; i++) {
-						formatter.format("%02x", bytes[i]);
-						if (i < bytes.length - 1) {
-							formatter.out().append(":");
-						}
-					}
-				}
-				return formatter.toString();
+		// by now, just use the first address formatted as hex
+		// not perfect but a good start
+		private Value firstAddress(NetworkInterface ni) {
+			var interfaceAddresses = ni.getInterfaceAddresses();
+			if (interfaceAddresses.isEmpty()) {
+				return Values.none();
 			}
+			return Values.ofText(interfaceAddresses.get(0).getAddress().getHostAddress());
 		}
+
 	}
 
 	@Description("http client (supports HTTP 1.1/2.0, HTTPS, system proxy)")
@@ -141,10 +138,10 @@ public class NetworkModule implements Module {
 				return ExitStatus.error();
 			}
 			HttpRequest request = HttpRequest.newBuilder()
-				                      .uri(URI.create(args.get(0)))
-									  .setHeader("User-Agent", "Hosh")
-				                      .GET()
-				                      .build();
+				.uri(URI.create(args.get(0)))
+				.setHeader("User-Agent", "Hosh")
+				.GET()
+				.build();
 			try {
 				HttpResponse<Stream<String>> response = requestor.send(request);
 				try (Stream<String> body = response.body()) {
@@ -178,11 +175,11 @@ public class NetworkModule implements Module {
 		private static class HttpClientHolder {
 
 			private static final HttpClient INSTANCE = HttpClient.newBuilder()
-				                                           .version(Version.HTTP_2)
-				                                           .followRedirects(Redirect.NORMAL)
-				                                           .proxy(ProxySelector.getDefault())
-				                                           .executor(Runnable::run)
-				                                           .build();
+				.version(Version.HTTP_2)
+				.followRedirects(Redirect.NORMAL)
+				.proxy(ProxySelector.getDefault())
+				.executor(Runnable::run)
+				.build();
 
 			public static HttpClient getInstance() {
 				return INSTANCE;

@@ -415,6 +415,46 @@ class ValuesTest {
 	}
 
 	@Nested
+	class BytesTest {
+
+		@Test
+		void appendOk() {
+			StringWriter writer = new StringWriter();
+			PrintWriter printWriter = new PrintWriter(writer);
+			Value value = Values.ofBytes(new byte[]{-1, 1, 127});
+			value.print(printWriter, Locale.getDefault());
+			assertThat(writer).hasToString("ff:01:7f");
+		}
+
+		@Test
+		void nullValue() {
+			assertThatThrownBy(() -> Values.ofBytes(null))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("bytes cannot be null");
+		}
+
+		@Test
+		void compareToAnotherValueType() {
+			Value a = Values.ofBytes(new byte[]{-1, -1});
+			Value b = Values.ofText("2");
+			assertThatThrownBy(() -> a.compareTo(b))
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("cannot compare Bytes[[-1, -1]] with Text[2]");
+		}
+
+		@Test
+		void equalsContract() {
+			EqualsVerifier.forClass(Values.BytesValue.class).verify();
+		}
+
+		@Test
+		void asString() {
+			assertThat(Values.ofBytes(new byte[]{-1, -1})).hasToString("Bytes[[-1, -1]]");
+		}
+
+	}
+
+	@Nested
 	class WithStyleTest {
 
 		@Test
