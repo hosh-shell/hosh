@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.NetworkInterface;
 import java.net.ProxySelector;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
@@ -93,7 +92,7 @@ public class NetworkModule implements Module {
 					out.send(record);
 				}
 				return ExitStatus.success();
-			} catch (SocketException e) {
+			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
 		}
@@ -106,13 +105,13 @@ public class NetworkModule implements Module {
 			return interfaceAddresses.get(0).getAddress().getHostAddress();
 		}
 
-		private String formatHex(byte[] bytes) {
+		private String formatHex(byte[] bytes) throws IOException {
 			try (Formatter formatter = new Formatter()) {
 				if (bytes != null) {
 					for (int i = 0; i < bytes.length; i++) {
 						formatter.format("%02x", bytes[i]);
 						if (i < bytes.length - 1) {
-							formatter.format(":");
+							formatter.out().append(":");
 						}
 					}
 				}

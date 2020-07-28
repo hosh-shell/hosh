@@ -32,36 +32,43 @@ import java.util.Collections;
 import java.util.ListIterator;
 
 /**
- * Fake no-op implementation of {@link History}: used for non-interactive sessions and for HoshIT.
+ * No-op implementation of {@link History}: used for non-interactive sessions and for integration tests (@see HoshIT).
  */
 public class DisabledHistory implements History {
 
 	@Override
 	public void attach(LineReader reader) {
+		// no-op
 	}
 
 	@Override
 	public void load() {
+		// no-op
 	}
 
 	@Override
 	public void save() {
+		// no-op
 	}
 
 	@Override
 	public void write(Path file, boolean incremental) {
+		// no-op
 	}
 
 	@Override
 	public void append(Path file, boolean incremental) {
+		// no-op
 	}
 
 	@Override
 	public void read(Path file, boolean incremental) {
+		// no-op
 	}
 
 	@Override
 	public void purge() {
+		// no-op
 	}
 
 	@Override
@@ -91,6 +98,7 @@ public class DisabledHistory implements History {
 
 	@Override
 	public void add(Instant time, String line) {
+		// no-op
 	}
 
 	@Override
@@ -130,9 +138,11 @@ public class DisabledHistory implements History {
 
 	@Override
 	public void moveToEnd() {
+		// no-op
 	}
 
 	@Override
 	public void resetIndex() {
+		// no-op
 	}
 }

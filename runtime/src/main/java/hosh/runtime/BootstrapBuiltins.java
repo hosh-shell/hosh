@@ -43,7 +43,7 @@ public class BootstrapBuiltins {
 		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {
-			logger.log(Level.INFO, "registering " + module.getClass().getCanonicalName());
+			logger.log(Level.INFO, () -> String.format("registering %s", module.getClass().getCanonicalName()));
 			module.initialize(commandRegistry);
 		}
 	}

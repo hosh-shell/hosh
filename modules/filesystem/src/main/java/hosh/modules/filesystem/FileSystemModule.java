@@ -131,12 +131,12 @@ public class FileSystemModule implements Module {
 					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 					Value size = attributes.isRegularFile() ? Values.ofSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
-						               .entry(Keys.PATH, Values.ofPath(path.getFileName()))
-						               .entry(Keys.SIZE, size)
-						               .entry(Keys.CREATED, Values.ofInstant(attributes.creationTime().toInstant()))
-						               .entry(Keys.MODIFIED, Values.ofInstant(attributes.lastModifiedTime().toInstant()))
-						               .entry(Keys.ACCESSED, Values.ofInstant(attributes.lastAccessTime().toInstant()))
-						               .build();
+						.entry(Keys.PATH, Values.ofPath(path.getFileName()))
+						.entry(Keys.SIZE, size)
+						.entry(Keys.CREATED, Values.ofInstant(attributes.creationTime().toInstant()))
+						.entry(Keys.MODIFIED, Values.ofInstant(attributes.lastModifiedTime().toInstant()))
+						.entry(Keys.ACCESSED, Values.ofInstant(attributes.lastAccessTime().toInstant()))
+						.build();
 					out.send(entry);
 				}
 				return ExitStatus.success();
@@ -144,7 +144,7 @@ public class FileSystemModule implements Module {
 				err.send(Errors.message("not a directory: %s", e.getMessage()));
 				return ExitStatus.error();
 			} catch (AccessDeniedException e) {
-				err.send(Errors.message("access denied: %s",  e.getMessage()));
+				err.send(Errors.message("access denied: %s", e.getMessage()));
 				return ExitStatus.error();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -296,16 +296,16 @@ public class FileSystemModule implements Module {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 				out.send(Records
-					         .builder()
-					         .entry(Keys.PATH, Values.ofPath(file))
-					         .entry(Keys.SIZE, Values.ofSize(attrs.size()))
-					         .build());
+					.builder()
+					.entry(Keys.PATH, Values.ofPath(file))
+					.entry(Keys.SIZE, Values.ofSize(attrs.size()))
+					.build());
 				return FileVisitResult.CONTINUE;
 			}
 
 			@Override
 			public FileVisitResult visitFileFailed(Path file, IOException exc) {
-				LOGGER.log(Level.SEVERE, "error while visiting: " + file, exc);
+				LOGGER.log(Level.SEVERE, exc, () -> String.format("error while visiting: %s", file));
 				err.send(Errors.message(exc));
 				return FileVisitResult.CONTINUE;
 			}
@@ -459,15 +459,15 @@ public class FileSystemModule implements Module {
 			for (FileStore store : FileSystems.getDefault().getFileStores()) {
 				try {
 					out.send(Records
-						         .builder()
-						         .entry(Keys.of("name"), Values.ofText(store.name()))
-						         .entry(Keys.of("type"), Values.ofText(store.type()))
-						         .entry(Keys.of("total"), Values.ofSize(store.getTotalSpace()))
-						         .entry(Keys.of("used"), Values.ofSize(store.getTotalSpace() - store.getUnallocatedSpace()))
-						         .entry(Keys.of("free"), Values.ofSize(store.getUsableSpace()))
-						         .entry(Keys.of("blocksize"), Values.ofSize(store.getBlockSize()))
-						         .entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
-						         .build());
+						.builder()
+						.entry(Keys.of("name"), Values.ofText(store.name()))
+						.entry(Keys.of("type"), Values.ofText(store.type()))
+						.entry(Keys.of("total"), Values.ofSize(store.getTotalSpace()))
+						.entry(Keys.of("used"), Values.ofSize(store.getTotalSpace() - store.getUnallocatedSpace()))
+						.entry(Keys.of("free"), Values.ofSize(store.getUsableSpace()))
+						.entry(Keys.of("blocksize"), Values.ofSize(store.getBlockSize()))
+						.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
+						.build());
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
@@ -663,9 +663,9 @@ public class FileSystemModule implements Module {
 				@SuppressWarnings("unchecked")
 				WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
 				out.send(Records.builder()
-					         .entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
-					         .entry(Keys.PATH, Values.ofPath(pathEvent.context()))
-					         .build());
+					.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
+					.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
+					.build());
 			}
 		}
 	}

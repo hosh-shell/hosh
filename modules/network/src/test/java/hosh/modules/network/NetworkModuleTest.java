@@ -32,11 +32,11 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 import hosh.test.support.WithThread;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -64,8 +64,12 @@ class NetworkModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		NetworkModule.Network sut;
+
+		@BeforeEach
+		void setUp() {
+			sut = new NetworkModule.Network();
+		}
 
 		@Todo(description = "this is a very bland test: let's try to consolidate this command before investing more")
 		@Test
@@ -110,8 +114,13 @@ class NetworkModuleTest {
 		@Mock(stubOnly = true)
 		HttpResponse<Stream<String>> response;
 
-		@InjectMocks
 		NetworkModule.Http sut;
+
+		@BeforeEach
+		void setUp() {
+			sut = new NetworkModule.Http();
+			sut.setRequestor(requestor);
+		}
 
 		@Test
 		void noArgs() {

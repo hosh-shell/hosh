@@ -270,7 +270,7 @@ class CompilerTest {
 		});
 	}
 
-	@Disabled
+	@Disabled("see https://github.com/dfa1/hosh/issues/63")
 	@Bug(description = "command cannot be dynamic", issue = "https://github.com/dfa1/hosh/issues/63")
 	@Test
 	void commandAsVariableExpansion() {

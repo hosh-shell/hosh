@@ -80,7 +80,7 @@ public class CommandCompleter implements Completer {
 				.map(p -> toCandidate(p, builtinOverrides))
 				.forEach(candidates::add);
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "got exception while listing " + dir, e);
+			LOGGER.log(Level.WARNING, e, () -> String.format("got exception while listing %s", dir));
 		}
 	}
 
