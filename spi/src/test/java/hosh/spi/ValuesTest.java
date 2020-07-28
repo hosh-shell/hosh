@@ -34,6 +34,7 @@ import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.quicktheories.core.Gen;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -46,12 +47,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.then;
+import static org.quicktheories.QuickTheory.qt;
+import static org.quicktheories.generators.SourceDSL.integers;
+import static org.quicktheories.generators.SourceDSL.lists;
 
 class ValuesTest {
 
@@ -397,6 +402,15 @@ class ValuesTest {
 		}
 
 		@Test
+		void compareTo() {
+			Value a = Values.ofPath(Paths.get("file"));
+			Value b = Values.ofPath(Paths.get("another_file"));
+
+			assertThat(a).isEqualByComparingTo(a);
+			assertThat(a).isNotEqualByComparingTo(b);
+		}
+
+		@Test
 		void compareToAnotherValueType() {
 			Value a = Values.ofPath(Paths.get("file"));
 			Value b = Values.ofText("2");
@@ -410,6 +424,14 @@ class ValuesTest {
 			assertThatThrownBy(() -> Values.ofPath(null))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("path cannot be null");
+		}
+
+		@Test
+		void unwrap() {
+			Value path = Values.ofPath(Paths.get("file"));
+			assertThat(path.unwrap(Path.class)).hasValue(Paths.get("file"));
+			assertThat(path.unwrap(String.class)).hasValue("file");
+			assertThat(path.unwrap(Integer.class)).isEmpty();
 		}
 
 	}
@@ -434,6 +456,15 @@ class ValuesTest {
 		}
 
 		@Test
+		void compareTo() {
+			Value a = Values.ofBytes(new byte[]{-1, -1});
+			Value b = Values.ofBytes(new byte[0]);
+
+			assertThat(a).isEqualByComparingTo(a);
+			assertThat(a).isNotEqualByComparingTo(b);
+		}
+
+		@Test
 		void compareToAnotherValueType() {
 			Value a = Values.ofBytes(new byte[]{-1, -1});
 			Value b = Values.ofText("2");
@@ -451,6 +482,7 @@ class ValuesTest {
 		void asString() {
 			assertThat(Values.ofBytes(new byte[]{-1, -1})).hasToString("Bytes[[-1, -1]]");
 		}
+
 
 	}
 
@@ -481,6 +513,14 @@ class ValuesTest {
 				.hasMessage("style cannot be null");
 		}
 
+		@Test
+		void compareTo() {
+			Value a = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
+			Value b = Values.withStyle(Values.ofNumeric(2), Ansi.Style.BG_BLUE);
+			assertThat(a).isEqualByComparingTo(a);
+			assertThat(a).isNotEqualByComparingTo(b);
+		}
+		
 		@Test
 		void compareToAnotherValueType() {
 			Value a = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
@@ -676,14 +716,11 @@ class ValuesTest {
 
 			@Test
 			void noneLast() {
-				List<Value> values = Stream.of(
-					Values.ofNumeric(1),
-					Values.ofNumeric(-1),
-					Values.none(),
-					Values.ofNumeric(0)
-				).sorted(sut).collect(Collectors.toList());
-
-				assertThat(values).last().isEqualTo(Values.none());
+				qt().forAll(listOfNumericValuesContainingNone())
+					.checkAssert(candidate -> {
+						candidate.sort(sut);
+						assertThat(candidate).last().isEqualTo(Values.none());
+					});
 			}
 		}
 
@@ -694,42 +731,52 @@ class ValuesTest {
 
 			@Test
 			void noneFirst() {
-				List<Value> values = Stream.of(
-					Values.ofNumeric(1),
-					Values.ofNumeric(-1),
-					Values.none(),
-					Values.ofNumeric(0)
-				).sorted(sut).collect(Collectors.toList());
-
-				assertThat(values).first().isEqualTo(Values.none());
+				qt().forAll(listOfNumericValuesContainingNone())
+					.checkAssert(candidate -> {
+						candidate.sort(sut);
+						assertThat(candidate).first().isEqualTo(Values.none());
+					});
 			}
 		}
 
-		@Nested
-		class MergeTest {
+		// creates random lists of values with at least 1 none (in a unspecified position)
+		private Gen<List<Value>> listOfNumericValuesContainingNone() {
+			return lists().of(integers().all().map(Values::ofNumeric))
+				.ofSizeBetween(1, 20)
+				.mutate((base, r) -> {
+					int randomIndex = ThreadLocalRandom.current().nextInt(base.size() + 1);
+					base.add(randomIndex, Values.none());
+					return base;
+				});
+		}
 
-			@Test
-			void mergeNumericValues() {
-				var none = Values.none();
-				var num = Values.ofNumeric(1);
+	}
 
-				assertThat(none.merge(none)).isEmpty();
-				assertThat(num.merge(num)).hasValue(Values.ofNumeric(2));
-				assertThat(none.merge(num)).hasValue(num);
-				assertThat(num.merge(none)).hasValue(num);
-			}
+	@Nested
+	class MergeTest {
+
+		@Test
+		void mergeNumericValues() {
+			var none = Values.none();
+			var num = Values.ofNumeric(1);
+
+			assertThat(none.merge(none)).isEmpty();
+			assertThat(num.merge(num)).hasValue(Values.ofNumeric(2));
+			assertThat(none.merge(num)).hasValue(num);
+			assertThat(num.merge(none)).hasValue(num);
+		}
 
 
-			@Test
-			void mergeSizeValues() {
-				var none = Values.none();
-				var size = Values.ofSize(1);
+		@Test
+		void mergeSizeValues() {
+			var none = Values.none();
+			var size = Values.ofSize(1);
 
-				assertThat(none.merge(none)).isEmpty();
-				assertThat(size.merge(size)).hasValue(Values.ofSize(2));
-				assertThat(none.merge(size)).hasValue(size);
-				assertThat(size.merge(none)).hasValue(size);
-			}
+			assertThat(none.merge(none)).isEmpty();
+			assertThat(size.merge(size)).hasValue(Values.ofSize(2));
+			assertThat(none.merge(size)).hasValue(size);
+			assertThat(size.merge(none)).hasValue(size);
 		}
 	}
+
 }
