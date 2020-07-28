@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.2] - 2020-07-28
+
 ### Added
 
 - (preview feature) hosh interprets the command line as it is typed and uses syntax highlighting to provide feedback to the user.
@@ -19,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     + `path prepend /usr/local/bin` to add `/usr/local/bin` as first element of current PATH
 
 ### Changed
+- bumped jline to 3.16.0
 
 ### Fixed
 - fixed regression in `ls | sum size`
