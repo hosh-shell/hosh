@@ -279,7 +279,7 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>3.0.0-M1</version>
 				<configuration>
-					<goals>clean deploy</goals>
+					<goals>clean verify</goals>
 					<localCheckout>true</localCheckout>
 					<tagNameFormat>v@{project.version}</tagNameFormat>
 				</configuration>
