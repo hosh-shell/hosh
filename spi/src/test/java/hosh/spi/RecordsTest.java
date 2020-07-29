@@ -120,7 +120,7 @@ class RecordsTest {
 		Records.Builder builder = Records.builder();
 		builder.entry(Keys.NAME, Values.none());
 		Record record = builder.build();
-		builder.entry(new Record.Entry(Keys.COUNT, Values.none())); // please note that this has been added after build()
+		builder.entry(new Record.Entry(Keys.COUNT, Values.none())); // please note that this entry has been added after build()
 		assertThat(record.value(Keys.NAME)).isPresent();
 		assertThat(record.value(Keys.COUNT)).isEmpty();
 	}

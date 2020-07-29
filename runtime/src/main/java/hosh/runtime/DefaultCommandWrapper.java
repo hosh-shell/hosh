@@ -56,7 +56,7 @@ class DefaultCommandWrapper<T> implements Command, InterpreterAware {
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		Optional<T> maybeResource = commandWrapper.before(args, in, out, err);
 		if (maybeResource.isEmpty()) {
-			// error is responsibility of command
+			// notification of error to the user is responsibility of commandWrapper implementation
 			return ExitStatus.error();
 		}
  		T resource = maybeResource.get();

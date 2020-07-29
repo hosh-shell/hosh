@@ -520,7 +520,7 @@ class ValuesTest {
 			assertThat(a).isEqualByComparingTo(a);
 			assertThat(a).isNotEqualByComparingTo(b);
 		}
-		
+
 		@Test
 		void compareToAnotherValueType() {
 			Value a = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);

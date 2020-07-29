@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import hosh.doc.Todo;
 import hosh.runtime.Compiler.Statement;
 import hosh.runtime.PipelineChannel.ProducerPoisonPill;
 import hosh.spi.Command;
@@ -30,10 +31,10 @@ import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -43,6 +44,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PipelineCommandTest {
@@ -83,8 +85,8 @@ class PipelineCommandTest {
 
 	@Test
 	void producerAndConsumerSuccess() {
-		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -94,8 +96,8 @@ class PipelineCommandTest {
 
 	@Test
 	void producerError() {
-		willReturn(ExitStatus.error()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.error()).given(interpreter).eval(eq(producer), any(), any(), any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveNoInteractions();
@@ -105,8 +107,8 @@ class PipelineCommandTest {
 
 	@Test
 	void consumerError() {
-		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
-		willReturn(ExitStatus.error()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		willReturn(ExitStatus.error()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveNoInteractions();
@@ -116,8 +118,8 @@ class PipelineCommandTest {
 
 	@Test
 	void producerPoisonPill() {
-		willThrow(new ProducerPoisonPill()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
+		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(producer), any(), any(), any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -127,8 +129,8 @@ class PipelineCommandTest {
 
 	@Test
 	void consumerPoisonPill() {
-		willThrow(new ProducerPoisonPill()).given(interpreter).eval(Mockito.eq(consumer), Mockito.any(), Mockito.any(), Mockito.any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.eq(producer), Mockito.any(), Mockito.any(), Mockito.any());
+		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -136,6 +138,7 @@ class PipelineCommandTest {
 		then(err).shouldHaveNoInteractions();
 	}
 
+	@Todo(description = "add checks also for failures + simplify structure")
 	@Test
 	void recursive() {
 		PipelineCommand downStream = new PipelineCommand(producer, consumer);
@@ -143,11 +146,34 @@ class PipelineCommandTest {
 		willReturn(downStream).given(consumerProducer).getCommand();
 		PipelineCommand pipeline = new PipelineCommand(producer, consumerProducer);
 		pipeline.setInterpreter(interpreter);
-		willReturn(ExitStatus.success()).given(interpreter).eval(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(any(), any(), any(), any());
 		ExitStatus exitStatus = pipeline.run(List.of(), in, out, err);
 		assertThat(exitStatus).isSuccess();
-		then(in).shouldHaveNoInteractions();
-		then(out).shouldHaveNoInteractions();
-		then(err).shouldHaveNoInteractions();
 	}
+
+	@Todo(description = "add checks also for failures + simplify structure")
+	@Disabled("not working yet")
+	@Test
+	void recursiveWithExternalCommands() {
+		PipelineCommand downStream = new PipelineCommand(consumerProducer, consumer);
+		downStream.setInterpreter(interpreter);
+		willReturn(downStream).given(consumerProducer).getCommand();
+		PipelineCommand pipeline = new PipelineCommand(producer, consumerProducer);
+		pipeline.setInterpreter(interpreter);
+		ExternalCommand externalCommand1 = mock(ExternalCommand.class);
+		ExternalCommand externalCommand2 = mock(ExternalCommand.class);
+		ExternalCommand externalCommand3 = mock(ExternalCommand.class);
+		given(producer.getCommand()).willReturn(externalCommand1);
+		given(consumerProducer.getCommand()).willReturn(externalCommand2);
+		given(consumer.getCommand()).willReturn(externalCommand3);
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumerProducer), any(), any(), any());
+		ExitStatus exitStatus = pipeline.run(List.of(), in, out, err);
+		assertThat(exitStatus).isSuccess();
+		then(externalCommand1).should().pipeline(PipelineCommand.Position.FIRST);
+		then(externalCommand2).should().pipeline(PipelineCommand.Position.LAST);
+		then(externalCommand3).should().pipeline(PipelineCommand.Position.MIDDLE);
+	}
+
 }

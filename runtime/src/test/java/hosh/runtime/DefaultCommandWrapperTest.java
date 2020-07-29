@@ -118,6 +118,15 @@ class DefaultCommandWrapperTest {
 	}
 
 	@Test
+	void failFastIfResourceIsNotAcquired() {
+		List<String> args = List.of();
+		given(commandWrapper.before(args, in, out, err)).willReturn(Optional.empty());
+		ExitStatus exitStatus = sut.run(args, in, out, err);
+		assertThat(exitStatus).isError();
+		then(commandWrapper).shouldHaveNoMoreInteractions();
+	}
+
+	@Test
 	void asString() {
 		assertThat(sut).hasToString("DefaultCommandWrapper[nested=statement,commandWrapper=commandWrapper]");
 	}

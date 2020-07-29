@@ -46,12 +46,18 @@ class ExitStatusTest {
 
 	@Test
 	void success() {
-		assertThat(ExitStatus.success().value()).isEqualTo(0);
+		ExitStatus exitStatus = ExitStatus.success();
+		assertThat(exitStatus.value()).isEqualTo(0);
+		assertThat(exitStatus.isSuccess()).isTrue();
+		assertThat(exitStatus.isError()).isFalse();
 	}
 
 	@Test
 	void error() {
-		assertThat(ExitStatus.error().value()).isEqualTo(1);
+		ExitStatus exitStatus = ExitStatus.error();
+		assertThat(exitStatus.value()).isEqualTo(1);
+		assertThat(exitStatus.isSuccess()).isFalse();
+		assertThat(exitStatus.isError()).isTrue();
 	}
 
 	@Test
