@@ -583,9 +583,13 @@ class HoshIT {
 		ProcessBuilder pb = new ProcessBuilder()
 			.command(cmd)
 			.redirectErrorStream(true);
+		// restricting environment variables to pass to the hosh process
 		pb.environment().clear();
 		pb.environment().put("PATH", System.getenv("PATH"));
-		pb.environment().put("PATHEXT", System.getenv("PATHEXT"));
+		String pathext = System.getenv("PATHEXT");
+		if (pathext != null) {
+			pb.environment().put("PATHEXT", pathext);
+		}
 		return pb;
 	}
 
