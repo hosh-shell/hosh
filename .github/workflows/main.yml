@@ -25,4 +25,4 @@ jobs:
           java-version: ${{ matrix.java }}
           architecture: ${{ matrix.architecture }}
       - name: Build project
-        run: ./mvnw --batch-mode verify
+        run: unset JAVA_TOOL_OPTIONS; ./mvnw --batch-mode verify
