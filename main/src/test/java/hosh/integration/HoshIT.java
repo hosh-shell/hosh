@@ -568,9 +568,9 @@ class HoshIT {
 		return givenHoshProcess(Map.of(Hosh.Environment.HOSH_HISTORY, "false"), args);
 	}
 
-	private Process givenHoshProcess(Map<String, String> additionalEnv, String... args) throws IOException {
+	private Process givenHoshProcess(Map<String, String> env, String... args) throws IOException {
 		ProcessBuilder pb = givenHoshProcessBuilder(args);
-		pb.environment().putAll(additionalEnv);
+		pb.environment().putAll(env);
 		return pb.start();
 	}
 
@@ -580,9 +580,11 @@ class HoshIT {
 		cmd.addAll(propagateJacocoAgentInvocation());
 		cmd.addAll(List.of("-jar", "target/hosh.jar"));
 		cmd.addAll(List.of(args));
-		return new ProcessBuilder()
+		ProcessBuilder pb = new ProcessBuilder()
 			.command(cmd)
 			.redirectErrorStream(true);
+		pb.environment().clear();
+		return pb;
 	}
 
 	private String absoluteJavaBinary() {
