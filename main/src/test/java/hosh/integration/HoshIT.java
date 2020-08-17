@@ -584,6 +584,7 @@ class HoshIT {
 			.command(cmd)
 			.redirectErrorStream(true);
 		pb.environment().clear();
+		pb.environment().put("PATH", System.getenv("PATH"));
 		return pb;
 	}
 
