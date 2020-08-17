@@ -585,6 +585,7 @@ class HoshIT {
 			.redirectErrorStream(true);
 		pb.environment().clear();
 		pb.environment().put("PATH", System.getenv("PATH"));
+		pb.environment().put("PATHEXT", System.getenv("PATHEXT"));
 		return pb;
 	}
 
