@@ -43,7 +43,6 @@ import org.mockito.Mock;
  */
 public abstract class UnitTestsFitnessTest {
 
-	@SuppressWarnings("unused")
 	@ArchTest
 	public static final ArchRule UNANNOTATED_METHODS_IN_TESTS_MUST_BE_PRIVATE =
 		ArchRuleDefinition.methods().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Test")
@@ -55,7 +54,6 @@ public abstract class UnitTestsFitnessTest {
 			.orShould().beAnnotatedWith(AfterEach.class)
 			.orShould().beAnnotatedWith(ParameterizedTest.class);
 
-	@SuppressWarnings("unused")
 	@ArchTest
 	public static final ArchRule MOCKS_MUST_BE_USED =
 		ArchRuleDefinition.fields()

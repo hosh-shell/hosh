@@ -464,7 +464,6 @@ public class SystemModule implements Module {
 
 		private ProcessLookup processLookup = ProcessHandle::of;
 
-		@SuppressWarnings("unused") // used by @InjectMock
 		public void setProcessLookup(ProcessLookup processLookup) {
 			this.processLookup = processLookup;
 		}

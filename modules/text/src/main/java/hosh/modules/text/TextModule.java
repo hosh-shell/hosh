@@ -340,7 +340,6 @@ public class TextModule implements Module {
 
 		private Clock clock = Clock.systemUTC();
 
-		@SuppressWarnings("unused") // used by @InjectMocks
 		public void setClock(Clock clock) {
 			this.clock = clock;
 		}

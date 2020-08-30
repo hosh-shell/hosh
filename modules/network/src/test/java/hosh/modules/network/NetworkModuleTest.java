@@ -48,6 +48,7 @@ import java.util.stream.Stream;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class NetworkModuleTest {
 
@@ -95,7 +96,6 @@ class NetworkModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	class HttpTest {
 
-		@SuppressWarnings("unused") // used to restore interrupted flag
 		@RegisterExtension
 		final WithThread withThread = new WithThread();
 
@@ -150,6 +150,7 @@ class NetworkModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
+			assertThat(withThread.isInterrupted()).isTrue();
 		}
 	}
 }
