@@ -38,7 +38,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<argLine /> <!-- defined for when not running with jacoco -->
-		<version.jline>3.16.0</version.jline>
+		<version.jline>3.17.0</version.jline>
 	</properties>
 	<modules>
 		<module>test-support</module>
