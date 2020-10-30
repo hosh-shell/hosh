@@ -9,10 +9,15 @@
 	<artifactId>hosh-runtime</artifactId>
 	<dependencies>
 		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>hosh</groupId>
 			<artifactId>hosh-spi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- testing classpath -->
 		<dependency>
 			<groupId>hosh</groupId>
 			<artifactId>hosh-test-support</artifactId>

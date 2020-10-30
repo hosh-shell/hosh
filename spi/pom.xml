@@ -9,9 +9,28 @@
     <artifactId>hosh-spi</artifactId>
     <dependencies>
         <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-reader</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-terminal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline-terminal-jna</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- testing classpath -->
+        <dependency>
             <groupId>hosh</groupId>
             <artifactId>hosh-test-support</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.quicktheories</groupId>
+            <artifactId>quicktheories</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -38,7 +38,18 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<argLine /> <!-- defined for when not running with jacoco -->
+		<!-- versions production classpath -->
+		<version.antlr>4.8-1</version.antlr>
+		<version.commonscli>1.4</version.commonscli>
 		<version.jline>3.16.0</version.jline>
+		<!-- versions testing classpath -->
+		<version.junit>5.6.2</version.junit>
+		<version.assertj>3.18.0</version.assertj>
+		<version.mockito>3.5.7</version.mockito>
+		<version.equalsverifier>3.5</version.equalsverifier>
+		<version.archunit>0.14.1</version.archunit>
+		<version.quicktheories>0.26</version.quicktheories>
+		<version.slf4j>1.7.30</version.slf4j>
 	</properties>
 	<modules>
 		<module>test-support</module>
@@ -53,95 +64,92 @@
 		<module>runtime</module>
 		<module>main</module>
 	</modules>
-	<dependencies>
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jline</groupId>
-			<artifactId>jline-terminal</artifactId>
-			<version>${version.jline}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jline</groupId>
-			<artifactId>jline-terminal-jna</artifactId>
-			<version>${version.jline}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.jline</groupId>
-			<artifactId>jline-reader</artifactId>
-			<version>${version.jline}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime</artifactId>
-			<version>4.8-1</version>
-		</dependency>
-		<!-- testing -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>5.6.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>3.5.7</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>3.5.7</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>nl.jqno.equalsverifier</groupId>
-			<artifactId>equalsverifier</artifactId>
-			<version>3.5</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>3.18.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.tngtech.archunit</groupId>
-			<artifactId>archunit</artifactId>
-			<version>0.14.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.tngtech.archunit</groupId>
-			<artifactId>archunit-junit5-api</artifactId>
-			<version>0.14.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.tngtech.archunit</groupId>
-			<artifactId>archunit-junit5-engine</artifactId>
-			<version>0.14.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.quicktheories</groupId>
-			<artifactId>quicktheories</artifactId>
-			<version>0.26</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.30</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<!-- production classpath -->
+			<dependency>
+				<groupId>commons-cli</groupId>
+				<artifactId>commons-cli</artifactId>
+				<version>${version.commonscli}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jline</groupId>
+				<artifactId>jline-terminal</artifactId>
+				<version>${version.jline}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jline</groupId>
+				<artifactId>jline-terminal-jna</artifactId>
+				<version>${version.jline}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jline</groupId>
+				<artifactId>jline-reader</artifactId>
+				<version>${version.jline}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-runtime</artifactId>
+				<version>${version.antlr}</version>
+			</dependency>
+			<!-- testing classpath -->
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${version.junit}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-params</artifactId>
+				<version>${version.junit}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${version.mockito}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-junit-jupiter</artifactId>
+				<version>${version.mockito}</version>
+			</dependency>
+			<dependency>
+				<groupId>nl.jqno.equalsverifier</groupId>
+				<artifactId>equalsverifier</artifactId>
+				<version>${version.equalsverifier}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-core</artifactId>
+				<version>${version.assertj}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.tngtech.archunit</groupId>
+				<artifactId>archunit</artifactId>
+				<version>${version.archunit}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.tngtech.archunit</groupId>
+				<artifactId>archunit-junit5-api</artifactId>
+				<version>${version.archunit}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.tngtech.archunit</groupId>
+				<artifactId>archunit-junit5-engine</artifactId>
+				<version>${version.archunit}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.quicktheories</groupId>
+				<artifactId>quicktheories</artifactId>
+				<version>${version.quicktheories}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>${version.slf4j}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<build>
 		<plugins>
 			<plugin>
