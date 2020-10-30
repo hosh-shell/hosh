@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `waitSuccess`: command wrapper to run nested command until first success
+- new experimental infrastucture for `cmd { ... }`
 - JDK 15 compatibility
 
 ### Changed
