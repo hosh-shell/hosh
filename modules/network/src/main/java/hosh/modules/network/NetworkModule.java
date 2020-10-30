@@ -42,6 +42,7 @@ import hosh.spi.Values;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.ConnectException;
 import java.net.NetworkInterface;
 import java.net.ProxySelector;
 import java.net.URI;
@@ -148,9 +149,12 @@ public class NetworkModule implements Module {
 					body.forEach(line -> out.send(Records.singleton(Keys.TEXT, Values.ofText(line))));
 				}
 				return ExitStatus.success();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ie) {
 				Thread.currentThread().interrupt();
 				err.send(Errors.message("interrupted"));
+				return ExitStatus.error();
+			} catch (RuntimeException re) {
+				err.send(Errors.message(re));
 				return ExitStatus.error();
 			}
 		}
