@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `http`: improving error handling
+
 ## [v0.1.2] - 2020-07-28
 
 ### Added

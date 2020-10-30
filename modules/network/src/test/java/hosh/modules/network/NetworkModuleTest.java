@@ -41,6 +41,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Stream;
@@ -132,7 +134,7 @@ class NetworkModuleTest {
 		}
 
 		@Test
-		void oneArg() throws InterruptedException {
+		void oneArg() throws InterruptedException, IOException {
 			given(requestor.send(Mockito.any())).willReturn(response);
 			given(response.body()).willReturn(Stream.of("line1"));
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
@@ -143,14 +145,24 @@ class NetworkModuleTest {
 		}
 
 		@Test
-		void interrupted() throws InterruptedException {
-			given(requestor.send(Mockito.any())).willThrow(new InterruptedException("simulated"));
+		void interrupted() throws InterruptedException, IOException {
+			given(requestor.send(Mockito.any())).willThrow(new InterruptedException());
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 			assertThat(withThread.isInterrupted()).isTrue();
+		}
+
+		@Test
+		void ioError() throws InterruptedException, IOException {
+			given(requestor.send(Mockito.any())).willThrow(new ConnectException("simulated"));
+			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
+			assertThat(exitStatus).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated")));
 		}
 	}
 }

@@ -148,27 +148,26 @@ public class NetworkModule implements Module {
 					body.forEach(line -> out.send(Records.singleton(Keys.TEXT, Values.ofText(line))));
 				}
 				return ExitStatus.success();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException ie) {
 				Thread.currentThread().interrupt();
 				err.send(Errors.message("interrupted"));
+				return ExitStatus.error();
+			} catch (IOException ioe) {
+				err.send(Errors.message(ioe.getMessage()));
 				return ExitStatus.error();
 			}
 		}
 
 		interface Requestor {
 
-			HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException;
+			HttpResponse<Stream<String>> send(HttpRequest request) throws IOException, InterruptedException;
 		}
 
 		private static class DefaultRequestor implements Requestor {
 
 			@Override
-			public HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException {
-				try {
-					return HttpClientHolder.getInstance().send(request, BodyHandlers.ofLines());
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
+			public HttpResponse<Stream<String>> send(HttpRequest request) throws IOException, InterruptedException {
+				return HttpClientHolder.getInstance().send(request, BodyHandlers.ofLines());
 			}
 		}
 
