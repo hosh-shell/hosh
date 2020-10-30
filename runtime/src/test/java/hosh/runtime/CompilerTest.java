@@ -239,6 +239,7 @@ class CompilerTest {
 	@Test
 	void commandUsedAsCommandWrapper() {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+		doReturn(Optional.of(command)).when(commandResolver).tryResolve("grep");
 		assertThatThrownBy(() -> sut.compile("ls { grep pattern } "))
 			.isInstanceOf(CompileError.class)
 			.hasMessage("line 1: 'ls' is not a command wrapper");

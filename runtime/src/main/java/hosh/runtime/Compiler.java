@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.CommandDecorator;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
 import hosh.doc.Todo;
@@ -125,7 +126,7 @@ public class Compiler {
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
 			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
-		if (command instanceof CommandWrapper) {
+		if (command instanceof CommandWrapper || command instanceof CommandDecorator) {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		}
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
@@ -142,18 +143,28 @@ public class Compiler {
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
 			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
-		if (!(command instanceof CommandWrapper)) {
-			throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));
-		}
-		CommandWrapper<?> commandWrapper = (CommandWrapper<?>) command;
+
 		if (ctx.stmt() == null) {
 			int line = ctx.start.getLine();
 			throw new CompileError(String.format("line %d: '%s' with empty wrapping statement", line, commandName));
 		}
 		Statement nestedStatement = compileStatement(ctx.stmt());
-		DefaultCommandWrapper<?> wrappedCommand = new DefaultCommandWrapper<>(nestedStatement, commandWrapper);
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
-		return new Statement(wrappedCommand, arguments, commandName);
+
+		// new style command wrapper support
+		if (command instanceof CommandDecorator) {
+			CommandDecorator commandDecorator = (CommandDecorator) command;
+			DefaultCommandDecorator decoratedCommand = new DefaultCommandDecorator(nestedStatement, commandDecorator);
+			return new Statement(decoratedCommand, arguments, commandName);
+		}
+		// backward compatible support for CommandWrapper
+		if (command instanceof CommandWrapper) {
+			CommandWrapper<?> commandWrapper = (CommandWrapper<?>) command;
+			DefaultCommandWrapper<?> wrappedCommand = new DefaultCommandWrapper<>(nestedStatement, commandWrapper);
+			return new Statement(wrappedCommand, arguments, commandName);
+		}
+		throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));
+
 	}
 
 	private Statement compileLambda(LambdaContext ctx) {

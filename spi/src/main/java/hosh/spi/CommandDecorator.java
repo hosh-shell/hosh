@@ -23,27 +23,15 @@
  */
 package hosh.spi;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
- * A command specialization that allows to run code before and after another
- * command.
+ * Replacement for {@link CommandWrapper}.
  */
-@Deprecated(forRemoval = true)
-public interface CommandWrapper<T> extends Command {
+public interface CommandDecorator extends Command {
 
-	/**
-	 * Try to acquire resource, yielding empty {@link Optional} on failures.
-	 */
-	Optional<T> before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err);
+    void setCommandNested(CommandNested commandNested);
 
-	void after(T resource, InputChannel in, OutputChannel out, OutputChannel err);
+    interface CommandNested {
 
-	boolean retry(T resource, InputChannel in, OutputChannel out, OutputChannel err);
-
-	@Override
-	default ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-		throw new UnsupportedOperationException("a suitable implementation will be provided by the compiler");
-	}
+        ExitStatus run();
+    }
 }
