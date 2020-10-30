@@ -42,7 +42,7 @@
 		<version.antlr>4.8-1</version.antlr>
 		<version.commonscli>1.4</version.commonscli>
 		<version.jline>3.16.0</version.jline>
-		<!-- versions testing classpath -->
+		<!-- versions test classpath -->
 		<version.junit>5.6.2</version.junit>
 		<version.assertj>3.18.0</version.assertj>
 		<version.mockito>3.5.7</version.mockito>
@@ -92,7 +92,7 @@
 				<artifactId>antlr4-runtime</artifactId>
 				<version>${version.antlr}</version>
 			</dependency>
-			<!-- testing classpath -->
+			<!-- test classpath -->
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
 				<artifactId>junit-jupiter</artifactId>

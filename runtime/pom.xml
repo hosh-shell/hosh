@@ -17,7 +17,7 @@
 			<artifactId>hosh-spi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- testing classpath -->
+		<!-- test classpath -->
 		<dependency>
 			<groupId>hosh</groupId>
 			<artifactId>hosh-test-support</artifactId>

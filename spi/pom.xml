@@ -22,7 +22,7 @@
             <artifactId>jline-terminal-jna</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- testing classpath -->
+        <!-- test classpath -->
         <dependency>
             <groupId>hosh</groupId>
             <artifactId>hosh-test-support</artifactId>
