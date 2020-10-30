@@ -29,6 +29,7 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
+import hosh.spi.CommandDecorator;
 import hosh.spi.CommandRegistry;
 import hosh.spi.CommandWrapper;
 import hosh.spi.Errors;
@@ -90,6 +91,7 @@ public class SystemModule implements Module {
 		registry.registerCommand("kill", KillProcess::new);
 		registry.registerCommand("err", Err::new);
 		registry.registerCommand("benchmark", Benchmark::new);
+		registry.registerCommand("waitSuccess", WaitSuccess::new);
 		registry.registerCommand("sink", Sink::new);
 		registry.registerCommand("set", SetVariable::new);
 		registry.registerCommand("unset", UnsetVariable::new);
@@ -505,7 +507,41 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Description("measure execution time (best, worst, average) of inner command")
+	@Description("repeat command until the first success")
+	@Examples({
+		@Example(command = "waitSuccess { http http://localhost:8080/ } ", description = "waiting for local service on port 8080")
+	})
+	public static class WaitSuccess implements CommandDecorator {
+
+		private CommandNested commandNested;
+
+		@Override
+		public void setCommandNested(CommandNested commandNested) {
+			this.commandNested = commandNested;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			while (true) {
+				ExitStatus exitStatus = commandNested.run();
+				if (exitStatus.isSuccess()) {
+					return exitStatus;
+				} else {
+					sleep();
+				}
+			}
+		}
+
+		private void sleep() {
+			try {
+				Thread.sleep(1_000L);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+	}
+
+		@Description("measure execution time (best, worst, average) of inner command")
 	@Examples({
 		@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
 	})
