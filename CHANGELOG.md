@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- JDK 15 compatibility
+
+### Changed
+
+### Fixed
 - `http`: improving error handling
 
 ## [v0.1.2] - 2020-07-28
