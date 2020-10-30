@@ -42,7 +42,6 @@ import hosh.spi.Values;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.ConnectException;
 import java.net.NetworkInterface;
 import java.net.ProxySelector;
 import java.net.URI;
@@ -153,26 +152,22 @@ public class NetworkModule implements Module {
 				Thread.currentThread().interrupt();
 				err.send(Errors.message("interrupted"));
 				return ExitStatus.error();
-			} catch (RuntimeException re) {
-				err.send(Errors.message(re));
+			} catch (IOException ioe) {
+				err.send(Errors.message(ioe.getMessage()));
 				return ExitStatus.error();
 			}
 		}
 
 		interface Requestor {
 
-			HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException;
+			HttpResponse<Stream<String>> send(HttpRequest request) throws IOException, InterruptedException;
 		}
 
 		private static class DefaultRequestor implements Requestor {
 
 			@Override
-			public HttpResponse<Stream<String>> send(HttpRequest request) throws InterruptedException {
-				try {
-					return HttpClientHolder.getInstance().send(request, BodyHandlers.ofLines());
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
+			public HttpResponse<Stream<String>> send(HttpRequest request) throws IOException, InterruptedException {
+				return HttpClientHolder.getInstance().send(request, BodyHandlers.ofLines());
 			}
 		}
 
