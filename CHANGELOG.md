@@ -7,14 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `waitSuccess`: command wrapper to run nested command until first success
-- new experimental infrastucture for `cmd { ... }`
+- `waitSuccess`: runs nested command until first success
+    inspired by https://medium.com/@marko.luksa/bash-trick-repeat-last-command-until-success-750a61c43c8a
+- `withTimeout`: runs nested command with a timeout
+    inspired by https://www.cyberciti.biz/faq/linux-run-a-command-with-a-time-limit/
+- new experimental infrastructure for `cmd { ... }`
 - JDK 15 compatibility
 
 ### Changed
+- bumped jline to 3.17.1
 
 ### Fixed
 - `http`: improving error handling
+- always destroy underlying native process on InterruptedException
 
 ## [v0.1.2] - 2020-07-28
 
@@ -23,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - (preview feature) hosh interprets the command line as it is typed and uses syntax highlighting to provide feedback to the user.
   Potential errors, that are marked in bold red, include:
     + any syntax error
-    + invalid commands (both built-in as well as external)
+    + invalid commands (both built-in and external)
 - `path`: new command to avoid text-based manipulation of PATH variable
     + `path show` to show all elements of current PATH
     + `path clear` to remove all elements of current PATH

@@ -53,7 +53,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// generated for any non built-in commands (native)
+// used for any non built-in commands (e.g. native commands such as 'vim' or 'ssh')
 class ExternalCommand implements Command, StateAware {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
@@ -87,8 +87,9 @@ class ExternalCommand implements Command, StateAware {
 		Path cwd = state.getCwd();
 		LOGGER.fine(() -> String.format("executing '%s' in directory %s", processArgs, cwd));
 		LOGGER.fine(() -> String.format("in '%s', out '%s', err '%s'", in, out, err));
+		Process process = null;
 		try {
-			Process process = processFactory.create(processArgs, cwd, state.getVariables(), position);
+			process = processFactory.create(processArgs, cwd, state.getVariables(), position);
 			writeStdin(in, process);
 			readStdout(out, process);
 			readStderr(err, process);
@@ -103,6 +104,10 @@ class ExternalCommand implements Command, StateAware {
 			Thread.currentThread().interrupt();
 			err.send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
 			return ExitStatus.error();
+		} finally {
+			if (process != null) {
+				process.destroy();
+			}
 		}
 	}
 
@@ -150,8 +155,7 @@ class ExternalCommand implements Command, StateAware {
 
 		@Override
 		public Process create(List<String> args, Path cwd, Map<String, String> env, PipelineCommand.Position position) throws IOException {
-			ProcessBuilder processBuilder = new ProcessBuilder(args)
-				                                .directory(cwd.toFile());
+			ProcessBuilder processBuilder = new ProcessBuilder(args).directory(cwd.toFile());
 			processBuilder.environment().clear();
 			processBuilder.environment().putAll(env);
 			processBuilder.inheritIO();

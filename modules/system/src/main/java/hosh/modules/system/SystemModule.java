@@ -70,6 +70,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -87,6 +93,7 @@ public class SystemModule implements Module {
 		registry.registerCommand("help", Help::new);
 		registry.registerCommand("sleep", Sleep::new);
 		registry.registerCommand("withTime", WithTime::new);
+		registry.registerCommand("withTimeout", WithTimeout::new);
 		registry.registerCommand("ps", ProcessList::new);
 		registry.registerCommand("kill", KillProcess::new);
 		registry.registerCommand("err", Err::new);
@@ -507,6 +514,43 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Description("run command with a timeout")
+	@Examples({
+		@Example(command = "withTimeout 5s { walk / } ", description = "try to walk the entire filsystem within 5s timeout")
+	})
+	public static class WithTimeout implements CommandDecorator {
+
+		private CommandNested commandNested;
+
+		@Override
+		public void setCommandNested(CommandNested commandNested) {
+			this.commandNested = commandNested;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			Duration duration = Duration.parse(args.get(0));
+			ExecutorService executorService = Executors.newSingleThreadExecutor();
+			Future<ExitStatus> future = executorService.submit(commandNested::run);
+			try {
+				return future.get(duration.toMillis(), TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				err.send(Errors.message("interrupted"));
+				return ExitStatus.error();
+			} catch (ExecutionException e) {
+				err.send(Errors.message(e));
+				return ExitStatus.error();
+			} catch (TimeoutException e) {
+				err.send(Errors.message("timeout"));
+				return ExitStatus.error();
+			} finally {
+				executorService.shutdownNow();
+			}
+		}
+
+	}
+
 	@Description("repeat command until the first success")
 	@Examples({
 		@Example(command = "waitSuccess { http http://localhost:8080/ } ", description = "waiting for local service on port 8080")
@@ -541,7 +585,7 @@ public class SystemModule implements Module {
 		}
 	}
 
-		@Description("measure execution time (best, worst, average) of inner command")
+	@Description("measure execution time (best, worst, average) of inner command")
 	@Examples({
 		@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
 	})
@@ -633,8 +677,8 @@ public class SystemModule implements Module {
 			return ExitStatus.success();
 		}
 
-		@SuppressWarnings("unused")
-		private void blackHole(Record ignored) { // NOSONAR: by design
+		private void blackHole(Record record) { // NOSONAR: by design
+			record.size();
 		}
 
 	}

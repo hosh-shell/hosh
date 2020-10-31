@@ -53,12 +53,8 @@ class DefaultCommandDecorator implements Command, InterpreterAware {
 
     @Override
     public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-        commandDecorator.setCommandNested(new CommandDecorator.CommandNested() {
-            @Override
-            public ExitStatus run() {
-                return interpreter.eval(nested, in, out, err);
-            }
-        });
+        // CommandNested is just a way to hide Interpreter and other internals to the modules
+        commandDecorator.setCommandNested(() -> interpreter.eval(nested, in, out, err));
         return commandDecorator.run(args, in, out, err);
     }
 
