@@ -323,8 +323,7 @@ public class SystemModule implements Module {
 
 	@Description("suspend execution for given duration, by default measured in millis")
 	@Examples({
-		@Example(command = "sleep 1 second", description = "suspend execution for 1 second"),
-		@Example(command = "sleep 1000", description = "suspend execution for 1000 millis"),
+		@Example(command = "sleep 2 seconds", description = "suspend execution for 1 second"),
 		@Example(command = "sleep PT1M", description = "suspend execution for 1 minute (using ISO 8601)"),
 	})
 	public static class Sleep implements Command {
