@@ -45,17 +45,7 @@ import hosh.modules.system.SystemModule.Sink;
 import hosh.modules.system.SystemModule.Sleep;
 import hosh.modules.system.SystemModule.UnsetVariable;
 import hosh.modules.system.SystemModule.WithTime;
-import hosh.spi.Ansi;
-import hosh.spi.Command;
-import hosh.spi.Errors;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.Values;
+import hosh.spi.*;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.TemporaryFolder;
 import hosh.test.support.WithThread;
@@ -848,32 +838,32 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
+		@Mock
+		CommandDecorator.CommandNested nested;
+
 		@InjectMocks
 		WithTime sut;
 
 		@Test
-		void usage() {
-			Optional<Long> maybeResource = sut.before(Collections.emptyList(), in, out, err);
-			assertThat(maybeResource).isPresent();
-			sut.after(maybeResource.get(), in, out, err);
+		void zeroArg() {
+			ExitStatus nestedExitStatus = ExitStatus.of(42);
+			given(nested.run()).willReturn(nestedExitStatus);
+			ExitStatus result = sut.run(List.of(), in, out, err);
+			assertThat(result).isEqualTo(nestedExitStatus);
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(any());
+			then(out).should().send(any(Record.class));
 			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
-		void retryIsNotSupported() {
-			Optional<Long> maybeResource = sut.before(Collections.emptyList(), in, out, err);
-			assertThat(maybeResource).isPresent();
-			boolean result = sut.retry(maybeResource.get(), in, out, err);
-			assertThat(result).isFalse();
+		void oneArg() {
+			ExitStatus result = sut.run(List.of("arg"), in, out, err);
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: withTime { ... }")));
 		}
 
-		@Test
-		void runIsMarkedAsError() {
-			assertThatThrownBy(() -> sut.run(Collections.emptyList(), in, out, err))
-				.isInstanceOf(UnsupportedOperationException.class);
-		}
 	}
 
 	@Nested
