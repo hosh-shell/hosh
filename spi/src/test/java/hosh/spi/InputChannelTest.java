@@ -73,7 +73,7 @@ class InputChannelTest {
 		given(in.recv()).willReturn(Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		Iterator<Record> iterator = iterable.iterator();
-		assertThatThrownBy(() -> iterator.next())
+		assertThatThrownBy(iterator::next)
 			.isInstanceOf(NoSuchElementException.class);
 	}
 

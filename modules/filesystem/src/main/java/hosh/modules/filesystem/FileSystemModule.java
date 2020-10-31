@@ -707,6 +707,7 @@ public class FileSystemModule implements Module {
 			}
 		}
 
+		@SuppressWarnings("BusyWait")
 		private void busyWaitForResource(OutputChannel err, RandomAccessFile randomAccessFile) throws IOException, InterruptedException {
 			while (randomAccessFile.getChannel().tryLock() == null) {
 				Thread.sleep(BUSY_WAIT.toMillis());
