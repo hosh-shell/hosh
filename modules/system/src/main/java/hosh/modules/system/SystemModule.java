@@ -327,7 +327,6 @@ public class SystemModule implements Module {
 		@Example(command = "sleep 1 second", description = "suspend execution for 1 second"),
 		@Example(command = "sleep 1000", description = "suspend execution for 1000 millis"),
 		@Example(command = "sleep PT1M", description = "suspend execution for 1 minute (using ISO 8601)"),
-
 	})
 	public static class Sleep implements Command {
 
@@ -514,9 +513,10 @@ public class SystemModule implements Module {
 		}
 	}
 
+	@Experimental(description = "support same syntax for duration as sleep")
 	@Description("run command with a timeout")
 	@Examples({
-		@Example(command = "withTimeout 5s { walk / } ", description = "try to walk the entire filsystem within 5s timeout")
+		@Example(command = "withTimeout PT5s { walk / } ", description = "try to walk the entire filesystem within 5s timeout")
 	})
 	public static class WithTimeout implements CommandDecorator {
 
