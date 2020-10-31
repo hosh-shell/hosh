@@ -29,22 +29,8 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
-import hosh.spi.Command;
-import hosh.spi.CommandRegistry;
-import hosh.spi.CommandWrapper;
-import hosh.spi.Errors;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.LoggerFactory;
+import hosh.spi.*;
 import hosh.spi.Module;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.Value;
-import hosh.spi.Values;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -70,7 +56,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -99,9 +84,9 @@ public class FileSystemModule implements Module {
 
 	@Description("list files")
 	@Examples({
-		@Example(command = "ls", description = "list current directory"),
-		@Example(command = "ls /tmp", description = "list specified absolute directory"),
-		@Example(command = "ls directory", description = "list relative directory")
+			@Example(command = "ls", description = "list current directory"),
+			@Example(command = "ls /tmp", description = "list specified absolute directory"),
+			@Example(command = "ls directory", description = "list relative directory")
 	})
 	@Todo(description = "add support for uid, gid, permissions")
 	public static class ListFiles implements Command, StateAware {
@@ -131,12 +116,12 @@ public class FileSystemModule implements Module {
 					BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
 					Value size = attributes.isRegularFile() ? Values.ofSize(attributes.size()) : Values.none();
 					Record entry = Records.builder()
-						.entry(Keys.PATH, Values.ofPath(path.getFileName()))
-						.entry(Keys.SIZE, size)
-						.entry(Keys.CREATED, Values.ofInstant(attributes.creationTime().toInstant()))
-						.entry(Keys.MODIFIED, Values.ofInstant(attributes.lastModifiedTime().toInstant()))
-						.entry(Keys.ACCESSED, Values.ofInstant(attributes.lastAccessTime().toInstant()))
-						.build();
+							.entry(Keys.PATH, Values.ofPath(path.getFileName()))
+							.entry(Keys.SIZE, size)
+							.entry(Keys.CREATED, Values.ofInstant(attributes.creationTime().toInstant()))
+							.entry(Keys.MODIFIED, Values.ofInstant(attributes.lastModifiedTime().toInstant()))
+							.entry(Keys.ACCESSED, Values.ofInstant(attributes.lastAccessTime().toInstant()))
+							.build();
 					out.send(entry);
 				}
 				return ExitStatus.success();
@@ -154,7 +139,7 @@ public class FileSystemModule implements Module {
 
 	@Description("output current working directory")
 	@Examples({
-		@Example(command = "cwd", description = "current working directory"),
+			@Example(command = "cwd", description = "current working directory"),
 	})
 	public static class CurrentWorkingDirectory implements Command, StateAware {
 
@@ -178,8 +163,8 @@ public class FileSystemModule implements Module {
 
 	@Description("set new current working directory")
 	@Examples({
-		@Example(command = "cd dir", description = "change current working directory to 'dir'"),
-		@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
+			@Example(command = "cd dir", description = "change current working directory to 'dir'"),
+			@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
 	})
 	public static class ChangeDirectory implements Command, StateAware {
 
@@ -208,7 +193,7 @@ public class FileSystemModule implements Module {
 
 	@Description("output file line by line")
 	@Examples({
-		@Example(command = "lines file.txt", description = "output all lines of 'file.txt'"),
+			@Example(command = "lines file.txt", description = "output all lines of 'file.txt'"),
 	})
 	public static class Lines implements Command, StateAware {
 
@@ -241,8 +226,8 @@ public class FileSystemModule implements Module {
 
 	@Description("walk directory recursively")
 	@Examples({
-		@Example(command = "walk .", description = "recursively output all paths in '.'"),
-		@Example(command = "walk /tmp", description = "recursively output all paths in '/tmp'"),
+			@Example(command = "walk .", description = "recursively output all paths in '.'"),
+			@Example(command = "walk /tmp", description = "recursively output all paths in '/tmp'"),
 	})
 	public static class Walk implements Command, StateAware {
 
@@ -296,10 +281,10 @@ public class FileSystemModule implements Module {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 				out.send(Records
-					.builder()
-					.entry(Keys.PATH, Values.ofPath(file))
-					.entry(Keys.SIZE, Values.ofSize(attrs.size()))
-					.build());
+						.builder()
+						.entry(Keys.PATH, Values.ofPath(file))
+						.entry(Keys.SIZE, Values.ofSize(attrs.size()))
+						.build());
 				return FileVisitResult.CONTINUE;
 			}
 
@@ -320,7 +305,7 @@ public class FileSystemModule implements Module {
 	@Todo(description = "allows to select path key")
 	@Description("glob pattern matching")
 	@Examples({
-		@Example(command = "walk . | glob '*.java'", description = "recursively find all 'java' files")
+			@Example(command = "walk . | glob '*.java'", description = "recursively find all 'java' files")
 	})
 	public static class Glob implements Command, StateAware {
 
@@ -341,10 +326,10 @@ public class FileSystemModule implements Module {
 			PathMatcher pathMatcher = state.getCwd().getFileSystem().getPathMatcher("glob:" + pattern);
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(Keys.PATH)
-					.flatMap(v -> v.unwrap(Path.class))
-					.map(Path::getFileName)
-					.filter(pathMatcher::matches)
-					.ifPresent(p -> out.send(record)); // side effect
+						.flatMap(v -> v.unwrap(Path.class))
+						.map(Path::getFileName)
+						.filter(pathMatcher::matches)
+						.ifPresent(p -> out.send(record)); // side effect
 			}
 			return ExitStatus.success();
 		}
@@ -353,8 +338,8 @@ public class FileSystemModule implements Module {
 	@Todo(description = "test 'cp file directory'")
 	@Description("copy file")
 	@Examples({
-		@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
-		@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"),
+			@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
+			@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"),
 	})
 	public static class Copy implements Command, StateAware {
 
@@ -385,8 +370,8 @@ public class FileSystemModule implements Module {
 	@Todo(description = "test 'mv file directory'")
 	@Description("move file")
 	@Examples({
-		@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
-		@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"),
+			@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
+			@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"),
 	})
 	public static class Move implements Command, StateAware {
 
@@ -416,8 +401,8 @@ public class FileSystemModule implements Module {
 
 	@Description("remove file")
 	@Examples({
-		@Example(command = "rm target.txt", description = "remove file using current working directory"),
-		@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"),
+			@Example(command = "rm target.txt", description = "remove file using current working directory"),
+			@Example(command = "rm /tmp/target.txt", description = "remove file by using absolute path"),
 	})
 	public static class Remove implements Command, StateAware {
 
@@ -446,7 +431,7 @@ public class FileSystemModule implements Module {
 
 	@Description("show partitions information like df -h")
 	@Examples({
-		@Example(command = "partitions", description = "show all partitions"),
+			@Example(command = "partitions", description = "show all partitions"),
 	})
 	public static class Partitions implements Command {
 
@@ -459,15 +444,15 @@ public class FileSystemModule implements Module {
 			for (FileStore store : FileSystems.getDefault().getFileStores()) {
 				try {
 					out.send(Records
-						.builder()
-						.entry(Keys.of("name"), Values.ofText(store.name()))
-						.entry(Keys.of("type"), Values.ofText(store.type()))
-						.entry(Keys.of("total"), Values.ofSize(store.getTotalSpace()))
-						.entry(Keys.of("used"), Values.ofSize(store.getTotalSpace() - store.getUnallocatedSpace()))
-						.entry(Keys.of("free"), Values.ofSize(store.getUsableSpace()))
-						.entry(Keys.of("blocksize"), Values.ofSize(store.getBlockSize()))
-						.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
-						.build());
+							.builder()
+							.entry(Keys.of("name"), Values.ofText(store.name()))
+							.entry(Keys.of("type"), Values.ofText(store.type()))
+							.entry(Keys.of("total"), Values.ofSize(store.getTotalSpace()))
+							.entry(Keys.of("used"), Values.ofSize(store.getTotalSpace() - store.getUnallocatedSpace()))
+							.entry(Keys.of("free"), Values.ofSize(store.getUsableSpace()))
+							.entry(Keys.of("blocksize"), Values.ofSize(store.getBlockSize()))
+							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
+							.build());
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
@@ -479,7 +464,7 @@ public class FileSystemModule implements Module {
 	@Experimental(description = "usefulness of this command is quite limited right now")
 	@Description("detect content type of a file")
 	@Examples({
-		@Example(command = "probe file", description = "attempt to detect content type"),
+			@Example(command = "probe file", description = "attempt to detect content type"),
 	})
 	public static class Probe implements Command, StateAware {
 
@@ -513,7 +498,7 @@ public class FileSystemModule implements Module {
 
 	@Description("create symlink")
 	@Examples({
-		@Example(command = "symlink source target", description = "create symlink"),
+			@Example(command = "symlink source target", description = "create symlink"),
 	})
 	public static class Symlink implements Command, StateAware {
 
@@ -543,7 +528,7 @@ public class FileSystemModule implements Module {
 
 	@Description("create hardlink")
 	@Examples({
-		@Example(command = "hardlink source target", description = "create hardlink"),
+			@Example(command = "hardlink source target", description = "create hardlink"),
 	})
 	public static class Hardlink implements Command, StateAware {
 
@@ -574,7 +559,7 @@ public class FileSystemModule implements Module {
 	@Todo(description = "add tests for regular files and directories")
 	@Description("resolve to canonical absolute path")
 	@Examples({
-		@Example(command = "resolve ./symlink", description = "resolve symlink to the absolute path"),
+			@Example(command = "resolve ./symlink", description = "resolve symlink to the absolute path"),
 	})
 	public static class Resolve implements Command, StateAware {
 
@@ -605,7 +590,7 @@ public class FileSystemModule implements Module {
 
 	@Description("watch for filesystem change in the given directory")
 	@Examples({
-		@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
+			@Example(command = "watch", description = "output records with type='CREATE|MODIFY|DELETE' and path in current working directory")
 	})
 	@Bug(description = "should be recursive by default", issue = "https://github.com/dfa1/hosh/issues/94")
 	public static class Watch implements Command, StateAware {
@@ -627,9 +612,9 @@ public class FileSystemModule implements Module {
 			}
 			Path dir = state.getCwd();
 			WatchEvent.Kind<?>[] events = {
-				StandardWatchEventKinds.ENTRY_CREATE,
-				StandardWatchEventKinds.ENTRY_DELETE,
-				StandardWatchEventKinds.ENTRY_MODIFY
+					StandardWatchEventKinds.ENTRY_CREATE,
+					StandardWatchEventKinds.ENTRY_DELETE,
+					StandardWatchEventKinds.ENTRY_MODIFY
 			};
 			try (WatchService watchService = dir.getFileSystem().newWatchService()) {
 				dir.register(watchService, events);
@@ -663,24 +648,25 @@ public class FileSystemModule implements Module {
 				@SuppressWarnings("unchecked")
 				WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
 				out.send(Records.builder()
-					.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
-					.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
-					.build());
+						.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
+						.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
+						.build());
 			}
 		}
 	}
 
-	@Experimental(description = "still using busy wait, explore better approaches here")
 	@Description("execute inner block after successfully locking file")
 	@Examples({
-		@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
+			@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
 	})
-	public static class WithLock implements CommandWrapper<WithLock.LockResource>, StateAware {
+	public static class WithLock implements CommandDecorator, StateAware {
 
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private static final Duration BUSY_WAIT = Duration.ofMillis(200);
 
 		private State state;
+
+		private CommandNested commandNested;
 
 		@Override
 		public void setState(State state) {
@@ -688,22 +674,37 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public Optional<LockResource> before(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public void setCommandNested(CommandNested commandNested) {
+			this.commandNested = commandNested;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("withLock file { ... }"));
-				return Optional.empty();
+				return ExitStatus.error();
 			}
+			Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
+			RandomAccessFile randomAccessFile = null;
 			try {
-				Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(0)));
-				RandomAccessFile randomAccessFile = new RandomAccessFile(path.toFile(), "rw");
+				randomAccessFile = new RandomAccessFile(path.toFile(), "rw");
 				busyWaitForResource(err, randomAccessFile);
-				LockResource lockResource = new LockResource(randomAccessFile, path);
-				return Optional.of(lockResource);
+				return commandNested.run();
 			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				err.send(Errors.message(e));
+				return ExitStatus.error();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
-				throw new RuntimeException(e);
+				return ExitStatus.error();
+			} finally {
+				try {
+					if (randomAccessFile != null) {
+						randomAccessFile.close();
+						Files.delete(path);
+					}
+				} catch (IOException e) {
+					LOGGER.log(Level.WARNING, "caught exception during cleanup", e);
+				}
 			}
 		}
 
@@ -715,41 +716,6 @@ public class FileSystemModule implements Module {
 			}
 		}
 
-		@Override
-		public void after(LockResource resource, InputChannel in, OutputChannel out, OutputChannel err) {
-			try {
-				resource.randomAccessFile.close();
-				Files.delete(resource.getPath());
-			} catch (IOException e) {
-				LOGGER.log(Level.INFO, "caught exception", e);
-				err.send(Errors.message(e));
-			}
-		}
-
-		@Override
-		public boolean retry(LockResource resource, InputChannel in, OutputChannel out, OutputChannel err) {
-			return false;
-		}
-
-		static class LockResource {
-
-			private final RandomAccessFile randomAccessFile;
-
-			private final Path path;
-
-			public LockResource(RandomAccessFile randomAccessFile, Path path) {
-				this.randomAccessFile = randomAccessFile;
-				this.path = path;
-			}
-
-			public Path getPath() {
-				return path;
-			}
-
-			public RandomAccessFile getRandomAccessFile() {
-				return randomAccessFile;
-			}
-		}
 	}
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();

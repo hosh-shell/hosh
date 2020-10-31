@@ -24,7 +24,7 @@
 package hosh.modules.filesystem;
 
 import hosh.doc.Bug;
-import hosh.modules.filesystem.FileSystemModule.WithLock.LockResource;
+import hosh.spi.CommandDecorator;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -50,7 +50,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -62,6 +61,7 @@ import java.util.Optional;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -184,7 +184,7 @@ class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(newFolder.getName()), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should().send(Mockito.any());
+			then(out).should().send(any());
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -690,7 +690,7 @@ class FileSystemModuleTest {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should(Mockito.atLeastOnce()).send(Mockito.any());
+			then(out).should(Mockito.atLeastOnce()).send(any());
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -1105,43 +1105,41 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
+		@Mock(stubOnly = true)
+		CommandDecorator.CommandNested nested;
+
 		@InjectMocks
 		FileSystemModule.WithLock sut;
 
 		@Test
 		void noArgs() {
-			Optional<LockResource> maybeResource = sut.before(List.of(), in, out, err);
-			assertThat(maybeResource).isEmpty();
+			ExitStatus result = sut.run(List.of(), in, out, err);
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: withLock file { ... }")));
 		}
 
 		@Test
-		void wrongFile() {
+		void cantCreateFile() {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			assertThatThrownBy(() -> sut.before(List.of("../missing_directory/file.txt"), in, out, err))
-				.isInstanceOf(UncheckedIOException.class);
+			ExitStatus result = sut.run(List.of("../missing_directory/file.lock"), in, out, err);
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).shouldHaveNoInteractions();
+			then(err).should().send(any(Record.class));
 		}
 
-		@Test
-		void lock() throws IOException {
+		@Test // very weak assertions... please improve them!
+		void lock() {
+			ExitStatus nestedExitStatus = ExitStatus.of(42);
+			given(nested.run()).willReturn(nestedExitStatus);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			File lockFile = temporaryFolder.newFile("file.txt");
-			Optional<LockResource> maybeResource = sut.before(List.of("file.txt"), in, out, err);
-			assertThat(maybeResource).isPresent();
-			// under same JVM tryLock throws exception
-			LockResource resource = maybeResource.get();
-			assertThatThrownBy(() -> resource.getRandomAccessFile().getChannel().tryLock())
-				.isInstanceOf(OverlappingFileLockException.class);
-			sut.after(resource, in, out, err);
+			ExitStatus result = sut.run(List.of("file.lock"), in, out, err);
+			assertThat(result).isEqualTo(nestedExitStatus);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(lockFile).doesNotExist();
 		}
 	}
 }

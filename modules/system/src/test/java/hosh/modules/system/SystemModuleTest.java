@@ -849,7 +849,7 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@Mock
+		@Mock(stubOnly = true)
 		CommandDecorator.CommandNested nested;
 
 		@InjectMocks
