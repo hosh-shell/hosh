@@ -813,7 +813,7 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void zeroArg() {
-			Record record = Records.singleton(Keys.COUNT, null).append(Keys.INDEX, null);
+			Record record = Records.singleton(Keys.COUNT, Values.none()).append(Keys.INDEX, Values.none());
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
