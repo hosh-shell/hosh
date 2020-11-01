@@ -589,6 +589,7 @@ public class SystemModule implements Module {
 					return exitStatus;
 				} else {
 					try {
+						//noinspection BusyWait
 						Thread.sleep(sleep.toMillis());
 					} catch (InterruptedException e) {
 						Thread.currentThread().interrupt();
@@ -674,9 +675,6 @@ public class SystemModule implements Module {
 				start();
 			}
 
-			public List<Duration> getResults() {
-				return results;
-			}
 		}
 	}
 
