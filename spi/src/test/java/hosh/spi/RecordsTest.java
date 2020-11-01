@@ -84,7 +84,7 @@ class RecordsTest {
 	@Test
 	void equalsContract() {
 		EqualsVerifier.forClass(Records.Empty.class).verify();
-		EqualsVerifier.forClass(Records.Singleton.class).withNonnullFields("key", "value").verify();
+		EqualsVerifier.forClass(Records.Singleton.class).withNonnullFields("entry").verify();
 		EqualsVerifier.forClass(Records.Generic.class).withNonnullFields("entries").verify();
 		EqualsVerifier.forClass(Record.Entry.class).verify();
 	}
