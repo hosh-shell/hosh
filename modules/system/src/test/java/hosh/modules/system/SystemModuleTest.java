@@ -27,7 +27,6 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.modules.system.SystemModule.Benchmark;
-import hosh.modules.system.SystemModule.Benchmark.Accumulator;
 import hosh.modules.system.SystemModule.Capture;
 import hosh.modules.system.SystemModule.Echo;
 import hosh.modules.system.SystemModule.Env;
@@ -83,7 +82,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -754,86 +752,42 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
+		@Mock(stubOnly = true)
+		CommandDecorator.CommandNested commandNested;
+
 		@InjectMocks
 		Benchmark sut;
 
 		@Test
-		void calculations() {
-			List<String> args = List.of("1");
-			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
-			assertThat(maybeAccumulator).isPresent();
-			Accumulator accumulator = maybeAccumulator.get();
-			accumulator.getResults().add(Duration.ofMillis(20));
-			accumulator.getResults().add(Duration.ofMillis(10));
-			sut.after(accumulator, in, out, err);
+		void onePositiveArg() {
+			given(commandNested.run()).willReturn(ExitStatus.success());
+			ExitStatus result = sut.run(List.of("10"), in, out, err);
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
-				Records.builder()
-					.entry(Keys.COUNT, Values.ofNumeric(2))
-					.entry(Benchmark.BEST, Values.ofDuration(Duration.ofMillis(10)))
-					.entry(Benchmark.WORST, Values.ofDuration(Duration.ofMillis(20)))
-					.entry(Benchmark.AVERAGE, Values.ofDuration(Duration.ofMillis(15)))
-					.build());
-			then(err).shouldHaveNoInteractions();
-		}
-
-		@Test
-		void avoidDivideByZero() {
-			List<String> args = List.of("1");
-			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
-			assertThat(maybeAccumulator).isPresent();
-			Accumulator accumulator = maybeAccumulator.get();
-			sut.after(accumulator, in, out, err);
-			then(in).shouldHaveNoInteractions();
-			then(out).should().send(
-				Records.builder()
-					.entry(Keys.COUNT, Values.ofNumeric(0))
-					.entry(Benchmark.BEST, Values.ofDuration(Duration.ZERO))
-					.entry(Benchmark.WORST, Values.ofDuration(Duration.ZERO))
-					.entry(Benchmark.AVERAGE, Values.ofDuration(Duration.ZERO))
-					.build());
-			then(err).shouldHaveNoInteractions();
-		}
-
-		@Test
-		void oneArg() {
-			List<String> args = List.of("1");
-			Optional<Accumulator> maybeAccumulator = sut.before(args, in, out, err);
-			assertThat(maybeAccumulator).isPresent();
-			Accumulator accumulator = maybeAccumulator.get();
-			boolean retry = sut.retry(accumulator, in, out, err);
-			assertThat(retry).isFalse();
-			sut.after(accumulator, in, out, err);
-			then(in).shouldHaveNoInteractions();
-			then(out).should().send(any()); // weak test
+				RecordMatcher.of(Keys.COUNT, Values.ofNumeric(10)) // not checking AVERAGE, WORST and BEST
+			);
 			then(err).shouldHaveNoInteractions();
 		}
 
 		@Test
 		void noArgs() {
-			List<String> args = List.of();
-			Optional<Accumulator> maybeResource = sut.before(args, in, out, err);
-			assertThat(maybeResource).isEmpty();
+			ExitStatus result = sut.run(List.of(), in, out, err);
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: benchmark number { ... }")));
 		}
 
 		@Test
-		void zeroArg() {
-			List<String> args = List.of("0");
-			Optional<Accumulator> maybeResource = sut.before(args, in, out, err);
-			assertThat(maybeResource).isEmpty();
+		void oneNonPositiveArg() {
+			ExitStatus result = sut.run(List.of("0"), in, out, err);
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("number must be >= 0")));
 		}
 
-		@Test // IMHO: this test should not exists (run is a design error)
-		void runIsMarkedAsError() {
-			assertThatThrownBy(() -> sut.run(Collections.emptyList(), in, out, err))
-				.isInstanceOf(UnsupportedOperationException.class);
-		}
 	}
 
 	@Nested
