@@ -23,8 +23,6 @@
  */
 package hosh.spi;
 
-import hosh.doc.Todo;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,9 +30,8 @@ import java.util.Optional;
 /**
  * An immutable value object representing a collection of key/value pairs.
  * <p>
- * Iteration order is well defined.
+ * Iteration order is well defined (i.e. insertion order).
  */
-@Todo(description = "Record should implement Value!")
 public interface Record extends Printable {
 
 	/**
@@ -57,6 +54,10 @@ public interface Record extends Printable {
 
 	int size();
 
+	/**
+	 * An immutable value object representing a key/value pair.
+	 * Key and value cannot be null.
+	 */
 	class Entry {
 
 		private final Key key;
@@ -64,8 +65,8 @@ public interface Record extends Printable {
 		private final Value value;
 
 		public Entry(Key key, Value value) {
-			this.key = key;
-			this.value = value;
+			this.key = Objects.requireNonNull(key);
+			this.value = Objects.requireNonNull(value);
 		}
 
 		public Key getKey() {
