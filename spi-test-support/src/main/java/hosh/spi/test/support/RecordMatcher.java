@@ -30,14 +30,14 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Mockito's argument matcher for Record that allows to specify
  * a subset of key/value mappings.
  * <p>
- * This has been done to allows unit tests with files e.g. in continuous
- * integration jobs such as azure pipelines is it possible to check for a
- * file named "foo.txt" but not the owner of the file.
+ * This has been done to allows unit tests with files in CI,
+ * i.e. is it possible to check for a file named "foo.txt" but not the owner of the file.
  */
 public class RecordMatcher implements ArgumentMatcher<Record> {
 
@@ -61,7 +61,7 @@ public class RecordMatcher implements ArgumentMatcher<Record> {
 			return false;
 		}
 		for (var entry : entries) {
-			if (!argument.entries().contains(entry)) {
+			if (argument.entries().noneMatch(e -> Objects.equals(e, entry))) {
 				return false;
 			}
 		}

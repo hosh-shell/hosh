@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -165,9 +166,10 @@ public class TextModule implements Module {
 			for (Record record : InputChannel.iterate(in)) {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
-				List<Value> values = record.values();
+				Iterator<Value> values = record.values().iterator();
 				boolean skipSep = true;
-				for (Value value : values) {
+				while (values.hasNext()) {
+					Value value = values.next();
 					if (skipSep) {
 						skipSep = false;
 					} else {
@@ -202,8 +204,9 @@ public class TextModule implements Module {
 
 		private Record trimByKey(Record record, Key key) {
 			Records.Builder builder = Records.builder();
-			List<Entry> entries = record.entries();
-			for (Entry entry : entries) {
+			Iterator<Entry> entries = record.entries().iterator();
+			while (entries.hasNext()) {
+				Entry entry = entries.next();
 				if (entry.getKey().equals(key)) {
 					builder = builder.entry(key, trim(entry.getValue()));
 				} else {
@@ -279,7 +282,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			for (Record record : InputChannel.iterate(in)) {
-				String schema = record.keys().stream().map(Key::name).collect(Collectors.joining(" "));
+				String schema = record.keys().map(Key::name).collect(Collectors.joining(" "));
 				out.send(Records.singleton(Keys.of("schema"), Values.ofText(schema)));
 			}
 			return ExitStatus.success();

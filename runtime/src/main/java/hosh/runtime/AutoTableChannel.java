@@ -38,6 +38,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -96,21 +97,23 @@ public class AutoTableChannel implements OutputChannel {
 		overflow = false;
 	}
 
-	private void outputTable(OutputChannel out, Iterable<Record> records, Map<Key, Integer> paddings) {
+	private void outputTable(OutputChannel out, Collection<Record> records, Map<Key, Integer> paddings) {
 		boolean headerSent = false;
 		for (Record record : records) {
 			if (!headerSent) {
-				sendHeader(paddings, record.keys(), out);
+				sendHeader(paddings, record, out);
 				headerSent = true;
 			}
 			sendRow(paddings, record, out);
 		}
 	}
 
-	private Map<Key, Integer> calculatePaddings(Iterable<Record> records) {
+	private Map<Key, Integer> calculatePaddings(Collection<Record> records) {
 		Map<Key, Integer> maxLengthPerColumn = new HashMap<>();
 		for (Record record : records) {
-			for (Record.Entry entry : record.entries()) {
+			Iterator<Record.Entry> entries = record.entries().iterator();
+			while (entries.hasNext()) {
+				Record.Entry entry = entries.next();
 				String formattedValue = valueAsString(entry.getValue());
 				int valueLength = lengthFor(formattedValue);
 				maxLengthPerColumn.compute(entry.getKey(), (k, v) -> v == null ? Math.max(k.name().length(), valueLength) : Math.max(v, valueLength));
@@ -144,9 +147,10 @@ public class AutoTableChannel implements OutputChannel {
 	private void sendRow(Map<Key, Integer> paddings, Record record, OutputChannel out) {
 		Locale locale = Locale.getDefault();
 		StringBuilder formatter = new StringBuilder();
-		Collection<Record.Entry> entries = record.entries();
-		List<String> formattedValues = new ArrayList<>(entries.size());
-		for (Record.Entry entry : entries) {
+		Iterator<Record.Entry> entries = record.entries().iterator();
+		List<String> formattedValues = new ArrayList<>(record.size());
+		while (entries.hasNext()) {
+			Record.Entry entry = entries.next();
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);
 			formatter.append(formatterFor(paddings.get(entry.getKey())));
@@ -162,12 +166,12 @@ public class AutoTableChannel implements OutputChannel {
 		return String.format("%%-%ds", length);
 	}
 
-	private void sendHeader(Map<Key, Integer> paddings, Collection<Key> keys, OutputChannel out) {
-		String format = keys.stream()
+	private void sendHeader(Map<Key, Integer> paddings, Record record, OutputChannel out) {
+		String format = record.keys()
 			.map(paddings::get)
 			.map(this::formatterFor)
 			.collect(Collectors.joining());
-		String header = String.format(format, keys.stream().map(Key::name).toArray());
+		String header = String.format(format, record.keys().map(Key::name).toArray());
 		out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 	}
 

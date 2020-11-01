@@ -28,13 +28,12 @@ import hosh.spi.Record.Entry;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Records {
 
@@ -46,7 +45,7 @@ public class Records {
 	}
 
 	public static Record singleton(Key key, Value value) {
-		return new Records.Singleton(key, value);
+		return new Records.Singleton(new Entry(key, value));
 	}
 
 	public static Builder builder() {
@@ -82,32 +81,33 @@ public class Records {
 	static class Empty implements Record {
 
 		@Override
-		public List<Key> keys() {
-			return Collections.emptyList();
+		public Stream<Key> keys() {
+			return Stream.empty();
 		}
 
 		@Override
-		public List<Value> values() {
-			return Collections.emptyList();
+		public Stream<Value> values() {
+			return Stream.empty();
 		}
 
 		@Override
-		public List<Record.Entry> entries() {
-			return Collections.emptyList();
+		public Stream<Record.Entry> entries() {
+			return Stream.empty();
 		}
 
 		@Override
 		public Record append(Key key, Value value) {
-			return new Records.Singleton(key, value);
+			return new Records.Singleton(new Entry(key, value));
 		}
 
 		@Override
 		public Record prepend(Key key, Value value) {
-			return new Records.Singleton(key, value);
+			return new Records.Singleton(new Entry(key, value));
 		}
 
 		@Override
 		public Optional<Value> value(Key key) {
+			// trivially returns empty optional
 			return Optional.empty();
 		}
 
@@ -144,50 +144,47 @@ public class Records {
 
 	static class Singleton implements Record {
 
-		private final Key key;
+		private final Entry entry;
 
-		private final Value value;
-
-		public Singleton(Key key, Value value) {
-			this.key = key;
-			this.value = value;
+		public Singleton(Entry entry) {
+			this.entry = entry;
 		}
 
 		@Override
-		public List<Key> keys() {
-			return Collections.singletonList(key);
+		public Stream<Key> keys() {
+			return Stream.of(entry).map(Entry::getKey);
 		}
 
 		@Override
-		public List<Value> values() {
-			return Collections.singletonList(value);
+		public Stream<Value> values() {
+			return Stream.of(entry).map(Entry::getValue);
 		}
 
 		@Override
-		public List<Record.Entry> entries() {
-			return Collections.singletonList(new Record.Entry(key, value));
+		public Stream<Record.Entry> entries() {
+			return Stream.of(entry);
 		}
 
 		@Override
 		public Record append(Key newKey, Value newValue) {
 			return new Builder()
-				       .entry(this.key, this.value)
-				       .entry(newKey, newValue)
-				       .build();
+				.entry(entry)
+				.entry(newKey, newValue)
+				.build();
 		}
 
 		@Override
 		public Record prepend(Key newKey, Value newValue) {
 			return new Builder()
-				       .entry(newKey, newValue)
-				       .entry(this.key, this.value)
-				       .build();
+				.entry(newKey, newValue)
+				.entry(entry)
+				.build();
 		}
 
 		@Override
 		public Optional<Value> value(Key wantedKey) {
-			if (Objects.equals(this.key, wantedKey)) {
-				return Optional.of(value);
+			if (Objects.equals(this.entry.getKey(), wantedKey)) {
+				return Optional.of(this.entry.getValue());
 			} else {
 				return Optional.empty();
 			}
@@ -200,14 +197,14 @@ public class Records {
 
 		@Override
 		public final int hashCode() {
-			return Objects.hash(key, value);
+			return Objects.hash(entry);
 		}
 
 		@Override
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record) {
 				Record that = (Record) obj;
-				return that.size() == 1 && this.entries().equals(that.entries());
+				return that.size() == 1 && Records.equals(this.entries(), that.entries());
 			} else {
 				return false;
 			}
@@ -215,12 +212,12 @@ public class Records {
 
 		@Override
 		public String toString() {
-			return String.format("Record[data={%s=%s}]", key, value);
+			return String.format("Record[data={%s=%s}]", entry.getKey(), entry.getValue());
 		}
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			value.print(printWriter, locale);
+			entry.getValue().print(printWriter, locale);
 		}
 	}
 
@@ -248,24 +245,22 @@ public class Records {
 		}
 
 		@Override
-		public List<Key> keys() {
+		public Stream<Key> keys() {
 			return Arrays
-				       .stream(entries)
-				       .map(Entry::getKey)
-				       .collect(Collectors.toUnmodifiableList());
+				.stream(entries)
+				.map(Entry::getKey);
 		}
 
 		@Override
-		public List<Value> values() {
+		public Stream<Value> values() {
 			return Arrays
-				       .stream(entries)
-				       .map(Entry::getValue)
-				       .collect(Collectors.toUnmodifiableList());
+				.stream(entries)
+				.map(Entry::getValue);
 		}
 
 		@Override
-		public List<Entry> entries() {
-			return List.of(entries);
+		public Stream<Entry> entries() {
+			return Stream.of(entries);
 		}
 
 		@Override
@@ -292,7 +287,7 @@ public class Records {
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record) {
 				Record that = (Record) obj;
-				return this.size() == that.size() && this.entries().equals(that.entries());
+				return this.size() == that.size() && Records.equals(this.entries(), that.entries());
 			} else {
 				return false;
 			}
@@ -318,5 +313,21 @@ public class Records {
 				}
 			}
 		}
+	}
+
+	// size has been checked before calling this method (and that is a very cheap check)
+	// this is a trivial implementation to check for equality two streams
+	private static boolean equals(Stream<Entry> s1, Stream<Entry> s2) {
+		Iterator<Entry> it1 = s1.iterator();
+		Iterator<Entry> it2 = s2.iterator();
+		while (it1.hasNext() && it2.hasNext()) {
+			if (!Objects.equals(it1.next(), it2.next())) {
+				return false;
+			}
+		}
+		if (it1.hasNext() || it2.hasNext()) {
+			throw new IllegalStateException("different lengths");
+		}
+		return true;
 	}
 }
