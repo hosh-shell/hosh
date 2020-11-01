@@ -204,8 +204,9 @@ public class TextModule implements Module {
 
 		private Record trimByKey(Record record, Key key) {
 			Records.Builder builder = Records.builder();
-			List<Entry> entries = record.entries();
-			for (Entry entry : entries) {
+			Iterator<Entry> entries = record.entries().iterator();
+			while (entries.hasNext()) {
+				Entry entry = entries.next();
 				if (entry.getKey().equals(key)) {
 					builder = builder.entry(key, trim(entry.getValue()));
 				} else {

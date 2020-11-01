@@ -93,8 +93,8 @@ public class Records {
 		}
 
 		@Override
-		public List<Record.Entry> entries() {
-			return Collections.emptyList();
+		public Stream<Record.Entry> entries() {
+			return Stream.empty();
 		}
 
 		@Override

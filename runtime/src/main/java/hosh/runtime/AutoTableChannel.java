@@ -38,6 +38,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -96,7 +97,7 @@ public class AutoTableChannel implements OutputChannel {
 		overflow = false;
 	}
 
-	private void outputTable(OutputChannel out, Iterable<Record> records, Map<Key, Integer> paddings) {
+	private void outputTable(OutputChannel out, Collection<Record> records, Map<Key, Integer> paddings) {
 		boolean headerSent = false;
 		for (Record record : records) {
 			if (!headerSent) {
@@ -107,10 +108,12 @@ public class AutoTableChannel implements OutputChannel {
 		}
 	}
 
-	private Map<Key, Integer> calculatePaddings(Iterable<Record> records) {
+	private Map<Key, Integer> calculatePaddings(Collection<Record> records) {
 		Map<Key, Integer> maxLengthPerColumn = new HashMap<>();
 		for (Record record : records) {
-			for (Record.Entry entry : record.entries()) {
+			Iterator<Record.Entry> entries = record.entries().iterator();
+			while (entries.hasNext()) {
+				Record.Entry entry = entries.next();
 				String formattedValue = valueAsString(entry.getValue());
 				int valueLength = lengthFor(formattedValue);
 				maxLengthPerColumn.compute(entry.getKey(), (k, v) -> v == null ? Math.max(k.name().length(), valueLength) : Math.max(v, valueLength));
@@ -144,9 +147,10 @@ public class AutoTableChannel implements OutputChannel {
 	private void sendRow(Map<Key, Integer> paddings, Record record, OutputChannel out) {
 		Locale locale = Locale.getDefault();
 		StringBuilder formatter = new StringBuilder();
-		Collection<Record.Entry> entries = record.entries();
-		List<String> formattedValues = new ArrayList<>(entries.size());
-		for (Record.Entry entry : entries) {
+		Iterator<Record.Entry> entries = record.entries().iterator();
+		List<String> formattedValues = new ArrayList<>(record.size());
+		while (entries.hasNext()) {
+			Record.Entry entry = entries.next();
 			StringWriter writer = new StringWriter();
 			PrintWriter printWriter = new PrintWriter(writer);
 			formatter.append(formatterFor(paddings.get(entry.getKey())));
