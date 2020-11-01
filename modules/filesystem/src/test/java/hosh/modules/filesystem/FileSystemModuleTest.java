@@ -24,7 +24,7 @@
 package hosh.modules.filesystem;
 
 import hosh.doc.Bug;
-import hosh.spi.CommandDecorator;
+import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -1104,7 +1104,7 @@ class FileSystemModuleTest {
 		OutputChannel err;
 
 		@Mock(stubOnly = true)
-		CommandDecorator.CommandNested nested;
+		CommandWrapper.NestedCommand nestedCommand;
 
 		@InjectMocks
 		FileSystemModule.WithLock sut;
@@ -1131,7 +1131,7 @@ class FileSystemModuleTest {
 		@Test // very weak assertions... please improve them!
 		void lock() {
 			ExitStatus nestedExitStatus = ExitStatus.of(42);
-			given(nested.run()).willReturn(nestedExitStatus);
+			given(nestedCommand.run()).willReturn(nestedExitStatus);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus result = sut.run(List.of("file.lock"), in, out, err);
 			assertThat(result).isEqualTo(nestedExitStatus);

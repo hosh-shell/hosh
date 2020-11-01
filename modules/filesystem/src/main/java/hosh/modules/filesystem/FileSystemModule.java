@@ -30,7 +30,7 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Command;
-import hosh.spi.CommandDecorator;
+import hosh.spi.CommandWrapper;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -673,14 +673,14 @@ public class FileSystemModule implements Module {
 	@Examples({
 			@Example(command = "withLock file.lock { echo 'critical section' }", description = "echo only if lock has been acquired")
 	})
-	public static class WithLock implements CommandDecorator, StateAware {
+	public static class WithLock implements CommandWrapper, StateAware {
 
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 		private static final Duration BUSY_WAIT = Duration.ofMillis(200);
 
 		private State state;
 
-		private CommandNested commandNested;
+		private NestedCommand nestedCommand;
 
 		@Override
 		public void setState(State state) {
@@ -688,8 +688,8 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public void setCommandNested(CommandNested commandNested) {
-			this.commandNested = commandNested;
+		public void setNestedCommand(NestedCommand nestedCommand) {
+			this.nestedCommand = nestedCommand;
 		}
 
 		@Override
@@ -703,7 +703,7 @@ public class FileSystemModule implements Module {
 			try {
 				randomAccessFile = new RandomAccessFile(path.toFile(), "rw");
 				busyWaitForResource(err, randomAccessFile);
-				return commandNested.run();
+				return nestedCommand.run();
 			} catch (IOException e) {
 				err.send(Errors.message(e));
 				return ExitStatus.error();

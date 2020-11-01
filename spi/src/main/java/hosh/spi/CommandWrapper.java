@@ -25,13 +25,16 @@ package hosh.spi;
 
 /**
  * A command specialization that is used for commands that take a block such as
- * `benchmark { cmd }`
+ * 'benchmark { cmd }'.
  */
-public interface CommandDecorator extends Command {
+public interface CommandWrapper extends Command {
 
-    void setCommandNested(CommandNested commandNested);
+    void setNestedCommand(NestedCommand nestedCommand);
 
-    interface CommandNested {
+    /**
+     * The inner block 'cmd' of 'benchmark { cmd }'.
+     */
+    interface NestedCommand {
 
         ExitStatus run();
     }

@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     inspired by https://medium.com/@marko.luksa/bash-trick-repeat-last-command-until-success-750a61c43c8a
 - `withTimeout`: runs nested command with a timeout
     inspired by https://www.cyberciti.biz/faq/linux-run-a-command-with-a-time-limit/
-- new experimental infrastructure for `cmd { ... }`
+- new infrastructure for `cmd { ... }`
 - JDK 15 compatibility
 
 ### Changed

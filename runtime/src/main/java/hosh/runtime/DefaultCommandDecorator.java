@@ -25,7 +25,7 @@ package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
-import hosh.spi.CommandDecorator;
+import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
@@ -37,13 +37,13 @@ class DefaultCommandDecorator implements Command, InterpreterAware {
 
     private final Statement nested;
 
-    private final CommandDecorator commandDecorator;
+    private final CommandWrapper commandWrapper;
 
     private Interpreter interpreter;
 
-    public DefaultCommandDecorator(Statement nested, CommandDecorator commandDecorator) {
+    public DefaultCommandDecorator(Statement nested, CommandWrapper commandWrapper) {
         this.nested = nested;
-        this.commandDecorator = commandDecorator;
+        this.commandWrapper = commandWrapper;
     }
 
     @Override
@@ -54,12 +54,12 @@ class DefaultCommandDecorator implements Command, InterpreterAware {
     @Override
     public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
         // CommandNested is just a way to hide Interpreter and other internals to the modules
-        commandDecorator.setCommandNested(() -> interpreter.eval(nested, in, out, err));
-        return commandDecorator.run(args, in, out, err);
+        commandWrapper.setNestedCommand(() -> interpreter.eval(nested, in, out, err));
+        return commandWrapper.run(args, in, out, err);
     }
 
     @Override
     public String toString() {
-        return String.format("DefaultCommandDecorator[nested=%s,commandDecorator=%s]", nested, commandDecorator);
+        return String.format("DefaultCommandDecorator[nested=%s,commandDecorator=%s]", nested, commandWrapper);
     }
 }

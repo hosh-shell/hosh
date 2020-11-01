@@ -46,7 +46,7 @@ import hosh.modules.system.SystemModule.UnsetVariable;
 import hosh.modules.system.SystemModule.WithTime;
 import hosh.spi.Ansi;
 import hosh.spi.Command;
-import hosh.spi.CommandDecorator;
+import hosh.spi.CommandWrapper;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -753,14 +753,14 @@ class SystemModuleTest {
 		OutputChannel err;
 
 		@Mock(stubOnly = true)
-		CommandDecorator.CommandNested commandNested;
+		CommandWrapper.NestedCommand nestedCommand;
 
 		@InjectMocks
 		Benchmark sut;
 
 		@Test
 		void onePositiveArg() {
-			given(commandNested.run()).willReturn(ExitStatus.success());
+			given(nestedCommand.run()).willReturn(ExitStatus.success());
 			ExitStatus result = sut.run(List.of("10"), in, out, err);
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -804,7 +804,7 @@ class SystemModuleTest {
 		OutputChannel err;
 
 		@Mock(stubOnly = true)
-		CommandDecorator.CommandNested nested;
+		CommandWrapper.NestedCommand nestedCommand;
 
 		@InjectMocks
 		WithTime sut;
@@ -812,7 +812,7 @@ class SystemModuleTest {
 		@Test
 		void zeroArg() {
 			ExitStatus nestedExitStatus = ExitStatus.of(42);
-			given(nested.run()).willReturn(nestedExitStatus);
+			given(nestedCommand.run()).willReturn(nestedExitStatus);
 			ExitStatus result = sut.run(List.of(), in, out, err);
 			assertThat(result).isEqualTo(nestedExitStatus);
 			then(in).shouldHaveNoInteractions();

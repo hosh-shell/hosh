@@ -29,7 +29,7 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
-import hosh.spi.CommandDecorator;
+import hosh.spi.CommandWrapper;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -408,13 +408,13 @@ public class SystemModule implements Module {
 		@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
 		@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
 	})
-	public static class WithTime implements CommandDecorator {
+	public static class WithTime implements CommandWrapper {
 
-		private CommandNested commandNested;
+		private NestedCommand nestedCommand;
 
 		@Override
-		public void setCommandNested(CommandNested commandNested) {
-			this.commandNested = commandNested;
+		public void setNestedCommand(NestedCommand nestedCommand) {
+			this.nestedCommand = nestedCommand;
 		}
 
 		@Override
@@ -424,7 +424,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			long startNanos = System.nanoTime();
-			ExitStatus exitStatus = commandNested.run();
+			ExitStatus exitStatus = nestedCommand.run();
 			long endNanos = System.nanoTime();
 			Duration duration = Duration.ofNanos(endNanos - startNanos);
 			out.send(Records.singleton(Keys.DURATION, Values.ofDuration(duration)));
@@ -521,20 +521,20 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "withTimeout PT5s { walk / } ", description = "try to walk the entire filesystem within 5s timeout")
 	})
-	public static class WithTimeout implements CommandDecorator {
+	public static class WithTimeout implements CommandWrapper {
 
-		private CommandNested commandNested;
+		private NestedCommand nestedCommand;
 
 		@Override
-		public void setCommandNested(CommandNested commandNested) {
-			this.commandNested = commandNested;
+		public void setNestedCommand(NestedCommand nestedCommand) {
+			this.nestedCommand = nestedCommand;
 		}
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			Duration duration = Duration.parse(args.get(0));
 			ExecutorService executorService = Executors.newSingleThreadExecutor();
-			Future<ExitStatus> future = executorService.submit(commandNested::run);
+			Future<ExitStatus> future = executorService.submit(nestedCommand::run);
 			try {
 				return future.get(duration.toMillis(), TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
@@ -558,19 +558,19 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "waitSuccess { http http://localhost:8080/ } ", description = "waiting for local service on port 8080")
 	})
-	public static class WaitSuccess implements CommandDecorator {
+	public static class WaitSuccess implements CommandWrapper {
 
-		private CommandNested commandNested;
+		private NestedCommand nestedCommand;
 
 		@Override
-		public void setCommandNested(CommandNested commandNested) {
-			this.commandNested = commandNested;
+		public void setNestedCommand(NestedCommand nestedCommand) {
+			this.nestedCommand = nestedCommand;
 		}
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			while (true) {
-				ExitStatus exitStatus = commandNested.run();
+				ExitStatus exitStatus = nestedCommand.run();
 				if (exitStatus.isSuccess()) {
 					return exitStatus;
 				} else {
@@ -592,7 +592,7 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
 	})
-	public static class Benchmark implements CommandDecorator {
+	public static class Benchmark implements CommandWrapper {
 
 		public static final Key BEST = Keys.of("best");
 
@@ -600,11 +600,11 @@ public class SystemModule implements Module {
 
 		public static final Key AVERAGE = Keys.of("average");
 
-		private CommandNested commandNested;
+		private NestedCommand nestedCommand;
 
 		@Override
-		public void setCommandNested(CommandNested commandNested) {
-			this.commandNested = commandNested;
+		public void setNestedCommand(NestedCommand nestedCommand) {
+			this.nestedCommand = nestedCommand;
 		}
 
 		@Override
@@ -625,7 +625,7 @@ public class SystemModule implements Module {
 
 			for (int i = 0; i < repeat; i++) {
 				// ignoring exit status
-				commandNested.run();
+				nestedCommand.run();
 				accumulator.takeTime();
 			}
 

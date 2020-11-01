@@ -24,7 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
-import hosh.spi.CommandDecorator;
+import hosh.spi.CommandWrapper;
 import hosh.spi.State;
 import hosh.doc.Todo;
 import org.antlr.v4.runtime.Token;
@@ -125,7 +125,7 @@ public class Compiler {
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
 			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
-		if (command instanceof CommandDecorator) {
+		if (command instanceof CommandWrapper) {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		}
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
@@ -149,9 +149,9 @@ public class Compiler {
 		}
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
-		if (command instanceof CommandDecorator) {
-			CommandDecorator commandDecorator = (CommandDecorator) command;
-			DefaultCommandDecorator decoratedCommand = new DefaultCommandDecorator(nestedStatement, commandDecorator);
+		if (command instanceof CommandWrapper) {
+			CommandWrapper commandWrapper = (CommandWrapper) command;
+			DefaultCommandDecorator decoratedCommand = new DefaultCommandDecorator(nestedStatement, commandWrapper);
 			return new Statement(decoratedCommand, arguments, commandName);
 		}
 		throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));

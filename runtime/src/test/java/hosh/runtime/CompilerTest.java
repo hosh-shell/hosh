@@ -28,7 +28,7 @@ import hosh.runtime.Compiler.CompileError;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
-import hosh.spi.CommandDecorator;
+import hosh.spi.CommandWrapper;
 import hosh.spi.State;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Disabled;
@@ -60,7 +60,7 @@ class CompilerTest {
 	Command anotherCommand;
 
 	@Mock(stubOnly = true)
-	CommandDecorator commandDecorator;
+	CommandWrapper commandWrapper;
 
 	@Mock(stubOnly = true)
 	CommandResolver commandResolver;
@@ -199,7 +199,7 @@ class CompilerTest {
 
 	@Test
 	void wrappedCommand() {
-		doReturn(Optional.of(commandDecorator)).when(commandResolver).tryResolve("withTime");
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime -t -a { git push }");
 		assertThat(program.getStatements())
@@ -212,7 +212,7 @@ class CompilerTest {
 
 	@Test
 	void nestedWrappedCommands() {
-		doReturn(Optional.of(commandDecorator)).when(commandResolver).tryResolve("withTime");
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 		Program program = sut.compile("withTime { withTime { git push } }");
 		assertThat(program.getStatements())
@@ -222,7 +222,7 @@ class CompilerTest {
 
 	@Test
 	void commandWrapperUsedAsCommand() {
-		doReturn(Optional.of(commandDecorator)).when(commandResolver).tryResolve("withTime");
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		assertThatThrownBy(() -> sut.compile("withTime"))
 			.isInstanceOf(CompileError.class)
 			.hasMessage("line 1: 'withTime' is a command wrapper");
@@ -230,7 +230,7 @@ class CompilerTest {
 
 	@Test
 	void emptyCommandWrapper() {
-		doReturn(Optional.of(commandDecorator)).when(commandResolver).tryResolve("withTime");
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		assertThatThrownBy(() -> sut.compile("withTime { }"))
 			.isInstanceOf(CompileError.class)
 			.hasMessage("line 1: 'withTime' with empty wrapping statement");
@@ -255,7 +255,7 @@ class CompilerTest {
 
 	@Test
 	void commandWrapperAsProducer() {
-		doReturn(Optional.of(commandDecorator)).when(commandResolver).tryResolve("benchmark");
+		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("benchmark");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
 		Program program = sut.compile("benchmark 50 { ls } | schema");
