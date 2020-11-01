@@ -28,9 +28,7 @@ import hosh.spi.Record.Entry;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -208,7 +206,7 @@ public class Records {
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record) {
 				Record that = (Record) obj;
-				return that.size() == 1 && this.entries().equals(that.entries());
+				return that.size() == 1 && Records.equals(this.entries(), that.entries());
 			} else {
 				return false;
 			}
@@ -291,7 +289,7 @@ public class Records {
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record) {
 				Record that = (Record) obj;
-				return this.size() == that.size() && this.entries().equals(that.entries());
+				return this.size() == that.size() && Records.equals(this.entries(), that.entries());
 			} else {
 				return false;
 			}
@@ -317,5 +315,19 @@ public class Records {
 				}
 			}
 		}
+	}
+
+	private static boolean equals(Stream<Entry> a, Stream<Entry> b) {
+		Iterator<Entry> it1 = a.iterator();
+		Iterator<Entry> it2 = b.iterator();
+		while (it1.hasNext() && it2.hasNext()) {
+			if (!Objects.equals(it1.next(), it2.next())) {
+				return false;
+			}
+		}
+		if (it1.hasNext() || it2.hasNext()) {
+			throw new IllegalStateException("different lengths");
+		}
+		return true;
 	}
 }

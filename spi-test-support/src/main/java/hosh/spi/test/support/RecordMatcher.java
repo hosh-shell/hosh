@@ -30,6 +30,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Mockito's argument matcher for Record that allows to specify
@@ -60,7 +61,7 @@ public class RecordMatcher implements ArgumentMatcher<Record> {
 			return false;
 		}
 		for (var entry : entries) {
-			if (!argument.entries().contains(entry)) {
+			if (argument.entries().noneMatch(e -> Objects.equals(e, entry))) {
 				return false;
 			}
 		}
