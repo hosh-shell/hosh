@@ -24,7 +24,8 @@
 package hosh.spi;
 
 /**
- * Replacement for {@link CommandWrapper}.
+ * A command specialization that is used for commands that take a block such as
+ * `benchmark { cmd }`
  */
 public interface CommandDecorator extends Command {
 
