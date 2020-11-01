@@ -100,7 +100,7 @@ public class AutoTableChannel implements OutputChannel {
 		boolean headerSent = false;
 		for (Record record : records) {
 			if (!headerSent) {
-				sendHeader(paddings, record.keys(), out);
+				sendHeader(paddings, record, out);
 				headerSent = true;
 			}
 			sendRow(paddings, record, out);
@@ -162,12 +162,12 @@ public class AutoTableChannel implements OutputChannel {
 		return String.format("%%-%ds", length);
 	}
 
-	private void sendHeader(Map<Key, Integer> paddings, Collection<Key> keys, OutputChannel out) {
-		String format = keys.stream()
+	private void sendHeader(Map<Key, Integer> paddings, Record record, OutputChannel out) {
+		String format = record.keys()
 			.map(paddings::get)
 			.map(this::formatterFor)
 			.collect(Collectors.joining());
-		String header = String.format(format, keys.stream().map(Key::name).toArray());
+		String header = String.format(format, record.keys().map(Key::name).toArray());
 		out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 	}
 

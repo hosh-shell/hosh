@@ -35,6 +35,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Records {
 
@@ -82,13 +83,13 @@ public class Records {
 	static class Empty implements Record {
 
 		@Override
-		public List<Key> keys() {
-			return Collections.emptyList();
+		public Stream<Key> keys() {
+			return Stream.empty();
 		}
 
 		@Override
-		public List<Value> values() {
-			return Collections.emptyList();
+		public Stream<Value> values() {
+			return Stream.empty();
 		}
 
 		@Override
@@ -154,18 +155,18 @@ public class Records {
 		}
 
 		@Override
-		public List<Key> keys() {
-			return Collections.singletonList(key);
+		public Stream<Key> keys() {
+			return Stream.of(key);
 		}
 
 		@Override
-		public List<Value> values() {
-			return Collections.singletonList(value);
+		public Stream<Value> values() {
+			return Stream.of(value);
 		}
 
 		@Override
-		public List<Record.Entry> entries() {
-			return Collections.singletonList(new Record.Entry(key, value));
+		public Stream<Record.Entry> entries() {
+			return Stream.of(new Record.Entry(key, value));
 		}
 
 		@Override
@@ -248,24 +249,22 @@ public class Records {
 		}
 
 		@Override
-		public List<Key> keys() {
+		public Stream<Key> keys() {
 			return Arrays
 				       .stream(entries)
-				       .map(Entry::getKey)
-				       .collect(Collectors.toUnmodifiableList());
+				       .map(Entry::getKey);
 		}
 
 		@Override
-		public List<Value> values() {
+		public Stream<Value> values() {
 			return Arrays
 				       .stream(entries)
-				       .map(Entry::getValue)
-				       .collect(Collectors.toUnmodifiableList());
+				       .map(Entry::getValue);
 		}
 
 		@Override
-		public List<Entry> entries() {
-			return List.of(entries);
+		public Stream<Entry> entries() {
+			return Stream.of(entries);
 		}
 
 		@Override

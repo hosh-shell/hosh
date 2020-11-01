@@ -26,6 +26,7 @@ package hosh.spi;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * An immutable value object representing a collection of key/value pairs.
@@ -44,11 +45,11 @@ public interface Record extends Printable {
 	 */
 	Record prepend(Key key, Value value);
 
-	List<Key> keys();
+	Stream<Key> keys();
 
-	List<Value> values();
+	Stream<Value> values();
 
-	List<Entry> entries();
+	Stream<Entry> entries();
 
 	Optional<Value> value(Key key);
 
