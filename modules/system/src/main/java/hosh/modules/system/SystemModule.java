@@ -532,20 +532,24 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			Duration duration = Duration.parse(args.get(0));
+			if (args.size() != 1) {
+				err.send(Errors.usage("withTimeout duration { ... }"));
+				return ExitStatus.error();
+			}
+			Duration timeout = Duration.parse(args.get(0));
 			ExecutorService executorService = Executors.newSingleThreadExecutor();
 			Future<ExitStatus> future = executorService.submit(nestedCommand::run);
 			try {
-				return future.get(duration.toMillis(), TimeUnit.MILLISECONDS);
+				return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				err.send(Errors.message("interrupted"));
 				return ExitStatus.error();
-			} catch (ExecutionException e) {
-				err.send(Errors.message(e));
-				return ExitStatus.error();
 			} catch (TimeoutException e) {
 				err.send(Errors.message("timeout"));
+				return ExitStatus.error();
+			} catch (ExecutionException e) {
+				err.send(Errors.message(e));
 				return ExitStatus.error();
 			} finally {
 				executorService.shutdownNow();

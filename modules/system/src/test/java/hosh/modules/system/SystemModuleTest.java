@@ -76,24 +76,26 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
 class SystemModuleTest {
 
@@ -810,7 +812,7 @@ class SystemModuleTest {
 		WithTime sut;
 
 		@Test
-		void zeroArg() {
+		void noArgs() {
 			ExitStatus nestedExitStatus = ExitStatus.of(42);
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 			ExitStatus result = sut.run(List.of(), in, out, err);
@@ -827,6 +829,100 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: withTime { ... }")));
+		}
+
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	class WithTimeoutTest {
+
+		@RegisterExtension
+		final WithThread withThread = new WithThread();
+
+		@Mock
+		InputChannel in;
+
+		@Mock
+		OutputChannel out;
+
+		@Mock
+		OutputChannel err;
+
+		@Mock(stubOnly = true)
+		CommandWrapper.NestedCommand nestedCommand;
+
+		@InjectMocks
+		SystemModule.WithTimeout sut;
+
+		@Test
+		void oneArgInterrupted() {
+			withThread.interrupt();
+			Duration timeout = Duration.ofMillis(10);
+			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
+				Thread.sleep(timeout.toMillis() * 2);
+				return ExitStatus.success(); // will be ignored
+			});
+			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+			assertThat(withThread.isInterrupted()).isTrue();
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("interrupted")));
+		}
+
+		@Test
+		void oneArgException() {
+			Duration timeout = Duration.ofMillis(10);
+			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
+				throw new NullPointerException("simulated error"); // could happen for a built-in command
+			});
+			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("java.lang.NullPointerException: simulated error")));
+		}
+
+		@Test
+		void oneArgTimeout() {
+			Duration timeout = Duration.ofMillis(10);
+			ExitStatus nestedExitStatus = ExitStatus.success();
+			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
+				// simulating a command slower than the timeout
+				Thread.sleep(timeout.toMillis() * 2);
+				return nestedExitStatus;
+			});
+			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("timeout")));
+		}
+
+		@Test
+		void oneArgNoTimeout() {
+			Duration timeout = Duration.ofMillis(20);
+			ExitStatus nestedExitStatus = ExitStatus.success();
+			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
+				// simulating a command faster than the timeout
+				Thread.sleep(timeout.toMillis() / 2);
+				return nestedExitStatus;
+			});
+			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+			assertThat(result).isEqualTo(nestedExitStatus);
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void noArgs() {
+			ExitStatus result = sut.run(List.of(), in, out, err);
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: withTimeout duration { ... }")));
 		}
 
 	}
@@ -851,7 +947,7 @@ class SystemModuleTest {
 		SetVariable sut;
 
 		@Test
-		void zeroArgs() {
+		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
