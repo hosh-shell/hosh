@@ -14,10 +14,14 @@ public class DurationParsing {
 		// to keep sonar happy :-)
 	}
 
-	// accept also values without PT later
 	public static Optional<Duration> parseIso(String value) {
 		try {
-			Duration parsed = Duration.parse(value);
+			Duration parsed;
+			if (value.startsWith("PT")) {
+				parsed = Duration.parse(value);
+			} else {
+				parsed = Duration.parse("PT" + value);
+			}
 			return Optional.of(parsed);
 		} catch (DateTimeParseException e) {
 			return Optional.empty();
