@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - bumped jline to 3.17.1
+- `sleep`: removed 2 args overload
+  now it is possible to specify duration with both ISO8601 format and with our custom format (just dropping PT prefix)
+  `sleep PT1s`, `sleep 1s` and `sleep 1S` are equivalent.
 
 ### Fixed
 - `http`: improving error handling
