@@ -859,10 +859,6 @@ class SystemModuleTest {
 		void oneArgInterrupted() {
 			withThread.interrupt();
 			Duration timeout = Duration.ofMillis(10);
-			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
-				Thread.sleep(timeout.toMillis() * 2);
-				return ExitStatus.success(); // will be ignored
-			});
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
 			assertThat(withThread.isInterrupted()).isTrue();
 			assertThat(result).isError();
