@@ -858,7 +858,7 @@ class SystemModuleTest {
 		@Test
 		void oneArgInterrupted() {
 			withThread.interrupt();
-			Duration timeout = Duration.ofMillis(10);
+			Duration timeout = Duration.ofMillis(100);
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
 			assertThat(withThread.isInterrupted()).isTrue();
 			assertThat(result).isError();
@@ -869,7 +869,7 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgException() {
-			Duration timeout = Duration.ofMillis(10);
+			Duration timeout = Duration.ofMillis(100);
 			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
 				throw new NullPointerException("simulated error"); // could happen for a built-in command
 			});
@@ -882,7 +882,7 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgTimeout() {
-			Duration timeout = Duration.ofMillis(10);
+			Duration timeout = Duration.ofMillis(100);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
 				// simulating a command slower than the timeout
@@ -898,7 +898,7 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgNoTimeout() {
-			Duration timeout = Duration.ofMillis(20);
+			Duration timeout = Duration.ofMillis(100);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
 				// simulating a command faster than the timeout
