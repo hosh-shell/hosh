@@ -68,7 +68,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -231,7 +230,6 @@ class SystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path prepend path")));
 			then(state).shouldHaveNoInteractions();
 		}
-
 	}
 
 	@Nested
@@ -603,7 +601,6 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid duration: '" +  input + "'")));
 		}
-
 	}
 
 	@Nested
@@ -759,7 +756,6 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("number must be >= 0")));
 		}
-
 	}
 
 	@Nested
@@ -800,7 +796,6 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: withTime { ... }")));
 		}
-
 	}
 
 	@Nested
@@ -890,7 +885,6 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: withTimeout duration { ... }")));
 		}
-
 	}
 
 	@Nested
@@ -972,9 +966,7 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: waitSuccess [duration] { ... }")));
 		}
-
 	}
-
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
@@ -1557,6 +1549,5 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
 		}
-
 	}
 }
