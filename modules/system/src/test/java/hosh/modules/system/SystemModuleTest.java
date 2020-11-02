@@ -823,7 +823,7 @@ class SystemModuleTest {
 		@Test
 		void oneArgInterrupted() {
 			withThread.interrupt();
-			Duration timeout = Duration.ofMillis(100);
+			Duration timeout = Duration.ofMillis(200);
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
 			assertThat(withThread.isInterrupted()).isTrue();
 			assertThat(result).isError();
@@ -834,7 +834,7 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgException() {
-			Duration timeout = Duration.ofMillis(100);
+			Duration timeout = Duration.ofMillis(200);
 			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
 				throw new NullPointerException("simulated error"); // could happen for a built-in command
 			});
@@ -847,7 +847,7 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgTimeout() {
-			Duration timeout = Duration.ofMillis(100);
+			Duration timeout = Duration.ofMillis(200);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
 				// simulating a command slower than the timeout
@@ -863,7 +863,7 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgNoTimeout() {
-			Duration timeout = Duration.ofMillis(100);
+			Duration timeout = Duration.ofMillis(200);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
 				// simulating a command faster than the timeout
@@ -912,7 +912,7 @@ class SystemModuleTest {
 		@Test
 		void oneArgInterrupted() {
 			withThread.interrupt();
-			Duration sleep = Duration.ofMillis(10);
+			Duration sleep = Duration.ofMillis(200);
 			ExitStatus nestedExitStatus = ExitStatus.error(); // to trigger at least one sleep()
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
@@ -925,7 +925,7 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgSuccessAtFirstAttempt() {
-			Duration sleep = Duration.ofMillis(10);
+			Duration sleep = Duration.ofMillis(200);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
@@ -937,7 +937,7 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgSuccessAtSecondAttempt() {
-			Duration sleep = Duration.ofMillis(10);
+			Duration sleep = Duration.ofMillis(200);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willReturn(ExitStatus.error(), nestedExitStatus);
 			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
