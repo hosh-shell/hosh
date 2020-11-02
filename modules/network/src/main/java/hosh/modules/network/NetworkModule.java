@@ -153,7 +153,7 @@ public class NetworkModule implements Module {
 				err.send(Errors.message("interrupted"));
 				return ExitStatus.error();
 			} catch (IOException ioe) {
-				err.send(Errors.message(ioe.getMessage()));
+				err.send(Errors.message(ioe));
 				return ExitStatus.error();
 			}
 		}
