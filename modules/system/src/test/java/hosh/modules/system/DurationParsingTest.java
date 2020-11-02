@@ -11,43 +11,43 @@ class DurationParsingTest {
 
 	@Test
 	void iso8601FormatUppercase() {
-		Optional<Duration> result = DurationParsing.parseIso("PT5S");
+		Optional<Duration> result = DurationParsing.parse("PT5S");
 		assertThat(result).contains(Duration.ofSeconds(5));
 	}
 
 	@Test
 	void iso8601FormatLowercase() {
-		Optional<Duration> result = DurationParsing.parseIso("PT5s");
+		Optional<Duration> result = DurationParsing.parse("PT5s");
 		assertThat(result).contains(Duration.ofSeconds(5));
 	}
 
 	@Test
 	void ourCustomFormatLowercase() {
-		Optional<Duration> result = DurationParsing.parseIso("5s");
+		Optional<Duration> result = DurationParsing.parse("5s");
 		assertThat(result).contains(Duration.ofSeconds(5));
 	}
 
 	@Test
 	void ourCustomFormatUppercase() {
-		Optional<Duration> result = DurationParsing.parseIso("5S");
+		Optional<Duration> result = DurationParsing.parse("5S");
 		assertThat(result).contains(Duration.ofSeconds(5));
 	}
 
 	@Test
 	void nullValue() {
-		Optional<Duration> result = DurationParsing.parseIso(null);
+		Optional<Duration> result = DurationParsing.parse(null);
 		assertThat(result).isEmpty();
 	}
 
 	@Test
 	void emptyValue() {
-		Optional<Duration> result = DurationParsing.parseIso("");
+		Optional<Duration> result = DurationParsing.parse("");
 		assertThat(result).isEmpty();
 	}
 
 	@Test
 	void missingUnit() {
-		Optional<Duration> result = DurationParsing.parseIso("5");
+		Optional<Duration> result = DurationParsing.parse("5");
 		assertThat(result).isEmpty();
 	}
 }

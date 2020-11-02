@@ -67,6 +67,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -544,7 +546,7 @@ class SystemModuleTest {
 		@Test
 		void interrupts() {
 			withThread.interrupt();
-			ExitStatus exitStatus = sut.run(List.of("1000"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("1s"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -552,12 +554,12 @@ class SystemModuleTest {
 		}
 
 		@Test
-		void tooManyArgs() {
-			ExitStatus exitStatus = sut.run(List.of("1", "seconds", "extra"), in, out, err);
+		void twoArgs() {
+			ExitStatus exitStatus = sut.run(List.of("1", "seconds"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sleep [duration|duration unit]")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sleep duration")));
 		}
 
 		@Test
@@ -566,72 +568,40 @@ class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sleep [duration|duration unit]")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: sleep duration")));
 		}
 
-		@Test
-		void oneArgNumber() {
-			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
-			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).shouldHaveNoInteractions();
-		}
-
-		@Test
-		void oneArgNotNumber() {
-			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
-			assertThat(exitStatus).isError();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: a")));
-		}
-
-		@Test
-		void twoArgsAmountNotValid() {
-			ExitStatus exitStatus = sut.run(List.of("a", "b"), in, out, err);
-			assertThat(exitStatus).isError();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: a")));
-		}
-
-		@Test
-		void twoArgsUnitNotValid() {
-			ExitStatus exitStatus = sut.run(List.of("1", "asd"), in, out, err);
-			assertThat(exitStatus).isError();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid unit: asd")));
-		}
-
-		@ValueSource(strings = {"nanos", "micros", "millis", "seconds", "minutes", "hours"})
+		// sleep 100ms
+		@ValueSource(strings = {
+			"PT0.1S", // ISO 8601
+			"PT0.1s", // same but with lowercase suffix
+			"0.1S",   // our custom format
+			"0.1s",   // our custom format
+		})
 		@ParameterizedTest
-		void sleepWithValidUnitDuration(String unit) {
-			ExitStatus exitStatus = sut.run(List.of("0", unit), in, out, err);
+		void validInput(String input) {
+			ExitStatus exitStatus = sut.run(List.of(input), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
 		}
 
-		@ValueSource(strings = {"PT0M", "PT0S"})
+		@EmptySource
+		@ValueSource(strings = {
+			"PT",   // missing value and unit
+			"PT1",  // missing unit
+			"1",    // missing unit
+			"AAA",  // bogus
+			"_",    // bogus
+		})
 		@ParameterizedTest
-		void sleepWithValidIso8601(String iso8601Spec) {
-			ExitStatus exitStatus = sut.run(List.of(iso8601Spec), in, out, err);
-			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).shouldHaveNoInteractions();
-		}
-
-		@Test
-		void sleepWithInvalidIso8601() {
-			ExitStatus exitStatus = sut.run(List.of("PTM"), in, out, err);
+		void sleepWithValidIso8601(String input) {
+			ExitStatus exitStatus = sut.run(List.of(input), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid amount: PTM")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid duration: '" +  input + "'")));
 		}
 
 	}

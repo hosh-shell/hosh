@@ -60,15 +60,12 @@ import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -321,84 +318,32 @@ public class SystemModule implements Module {
 		}
 	}
 
-	@Description("suspend execution for given duration, by default measured in millis")
+	@Description("suspend execution for given duration")
 	@Examples({
-		@Example(command = "sleep 2 seconds", description = "suspend execution for 1 second"),
+		@Example(command = "sleep 2s", description = "suspend execution for 2 seconds (using ISO 8061 without PT prefix)"),
 		@Example(command = "sleep PT1M", description = "suspend execution for 1 minute (using ISO 8601)"),
 	})
 	public static class Sleep implements Command {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			OptionalLong amount;
-			Optional<ChronoUnit> unit;
-			if (args.size() == 1) {
-				String arg = args.get(0);
-				amount = parse(arg);
-				unit = parseUnit("millis");
-			} else if (args.size() == 2) {
-				String arg = args.get(0);
-				amount = parseLong(arg);
-				unit = parseUnit(args.get(1).toLowerCase());
-			} else {
-				err.send(Errors.usage("sleep [duration|duration unit]"));
+			if (args.size() != 1) {
+				err.send(Errors.usage("sleep duration"));
 				return ExitStatus.error();
 			}
-			if (amount.isEmpty()) {
-				err.send(Errors.message("invalid amount: %s", args.get(0)));
-				return ExitStatus.error();
-			}
-			if (unit.isEmpty()) {
-				err.send(Errors.message("invalid unit: %s", args.get(1)));
+			Optional<Duration> duration = DurationParsing.parse(args.get(0));
+			if (duration.isEmpty()) {
+				err.send(Errors.message("invalid duration: '%s'", args.get(0)));
 				return ExitStatus.error();
 			}
 			try {
-				Duration duration = Duration.of(amount.getAsLong(), unit.get());
-				Thread.sleep(duration.toMillis());
+				Thread.sleep(duration.get().toMillis());
 				return ExitStatus.success();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				err.send(Errors.message("interrupted"));
 				return ExitStatus.error();
 			}
-		}
-
-		private OptionalLong parse(String s) {
-			if (s.startsWith("P")) {
-				return parseIso8601(s);
-			} else {
-				return parseLong(s);
-			}
-		}
-
-		private OptionalLong parseIso8601(String s) {
-			try {
-				Duration parsed = Duration.parse(s);
-				return OptionalLong.of(parsed.toMillis());
-			} catch (DateTimeParseException e) {
-				return OptionalLong.empty();
-			}
-		}
-
-		private OptionalLong parseLong(String s) {
-			try {
-				return OptionalLong.of(Long.parseLong(s));
-			} catch (NumberFormatException e) {
-				return OptionalLong.empty();
-			}
-		}
-
-		private final Map<String, ChronoUnit> validUnits = Map.ofEntries(
-			Map.entry("nanos", ChronoUnit.NANOS),
-			Map.entry("micros", ChronoUnit.MICROS),
-			Map.entry("millis", ChronoUnit.MILLIS),
-			Map.entry("seconds", ChronoUnit.SECONDS),
-			Map.entry("minutes", ChronoUnit.MINUTES),
-			Map.entry("hours", ChronoUnit.HOURS)
-		);
-
-		private Optional<ChronoUnit> parseUnit(String value) {
-			return Optional.ofNullable(validUnits.get(value));
 		}
 	}
 

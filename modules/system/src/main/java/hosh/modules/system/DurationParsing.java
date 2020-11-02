@@ -14,14 +14,12 @@ import java.util.logging.Logger;
  */
 public class DurationParsing {
 
-	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
-
 	/**
 	 * Parsing duration ISO 8601 format with possibility to omit leading 'PT' prefix.
 	 *
 	 * Any invalid input, including null, returns empty.
 	 */
-	public static Optional<Duration> parseIso(String value) {
+	public static Optional<Duration> parse(String value) {
 		try {
 			Duration parsed;
 			if (value == null) {
@@ -33,7 +31,6 @@ public class DurationParsing {
 			}
 			return Optional.ofNullable(parsed);
 		} catch (DateTimeParseException e) {
-			LOGGER.log(Level.WARNING, e, () -> String.format("cannot parse duration: '%s'", value));
 			return Optional.empty();
 		}
 	}
