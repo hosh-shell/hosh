@@ -895,7 +895,6 @@ public class SystemModule implements Module {
 		}
 	}
 
-
 	@Description("capture output of a command into a variable")
 	@Examples({
 		@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
