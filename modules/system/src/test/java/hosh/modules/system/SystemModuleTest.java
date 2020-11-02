@@ -929,6 +929,90 @@ class SystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
+	class WaitSuccessTest {
+
+		@RegisterExtension
+		final WithThread withThread = new WithThread();
+
+		@Mock
+		InputChannel in;
+
+		@Mock
+		OutputChannel out;
+
+		@Mock
+		OutputChannel err;
+
+		@Mock(stubOnly = true)
+		CommandWrapper.NestedCommand nestedCommand;
+
+		@InjectMocks
+		SystemModule.WaitSuccess sut;
+
+		@Test
+		void oneArgInterrupted() {
+			withThread.interrupt();
+			Duration sleep = Duration.ofMillis(10);
+			ExitStatus nestedExitStatus = ExitStatus.error(); // to trigger at least one sleep()
+			given(nestedCommand.run()).willReturn(nestedExitStatus);
+			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+			assertThat(result).isError();
+			assertThat(withThread.isInterrupted()).isTrue();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("interrupted")));
+		}
+
+		@Test
+		void oneArgSuccessAtFirstAttempt() {
+			Duration sleep = Duration.ofMillis(10);
+			ExitStatus nestedExitStatus = ExitStatus.success();
+			given(nestedCommand.run()).willReturn(nestedExitStatus);
+			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+			assertThat(result).isEqualTo(nestedExitStatus);
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void oneArgSuccessAtSecondAttempt() {
+			Duration sleep = Duration.ofMillis(10);
+			ExitStatus nestedExitStatus = ExitStatus.success();
+			given(nestedCommand.run()).willReturn(ExitStatus.error(), nestedExitStatus);
+			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+			assertThat(result).isEqualTo(nestedExitStatus);
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test // testing success at first attempt only in order to avoid 1s wait (default) in unit tests
+		void noArgsSuccessAtFirstAttempt() {
+			Duration sleep = Duration.ofMillis(10);
+			ExitStatus nestedExitStatus = ExitStatus.success();
+			given(nestedCommand.run()).willReturn(nestedExitStatus);
+			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+			assertThat(result).isEqualTo(nestedExitStatus);
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void twoArgs() {
+			ExitStatus result = sut.run(List.of("first", "second"), in, out, err);
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: waitSuccess [duration] { ... }")));
+		}
+
+	}
+
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
 	class SetVariableTest {
 
 		@Mock

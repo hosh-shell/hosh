@@ -29,8 +29,8 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
-import hosh.spi.CommandWrapper;
 import hosh.spi.CommandRegistry;
+import hosh.spi.CommandWrapper;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -560,7 +560,8 @@ public class SystemModule implements Module {
 
 	@Description("repeat command until the first success")
 	@Examples({
-		@Example(command = "waitSuccess { http http://localhost:8080/ } ", description = "waiting for local service on port 8080")
+		@Example(command = "waitSuccess { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 1s between attempts (default)"),
+		@Example(command = "waitSuccess PT5s { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 5s between attempts")
 	})
 	public static class WaitSuccess implements CommandWrapper {
 
@@ -573,21 +574,29 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() >= 2) {
+				err.send(Errors.usage("waitSuccess [duration] { ... }"));
+				return ExitStatus.error();
+			}
+			Duration sleep;
+			if (args.size() == 0) {
+				sleep = Duration.ofSeconds(1);
+			} else {
+				sleep = Duration.parse(args.get(0));
+			}
 			while (true) {
 				ExitStatus exitStatus = nestedCommand.run();
 				if (exitStatus.isSuccess()) {
 					return exitStatus;
 				} else {
-					sleep();
+					try {
+						Thread.sleep(sleep.toMillis());
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+						err.send(Errors.message("interrupted"));
+						return ExitStatus.error();
+					}
 				}
-			}
-		}
-
-		private void sleep() {
-			try {
-				Thread.sleep(1_000L);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
 			}
 		}
 	}
