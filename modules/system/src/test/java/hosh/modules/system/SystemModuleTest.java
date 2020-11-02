@@ -955,10 +955,9 @@ class SystemModuleTest {
 
 		@Test // testing success at first attempt only in order to avoid 1s wait (default) in unit tests
 		void noArgsSuccessAtFirstAttempt() {
-			Duration sleep = Duration.ofMillis(10);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
-			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 			assertThat(result).isEqualTo(nestedExitStatus);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();

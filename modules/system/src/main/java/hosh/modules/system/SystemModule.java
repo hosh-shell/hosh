@@ -463,6 +463,7 @@ public class SystemModule implements Module {
 	@Experimental(description = "support same syntax for duration as sleep")
 	@Description("run command with a timeout")
 	@Examples({
+		@Example(command = "withTimeout 5s { walk / } ", description = "try to walk the entire filesystem within 5s timeout"),
 		@Example(command = "withTimeout PT5s { walk / } ", description = "try to walk the entire filesystem within 5s timeout")
 	})
 	public static class WithTimeout implements CommandWrapper {
@@ -480,11 +481,15 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("withTimeout duration { ... }"));
 				return ExitStatus.error();
 			}
-			Duration timeout = Duration.parse(args.get(0));
+			Optional<Duration> timeout = DurationParsing.parse(args.get(0));
+			if (timeout.isEmpty()) {
+				err.send(Errors.message("invalid duration: '%s'", args.get(0)));
+				return ExitStatus.error();
+			}
 			ExecutorService executorService = Executors.newSingleThreadExecutor();
 			Future<ExitStatus> future = executorService.submit(nestedCommand::run);
 			try {
-				return future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+				return future.get(timeout.get().toMillis(), TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 				err.send(Errors.message("interrupted"));
@@ -505,7 +510,8 @@ public class SystemModule implements Module {
 	@Description("repeat command until the first success")
 	@Examples({
 		@Example(command = "waitSuccess { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 1s between attempts (default)"),
-		@Example(command = "waitSuccess PT5s { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 5s between attempts")
+		@Example(command = "waitSuccess 5s { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 5s between attempts"),
+		@Example(command = "waitSuccess PS5s { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 5s between attempts")
 	})
 	public static class WaitSuccess implements CommandWrapper {
 
@@ -526,7 +532,13 @@ public class SystemModule implements Module {
 			if (args.size() == 0) {
 				sleep = Duration.ofSeconds(1);
 			} else {
-				sleep = Duration.parse(args.get(0));
+				Optional<Duration> maybeSleep = DurationParsing.parse(args.get(0));
+				if (maybeSleep.isEmpty()) {
+					err.send(Errors.message("invalid duration: '%s'", args.get(0)));
+					return ExitStatus.error();
+				} else {
+					sleep = maybeSleep.get();
+				}
 			}
 			while (true) {
 				ExitStatus exitStatus = nestedCommand.run();
