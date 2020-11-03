@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>hosh-parent</artifactId>
 		<groupId>hosh</groupId>
-		<version>0.1.3</version>
+		<version>0.1.4-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
