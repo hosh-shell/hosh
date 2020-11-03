@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.3] - 2020-11-03
+
 ### Added
 - `waitSuccess`: runs nested command until first success
     inspired by https://medium.com/@marko.luksa/bash-trick-repeat-last-command-until-success-750a61c43c8a
