@@ -24,5 +24,4 @@
 module hosh.modules.system {
 	requires hosh.spi;
 	requires org.jline.reader;
-	requires java.logging;
 }
