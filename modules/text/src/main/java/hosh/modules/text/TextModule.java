@@ -26,6 +26,7 @@ package hosh.modules.text;
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
+import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandRegistry;
@@ -41,6 +42,7 @@ import hosh.spi.Record.Entry;
 import hosh.spi.Records;
 import hosh.spi.Value;
 import hosh.spi.Values;
+import info.debatty.java.stringsimilarity.experimental.Sift4;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -74,6 +76,7 @@ public class TextModule implements Module {
 		registry.registerCommand("regex", Regex::new);
 		registry.registerCommand("schema", Schema::new);
 		registry.registerCommand("filter", Filter::new);
+		registry.registerCommand("search", Search::new);
 		registry.registerCommand("enumerate", Enumerate::new);
 		registry.registerCommand("timestamp", Timestamp::new);
 		registry.registerCommand("distinct", Distinct::new);
@@ -312,6 +315,43 @@ public class TextModule implements Module {
 			}
 			return ExitStatus.success();
 		}
+	}
+
+
+	@Experimental(description = "similarity search using experimental SIFT4")
+	@Description("copy incoming records to the output only if they similarity is above a certain threshold")
+	@Examples({
+		@Example(command = "lines file.txt | search text 'teh' ", description = "output only lines containing 'teh' or 'the' somewhere"),
+	})
+	public static class Search implements Command {
+
+		/**
+		 * Default similarity threshold.
+		 */
+		private static final double THRESHOLD = 0.9;
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 2) {
+				err.send(Errors.usage("simil key words"));
+				return ExitStatus.error();
+			}
+			Key key = Keys.of(args.get(0));
+			String words = args.get(1);
+			Sift4 sift4 = new Sift4();
+			sift4.setMaxOffset(5);
+
+			for (Record record : InputChannel.iterate(in)) {
+				// this could be allocation intensive but let's see
+				record.value(key)
+					.flatMap(v -> v.unwrap(String.class))
+					.filter(s -> sift4.distance(s, words) > THRESHOLD)
+					.ifPresent(v -> out.send(record)); // side effect
+			}
+
+			return ExitStatus.success();
+		}
+
 	}
 
 	@Description("prepend 'index' key to all incoming records")
