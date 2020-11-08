@@ -42,6 +42,7 @@ import hosh.spi.Record.Entry;
 import hosh.spi.Records;
 import hosh.spi.Value;
 import hosh.spi.Values;
+import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.experimental.Sift4;
 
 import java.io.PrintWriter;
@@ -318,7 +319,7 @@ public class TextModule implements Module {
 	}
 
 
-	@Experimental(description = "similarity search using experimental SIFT4")
+	@Experimental(description = "similarity search with JaroWinkler")
 	@Description("copy incoming records to the output only if they similarity is above a certain threshold")
 	@Examples({
 		@Example(command = "lines file.txt | search text 'teh' ", description = "output only lines containing 'teh' or 'the' somewhere"),
@@ -333,19 +334,17 @@ public class TextModule implements Module {
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
-				err.send(Errors.usage("simil key words"));
+				err.send(Errors.usage("search key words"));
 				return ExitStatus.error();
 			}
 			Key key = Keys.of(args.get(0));
 			String words = args.get(1);
-			Sift4 sift4 = new Sift4();
-			sift4.setMaxOffset(5);
-
+			JaroWinkler jaroWinkler = new JaroWinkler();
 			for (Record record : InputChannel.iterate(in)) {
 				// this could be allocation intensive but let's see
 				record.value(key)
 					.flatMap(v -> v.unwrap(String.class))
-					.filter(s -> sift4.distance(s, words) > THRESHOLD)
+					.filter(s -> jaroWinkler.similarity(s, words) > THRESHOLD)
 					.ifPresent(v -> out.send(record)); // side effect
 			}
 
