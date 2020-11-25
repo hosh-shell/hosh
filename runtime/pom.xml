@@ -56,7 +56,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
 				<configuration>
 					<compilerArgs>
 						<arg>--add-exports</arg>
@@ -67,7 +66,7 @@
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>4.8-1</version>
+				<version>${version.antlr}</version>
 				<configuration>
 					<treatWarningsAsErrors>true</treatWarningsAsErrors>
 				</configuration>
