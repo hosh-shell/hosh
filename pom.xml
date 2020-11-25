@@ -39,7 +39,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<argLine /> <!-- defined for when not running with jacoco -->
 		<!-- versions production classpath -->
-		<version.antlr>4.8-1</version.antlr>
+		<version.antlr>4.9</version.antlr>
 		<version.commonscli>1.4</version.commonscli>
 		<version.jline>3.17.1</version.jline>
 		<!-- versions test classpath -->
