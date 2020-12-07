@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/dfa1/hosh/workflows/CI/badge.svg)](https://github.com/dfa1/hosh/actions?query=workflow%3ACI) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dfa1_hosh&metric=alert_status)](https://sonarcloud.io/dashboard?id=dfa1_hosh)
  [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dfa1_hosh&metric=coverage)](https://sonarcloud.io/dashboard?id=dfa1_hosh) [![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=hosh-shell/hosh)](https://dependabot.com)
 
-Experimental shell, written in Java 11.
+Human Oriented SHell, written in Java.
 
 Website: https://hosh-shell.github.io
 
@@ -45,3 +45,4 @@ Build a release with docker:
 ## Sponsors
 
 [![JetBrains](https://raw.githubusercontent.com/JetBrains/logos/master/web/jetbrains/jetbrains-variant-2.svg)](https://www.jetbrains.com/?from=hosh)
+[![YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com/java/profiler?from=hosh)
