@@ -52,7 +52,7 @@ public class Supervisor implements AutoCloseable {
 
 	private static final Signal INT = new Signal("INT");
 
-	private final ExecutorService executor = Executors.newUnboundedExecutor(Thread.builder().virtual().factory());
+	private final ExecutorService executor = Executors.newVirtualThreadExecutor();
 
 	private final List<Future<ExitStatus>> futures = new ArrayList<>();
 
