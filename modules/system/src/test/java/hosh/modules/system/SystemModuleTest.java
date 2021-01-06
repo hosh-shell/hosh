@@ -867,7 +867,7 @@ class SystemModuleTest {
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
 				// simulating a command faster than the timeout
-				Thread.sleep(timeout.toMillis() / 2);
+				Thread.sleep(1);
 				return nestedExitStatus;
 			});
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
