@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-18.04, macOS-10.14, windows-2019]
-        java: [11, 15]
+        java: [11, 16]
         architecture: [x64]
     runs-on: ${{ matrix.os }}
     steps:
