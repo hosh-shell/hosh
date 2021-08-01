@@ -69,6 +69,7 @@ class CommandCompleterTest {
 	@Test
 	void emptyPathAndNoBuiltins() {
 		given(state.getPath()).willReturn(List.of());
+		given(line.line()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates).isEmpty();
@@ -77,6 +78,7 @@ class CommandCompleterTest {
 	@Test
 	void builtin() {
 		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
+		given(line.line()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
@@ -90,6 +92,7 @@ class CommandCompleterTest {
 	@Test
 	void builtinOverridesExternal() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
+		given(line.line()).willReturn("");
 		File file = temporaryFolder.newFile("cmd");
 		assertThat(file.setExecutable(true, true)).isTrue();
 		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
@@ -106,6 +109,7 @@ class CommandCompleterTest {
 	@Test
 	void pathWithEmptyDir() {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
+		given(line.line()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates).isEmpty();
@@ -114,6 +118,7 @@ class CommandCompleterTest {
 	@Test
 	void pathWithExecutable() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
+		given(line.line()).willReturn("");
 		File file = temporaryFolder.newFile("cmd");
 		assertThat(file.setExecutable(true, true)).isTrue();
 		List<Candidate> candidates = new ArrayList<>();
@@ -127,9 +132,21 @@ class CommandCompleterTest {
 	}
 
 	@Test
+	void pathWithExecutableAndNonEmptyLine() throws IOException {
+		given(line.line()).willReturn("vim "); // skipping autocomplete of commands in this case
+		File file = temporaryFolder.newFile("cmd");
+		assertThat(file.setExecutable(true, true)).isTrue();
+		List<Candidate> candidates = new ArrayList<>();
+		sut.complete(lineReader, line, candidates);
+		assertThat(candidates)
+			.isEmpty();
+	}
+
+	@Test
 	void skipNonInPathDirectory() throws IOException {
 		File file = temporaryFolder.newFile();
 		given(state.getPath()).willReturn(List.of(file.toPath()));
+		given(line.line()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
@@ -142,6 +159,7 @@ class CommandCompleterTest {
 		bin.setExecutable(false);
 		bin.setReadable(false); // throws java.nio.file.AccessDeniedException
 		given(state.getPath()).willReturn(List.of(bin.toPath().toAbsolutePath()));
+		given(line.line()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates).isEmpty();
