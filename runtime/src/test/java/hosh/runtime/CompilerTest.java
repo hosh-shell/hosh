@@ -31,11 +31,11 @@ import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
 import org.assertj.core.api.InstanceOfAssertFactories;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -65,8 +65,12 @@ class CompilerTest {
 	@Mock(stubOnly = true)
 	CommandResolver commandResolver;
 
-	@InjectMocks
 	Compiler sut;
+
+	@BeforeEach
+	void createSut() {
+		sut = new Compiler(commandResolver);
+	}
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")
 	@Test

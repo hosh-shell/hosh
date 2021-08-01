@@ -34,11 +34,11 @@ import hosh.spi.Records;
 import hosh.spi.Values;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -67,8 +67,13 @@ class TerminalModuleTest {
 		@Mock
 		Terminal terminal;
 
-		@InjectMocks
 		Clear sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TerminalModule.Clear();
+			sut.setTerminal(terminal);
+		}
 
 		@Test
 		void noArgs() {
@@ -110,8 +115,13 @@ class TerminalModuleTest {
 		@Mock
 		Terminal terminal;
 
-		@InjectMocks
 		Bell sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TerminalModule.Bell();
+			sut.setTerminal(terminal);
+		}
 
 		@Test
 		void noArgs() {
@@ -153,8 +163,13 @@ class TerminalModuleTest {
 		@Mock
 		Terminal terminal;
 
-		@InjectMocks
 		Dump sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TerminalModule.Dump();
+			sut.setTerminal(terminal);
+		}
 
 		@Test
 		void noArgs() {

@@ -25,10 +25,10 @@ package hosh.runtime;
 
 import hosh.test.support.WithThread;
 import hosh.test.support.WithTimeZone;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -52,8 +52,12 @@ class HoshFormatterTest {
 	@Mock(stubOnly = true)
 	LogRecord logRecord;
 
-	@InjectMocks
 	HoshFormatter sut;
+
+	@BeforeEach
+	void createSut() {
+		sut = new HoshFormatter();
+	}
 
 	@Test
 	void severeWithStacktrace() {

@@ -48,13 +48,13 @@ import hosh.spi.Records;
 import hosh.spi.Values;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.WithThread;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -88,10 +88,15 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		TextModule.Rand sut;
 
-		@Test // not a very good test, just checking if rand can be interrupted
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Rand();
+		}
+
+		@Test
+			// not a very good test, just checking if rand can be interrupted
 		void interrupt() {
 			withThread.interrupt();
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
@@ -125,8 +130,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Trim sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Trim();
+		}
 
 		@Test
 		void empty() {
@@ -197,8 +206,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Join sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Join();
+		}
 
 		@Test
 		void noArgs() {
@@ -257,8 +270,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Sum sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Sum();
+		}
 
 		@Test
 		void noArgs() {
@@ -342,8 +359,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		TextModule.Freq sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Freq();
+		}
 
 		@Test
 		void noArgs() {
@@ -428,8 +449,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		TextModule.Min sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Min();
+		}
 
 		@Test
 		void noArgs() {
@@ -515,8 +540,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		TextModule.Max sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Max();
+		}
 
 		@Test
 		void noArgs() {
@@ -603,8 +632,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Select sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Select();
+		}
 
 		@Test
 		void empty() {
@@ -665,8 +698,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Split sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Split();
+		}
 
 		@Test
 		void noArgs() {
@@ -726,8 +763,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Regex sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Regex();
+		}
 
 		@Test
 		void zeroArg() {
@@ -807,8 +848,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Schema sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Schema();
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test
@@ -846,8 +891,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Count sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Count();
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test
@@ -907,8 +956,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Enumerate sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Enumerate();
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test
@@ -947,11 +1000,16 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@Mock
+		@Mock(stubOnly = true)
 		Clock clock;
 
-		@InjectMocks
 		Timestamp sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Timestamp();
+			sut.setClock(clock);
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test
@@ -994,8 +1052,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Drop sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Drop();
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test
@@ -1054,8 +1116,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Take sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Take();
+		}
 
 		@Test
 		void takeZero() {
@@ -1139,8 +1205,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		TextModule.Last sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Last();
+		}
 
 		@Test
 		void lastNoArgs() {
@@ -1212,8 +1282,12 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Filter sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Filter();
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test
@@ -1276,8 +1350,12 @@ class TextModuleTest {
 		@Captor
 		ArgumentCaptor<Record> records;
 
-		@InjectMocks
 		Sort sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Sort();
+		}
 
 		@Test
 		void empty() {
@@ -1403,11 +1481,15 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
-		Distinct sut;
-
 		@Captor
 		ArgumentCaptor<Record> records;
+
+		Distinct sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Distinct();
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test
@@ -1475,11 +1557,15 @@ class TextModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
-		Duplicated sut;
-
 		@Captor
 		ArgumentCaptor<Record> records;
+
+		Duplicated sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new TextModule.Duplicated();
+		}
 
 		@SuppressWarnings("unchecked")
 		@Test

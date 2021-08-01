@@ -36,13 +36,13 @@ import hosh.spi.Values;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.IgnoreWindowsUACExceptions;
 import hosh.test.support.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -86,8 +86,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.ListFiles sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.ListFiles();
+			sut.setState(state);
+		}
 
 		@Test
 		void errorTwoOrMoreArgs() {
@@ -291,8 +296,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.ChangeDirectory sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.ChangeDirectory();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -367,8 +377,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.CurrentWorkingDirectory sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.CurrentWorkingDirectory();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -409,8 +424,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Lines sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Lines();
+			sut.setState(state);
+		}
 
 		@Test
 		void emptyFile() throws IOException {
@@ -491,8 +511,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Copy sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Copy();
+			sut.setState(state);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -561,8 +586,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Move sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Move();
+			sut.setState(state);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -631,8 +661,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Remove sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Remove();
+			sut.setState(state);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -680,15 +715,19 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Partitions sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Partitions();
+		}
 
 		@Test
 		void listAllPartitions() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
-			then(out).should(Mockito.atLeastOnce()).send(any());
+			then(out).should(Mockito.atLeastOnce()).send(any()); // not very precise test... to be improved
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -722,8 +761,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Walk sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Walk();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -819,8 +863,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Probe sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Probe();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -873,8 +922,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Glob sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Glob();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -946,8 +1000,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Symlink sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Symlink();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -991,8 +1050,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Hardlink sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Hardlink();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -1037,8 +1101,13 @@ class FileSystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		FileSystemModule.Resolve sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Resolve();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -1106,8 +1175,14 @@ class FileSystemModuleTest {
 		@Mock(stubOnly = true)
 		CommandWrapper.NestedCommand nestedCommand;
 
-		@InjectMocks
 		FileSystemModule.WithLock sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.WithLock();
+			sut.setNestedCommand(nestedCommand);
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -1128,7 +1203,8 @@ class FileSystemModuleTest {
 			then(err).should().send(any(Record.class));
 		}
 
-		@Test // very weak assertions... please improve them!
+		@Test
+			// very weak assertions... please improve them!
 		void lock() {
 			ExitStatus nestedExitStatus = ExitStatus.of(42);
 			given(nestedCommand.run()).willReturn(nestedExitStatus);

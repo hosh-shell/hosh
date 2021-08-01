@@ -62,6 +62,7 @@ import hosh.test.support.WithThread;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,7 +73,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
@@ -116,8 +116,13 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		SystemModule.Path sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Path();
+			sut.setState(state);
+		}
 
 		@Test
 		void noSubCommand() {
@@ -248,8 +253,13 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Exit sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Exit();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -311,8 +321,13 @@ class SystemModuleTest {
 		@Captor
 		ArgumentCaptor<Record> records;
 
-		@InjectMocks
 		Env sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Env();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgsWithNoEnvVariables() {
@@ -365,8 +380,13 @@ class SystemModuleTest {
 		@Captor
 		ArgumentCaptor<Record> records;
 
-		@InjectMocks
 		Help sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Help();
+			sut.setState(state);
+		}
 
 		@Test
 		void specificCommandWithExamples() {
@@ -491,8 +511,12 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Echo sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Echo();
+		}
 
 		@Test
 		void noArgs() {
@@ -538,8 +562,12 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Sleep sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Sleep();
+		}
 
 		@Test
 		void interrupts() {
@@ -599,7 +627,7 @@ class SystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid duration: '" +  input + "'")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid duration: '" + input + "'")));
 		}
 	}
 
@@ -616,8 +644,12 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		ProcessList sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.ProcessList();
+		}
 
 		@Test
 		void noArgs() {
@@ -651,8 +683,12 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Err sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Err();
+		}
 
 		@Test
 		void noArgs() {
@@ -683,8 +719,12 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Sink sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Sink();
+		}
 
 		@Test
 		void consumeEmpty() {
@@ -724,8 +764,13 @@ class SystemModuleTest {
 		@Mock(stubOnly = true)
 		CommandWrapper.NestedCommand nestedCommand;
 
-		@InjectMocks
 		Benchmark sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Benchmark();
+			sut.setNestedCommand(nestedCommand);
+		}
 
 		@Test
 		void onePositiveArg() {
@@ -774,8 +819,13 @@ class SystemModuleTest {
 		@Mock(stubOnly = true)
 		CommandWrapper.NestedCommand nestedCommand;
 
-		@InjectMocks
 		WithTime sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.WithTime();
+			sut.setNestedCommand(nestedCommand);
+		}
 
 		@Test
 		void noArgs() {
@@ -817,8 +867,13 @@ class SystemModuleTest {
 		@Mock(stubOnly = true)
 		CommandWrapper.NestedCommand nestedCommand;
 
-		@InjectMocks
 		SystemModule.WithTimeout sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.WithTimeout();
+			sut.setNestedCommand(nestedCommand);
+		}
 
 		@Test
 		void oneArgInterrupted() {
@@ -906,8 +961,13 @@ class SystemModuleTest {
 		@Mock(stubOnly = true)
 		CommandWrapper.NestedCommand nestedCommand;
 
-		@InjectMocks
 		SystemModule.WaitSuccess sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.WaitSuccess();
+			sut.setNestedCommand(nestedCommand);
+		}
 
 		@Test
 		void oneArgInterrupted() {
@@ -947,7 +1007,8 @@ class SystemModuleTest {
 			then(err).shouldHaveNoInteractions();
 		}
 
-		@Test // testing success at first attempt only in order to avoid 1s wait (default) in unit tests
+		@Test
+			// testing success at first attempt only in order to avoid 1s wait (default) in unit tests
 		void noArgsSuccessAtFirstAttempt() {
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
@@ -984,8 +1045,13 @@ class SystemModuleTest {
 		@Spy
 		final State state = new State();
 
-		@InjectMocks
 		SetVariable sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.SetVariable();
+			sut.setState(state);
+		}
 
 		@Test
 		void noArgs() {
@@ -1053,8 +1119,13 @@ class SystemModuleTest {
 		@Spy
 		final State state = new State();
 
-		@InjectMocks
 		UnsetVariable sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.UnsetVariable();
+			sut.setState(state);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -1106,8 +1177,13 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		KillProcess sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.KillProcess();
+			sut.setProcessLookup(processLookup);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -1176,8 +1252,13 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Capture sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Capture();
+			sut.setState(state);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -1257,8 +1338,13 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Open sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Open();
+			sut.setState(state);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -1362,8 +1448,14 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Input sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Input();
+			sut.setLineReader(lineReader);
+			sut.setState(state);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -1425,8 +1517,14 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		Secret sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Secret();
+			sut.setLineReader(lineReader);
+			sut.setState(state);
+		}
 
 		@Test
 		void zeroArgs() {
@@ -1485,8 +1583,13 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@InjectMocks
 		SystemModule.Confirm sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new SystemModule.Confirm();
+			sut.setLineReader(lineReader);
+		}
 
 		@Test
 		void zeroArgs() {

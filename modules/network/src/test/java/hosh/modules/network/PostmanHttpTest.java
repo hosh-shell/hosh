@@ -32,11 +32,11 @@ import hosh.spi.Record;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReaderFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -69,8 +69,12 @@ class PostmanHttpTest {
 	@Captor
 	ArgumentCaptor<Record> body;
 
-	@InjectMocks
 	NetworkModule.Http sut;
+
+	@BeforeEach
+	void createSut() {
+		sut = new NetworkModule.Http();
+	}
 
 	@Test
 	void getOk() {

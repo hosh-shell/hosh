@@ -29,10 +29,10 @@ import hosh.test.support.TemporaryFolder;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -63,8 +63,12 @@ class CommandCompleterTest {
 	@Mock(stubOnly = true)
 	ParsedLine line;
 
-	@InjectMocks
 	CommandCompleter sut;
+
+	@BeforeEach
+	void createSut() {
+		sut = new CommandCompleter(state);
+	}
 
 	@Test
 	void emptyPathAndNoBuiltins() {

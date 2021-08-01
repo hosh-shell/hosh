@@ -27,9 +27,9 @@ import hosh.spi.State;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -53,8 +53,12 @@ class VariableExpansionCompleterTest {
 	@Spy
 	final State state = new State();
 
-	@InjectMocks
 	VariableExpansionCompleter sut;
+
+	@BeforeEach
+	void createSut() {
+		sut = new VariableExpansionCompleter(state);
+	}
 
 	@Test
 	void notInExpansion() {

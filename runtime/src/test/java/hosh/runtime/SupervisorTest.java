@@ -26,10 +26,10 @@ package hosh.runtime;
 import hosh.spi.ExitStatus;
 import hosh.test.support.WithThread;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.concurrent.ExecutionException;
@@ -42,8 +42,12 @@ class SupervisorTest {
 	@RegisterExtension
 	final WithThread withThread = new WithThread();
 
-	@InjectMocks
 	Supervisor sut;
+
+	@BeforeEach
+	void createSut() {
+		sut = new Supervisor();
+	}
 
 	@AfterEach
 	void cleanup() {
