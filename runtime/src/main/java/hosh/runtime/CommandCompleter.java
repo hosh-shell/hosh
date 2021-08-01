@@ -52,6 +52,9 @@ public class CommandCompleter implements Completer {
 
 	@Override
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
+		if (!line.line().isEmpty()) {
+			return;
+		}
 		Set<String> builtinOverrides = new HashSet<>();
 		completeExternals(candidates, builtinOverrides);
 		completeBuiltinsExcludingOverrides(candidates, builtinOverrides);

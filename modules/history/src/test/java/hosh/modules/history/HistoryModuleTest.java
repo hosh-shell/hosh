@@ -30,10 +30,10 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.Values;
 import org.jline.reader.History;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -66,8 +66,13 @@ class HistoryModuleTest {
 		@Mock(stubOnly = true)
 		History.Entry entry;
 
-		@InjectMocks
 		HistoryModule.ListHistory sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new HistoryModule.ListHistory();
+			sut.setHistory(history);
+		}
 
 		@Test
 		void noArgsEmptyHistory() {

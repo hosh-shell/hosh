@@ -30,11 +30,11 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -48,11 +48,15 @@ class AutoTableChannelTest {
 	@Mock
 	OutputChannel out;
 
-	@InjectMocks
-	AutoTableChannel sut;
-
 	@Captor
 	ArgumentCaptor<Record> records;
+
+	AutoTableChannel sut;
+
+	@BeforeEach
+	void createSut() {
+		sut = new AutoTableChannel(out);
+	}
 
 	@Test
 	void tableWithNoRecords() {

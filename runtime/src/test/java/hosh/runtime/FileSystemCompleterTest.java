@@ -28,13 +28,13 @@ import hosh.test.support.TemporaryFolder;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -61,8 +61,12 @@ class FileSystemCompleterTest {
 	@Mock(stubOnly = true)
 	ParsedLine line;
 
-	@InjectMocks
 	FileSystemCompleter sut;
+
+	@BeforeEach
+	void createSut() {
+		sut = new FileSystemCompleter(state);
+	}
 
 	@Test
 	void emptyWordInEmptyDir() {
