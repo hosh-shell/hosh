@@ -38,9 +38,12 @@ Logging events will be persisted in `$HOME/.hosh.log`.
 
 Build a release with docker:
 
-- `$ cat ~/.github/hosh_packages.txt | docker login https://docker.pkg.github.com -u $USERNAME --password-stdin`
+- `$ cat ~/.github/secret_token | docker login https://ghcr.io -u $USERNAME --password-stdin`
 - `$ ./mvnw clean verify # uberjar ready at main/target/`
-- `docker build -t docker.pkg.github.com/hosh-shell/hosh/hosh:$VERSION .`
+- `docker build -t ghcr.io/hosh-shell/hosh/hosh:$VERSION .`
+- `docker push ghcr.io/hosh-shell/hosh:$VERSION`
+- `docker run -it ghcr.io/hosh-shell/hosh:$VERSION`
+
 
 ## Sponsors
 
