@@ -88,7 +88,7 @@ public class FileSystemCompleter implements Completer {
 			resolved = state.getCwd().resolve(path);
 		}
 		if (Files.isDirectory(resolved)) {
-			return Candidates.incomplete(path.toString() + File.separator);
+			return Candidates.incomplete(path + File.separator);
 		} else {
 			return Candidates.complete(path.toString());
 		}

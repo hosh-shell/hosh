@@ -166,7 +166,7 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory: " + file.toAbsolutePath().toString())));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory: " + file.toAbsolutePath())));
 		}
 
 		@Test
@@ -273,7 +273,7 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + cwd.toString())));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + cwd)));
 		}
 	}
 
