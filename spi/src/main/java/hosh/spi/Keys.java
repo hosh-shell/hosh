@@ -145,7 +145,7 @@ public class Keys {
 		}
 
 		@Override
-		public final boolean equals(Object obj) {
+		public boolean equals(Object obj) {
 			if (obj instanceof Key) {
 				final Key that = (Key) obj;
 				return Objects.equals(this.name(), that.name());
