@@ -18,7 +18,7 @@ RUN mvn --errors --batch-mode -DskipTests clean verify
 LABEL maintainer="Davide Angelocola <davide.angelocola@gmail.com>"
 LABEL org.opencontainers.image.source=https://github.com/hosh-shell/hosh
 
-FROM openjdk:11-jre
+FROM openjdk:11-jre-slim
 COPY --from=builder /build/main/target/hosh.jar /
 CMD ["java", "-jar", "/hosh.jar"]
 
