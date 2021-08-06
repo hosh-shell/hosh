@@ -52,7 +52,8 @@ public class CommandCompleter implements Completer {
 
 	@Override
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-		if (!line.line().isEmpty()) {
+		// don't propose commands if not at the start of the line
+		if (line.wordIndex() > 0) {
 			return;
 		}
 		Set<String> builtinOverrides = new HashSet<>();
