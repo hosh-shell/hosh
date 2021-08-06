@@ -872,12 +872,12 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("capture variable"));
 				return ExitStatus.error();
 			}
-			Locale locale = Locale.getDefault();
 			String key = args.get(0);
 			if (!VARIABLE.matcher(key).matches()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
+			Locale locale = Locale.getDefault();
 			StringWriter result = new StringWriter();
 			PrintWriter pw = new PrintWriter(result);
 			for (Record incoming : InputChannel.iterate(in)) {

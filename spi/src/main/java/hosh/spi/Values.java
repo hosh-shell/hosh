@@ -24,9 +24,10 @@
 package hosh.spi;
 
 import java.io.PrintWriter;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -94,7 +95,7 @@ public class Values {
 
 	/**
 	 * Used to represent array of bytes, encoded as hexadecimal and separated by ':' by default.
-	 *
+	 * <p>
 	 * NB: it will be used to represent also message digest such as md5 and sha1.
 	 */
 	public static Value ofBytes(byte[] bytes) {
@@ -182,18 +183,19 @@ public class Values {
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			BigDecimal value;
+			double value;
 			Unit unit;
 			if (bytes < KIB) {
 				unit = Unit.B;
-				value = BigDecimal.valueOf(bytes);
+				value = bytes;
 			} else {
 				int exp = (int) (Math.log(bytes) / Math.log(KIB));
 				unit = UNITS[exp - 1];
-				value = BigDecimal.valueOf(bytes).divide(BigDecimal.valueOf(Math.pow(KIB, exp)), 1, RoundingMode.HALF_UP);
+				value = bytes / Math.pow(KIB, exp);
 			}
-			NumberFormat instance = NumberFormat.getInstance(locale);
-			printWriter.append(instance.format(value));
+			var formatter = new DecimalFormat("#.#", new DecimalFormatSymbols(locale));
+			formatter.setRoundingMode(RoundingMode.HALF_UP);
+			printWriter.append(formatter.format(value));
 			printWriter.append(unit.toString());
 		}
 
@@ -739,5 +741,4 @@ public class Values {
 	private static int cannotCompare(Value a, Value b) {
 		throw new IllegalArgumentException("cannot compare " + a + " with " + b);
 	}
-
 }

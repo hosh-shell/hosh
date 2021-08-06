@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -309,19 +308,30 @@ class ValuesTest {
 
 		@ParameterizedTest
 		@CsvSource({
-			"         0,     0,  B",
-			"        10,    10,  B",
-			"      1023, 1.023,  B",
-			"      1024,     1, KB",
-			"      2048,     2, KB",
-			"      4096,     4, KB",
-			"   1048576,     1, MB",
+			"            0,     0,  B",
+			"            1,     1,  B",
+            "            2,     2,  B",
+			"           10,    10,  B",
+			"         1023,  1023,  B",
+			"         1024,     1, KB",
+			"         2047,     2, KB",
+			"         2048,     2, KB",
+			"         4096,     4, KB",
+			"         8192,     8, KB",
+			"        16384,    16, KB",
+			"      1048576,     1, MB",
+			"      2097152,     2, MB",
+			"     11048576,  10.5, MB",
+			"    134217728,   128, MB",
+			"    199999999, 190.7, MB",
+			"    200000001, 190.7, MB",
+			"   1073741824,     1, GB",
+			"  17179869184,    16, GB",
+			" 274877906944,   256, GB",
+			"1099511627780,     1, TB"
 		})
-		void approximateOnPrint(ArgumentsAccessor args) {
-			long bytes = args.getLong(0);
-			String expectedValue = args.getString(1);
-			String expectedUnit = args.getString(2);
-			Values.ofSize(bytes).print(printWriter, Locale.ITALIAN);
+		void approximateOnPrint(long bytes, String expectedValue, String expectedUnit) {
+			Values.ofSize(bytes).print(printWriter, Locale.US);
 			then(printWriter).should().append(expectedValue);
 			then(printWriter).should().append(expectedUnit);
 		}
@@ -554,9 +564,9 @@ class ValuesTest {
 		@Test
 		void instant() {
 			List<Value> sorted = Stream.of(
-				Values.ofInstant(Instant.ofEpochMilli(100)),
-				Values.ofInstant(Instant.ofEpochMilli(-100)),
-				Values.ofInstant(Instant.ofEpochMilli(0)))
+					Values.ofInstant(Instant.ofEpochMilli(100)),
+					Values.ofInstant(Instant.ofEpochMilli(-100)),
+					Values.ofInstant(Instant.ofEpochMilli(0)))
 				.sorted()
 				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
@@ -568,9 +578,9 @@ class ValuesTest {
 		@Test
 		void numeric() {
 			List<Value> sorted = Stream.of(
-				Values.ofNumeric(1),
-				Values.ofNumeric(-1),
-				Values.ofNumeric(0))
+					Values.ofNumeric(1),
+					Values.ofNumeric(-1),
+					Values.ofNumeric(0))
 				.sorted()
 				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
@@ -582,9 +592,9 @@ class ValuesTest {
 		@Test
 		void text() {
 			List<Value> sorted = Stream.of(
-				Values.ofText("a2"),
-				Values.ofText("a10"),
-				Values.ofText("a1"))
+					Values.ofText("a2"),
+					Values.ofText("a10"),
+					Values.ofText("a1"))
 				.sorted()
 				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
@@ -596,9 +606,9 @@ class ValuesTest {
 		@Test
 		void size() {
 			List<Value> sorted = Stream.of(
-				Values.ofSize(1),
-				Values.ofSize(2),
-				Values.ofSize(3))
+					Values.ofSize(1),
+					Values.ofSize(2),
+					Values.ofSize(3))
 				.sorted()
 				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
@@ -610,10 +620,10 @@ class ValuesTest {
 		@Test
 		void path() {
 			List<Value> sorted = Stream.of(
-				Values.ofPath(Paths.get("a10")),
-				Values.ofPath(Paths.get("a1")),
-				Values.ofPath(Paths.get("a20")),
-				Values.ofPath(Paths.get("a2")))
+					Values.ofPath(Paths.get("a10")),
+					Values.ofPath(Paths.get("a1")),
+					Values.ofPath(Paths.get("a20")),
+					Values.ofPath(Paths.get("a2")))
 				.sorted()
 				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
@@ -626,8 +636,8 @@ class ValuesTest {
 		@Test
 		void duration() {
 			List<Value> sorted = Stream.of(
-				Values.ofDuration(Duration.ofMillis(1)),
-				Values.ofDuration(Duration.ofMillis(2)))
+					Values.ofDuration(Duration.ofMillis(1)),
+					Values.ofDuration(Duration.ofMillis(2)))
 				.sorted()
 				.collect(Collectors.toList());
 			assertThat(sorted).containsExactly(
