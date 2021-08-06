@@ -864,7 +864,7 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@Mock(stubOnly = true)
+		@Mock(stubOnly = true, lenient = true)
 		CommandWrapper.NestedCommand nestedCommand;
 
 		SystemModule.WithTimeout sut;
@@ -879,6 +879,8 @@ class SystemModuleTest {
 		void oneArgInterrupted() {
 			withThread.interrupt();
 			Duration timeout = Duration.ofMillis(200);
+			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(2));
+			given(nestedCommand.run()).willAnswer(commandSlowerThanTimeout);
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
 			assertThat(withThread.isInterrupted()).isTrue();
 			assertThat(result).isError();
@@ -903,12 +905,8 @@ class SystemModuleTest {
 		@Test
 		void oneArgTimeout() {
 			Duration timeout = Duration.ofMillis(200);
-			ExitStatus nestedExitStatus = ExitStatus.success();
-			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
-				// simulating a command slower than the timeout
-				Thread.sleep(timeout.toMillis() * 2);
-				return nestedExitStatus;
-			});
+			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(2));
+			given(nestedCommand.run()).willAnswer(commandSlowerThanTimeout);
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -919,14 +917,10 @@ class SystemModuleTest {
 		@Test
 		void oneArgNoTimeout() {
 			Duration timeout = Duration.ofMillis(200);
-			ExitStatus nestedExitStatus = ExitStatus.success();
-			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
-				// simulating a command faster than the timeout
-				Thread.sleep(1);
-				return nestedExitStatus;
-			});
+			Answer<ExitStatus> commandFasterThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.dividedBy(2));
+			given(nestedCommand.run()).willAnswer(commandFasterThanTimeout);
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
-			assertThat(result).isEqualTo(nestedExitStatus);
+			assertThat(result).isSuccess(); // success means no timeout
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -941,6 +935,7 @@ class SystemModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: withTimeout duration { ... }")));
 		}
 	}
+
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
@@ -958,7 +953,7 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@Mock(stubOnly = true)
+		@Mock(stubOnly = true, lenient = true)
 		CommandWrapper.NestedCommand nestedCommand;
 
 		SystemModule.WaitSuccess sut;
@@ -1653,4 +1648,21 @@ class SystemModuleTest {
 			then(err).shouldHaveNoInteractions();
 		}
 	}
+
+	/**
+	 * Factory methods to create arbitrary slow commands (useful to test various time-outs).
+ 	 */
+	public static class FakeCommands {
+
+		public static Answer<ExitStatus> sleepThenReturnSuccess(Duration sleep) {
+			return invocationOnMock -> {
+				Thread.sleep(sleep.toMillis());
+				return ExitStatus.success();
+			};
+		}
+
+		private FakeCommands() {
+		}
+	}
+
 }
