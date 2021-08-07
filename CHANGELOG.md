@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - skipping autocomplete of commands when current line is not empty
 - improving Dockerfile
-   + proper use of layers for caching
-   + proper use of multi stage builds
-   + improved build reproducibility
+   + build from source in a consistent environment
+   + fetch dependencies in a separate step (for caching!)
+   + use multi-stage builds to remove build dependencies
 - JDK 16 compatibility
 
 ## [v0.1.3] - 2020-11-03
