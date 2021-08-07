@@ -2,18 +2,17 @@ FROM maven:3.8.1-openjdk-11 as builder
 WORKDIR /build
 
 COPY ./pom.xml ./
-COPY ./runtime/pom.xml ./runtime
-COPY ./spi/pom.xml ./spi
-COPY ./test-support/pom.xml ./test-support
-COPY ./main/pom.xml ./main
-COPY ./modules/network/pom.xml ./modules/network
-COPY ./modules/terminal/pom.xml ./modules/terminal
-COPY ./modules/filesystem/pom.xml ./modules/filesystem
-COPY ./modules/system/pom.xml ./modules/system
-COPY ./modules/history/pom.xml ./modules/history
-COPY ./modules/text/pom.xml ./modules/text
-COPY ./spi-test-support/pom.xml ./spi-test-support
-RUN find .
+COPY ./runtime/pom.xml ./runtime/pom.xml
+COPY ./spi/pom.xml ./spi/pom.xml
+COPY ./test-support/pom.xml ./test-support/pom.xml
+COPY ./main/pom.xml ./main/pom.xml
+COPY ./modules/network/pom.xml ./modules/network/pom.xml
+COPY ./modules/terminal/pom.xml ./modules/terminal/pom.xml
+COPY ./modules/filesystem/pom.xml ./modules/filesystem/pom.xml
+COPY ./modules/system/pom.xml ./modules/system/pom.xml
+COPY ./modules/history/pom.xml ./modules/history/pom.xml
+COPY ./modules/text/pom.xml ./modules/text/pom.xml
+COPY ./spi-test-support/pom.xml ./spi-test-support/pom.xml
 RUN mvn --errors --batch-mode dependency:resolve
 
 COPY .git ./.git
