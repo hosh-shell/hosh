@@ -15,10 +15,10 @@ COPY ./modules/text/pom.xml ./modules/text/pom.xml
 COPY ./runtime/pom.xml ./runtime/pom.xml
 COPY ./checkstyle.xml ./checkstyle.xml
 COPY ./.git ./.git
-RUN mvn --errors --batch-mode compile dependency:resolve
-
 COPY CHANGELOG.md .
 COPY LICENSE.md .
+RUN mvn --errors --batch-mode verify dependency:resolve
+
 COPY runtime ./runtime
 COPY spi ./spi
 COPY spi-test-support ./spi-test-support
