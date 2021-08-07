@@ -7,6 +7,10 @@ Human Oriented SHell, written in Java.
 
 Website: https://hosh-shell.github.io
 
+## Try it with Docker
+
+`$ docker run -it --rm ghcr.io/hosh-shell/hosh:0.1.4`
+
 ## Development
 
 ### Requirements
@@ -40,9 +44,8 @@ Build a release with docker:
 
 - `$ cat ~/.github/secret_token | docker login https://ghcr.io -u $USERNAME --password-stdin`
 - `$ ./mvnw clean verify # uberjar ready at main/target/`
-- `docker build -t ghcr.io/hosh-shell/hosh/hosh:$VERSION .`
-- `docker push ghcr.io/hosh-shell/hosh:$VERSION`
-- `docker run -it ghcr.io/hosh-shell/hosh:$VERSION`
+- `$ docker build -t ghcr.io/hosh-shell/hosh:$VERSION .`
+- `$ docker push ghcr.io/hosh-shell/hosh:$VERSION`
 
 
 ## Sponsors
