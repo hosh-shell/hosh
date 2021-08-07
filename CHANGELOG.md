@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.4] - 2021-8-07
+- bumped jline to 3.20
 - skipping autocomplete of commands when current line is not empty
 - improving Dockerfile
    + build from source in a consistent environment
