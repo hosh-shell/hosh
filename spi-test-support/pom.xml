@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>hosh-parent</artifactId>
 		<groupId>hosh</groupId>
-		<version>0.1.4-SNAPSHOT</version>
+		<version>0.1.4</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hosh-spi-test-support</artifactId>

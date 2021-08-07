@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>hosh</groupId>
 	<artifactId>hosh-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1.4-SNAPSHOT</version>
+	<version>0.1.4</version>
 	<url>https://hosh-shell.github.io</url>
 	<description>The Human Oriented SHell</description>
 	<inceptionYear>2018</inceptionYear>
@@ -27,7 +26,7 @@
 	</developers>
 	<scm>
 		<developerConnection>scm:git:.</developerConnection>
-		<tag>HEAD</tag>
+		<tag>v0.1.4</tag>
 	</scm>
 	<distributionManagement>
 		<repository>
@@ -38,7 +37,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<argLine/> <!-- defined for when not running with jacoco -->
+		<argLine /> <!-- defined for when not running with jacoco -->
 		<!-- versions production classpath -->
 		<version.antlr>4.9.2</version.antlr>
 		<version.commonscli>1.4</version.commonscli>
