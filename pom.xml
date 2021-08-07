@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>hosh</groupId>
 	<artifactId>hosh-parent</artifactId>
@@ -37,7 +38,7 @@
 	</distributionManagement>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<argLine /> <!-- defined for when not running with jacoco -->
+		<argLine/> <!-- defined for when not running with jacoco -->
 		<!-- versions production classpath -->
 		<version.antlr>4.9.2</version.antlr>
 		<version.commonscli>1.4</version.commonscli>
@@ -53,8 +54,8 @@
 	</properties>
 	<modules>
 		<module>test-support</module>
-		<module>spi</module>
 		<module>spi-test-support</module>
+		<module>spi</module>
 		<module>modules/system</module>
 		<module>modules/text</module>
 		<module>modules/history</module>
@@ -152,6 +153,11 @@
 	</dependencyManagement>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.2.0</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
