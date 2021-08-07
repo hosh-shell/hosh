@@ -13,14 +13,12 @@ COPY ./modules/system/pom.xml ./modules/system/pom.xml
 COPY ./modules/history/pom.xml ./modules/history/pom.xml
 COPY ./modules/text/pom.xml ./modules/text/pom.xml
 COPY ./runtime/pom.xml ./runtime/pom.xml
-RUN find .
-RUN mvn --errors --batch-mode dependency:resolve -Dclassifier=test-jar
+COPY ./checkstyle.xml ./checkstyle.xml
+COPY ./.git ./.git
+RUN mvn --errors --batch-mode compile dependency:resolve
 
-COPY .git ./.git
 COPY CHANGELOG.md .
 COPY LICENSE.md .
-COPY checkstyle.xml .
-COPY pom.xml .
 COPY runtime ./runtime
 COPY spi ./spi
 COPY spi-test-support ./spi-test-support
