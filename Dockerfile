@@ -13,7 +13,7 @@ COPY ./modules/system/pom.xml ./modules/system
 COPY ./modules/history/pom.xml ./modules/history
 COPY ./modules/text/pom.xml ./modules/text
 COPY ./spi-test-support/pom.xml ./spi-test-support
-RUN ls -lh
+RUN find .
 RUN mvn --errors --batch-mode dependency:resolve
 
 COPY .git ./.git
