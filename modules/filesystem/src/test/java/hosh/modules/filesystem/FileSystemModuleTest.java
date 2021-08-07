@@ -260,7 +260,7 @@ class FileSystemModuleTest {
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
-		@DisabledOnOs(OS.WINDOWS) // File.setReadable() fails on windows
+		@DisabledOnOs({OS.WINDOWS,OS.LINUX}) // File.setReadable() fails on windows
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test
 		void accessDenied() {

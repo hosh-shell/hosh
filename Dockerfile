@@ -26,7 +26,7 @@ COPY test-support ./test-support
 COPY modules ./modules
 COPY runtime ./runtime
 COPY main ./main
-RUN mvn --errors --batch-mode -DskipTests clean verify
+RUN mvn --errors --batch-mode clean verify
 
 LABEL maintainer="Davide Angelocola <davide.angelocola@gmail.com>"
 LABEL org.opencontainers.image.source=https://github.com/hosh-shell/hosh
