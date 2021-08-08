@@ -55,6 +55,7 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
+import hosh.spi.StateMutator;
 import hosh.spi.Values;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.TemporaryFolder;
@@ -75,7 +76,6 @@ import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
@@ -85,7 +85,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +96,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willReturn;
 
 class SystemModuleTest {
 
@@ -104,8 +104,11 @@ class SystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	class PathTest {
 
-		@Spy
-		final State state = new State();
+		@Mock
+		State state;
+
+		@Mock
+		StateMutator stateMutator;
 
 		@Mock
 		InputChannel in;
@@ -122,6 +125,7 @@ class SystemModuleTest {
 		void createSut() {
 			sut = new SystemModule.Path();
 			sut.setState(state);
+			sut.setStateMutator(stateMutator);
 		}
 
 		@Test
@@ -132,6 +136,7 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path [show|clear|append path|prepend path]")));
 			then(state).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -142,6 +147,7 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path [show|clear|append path|prepend path]")));
 			then(state).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -157,6 +163,7 @@ class SystemModuleTest {
 			then(out).should(inOrder).send(Records.singleton(Keys.PATH, Values.ofPath(bin)));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -167,19 +174,17 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path show")));
 			then(state).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
 		void clearZeroArg() {
-			Path sbin = Paths.get("/sbin");
-			Path bin = Paths.get("/bin");
-			state.setPath(new ArrayList<>(List.of(sbin, bin)));
-			ExitStatus exitStatus = sut.run(List.of("clear"), in, out, err);
+				ExitStatus exitStatus = sut.run(List.of("clear"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getPath()).isEmpty();
+			then(stateMutator).should().mutatePath(List.of());
 		}
 
 		@Test
@@ -190,18 +195,19 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path clear")));
 			then(state).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
 		void appendOneArg() {
 			Path bin = Paths.get("/bin");
-			state.setPath(new ArrayList<>(List.of(bin)));
+			willReturn(List.of(bin)).given(state).getPath();
 			ExitStatus exitStatus = sut.run(List.of("append", "/usr/local/bin"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getPath()).containsExactly(bin, Path.of("/usr/local/bin"));
+			then(stateMutator).should().mutatePath(List.of(bin, Path.of("/usr/local/bin")));
 		}
 
 		@Test
@@ -212,18 +218,19 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path append path")));
 			then(state).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
 		void prependOneArg() {
 			Path bin = Paths.get("/bin");
-			state.setPath(new ArrayList<>(List.of(bin)));
+			willReturn(List.of(bin)).given(state).getPath();
 			ExitStatus exitStatus = sut.run(List.of("prepend", "/usr/local/bin"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getPath()).containsExactly(Path.of("/usr/local/bin"), bin);
+			then(stateMutator).should().mutatePath(List.of(Path.of("/usr/local/bin"), bin));
 		}
 
 		@Test
@@ -234,6 +241,7 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: path prepend path")));
 			then(state).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 	}
 
@@ -241,8 +249,8 @@ class SystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	class ExitTest {
 
-		@Spy
-		final State state = new State();
+		@Mock
+		StateMutator stateMutator;
 
 		@Mock
 		InputChannel in;
@@ -258,14 +266,14 @@ class SystemModuleTest {
 		@BeforeEach
 		void createSut() {
 			sut = new SystemModule.Exit();
-			sut.setState(state);
+			sut.setStateMutator(stateMutator);
 		}
 
 		@Test
 		void noArgs() {
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).hasExitCode(0);
-			assertThat(state.isExit()).isTrue();
+			then(stateMutator).should().mutateExit(true);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -275,7 +283,7 @@ class SystemModuleTest {
 		void oneValidArg() {
 			ExitStatus exitStatus = sut.run(List.of("21"), in, out, err);
 			assertThat(exitStatus).hasExitCode(21);
-			assertThat(state.isExit()).isTrue();
+			then(stateMutator).should().mutateExit(true);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -285,7 +293,7 @@ class SystemModuleTest {
 		void oneInvalidArg() {
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
-			then(state).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a valid exit status: asd")));
 			then(out).shouldHaveNoInteractions();
@@ -295,7 +303,7 @@ class SystemModuleTest {
 		void twoArgs() {
 			ExitStatus exitStatus = sut.run(List.of("asd", "fgh"), in, out, err);
 			assertThat(exitStatus).hasExitCode(1);
-			then(state).shouldHaveNoInteractions();
+			then(stateMutator).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: exit [value]")));
 			then(out).shouldHaveNoInteractions();
@@ -1037,8 +1045,11 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@Spy
-		final State state = new State();
+		@Mock
+		State state;
+
+		@Mock
+		StateMutator stateMutator;
 
 		SetVariable sut;
 
@@ -1046,6 +1057,7 @@ class SystemModuleTest {
 		void createSut() {
 			sut = new SystemModule.SetVariable();
 			sut.setState(state);
+			sut.setStateMutator(stateMutator);
 		}
 
 		@Test
@@ -1055,6 +1067,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set variable value")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -1064,6 +1077,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: set variable value")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -1073,18 +1087,18 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "bar");
+			then(stateMutator).should().mutateVariables(Map.of("FOO", "bar"));
 		}
 
 		@Test
 		void updatesExistingVariable() {
-			state.getVariables().put("FOO", "baz");
+			willReturn(Map.of("FOO", "bar")).given(state).getVariables();
 			ExitStatus exitStatus = sut.run(List.of("FOO", "baz"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "baz");
+			then(stateMutator).should().mutateVariables(Map.of("FOO", "baz"));
 		}
 
 		@Test
@@ -1094,7 +1108,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
-			assertThat(state.getVariables()).isEmpty();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 	}
 
@@ -1111,8 +1125,11 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@Spy
-		final State state = new State();
+		@Mock(stubOnly = true)
+		State state;
+
+		@Mock
+		StateMutator stateMutator;
 
 		UnsetVariable sut;
 
@@ -1120,6 +1137,7 @@ class SystemModuleTest {
 		void createSut() {
 			sut = new SystemModule.UnsetVariable();
 			sut.setState(state);
+			sut.setStateMutator(stateMutator);
 		}
 
 		@Test
@@ -1129,27 +1147,29 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: unset variable")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
 		void removesExistingBinding() {
-			state.getVariables().put("FOO", "BAR");
+			willReturn(Map.of("FOO", "BAR")).given(state).getVariables();
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getVariables()).doesNotContainKey("FOO");
+			then(stateMutator).should().mutateVariables(Map.of());
 		}
 
 		@Test
 		void doesNothingWhenNotExistingBinding() {
-			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+			willReturn(Map.of("FOO", "BAR")).given(state).getVariables();
+			ExitStatus exitStatus = sut.run(List.of("BAZ"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getVariables()).doesNotContainKey("FOO");
+			then(stateMutator).should().mutateVariables(Map.of("FOO", "BAR"));
 		}
 	}
 
@@ -1235,8 +1255,11 @@ class SystemModuleTest {
 	@ExtendWith(MockitoExtension.class)
 	class CaptureTest {
 
-		@Spy
-		final State state = new State();
+		@Mock(stubOnly = true)
+		State state;
+
+		@Mock
+		StateMutator stateMutator;
 
 		@Mock
 		InputChannel in;
@@ -1253,6 +1276,7 @@ class SystemModuleTest {
 		void createSut() {
 			sut = new SystemModule.Capture();
 			sut.setState(state);
+			sut.setStateMutator(stateMutator);
 		}
 
 		@Test
@@ -1262,6 +1286,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: capture variable")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -1271,22 +1296,25 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
 		void emptyCapture() {
+			willReturn(Map.of()).given(state).getVariables();
 			given(in.recv()).willReturn(Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "");
+			then(stateMutator).should().mutateVariables(Map.of("FOO", ""));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
-		void oneLine() {
+		void captureOneLine() {
+			willReturn(Map.of()).given(state).getVariables();
 			given(in.recv()).willReturn(
 				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 				Optional.empty());
@@ -1295,12 +1323,13 @@ class SystemModuleTest {
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "1");
+			then(stateMutator).should().mutateVariables(Map.of("FOO", "1"));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Test
-		void twoLines() {
+		void captureTwoLines() {
+			willReturn(Map.of()).given(state).getVariables();
 			given(in.recv()).willReturn(
 				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
@@ -1310,7 +1339,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "12");
+			then(stateMutator).should().mutateVariables(Map.of("FOO", "12"));
 		}
 	}
 
@@ -1431,8 +1460,11 @@ class SystemModuleTest {
 		@Mock(stubOnly = true)
 		LineReader lineReader;
 
-		@Spy
-		final State state = new State();
+		@Mock(stubOnly = true)
+		State state;
+
+		@Mock
+		StateMutator stateMutator;
 
 		@Mock
 		InputChannel in;
@@ -1450,6 +1482,7 @@ class SystemModuleTest {
 			sut = new SystemModule.Input();
 			sut.setLineReader(lineReader);
 			sut.setState(state);
+			sut.setStateMutator(stateMutator);
 		}
 
 		@Test
@@ -1459,6 +1492,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: input variable")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -1468,17 +1502,19 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
 		void inputNonEmptyString() {
+			willReturn(Map.of()).given(state).getVariables();
 			given(lineReader.readLine(Mockito.eq("input> "))).willReturn("1");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "1");
+			then(stateMutator).should().mutateVariables(Map.of("FOO", "1"));
 		}
 
 		@Test
@@ -1489,7 +1525,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getVariables()).isEmpty();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 	}
 
@@ -1500,8 +1536,11 @@ class SystemModuleTest {
 		@Mock(stubOnly = true)
 		LineReader lineReader;
 
-		@Spy
-		final State state = new State();
+		@Mock(stubOnly = true)
+		State state;
+
+		@Mock
+		StateMutator stateMutator;
 
 		@Mock
 		InputChannel in;
@@ -1519,6 +1558,7 @@ class SystemModuleTest {
 			sut = new SystemModule.Secret();
 			sut.setLineReader(lineReader);
 			sut.setState(state);
+			sut.setStateMutator(stateMutator);
 		}
 
 		@Test
@@ -1528,6 +1568,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: secret variable")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
@@ -1537,21 +1578,24 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("invalid variable name")));
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 
 		@Test
 		void inputNonEmptyString() {
+			willReturn(Map.of()).given(state).getVariables();
 			given(lineReader.readLine(Mockito.eq('\0'))).willReturn("1");
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			assertThat(state.getVariables()).containsEntry("FOO", "1");
+			then(stateMutator).should().mutateVariables(Map.of("FOO", "1"));
 		}
 
 		@Test
 		void emptyInput() {
+			willReturn(Map.of()).given(state).getVariables();
 			given(lineReader.readLine(Mockito.eq('\0'))).willThrow(new EndOfFileException("simulated"));
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isError();
@@ -1559,6 +1603,7 @@ class SystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
 			assertThat(state.getVariables()).isEmpty();
+			then(stateMutator).shouldHaveNoInteractions();
 		}
 	}
 

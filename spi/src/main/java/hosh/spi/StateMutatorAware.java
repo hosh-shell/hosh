@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018-2021 Davide Angelocola
+ * Copyright (c) 2019-2021 Davide Angelocola
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,31 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.spi;
 
-import hosh.spi.Command;
-import hosh.spi.CommandRegistry;
+public interface StateMutatorAware {
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
+	void setStateMutator(StateMutator stateMutator);
 
-public class SimpleCommandRegistry implements CommandRegistry {
-
-	private final Map<String, Supplier<Command>> commands = new HashMap<>();
-
-	public Map<String, Supplier<Command>> getCommands() {
-		return commands;
-	}
-
-	@Override
-	public void registerCommand(String name, Supplier<Command> command) {
-		Objects.requireNonNull(name, "name cannot be null");
-		Objects.requireNonNull(command, "command cannot be null");
-		if (commands.containsKey(name)) {
-			throw new IllegalArgumentException("command with same name already registered: " + name);
-		}
-		commands.put(name, command);
-	}
 }

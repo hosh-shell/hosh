@@ -43,6 +43,8 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
+import hosh.spi.StateMutator;
+import hosh.spi.StateMutatorAware;
 import hosh.spi.Value;
 import hosh.spi.Values;
 
@@ -180,13 +182,19 @@ public class FileSystemModule implements Module {
 			@Example(command = "cd dir", description = "change current working directory to 'dir'"),
 			@Example(command = "cd /tmp", description = "change current working directory to '/tmp'"),
 	})
-	public static class ChangeDirectory implements Command, StateAware {
+	public static class ChangeDirectory implements Command, StateAware, StateMutatorAware {
 
 		private State state;
+		private StateMutator stateMutator;
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		@Override
+		public void setStateMutator(StateMutator stateMutator) {
+			this.stateMutator = stateMutator;
 		}
 
 		@Override
@@ -200,7 +208,7 @@ public class FileSystemModule implements Module {
 				err.send(Errors.message("not a directory"));
 				return ExitStatus.error();
 			}
-			state.setCwd(newCwd);
+			stateMutator.mutateCwd(newCwd);
 			return ExitStatus.success();
 		}
 	}

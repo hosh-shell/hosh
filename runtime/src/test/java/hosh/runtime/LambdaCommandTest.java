@@ -29,6 +29,7 @@ import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
+import hosh.spi.StateMutator;
 import hosh.spi.Values;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,8 +67,11 @@ class LambdaCommandTest {
 	@Mock
 	OutputChannel err;
 
-	@Mock
+	@Mock(stubOnly = true)
 	State state;
+
+	@Mock
+	StateMutator stateMutator;
 
 	LambdaCommand sut;
 
@@ -75,6 +79,7 @@ class LambdaCommandTest {
 	void setUp() {
 		sut = new LambdaCommand(statement, Keys.PATH.name());
 		sut.setState(state);
+		sut.setStateMutator(stateMutator);
 		sut.setInterpreter(interpreter);
 	}
 
@@ -88,8 +93,8 @@ class LambdaCommandTest {
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		assertThat(variables).isEmpty();
-		then(state).should().setVariables(Collections.singletonMap("path", "file"));
-		then(state).should().setVariables(variables);
+		then(stateMutator).should().mutateVariables(Collections.singletonMap("path", "file"));
+		then(stateMutator).should().mutateVariables(variables);
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -105,8 +110,8 @@ class LambdaCommandTest {
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
 		assertThat(variables).isEmpty();
-		then(state).should().setVariables(Collections.singletonMap("path", "file"));
-		then(state).should().setVariables(variables);
+		then(stateMutator).should().mutateVariables(Collections.singletonMap("path", "file"));
+		then(stateMutator).should().mutateVariables(variables);
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -120,7 +125,7 @@ class LambdaCommandTest {
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
 		assertThat(variables).isEmpty();
-		then(state).shouldHaveNoInteractions();
+		then(stateMutator).shouldHaveNoInteractions();
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("missing key 'path'")));

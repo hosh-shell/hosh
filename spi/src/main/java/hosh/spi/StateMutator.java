@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018-2021 Davide Angelocola
+ * Copyright (c) 2019-2021 Davide Angelocola
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,31 +23,20 @@
  */
 package hosh.spi;
 
-import org.junit.jupiter.api.Test;
-
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import static org.assertj.core.api.Assertions.assertThat;
+public interface StateMutator {
 
-class StateTest {
+	State mutateCwd(Path newPath);
 
-	@Test
-	void asString() {
-		assertThat(new State()).hasToString("State[cwd='null',path=[],variables={},commands={}]");
-	}
+	State mutatePath(List<Path> newPath);
 
-	@Test
-	void cwdIsAlwaysAbsolute() {
-		State sut = new State();
-		Path path = Paths.get(".");
-		assertThat(path).isRelative();
-		sut.setCwd(path);
-		// transform path to a cwd
-		Path cwd = sut.getCwd();
-		assertThat(cwd)
-			.isAbsolute()
-			.isNormalized();
-	}
+	State mutateVariables(Map<String, String> newVariables);
 
+	State mutateCommands(Map<String, Supplier<Command>> newCommands);
+
+	State mutateExit(boolean newExit);
 }

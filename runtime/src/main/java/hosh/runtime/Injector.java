@@ -28,6 +28,8 @@ import hosh.spi.HistoryAware;
 import hosh.spi.LineReaderAware;
 import hosh.spi.State;
 import hosh.spi.StateAware;
+import hosh.spi.StateMutator;
+import hosh.spi.StateMutatorAware;
 import hosh.spi.TerminalAware;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
@@ -37,6 +39,8 @@ import org.jline.terminal.Terminal;
 // NB: Interpreter is not injected here to avoid circular dependencies.
 public class Injector {
 
+	// keep fields sorted by name
+
 	private History history;
 
 	// this is a "private" LineReader to be injected in commands: it has no history
@@ -44,6 +48,8 @@ public class Injector {
 	private LineReader lineReader;
 
 	private State state;
+
+	private StateMutator stateMutator;
 
 	private Terminal terminal;
 
@@ -56,6 +62,9 @@ public class Injector {
 		}
 		if (command instanceof StateAware) {
 			((StateAware) command).setState(state);
+		}
+		if (command instanceof StateMutatorAware) {
+			((StateMutatorAware) command).setStateMutator(stateMutator);
 		}
 		if (command instanceof TerminalAware) {
 			((TerminalAware) command).setTerminal(terminal);
@@ -72,6 +81,10 @@ public class Injector {
 
 	public void setState(State state) {
 		this.state = state;
+	}
+
+	public void setStateMutator(StateMutator stateMutator) {
+		this.stateMutator = stateMutator;
 	}
 
 	public void setTerminal(Terminal terminal) {
