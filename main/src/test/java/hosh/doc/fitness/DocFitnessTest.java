@@ -41,7 +41,10 @@ import hosh.runtime.Compiler.CompileError;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Parser.ParseError;
 import hosh.spi.Command;
-import hosh.spi.State;
+import hosh.runtime.MutableState;
+
+import java.util.Map;
+import java.util.function.Supplier;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,10 +84,11 @@ public class DocFitnessTest {
 
 		private BeSyntacticallyCorrect() {
 			super("be syntactically correct");
-			State state = new State();
 			BootstrapBuiltins bootstrapBuiltins = new BootstrapBuiltins();
-			bootstrapBuiltins.registerAllBuiltins(state);
-			assertThat(state.getCommands()).isNotEmpty();
+			Map<String, Supplier<Command>> commands = bootstrapBuiltins.registerAllBuiltins();
+			assertThat(commands).isNotEmpty();
+			MutableState state = new MutableState();
+			state.mutateCommands(commands);
 			compiler = new Compiler(new CommandResolvers.BuiltinCommandResolver(state));
 		}
 

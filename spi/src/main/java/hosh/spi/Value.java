@@ -23,20 +23,32 @@
  */
 package hosh.spi;
 
-import hosh.doc.Experimental;
-
 import java.util.Optional;
 
 /**
  * The value in @{see Record}.
+ *
+ * NB: all concrete classes implementing this interface should be value objects.
  */
 public interface Value extends Comparable<Value>, Printable {
 
+	/**
+	 * Access to the underlying value. This can be used to convert a value to a more primitive type.
+	 *
+	 * @param type the class representing wanted type
+	 * @param <T> the wanted type
+	 * @return optionally result value
+	 */
 	default <T> Optional<T> unwrap(Class<T> type) {
 		return Optional.empty();
 	}
 
-	@Experimental(description = "right now this is basically add()")
+	/**
+	 * Merge two values to produce at most one value.
+	 *
+	 * @param value the value to merge with
+	 * @return optionally a new value holding the result of the merge
+	 */
 	default Optional<Value> merge(Value value) {
 		return Optional.empty();
 	}

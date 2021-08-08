@@ -24,7 +24,6 @@
 package hosh.runtime;
 
 import hosh.runtime.Compiler.Program;
-import hosh.runtime.Compiler.Resolvable;
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
@@ -32,6 +31,7 @@ import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.State;
+import hosh.spi.StateMutator;
 import hosh.spi.Values;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.WithThread;
@@ -43,8 +43,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
@@ -62,6 +61,9 @@ class InterpreterTest {
 
 	@Mock(stubOnly = true)
 	State state;
+
+	@Mock
+	StateMutator stateMutator;
 
 	@Mock
 	Injector injector;
@@ -84,38 +86,34 @@ class InterpreterTest {
 	@Mock
 	Command command;
 
-	final Map<String, String> variables = new HashMap<>();
-
-	final List<Resolvable> args = new ArrayList<>();
-
 	Interpreter sut;
 
 	@BeforeEach
 	void setup() {
-		sut = new Interpreter(state, injector);
+		sut = new Interpreter(state, stateMutator, injector);
 	}
 
 	@Test
 	void injectDependencies() {
-		given(state.getVariables()).willReturn(variables);
+		given(state.getVariables()).willReturn(Map.of());
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
+		given(statement.getArguments()).willReturn(List.of());
 		sut.eval(program, out, err);
 		then(injector).should().injectDeps(command);
 	}
 
 	@Test
 	void storeCommandExitStatus() {
-		given(state.getVariables()).willReturn(variables);
+		given(state.getVariables()).willReturn(Map.of());
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.of(2));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
+		given(statement.getArguments()).willReturn(List.of());
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
-		assertThat(variables).containsEntry("EXIT_STATUS", "2");
+		then(stateMutator).should().mutateVariables(Map.of("EXIT_STATUS", "2"));
 	}
 
 	@Test
@@ -124,7 +122,7 @@ class InterpreterTest {
 			.willThrow(new CancellationException("simulated cancellation"));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
+		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
@@ -136,7 +134,7 @@ class InterpreterTest {
 			.willThrow(new NullPointerException());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
+		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
@@ -149,7 +147,7 @@ class InterpreterTest {
 			.willThrow(new IllegalArgumentException("simulated error"));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
+		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
@@ -158,25 +156,22 @@ class InterpreterTest {
 
 	@Test
 	void constantArgument() {
-		args.add(new Compiler.Constant("file"));
-		given(state.getVariables()).willReturn(variables);
+		given(state.getVariables()).willReturn(Map.of());
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
+		given(statement.getArguments()).willReturn(List.of(new Compiler.Constant("file")));
 		sut.eval(program, out, err);
 		then(command).should().run(Mockito.eq(List.of("file")), Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test
 	void presentVariable() {
-		args.add(new Compiler.Variable("VARIABLE"));
-		variables.put("VARIABLE", "1");
-		given(state.getVariables()).willReturn(variables);
+		given(state.getVariables()).willReturn(Map.of("VARIABLE", "1"));
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
+		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable("VARIABLE")));
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -187,12 +182,10 @@ class InterpreterTest {
 
 	@Test
 	void absentVariables() {
-		args.add(new Compiler.Variable("VARIABLE"));
-		variables.put("VARIABLE", null);
-		given(state.getVariables()).willReturn(variables);
+		given(state.getVariables()).willReturn(Collections.singletonMap("VARIABLE", null));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(args);
+		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable("VARIABLE")));
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();

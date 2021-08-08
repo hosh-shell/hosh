@@ -26,74 +26,27 @@ package hosh.spi;
 import hosh.doc.Todo;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * The state of the shell: it has been modeled as explicit state,
- * in practice this is a global variable.
+ * The state of the shell including: cwd (current working directory), path, variables and built-in commands.
+ * This is a view on the state, nothing can be changed here. To be able to change the state, a command must implement {@link StateMutatorAware}.
  * <p>
- * Not thread-safe.
+ * State can be also inject in any built-in command to access and change the shell state.
  */
-@Todo(description = "must be thread-safe sooner or later")
-public class State {
+public interface State {
 
-	// variables
-	private Map<String, String> variables = new LinkedHashMap<>();
+	Path getCwd();
 
-	// registered commands
-	private final Map<String, Supplier<Command>> commands = new LinkedHashMap<>();
+	Map<String, Supplier<Command>> getCommands();
 
-	// current working directory
-	private Path cwd;
+	@Todo(description = "this should be a Map<VariableName, Value>... VariableName must be used to enforce valid variable names, as in SystemModule.VARIABLE")
+	Map<String, String> getVariables();
 
-	// PATH
-	private List<Path> path = new ArrayList<>();
+	List<Path> getPath();
 
-	// request exit shell before executing next command
-	private boolean exit = false;
+	boolean isExit();
 
-	public void setCwd(Path cwd) {
-		this.cwd = cwd.normalize().toAbsolutePath();
-	}
-
-	public Path getCwd() {
-		return cwd;
-	}
-
-	public Map<String, Supplier<Command>> getCommands() {
-		return commands;
-	}
-
-	public void setVariables(Map<String, String> variables) {
-		this.variables = variables;
-	}
-
-	public Map<String, String> getVariables() {
-		return variables;
-	}
-
-	public List<Path> getPath() {
-		return path;
-	}
-
-	public void setPath(List<Path> path) {
-		this.path = path;
-	}
-
-	public boolean isExit() {
-		return exit;
-	}
-
-	public void setExit(boolean exit) {
-		this.exit = exit;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("State[cwd='%s',path=%s,variables=%s,commands=%s]", cwd, path, variables, commands);
-	}
 }

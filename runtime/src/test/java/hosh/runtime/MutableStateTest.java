@@ -23,29 +23,31 @@
  */
 package hosh.runtime;
 
-import hosh.spi.Command;
-import hosh.spi.CommandRegistry;
+import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class SimpleCommandRegistry implements CommandRegistry {
+import static org.assertj.core.api.Assertions.assertThat;
 
-	private final Map<String, Supplier<Command>> commands = new HashMap<>();
+class MutableStateTest {
 
-	public Map<String, Supplier<Command>> getCommands() {
-		return commands;
+	@Test
+	void asString() {
+		assertThat(new MutableState()).hasToString("MutableState[cwd='',path=[],variables={},commands={}]");
 	}
 
-	@Override
-	public void registerCommand(String name, Supplier<Command> command) {
-		Objects.requireNonNull(name, "name cannot be null");
-		Objects.requireNonNull(command, "command cannot be null");
-		if (commands.containsKey(name)) {
-			throw new IllegalArgumentException("command with same name already registered: " + name);
-		}
-		commands.put(name, command);
+	@Test
+	void cwdIsAlwaysAbsolute() {
+		MutableState sut = new MutableState();
+		Path path = Paths.get(".");
+		assertThat(path).isRelative();
+		sut.mutateCwd(path);
+		// transform path to a cwd
+		Path cwd = sut.getCwd();
+		assertThat(cwd)
+			.isAbsolute()
+			.isNormalized();
 	}
+
 }

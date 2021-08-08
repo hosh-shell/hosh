@@ -32,6 +32,7 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
+import hosh.spi.StateMutator;
 import hosh.spi.Values;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.IgnoreWindowsUACExceptions;
@@ -287,8 +288,11 @@ class FileSystemModuleTest {
 		@RegisterExtension
 		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-		@Mock
+		@Mock(stubOnly = true)
 		State state;
+
+		@Mock
+		StateMutator stateMutator;
 
 		@Mock
 		InputChannel in;
@@ -305,6 +309,7 @@ class FileSystemModuleTest {
 		void createSut() {
 			sut = new FileSystemModule.ChangeDirectory();
 			sut.setState(state);
+			sut.setStateMutator(stateMutator);
 		}
 
 		@Test
@@ -331,7 +336,7 @@ class FileSystemModuleTest {
 			File newFolder = temporaryFolder.newFolder("dir");
 			ExitStatus exitStatus = sut.run(List.of("dir"), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(state).should().setCwd(newFolder.toPath().toAbsolutePath());
+			then(stateMutator).should().mutateCwd(newFolder.toPath().toAbsolutePath());
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -342,7 +347,7 @@ class FileSystemModuleTest {
 			File newFolder = temporaryFolder.newFolder("dir");
 			ExitStatus exitStatus = sut.run(List.of(newFolder.toPath().toAbsolutePath().toString()), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(state).should().setCwd(newFolder.toPath());
+			then(stateMutator).should().mutateCwd(newFolder.toPath());
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -354,7 +359,7 @@ class FileSystemModuleTest {
 			File newFile = temporaryFolder.newFile("file");
 			ExitStatus exitStatus = sut.run(List.of(newFile.getName()), in, out, err);
 			assertThat(exitStatus).isError();
-			then(state).shouldHaveNoMoreInteractions();
+			then(stateMutator).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));

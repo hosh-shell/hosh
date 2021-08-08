@@ -23,12 +23,13 @@
  */
 package hosh.runtime;
 
-import hosh.spi.CommandRegistry;
+import hosh.spi.Command;
 import hosh.spi.LoggerFactory;
 import hosh.spi.Module;
-import hosh.spi.State;
 
+import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,12 +40,13 @@ public class BootstrapBuiltins {
 
 	private final Logger logger = LoggerFactory.forEnclosingClass();
 
-	public void registerAllBuiltins(State state) {
-		CommandRegistry commandRegistry = new SimpleCommandRegistry(state);
+	public Map<String, Supplier<Command>> registerAllBuiltins() {
+		SimpleCommandRegistry commandRegistry = new SimpleCommandRegistry();
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {
 			logger.log(Level.INFO, () -> String.format("registering %s", module.getClass().getCanonicalName()));
 			module.initialize(commandRegistry);
 		}
+		return commandRegistry.getCommands();
 	}
 }

@@ -32,9 +32,11 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
+import hosh.spi.StateMutator;
 import hosh.spi.Values;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -47,10 +49,12 @@ public class Interpreter {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 	private final State state;
+	private final StateMutator stateMutator;
 	private final Injector injector;
 
-	public Interpreter(State state, Injector injector) {
+	public Interpreter(State state, StateMutator stateMutator, Injector injector) {
 		this.state = state;
+		this.stateMutator = stateMutator;
 		this.injector = injector;
 	}
 
@@ -76,7 +80,9 @@ public class Interpreter {
 
 	private void store(ExitStatus exitStatus) {
 		Objects.requireNonNull(exitStatus, "exit status cannot be null");
-		state.getVariables().put("EXIT_STATUS", String.valueOf(exitStatus.value()));
+		var newVariables = new HashMap<>(state.getVariables());
+		newVariables.put("EXIT_STATUS", String.valueOf(exitStatus.value()));
+		stateMutator.mutateVariables(newVariables);
 	}
 
 	private ExitStatus evalUnderSupervision(Compiler.Statement statement, OutputChannel out, OutputChannel err) {

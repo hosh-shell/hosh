@@ -43,6 +43,8 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
+import hosh.spi.StateMutator;
+import hosh.spi.StateMutatorAware;
 import hosh.spi.Values;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -62,6 +64,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -109,13 +112,19 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "path show", description = "show path"),
 	})
-	public static class Path implements Command, StateAware {
+	public static class Path implements Command, StateAware, StateMutatorAware {
 
 		private State state;
+		private StateMutator stateMutator;
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		@Override
+		public void setStateMutator(StateMutator stateMutator) {
+			this.stateMutator = stateMutator;
 		}
 
 		@Override
@@ -143,7 +152,7 @@ public class SystemModule implements Module {
 						return ExitStatus.error();
 					}
 
-					state.getPath().clear();
+					stateMutator.mutatePath(List.of());
 					return ExitStatus.success();
 				}
 
@@ -152,8 +161,10 @@ public class SystemModule implements Module {
 						err.send(Errors.usage("path append path"));
 						return ExitStatus.error();
 					}
-					var path = Paths.get(args.get(1));
-					state.getPath().add(path);
+					java.nio.file.Path pathToAppend = Paths.get(args.get(1));
+					List<java.nio.file.Path> newPath = new ArrayList<>(state.getPath());
+					newPath.add(pathToAppend);
+					stateMutator.mutatePath(newPath);
 					return ExitStatus.success();
 				}
 
@@ -162,8 +173,10 @@ public class SystemModule implements Module {
 						err.send(Errors.usage("path prepend path"));
 						return ExitStatus.error();
 					}
-					var path = Paths.get(args.get(1));
-					state.getPath().add(0, path);
+					java.nio.file.Path pathToAppend = Paths.get(args.get(1));
+					List<java.nio.file.Path> newPath = new ArrayList<>(state.getPath());
+					newPath.add(0, pathToAppend);
+					stateMutator.mutatePath(newPath);
 					return ExitStatus.success();
 				}
 
@@ -228,26 +241,26 @@ public class SystemModule implements Module {
 		@Example(command = "exit 1", description = "exit with status 1 (error)"),
 		@Example(command = "exit 0", description = "exit with status 0 (success)"),
 	})
-	public static class Exit implements Command, StateAware {
+	public static class Exit implements Command, StateMutatorAware {
 
-		private State state;
+		private StateMutator stateMutator;
 
 		@Override
-		public void setState(State state) {
-			this.state = state;
+		public void setStateMutator(StateMutator stateMutator) {
+			this.stateMutator = stateMutator;
 		}
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			switch (args.size()) {
 				case 0:
-					state.setExit(true);
+					stateMutator.mutateExit(true);
 					return ExitStatus.success();
 				case 1:
 					String arg = args.get(0);
 					Optional<ExitStatus> exitStatus = ExitStatus.parse(arg);
 					if (exitStatus.isPresent()) {
-						state.setExit(true);
+						stateMutator.mutateExit(true);
 						return exitStatus.get();
 					} else {
 						err.send(Errors.message("not a valid exit status: %s", arg));
@@ -660,13 +673,19 @@ public class SystemModule implements Module {
 		@Example(command = "set FILE file.txt", description = "create variable FILE"),
 		@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
 	})
-	public static class SetVariable implements Command, StateAware {
+	public static class SetVariable implements Command, StateAware, StateMutatorAware {
 
 		private State state;
+		private StateMutator stateMutator;
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		@Override
+		public void setStateMutator(StateMutator stateMutator) {
+			this.stateMutator = stateMutator;
 		}
 
 		@Override
@@ -681,7 +700,9 @@ public class SystemModule implements Module {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
-			state.getVariables().put(key, value);
+			var newVariables = new HashMap<>(state.getVariables());
+			newVariables.put(key, value);
+			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
 	}
@@ -690,13 +711,19 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "unset FILE", description = "delete variable FILE, cannot be referenced anymore after this command"),
 	})
-	public static class UnsetVariable implements Command, StateAware {
+	public static class UnsetVariable implements Command, StateAware, StateMutatorAware {
 
 		private State state;
+		private StateMutator stateMutator;
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		@Override
+		public void setStateMutator(StateMutator stateMutator) {
+			this.stateMutator = stateMutator;
 		}
 
 		@Override
@@ -706,7 +733,9 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			String key = args.get(0);
-			state.getVariables().remove(key);
+			var newVariables = new HashMap<>(state.getVariables());
+			newVariables.remove(key);
+			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
 	}
@@ -715,15 +744,22 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "input FILE", description = "save string read to variable 'FILE'"),
 	})
-	public static class Input implements Command, StateAware, LineReaderAware {
+	public static class Input implements Command, StateAware, StateMutatorAware, LineReaderAware {
 
 		private State state;
+
+		private StateMutator stateMutator;
 
 		private LineReader lineReader;
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		@Override
+		public void setStateMutator(StateMutator stateMutator) {
+			this.stateMutator = stateMutator;
 		}
 
 		@Override
@@ -746,7 +782,9 @@ public class SystemModule implements Module {
 			if (maybeInput.isEmpty()) {
 				return ExitStatus.error();
 			}
-			state.getVariables().put(key, maybeInput.get());
+			var newVariables = new HashMap<>(state.getVariables());
+			newVariables.put(key, maybeInput.get());
+			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
 
@@ -763,15 +801,22 @@ public class SystemModule implements Module {
 	@Examples({
 		@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
 	})
-	public static class Secret implements Command, StateAware, LineReaderAware {
+	public static class Secret implements Command, StateAware, StateMutatorAware, LineReaderAware {
 
 		private State state;
+
+		private StateMutator stateMutator;
 
 		private LineReader lineReader;
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		@Override
+		public void setStateMutator(StateMutator stateMutator) {
+			this.stateMutator = stateMutator;
 		}
 
 		@Override
@@ -790,11 +835,13 @@ public class SystemModule implements Module {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
-			Optional<String> read = readSecret();
-			if (read.isEmpty()) {
+			Optional<String> maybeInput = readSecret();
+			if (maybeInput.isEmpty()) {
 				return ExitStatus.error();
 			}
-			state.getVariables().put(key, read.get());
+			var newVariables = new HashMap<>(state.getVariables());
+			newVariables.put(key, maybeInput.get());
+			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
 
@@ -857,13 +904,19 @@ public class SystemModule implements Module {
 		@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
 	})
 	@Experimental(description = "too low level compared to simply VARNAME=$(ls)")
-	public static class Capture implements Command, StateAware {
+	public static class Capture implements Command, StateAware, StateMutatorAware {
 
 		private State state;
+
+		private StateMutator stateMutator;
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		public void setStateMutator(StateMutator stateMutator) {
+			this.stateMutator = stateMutator;
 		}
 
 		@Override
@@ -883,7 +936,9 @@ public class SystemModule implements Module {
 			for (Record incoming : InputChannel.iterate(in)) {
 				incoming.print(pw, locale);
 			}
-			state.getVariables().put(key, result.toString());
+			var newVariables = new HashMap<>(state.getVariables());
+			newVariables.put(key, result.toString());
+			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
 	}

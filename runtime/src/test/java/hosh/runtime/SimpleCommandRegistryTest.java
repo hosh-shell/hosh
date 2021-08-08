@@ -24,12 +24,10 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
-import hosh.spi.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.function.Supplier;
@@ -46,34 +44,31 @@ class SimpleCommandRegistryTest {
 	@Mock(stubOnly = true)
 	Command anotherCommand;
 
-	@Spy
-	final State state = new State();
-
 	SimpleCommandRegistry sut;
 
 	@BeforeEach
 	void createSut() {
-		sut = new SimpleCommandRegistry(state);
+		sut = new SimpleCommandRegistry();
 	}
 
 	@Test
 	void oneCommand() {
 		sut.registerCommand("foo", () -> command);
-		assertThat(state.getCommands()).containsKey("foo");
+		assertThat(sut.getCommands()).containsKey("foo");
 	}
 
 	@Test
 	void oneCommandWithAlias() {
 		sut.registerCommand("foo", () -> command);
 		sut.registerCommand("bar", () -> command);
-		assertThat(state.getCommands()).containsKeys("foo", "bar");
+		assertThat(sut.getCommands()).containsKeys("foo", "bar");
 	}
 
 	@Test
 	void twoDifferentCommands() {
 		sut.registerCommand("foo", () -> command);
 		sut.registerCommand("bar", () -> anotherCommand);
-		assertThat(state.getCommands()).containsKeys("foo", "bar");
+		assertThat(sut.getCommands()).containsKeys("foo", "bar");
 	}
 
 	@Test
@@ -83,6 +78,6 @@ class SimpleCommandRegistryTest {
 		assertThatThrownBy(() -> sut.registerCommand("foo", () -> anotherCommand)).hasMessage("command with same name already registered: foo")
 			.isInstanceOf(IllegalArgumentException.class);
 		// make sure first mapping is still in place
-		assertThat(state.getCommands()).containsEntry("foo", commandSupplier);
+		assertThat(sut.getCommands()).containsEntry("foo", commandSupplier);
 	}
 }
