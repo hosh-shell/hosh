@@ -45,7 +45,7 @@ public class VariableExpansionCompleter implements Completer {
 			state.getVariables()
 				.keySet()
 				.stream()
-				.map(s -> "${" + s + "}")
+				.map(variableName -> "${" + variableName.name() + "}")
 				.map(Candidates::complete)
 				.forEach(candidates::add);
 		}

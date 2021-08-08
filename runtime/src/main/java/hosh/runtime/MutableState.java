@@ -26,6 +26,7 @@ package hosh.runtime;
 import hosh.spi.Command;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
+import hosh.spi.VariableName;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,9 +43,9 @@ import java.util.function.Supplier;
 public class MutableState implements State, StateMutator {
 
 	// variables
-	private Map<String, String> variables = Map.of();
+	private Map<VariableName, String> variables = Map.of();
 
-	// registered commands
+	// built-in commands
 	private Map<String, Supplier<Command>> commands = Map.of();
 
 	// current working directory
@@ -68,7 +69,7 @@ public class MutableState implements State, StateMutator {
 	}
 
 	@Override
-	public Map<String, String> getVariables() {
+	public Map<VariableName, String> getVariables() {
 		// defensive programming: creating an unmodifiable list to spot modifications via reference
 		return Map.copyOf(variables);
 	}
@@ -100,7 +101,7 @@ public class MutableState implements State, StateMutator {
 	}
 
 	@Override
-	public void mutateVariables(Map<String, String> newVariables) {
+	public void mutateVariables(Map<VariableName, String> newVariables) {
 		this.variables = Objects.requireNonNull(newVariables);
 	}
 

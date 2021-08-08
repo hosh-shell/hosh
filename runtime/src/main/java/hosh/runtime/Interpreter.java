@@ -34,6 +34,7 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
 import hosh.spi.Values;
+import hosh.spi.VariableName;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Interpreter {
+
+	// well-known variable name for holding the result of the last command
+	// (for interactive shell)
+	public static final VariableName EXIT_STATUS = VariableName.constant("EXIT_STATUS");
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
@@ -80,7 +85,7 @@ public class Interpreter {
 	private void store(ExitStatus exitStatus) {
 		Objects.requireNonNull(exitStatus, "exit status cannot be null");
 		var newVariables = new HashMap<>(state.getVariables());
-		newVariables.put("EXIT_STATUS", String.valueOf(exitStatus.value()));
+		newVariables.put(EXIT_STATUS, String.valueOf(exitStatus.value()));
 		stateMutator.mutateVariables(newVariables);
 	}
 

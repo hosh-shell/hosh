@@ -26,7 +26,7 @@ package hosh.runtime;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
-import hosh.doc.Todo;
+import hosh.spi.VariableName;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -203,11 +203,11 @@ public class Compiler {
 			} else if (part.DQUOTE_VARIABLE() != null) {
 				Token token = part.DQUOTE_VARIABLE().getSymbol();
 				String name = dropDeref(token.getText());
-				result.add(new Variable(name));
+				result.add(new Variable(VariableName.constant(name)));
 			} else if (part.DQUOTE_VARIABLE_OR_FALLBACK() != null) {
 				Token token = part.DQUOTE_VARIABLE_OR_FALLBACK().getSymbol();
 				String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
-				result.add(new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]));
+				result.add(new VariableOrFallback(VariableName.constant(nameAndFallback[0]), nameAndFallback[1]));
 			} else {
 				throw new InternalBug(ctx);
 			}
@@ -227,17 +227,16 @@ public class Compiler {
 		if (ctx.VARIABLE() != null) {
 			Token token = ctx.VARIABLE().getSymbol();
 			String name = dropDeref(token.getText());
-			return new Variable(name);
+			return new Variable(VariableName.constant(name));
 		}
 		if (ctx.VARIABLE_OR_FALLBACK() != null) {
 			Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
 			String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
-			return new VariableOrFallback(nameAndFallback[0], nameAndFallback[1]);
+			return new VariableOrFallback(VariableName.constant(nameAndFallback[0]), nameAndFallback[1]);
 		}
 		throw new InternalBug(ctx);
 	}
 
-	@Todo(description = "remove substring")
 	// ${VARIABLE} -> VARIABLE
 	private String dropDeref(String variable) {
 		return variable.substring(2, variable.length() - 1);
@@ -330,9 +329,9 @@ public class Compiler {
 
 	public static class Variable implements Resolvable {
 
-		private final String name;
+		private final VariableName name;
 
-		public Variable(String name) {
+		public Variable(VariableName name) {
 			this.name = name;
 		}
 
@@ -340,7 +339,7 @@ public class Compiler {
 		public String resolve(State state) {
 			String value = state.getVariables().get(name);
 			if (value == null) {
-				throw new IllegalStateException(String.format("cannot resolve variable: %s", name));
+				throw new IllegalStateException(String.format("cannot resolve variable: %s", name.name()));
 			}
 			return value;
 		}
@@ -348,11 +347,11 @@ public class Compiler {
 
 	public static class VariableOrFallback implements Resolvable {
 
-		private final String name;
+		private final VariableName name;
 
 		private final String fallback;
 
-		public VariableOrFallback(String name, String fallback) {
+		public VariableOrFallback(VariableName name, String fallback) {
 			this.name = name;
 			this.fallback = fallback;
 		}

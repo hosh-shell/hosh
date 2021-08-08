@@ -47,6 +47,7 @@ import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -89,7 +90,7 @@ class ExternalCommand implements Command, StateAware {
 		LOGGER.fine(() -> String.format("in '%s', out '%s', err '%s'", in, out, err));
 		Process process = null;
 		try {
-			process = processFactory.create(processArgs, cwd, state.getVariables(), position);
+			process = processFactory.create(processArgs, cwd, env(), position);
 			writeStdin(in, process);
 			readStdout(out, process);
 			readStderr(err, process);
@@ -109,6 +110,14 @@ class ExternalCommand implements Command, StateAware {
 				process.destroy();
 			}
 		}
+	}
+
+	private Map<String, String> env() {
+		var result = new HashMap<String, String>();
+		for (var entry : state.getVariables().entrySet()) {
+			result.put(entry.getKey().name(), entry.getValue());
+		}
+		return result;
 	}
 
 	private void writeStdin(InputChannel in, Process process) {

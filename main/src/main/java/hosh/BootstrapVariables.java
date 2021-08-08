@@ -21,29 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi;
+package hosh;
 
-import java.nio.file.Path;
-import java.util.List;
+import hosh.spi.VariableName;
+
+import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.Optional;
 
-/**
- * The state of the shell including: cwd (current working directory), path, variables and built-in commands.
- * This is a view on the state, nothing can be changed here. To be able to change the state, a command must implement {@link StateMutatorAware}.
- * <p>
- * State can be also inject in any built-in command to access and change the shell state.
- */
-public interface State {
+public class BootstrapVariables {
 
-	Path getCwd();
-
-	Map<String, Supplier<Command>> getCommands();
-
-	Map<VariableName, String> getVariables();
-
-	List<Path> getPath();
-
-	boolean isExit();
+	// attempt to import system variables as Hosh variables
+	// any invalid name will be logged and skipped
+	public Map<VariableName, String> fromEnv(Map<String, String> env) {
+		var result = new HashMap<VariableName, String>();
+		for (var entry : env.entrySet()) {
+			Optional<VariableName> variableName = VariableName.from(entry.getKey());
+			variableName.ifPresent(name -> result.put(name, entry.getValue()));
+		}
+		return result;
+	}
 
 }

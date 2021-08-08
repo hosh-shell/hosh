@@ -33,23 +33,21 @@ OPEN_DQUOTE
 	: '"' -> pushMode(STRING)
 	;
 
+// ID will be checked by the compiler on case by case basic: sometimes it is a variable name, sometimes it is a literal
 ID
 	: I+
 	;
 
 VARIABLE
-	: '$' '{' V+ '}'
+	: '$' '{' ID '}'
 	;
 
 VARIABLE_OR_FALLBACK
-	: '$' '{' V+ '!' I+ '}'
+	: '$' '{' ID '!' ID '}'
 	;
 
-fragment I : LETTER | DIGIT | ':' | '_' | '-' | '.' | '/' | '\\' | '~' | '+' | '*' | '=' | '?' | '<' | '>' | '(' | ')' | ',';
-
-fragment V : LETTER | '_' | '-' ;
-
-fragment LETTER: LOWER | UPPER;
+// try to simplify by using modes (i.e. LITERAL_STRING): "I" should be able to define paths for all OS (so that's why we have / \\)
+fragment I : LOWER | UPPER | DIGIT | ':' | '_' | '-' | '.' | '/' | '\\' | '~' | '+' | '*' | '=' | '?' | '<' | '>' | '(' | ')' | ',' ;
 
 fragment LOWER: 'a'..'z';
 
@@ -82,10 +80,10 @@ DQUOTE_TEXT
 	;
 
 DQUOTE_VARIABLE
-	: '${' V+ CLOSE_CURLY
+	: '${' ID CLOSE_CURLY
 	;
 
 DQUOTE_VARIABLE_OR_FALLBACK
-	: '${' V+ '!' I+ CLOSE_CURLY
+	: '${' ID '!' ID CLOSE_CURLY
 	;
 

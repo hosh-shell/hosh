@@ -46,6 +46,7 @@ import hosh.spi.StateAware;
 import hosh.spi.StateMutator;
 import hosh.spi.StateMutatorAware;
 import hosh.spi.Values;
+import hosh.spi.VariableName;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
@@ -76,12 +77,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 public class SystemModule implements Module {
-
-	// please keep in sync with HoshParser.g4 and HoshLexer.g4
-	private static final Pattern VARIABLE = Pattern.compile("[A-Za-z_\\-]+");
 
 	@Override
 	public void initialize(CommandRegistry registry) {
@@ -223,10 +220,10 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("env"));
 				return ExitStatus.error();
 			}
-			Map<String, String> variables = state.getVariables();
+			Map<VariableName, String> variables = state.getVariables();
 			for (var entry : variables.entrySet()) {
 				Record record = Records.builder()
-					.entry(Keys.NAME, Values.ofText(entry.getKey()))
+					.entry(Keys.NAME, Values.ofText(entry.getKey().name()))
 					.entry(Keys.VALUE, Values.ofText(entry.getValue()))
 					.build();
 				out.send(record);
@@ -694,14 +691,14 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("set variable value"));
 				return ExitStatus.error();
 			}
-			String key = args.get(0);
-			String value = args.get(1);
-			if (!VARIABLE.matcher(key).matches()) {
+			Optional<VariableName> name = VariableName.from(args.get(0));
+			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
+			String value = args.get(1);
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(key, value);
+			newVariables.put(name.get(), value);
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
@@ -732,9 +729,13 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("unset variable"));
 				return ExitStatus.error();
 			}
-			String key = args.get(0);
+			Optional<VariableName> name = VariableName.from(args.get(0));
+			if (name.isEmpty()) {
+				err.send(Errors.message("invalid variable name"));
+				return ExitStatus.error();
+			}
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.remove(key);
+			newVariables.remove(name.get());
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
@@ -773,17 +774,17 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("input variable"));
 				return ExitStatus.error();
 			}
-			String key = args.get(0);
-			if (!VARIABLE.matcher(key).matches()) {
+			Optional<VariableName> name = VariableName.from(args.get(0));
+			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
-			Optional<String> maybeInput = readInput();
-			if (maybeInput.isEmpty()) {
+			Optional<String> value = readInput();
+			if (value.isEmpty()) {
 				return ExitStatus.error();
 			}
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(key, maybeInput.get());
+			newVariables.put(name.get(), value.get());
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
@@ -830,17 +831,17 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("secret variable"));
 				return ExitStatus.error();
 			}
-			String key = args.get(0);
-			if (!VARIABLE.matcher(key).matches()) {
+			Optional<VariableName> name = VariableName.from(args.get(0));
+			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
-			Optional<String> maybeInput = readSecret();
-			if (maybeInput.isEmpty()) {
+			Optional<String> value = readSecret();
+			if (value.isEmpty()) {
 				return ExitStatus.error();
 			}
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(key, maybeInput.get());
+			newVariables.put(name.get(), value.get());
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
@@ -925,19 +926,19 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("capture variable"));
 				return ExitStatus.error();
 			}
-			String key = args.get(0);
-			if (!VARIABLE.matcher(key).matches()) {
+			Optional<VariableName> name = VariableName.from(args.get(0));
+			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
-			StringWriter result = new StringWriter();
-			PrintWriter pw = new PrintWriter(result);
+			StringWriter value = new StringWriter();
+			PrintWriter pw = new PrintWriter(value);
 			for (Record incoming : InputChannel.iterate(in)) {
 				incoming.print(pw, locale);
 			}
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(key, result.toString());
+			newVariables.put(name.get(), value.toString());
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}

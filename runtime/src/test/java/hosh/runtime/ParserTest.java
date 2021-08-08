@@ -159,7 +159,11 @@ class ParserTest {
 			"withTime { cat file.txt | grep /regexp/ } | schema",
 			"walk . | glob '*'",
 			"walk . | glob '*.{jar,war}'", // regression test for #205
-			"walk . | glob '*.[ch]'"
+			"walk . | glob '*.[ch]'",
+			"ls | { _PATH -> echo ${_PATH} }",
+			"ls | { path -> echo ${path} }",
+			"ls | { path -> echo }",
+     		"{ path -> echo }"
 		);
 	}
 

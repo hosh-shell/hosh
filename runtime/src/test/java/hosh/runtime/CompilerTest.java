@@ -30,6 +30,7 @@ import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
+import hosh.spi.VariableName;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -445,7 +446,7 @@ class CompilerTest {
 		@Test
 		void doubleQuotedStringWithVariable() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
-			doReturn(Map.of("HOME", "/home/dfa")).when(state).getVariables();
+			doReturn(Map.of(VariableName.constant("HOME"), "/home/dfa")).when(state).getVariables();
 			Program program = sut.compile("ls \"${HOME}\"");
 			assertThat(program.getStatements())
 				.hasSize(1)
@@ -461,7 +462,7 @@ class CompilerTest {
 		@Test
 		void doubleQuotedStringWithVariables() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
-			doReturn(Map.of("HOME", "/home/dfa", "BIN", "bin")).when(state).getVariables();
+			doReturn(Map.of(VariableName.constant("HOME"), "/home/dfa", VariableName.constant("BIN"), "bin")).when(state).getVariables();
 			Program program = sut.compile("ls \"${HOME}/${BIN}\"");
 			assertThat(program.getStatements())
 				.hasSize(1)
@@ -477,7 +478,7 @@ class CompilerTest {
 		@Test
 		void doubleQuotedStringWithFallback() {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
-			doReturn(Map.of("HOME", "/home/dfa")).when(state).getVariables();
+			doReturn(Map.of(VariableName.constant("HOME"), "/home/dfa")).when(state).getVariables();
 			Program program = sut.compile("ls \"${HOME!/home}/${BIN!bin}\"");
 			assertThat(program.getStatements())
 				.hasSize(1)
