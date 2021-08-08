@@ -33,9 +33,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * Heavily inspired by JUnit 4.12 TemporaryFolder but with less features.
+ * Heavily inspired by JUnit 4.12 TemporaryFolder but with fewer features.
  */
-// don't expose java.io.File, tests usually want java.nio.file.Path
+// we should not expose java.io.File here, tests usually want java.nio.file.Path
 public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEachCallback {
 
 	private File folder;

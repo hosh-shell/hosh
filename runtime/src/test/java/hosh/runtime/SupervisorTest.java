@@ -63,7 +63,7 @@ class SupervisorTest {
 	@Test
 	void handleInterruptions() throws ExecutionException {
 		sut.submit(() -> {
-			Thread.sleep(10_000); // NOSONAR - thread will interrupted here without waiting 10s
+			Thread.sleep(10_000); // NOSONAR - thread will be interrupted here without waiting 10s
 			return ExitStatus.success();
 		});
 		withThread.interrupt(); // next call to Future.get() will throw InterruptedException

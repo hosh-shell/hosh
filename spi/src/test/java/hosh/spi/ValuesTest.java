@@ -749,7 +749,7 @@ class ValuesTest {
 			}
 		}
 
-		// creates random lists of values with at least 1 none (in a unspecified position)
+		// creates random lists of values with at least 1 none (in an unspecified position)
 		private Gen<List<Value>> listOfNumericValuesContainingNone() {
 			return lists().of(integers().all().map(Values::ofNumeric))
 				.ofSizeBetween(1, 20)

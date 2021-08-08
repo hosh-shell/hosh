@@ -280,7 +280,7 @@ public class Compiler {
 		}
 
 		/**
-		 * Describe command in a human readable form: the main purpose is to automatically adding the location of an error.
+		 * Describe command in a human-readable form: the main purpose is to automatically adding the location of an error.
 		 * <p>
 		 * For example, assuming the following pipeline "ls | cmd1 | cmd2",
 		 * if cmd1 is returning error, the error message will start with "cmd1".

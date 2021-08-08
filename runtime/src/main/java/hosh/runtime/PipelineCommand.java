@@ -64,7 +64,7 @@ class PipelineCommand implements Command, InterpreterAware {
 		this.interpreter = interpreter;
 	}
 
-	// Used to control to control pipe of an external command.
+	// Used to control pipe of an external command.
 	// Inspired by implementation of
 	// java.lang.ProcessBuilder.startPipeline(List<ProcessBuilder).
 	public enum Position {

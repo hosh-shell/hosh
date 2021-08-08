@@ -32,7 +32,7 @@ JDK 11
 ### Logging
 
 Hosh uses `java.util.logging` (to not require additional dependencies). `HOSH_LOG_LEVEL` controls
-logging behaviour according to [Level](https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/Level.html). By default logging is disabled, to enable it:
+logging behaviour according to [Level](https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/Level.html). By default, logging is disabled, to enable it:
 
 `$ HOSH_LOG_LEVEL=FINE java -jar main/target/hosh.jar`
 

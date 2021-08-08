@@ -38,7 +38,7 @@ import org.mockito.Mock;
 
 /**
  * Fitness function to check:
- * - methods in tests are well encapsulated (e.g. no public utility methods, etc)
+ * - methods in tests are well encapsulated (e.g. no public utility methods, etc.)
  * - all @Mocks are used (@InjectMock prevents to see that easily)
  */
 public abstract class UnitTestsFitnessTest {

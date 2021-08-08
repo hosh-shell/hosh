@@ -27,7 +27,7 @@ package hosh.spi;
  * Channel used to communicate with user and other external programs.
  * <p>
  * Any special behavior regarding how to behave (e.g. back-pressure, how to stop
- * a producer, etc) is left to the implementor class.
+ * a producer, etc.) is left to the implementor class.
  */
 public interface OutputChannel {
 

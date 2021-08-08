@@ -84,13 +84,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `probe`: fix exit status when content type cannot be determined
 - minor fixes
-   - ignoring UAC errors in test on windows
+   - ignoring UAC errors in test on Windows
    - stability of integration tests
 
 ## [v0.1.0] - 2020-05-31
 
 ### Added
-- sign jar file with GPG when deploy on github
+- sign jar file with GPG when deploy on GitHub
 - `ls`: adding mtime, atime and ctime
 
 ### Changed
@@ -152,7 +152,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - added `size` key, enabling to quickly find the largest file by doing `walk . | sort size`
 
 ### Fixed
-- storing history in `$HOME/.hosh_history` instead of `$HOME/.hosh.history)
+- storing history in `$HOME/.hosh_history` instead of `$HOME/.hosh.history
 - dropping trailing spaces during PATH init to avoid `java.nio.file.InvalidPathException`
 - improving path normalization (e.g. `c:\\vagrant` into `\\vboxsrv`)
 
@@ -232,7 +232,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - improved test coverage (thanks @pitest)
 
 ## [v0.0.28] - 2019-03-29
-- new command 'regex', basically named groups regexp to record
+- new command 'regex', basically named groups regular expressions to record
 - new command 'network', to display all network interfaces in this system
 - introducing annotation-based help system
 - improving auto-complete of partially specified directories

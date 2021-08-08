@@ -53,7 +53,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// used for any non built-in commands (e.g. native commands such as 'vim' or 'ssh')
+// used for any non-built-in commands (e.g. native commands such as 'vim' or 'ssh')
 class ExternalCommand implements Command, StateAware {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();

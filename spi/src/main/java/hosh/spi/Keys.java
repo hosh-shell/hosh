@@ -36,27 +36,27 @@ import java.util.Objects;
 public class Keys {
 
 	/**
-	 * Human readable name of something (e.g. name of an env variable).
+	 * Human-readable name of something (e.g. name of an env variable).
 	 */
 	public static final Key NAME = Keys.of("name");
 
 	/**
-	 * Human readable description of something.
+	 * Human-readable description of something.
 	 */
 	public static final Key DESCRIPTION = Keys.of("description");
 
 	/**
-	 * Human readable value of something (e.g. value of env variable).
+	 * Human-readable value of something (e.g. value of env variable).
 	 */
 	public static final Key VALUE = Keys.of("value");
 
 	/**
-	 * A human readable error message.
+	 * Human-readable error message.
 	 */
 	public static final Key ERROR = Keys.of("error");
 
 	/**
-	 * A human readable location of an error.
+	 * Human-readable location of an error.
 	 */
 	public static final Key LOCATION = Keys.of("location");
 
@@ -104,17 +104,17 @@ public class Keys {
 	public static final Key TIMESTAMP = Keys.of("timestamp");
 
 	/**
-	 * Last modification time of a file (see {@link BasicFileAttributes#lastModifiedTime()}.
+	 * Last modification time of a file (see {@link BasicFileAttributes#lastModifiedTime()}).
 	 */
 	public static final Key MODIFIED = Keys.of("modified");
 
 	/**
-	 * Last access time of a file (see {@link BasicFileAttributes#lastAccessTime()}.
+	 * Last access time of a file (see {@link BasicFileAttributes#lastAccessTime()}).
 	 */
 	public static final Key ACCESSED = Keys.of("accessed");
 
 	/**
-	 * Creation time of a file (see {@link BasicFileAttributes#creationTime()}.
+	 * Creation time of a file (see {@link BasicFileAttributes#creationTime()}).
 	 */
 	public static final Key CREATED = Keys.of("created");
 

@@ -32,7 +32,7 @@ import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 /**
  * Special exception handler to ignore UAC exceptions on Windows.
  *
- * This is a workaround for local builds on Windows: by now on Github this
+ * This is a workaround for local builds on Windows: by now on GitHub this
  * privilege is always held.
  */
 public class IgnoreWindowsUACExceptions implements TestExecutionExceptionHandler {

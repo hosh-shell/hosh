@@ -33,13 +33,13 @@ import java.util.Optional;
 public interface InputChannel {
 
 	/**
-	 * Yield next record in this channel, yields {@link Optional#empty()} to signal
+	 * Yields next record in this channel, yields {@link Optional#empty()} to signal
 	 * end of channel.
 	 */
 	Optional<Record> recv();
 
 	/**
-	 * Allow to use for-each statement. Consumes the input channel.
+	 * Allows using for-each statement. Consumes the input channel.
 	 */
 	static Iterable<Record> iterate(InputChannel in) {
 		return () -> new InputChannelIterator(in);

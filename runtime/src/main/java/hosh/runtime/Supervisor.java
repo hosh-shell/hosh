@@ -41,8 +41,7 @@ import java.util.logging.Logger;
 /**
  * Manages execution of built-in commands as well as external commands via @{see
  * {@link Supervisor#submit(Callable)}
- * while providing a synchronization point via @{see
- * {@link Supervisor#waitForAll()}.
+ * while providing a synchronization point via {@link Supervisor#waitForAll()}.
  * <p>
  * SIGINT is handled as well, if requested.
  */

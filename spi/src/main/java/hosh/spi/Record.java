@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 /**
  * An immutable value object representing a collection of key/value pairs.
  * <p>
- * Iteration order is well defined (i.e. insertion order).
+ * Iteration order is well-defined (i.e. insertion order).
  */
 public interface Record extends Printable {
 
