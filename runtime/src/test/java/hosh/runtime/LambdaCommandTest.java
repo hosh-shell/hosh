@@ -31,6 +31,7 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
 import hosh.spi.Values;
+import hosh.spi.VariableName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,14 +87,14 @@ class LambdaCommandTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void presentKeyWithInnerCommandSuccess() {
-		Map<String, String> variables = new HashMap<>();
+		Map<VariableName, String> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.success());
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		assertThat(variables).isEmpty();
-		then(stateMutator).should().mutateVariables(Collections.singletonMap("path", "file"));
+		then(stateMutator).should().mutateVariables(Collections.singletonMap(VariableName.constant("path"), "file"));
 		then(stateMutator).should().mutateVariables(variables);
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -103,14 +104,14 @@ class LambdaCommandTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void presentKeyWithInnerCommandError() {
-		Map<String, String> variables = new HashMap<>();
+		Map<VariableName, String> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.error());
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
 		assertThat(variables).isEmpty();
-		then(stateMutator).should().mutateVariables(Collections.singletonMap("path", "file"));
+		then(stateMutator).should().mutateVariables(Collections.singletonMap(VariableName.constant("path"), "file"));
 		then(stateMutator).should().mutateVariables(variables);
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();

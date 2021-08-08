@@ -34,7 +34,7 @@ public interface StateMutator {
 
 	void mutatePath(List<Path> newPath);
 
-	void mutateVariables(Map<String, String> newVariables);
+	void mutateVariables(Map<VariableName, String> newVariables);
 
 	void mutateCommands(Map<String, Supplier<Command>> newCommands);
 

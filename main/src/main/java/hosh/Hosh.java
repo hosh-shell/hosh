@@ -45,7 +45,6 @@ import hosh.runtime.VariableExpansionCompleter;
 import hosh.runtime.VersionLoader;
 import hosh.runtime.MutableState;
 import hosh.spi.Ansi;
-import hosh.spi.Command;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
@@ -79,10 +78,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.function.Supplier;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -158,11 +155,10 @@ public class Hosh {
 	}
 
 	private static ExitStatus run(Terminal terminal, Version version, Logger logger, String[] args) {
-		Map<String, Supplier<Command>> commands = new BootstrapBuiltins().registerAllBuiltins();
 		MutableState state = new MutableState();
 		state.mutateCwd(Paths.get("."));
-		state.mutateCommands(commands);
-		state.mutateVariables(System.getenv());
+		state.mutateCommands(new BootstrapBuiltins().registerAllBuiltins());
+		state.mutateVariables(new BootstrapVariables().fromEnv(System.getenv()));
 		state.mutatePath(new PathInitializer().initializePath(System.getenv("PATH")));
 		Injector injector = new Injector();
 		injector.setLineReader(LineReaderBuilder.builder().terminal(terminal).build());

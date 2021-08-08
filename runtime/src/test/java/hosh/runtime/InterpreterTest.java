@@ -33,6 +33,7 @@ import hosh.spi.OutputChannel;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
 import hosh.spi.Values;
+import hosh.spi.VariableName;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.WithThread;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,7 +114,7 @@ class InterpreterTest {
 		given(statement.getArguments()).willReturn(List.of());
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
-		then(stateMutator).should().mutateVariables(Map.of("EXIT_STATUS", "2"));
+		then(stateMutator).should().mutateVariables(Map.of(Interpreter.EXIT_STATUS, "2"));
 	}
 
 	@Test
@@ -167,11 +168,12 @@ class InterpreterTest {
 
 	@Test
 	void presentVariable() {
-		given(state.getVariables()).willReturn(Map.of("VARIABLE", "1"));
+		VariableName variable = VariableName.constant("VARIABLE");
+		given(state.getVariables()).willReturn(Map.of(variable, "1"));
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable("VARIABLE")));
+		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable(variable)));
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -182,10 +184,11 @@ class InterpreterTest {
 
 	@Test
 	void absentVariables() {
-		given(state.getVariables()).willReturn(Collections.singletonMap("VARIABLE", null));
+		VariableName variableName = VariableName.constant("VARIABLE");
+		given(state.getVariables()).willReturn(Collections.singletonMap(variableName, null));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
-		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable("VARIABLE")));
+		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable(variableName)));
 		given(statement.getLocation()).willReturn("cmd");
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();

@@ -57,6 +57,7 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
 import hosh.spi.Values;
+import hosh.spi.VariableName;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.TemporaryFolder;
 import hosh.test.support.WithThread;
@@ -349,7 +350,7 @@ class SystemModuleTest {
 
 		@Test
 		void noArgsWithSomeEnvVariables() {
-			given(state.getVariables()).willReturn(Map.of("HOSH_VERSION", "1.0"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("HOSH_VERSION"), "1.0"));
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -1087,18 +1088,18 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			then(stateMutator).should().mutateVariables(Map.of("FOO", "bar"));
+			then(stateMutator).should().mutateVariables(Map.of(VariableName.constant("FOO"), "bar"));
 		}
 
 		@Test
 		void updatesExistingVariable() {
-			willReturn(Map.of("FOO", "bar")).given(state).getVariables();
+			willReturn(Map.of(VariableName.constant("FOO"), "bar")).given(state).getVariables();
 			ExitStatus exitStatus = sut.run(List.of("FOO", "baz"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			then(stateMutator).should().mutateVariables(Map.of("FOO", "baz"));
+			then(stateMutator).should().mutateVariables(Map.of(VariableName.constant("FOO"), "baz"));
 		}
 
 		@Test
@@ -1152,7 +1153,7 @@ class SystemModuleTest {
 
 		@Test
 		void removesExistingBinding() {
-			willReturn(Map.of("FOO", "BAR")).given(state).getVariables();
+			willReturn(Map.of(VariableName.constant("FOO"), "BAR")).given(state).getVariables();
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -1163,13 +1164,13 @@ class SystemModuleTest {
 
 		@Test
 		void doesNothingWhenNotExistingBinding() {
-			willReturn(Map.of("FOO", "BAR")).given(state).getVariables();
+			willReturn(Map.of(VariableName.constant("FOO"), "BAR")).given(state).getVariables();
 			ExitStatus exitStatus = sut.run(List.of("BAZ"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			then(stateMutator).should().mutateVariables(Map.of("FOO", "BAR"));
+			then(stateMutator).should().mutateVariables(Map.of(VariableName.constant("FOO"), "BAR"));
 		}
 	}
 
@@ -1308,7 +1309,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			then(stateMutator).should().mutateVariables(Map.of("FOO", ""));
+			then(stateMutator).should().mutateVariables(Map.of(VariableName.constant("FOO"), ""));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1323,7 +1324,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			then(stateMutator).should().mutateVariables(Map.of("FOO", "1"));
+			then(stateMutator).should().mutateVariables(Map.of(VariableName.constant("FOO"), "1"));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -1339,7 +1340,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
-			then(stateMutator).should().mutateVariables(Map.of("FOO", "12"));
+			then(stateMutator).should().mutateVariables(Map.of(VariableName.constant("FOO"), "12"));
 		}
 	}
 
@@ -1514,7 +1515,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			then(stateMutator).should().mutateVariables(Map.of("FOO", "1"));
+			then(stateMutator).should().mutateVariables(Map.of(VariableName.constant("FOO"), "1"));
 		}
 
 		@Test
@@ -1590,7 +1591,7 @@ class SystemModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
-			then(stateMutator).should().mutateVariables(Map.of("FOO", "1"));
+			then(stateMutator).should().mutateVariables(Map.of(VariableName.constant("FOO"), "1"));
 		}
 
 		@Test

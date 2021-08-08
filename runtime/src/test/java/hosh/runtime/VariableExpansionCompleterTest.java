@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.State;
+import hosh.spi.VariableName;
 import org.jline.reader.Candidate;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
@@ -70,7 +71,7 @@ class VariableExpansionCompleterTest {
 	@Test
 	void inExpansionMatchingSingle() {
 		given(parsedLine.word()).willReturn("${");
-		given(state.getVariables()).willReturn(Map.of("FOO", "whatever"));
+		given(state.getVariables()).willReturn(Map.of(VariableName.constant("FOO"), "whatever"));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates)
@@ -84,7 +85,7 @@ class VariableExpansionCompleterTest {
 	@Test
 	void inExpansionMatchingMultiple() {
 		given(parsedLine.word()).willReturn("${");
-		given(state.getVariables()).willReturn(Map.of("FOO", "whatever", "BAR", "whatever"));
+		given(state.getVariables()).willReturn(Map.of(VariableName.constant("FOO"), "whatever", VariableName.constant("BAR"), "whatever"));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates)

@@ -26,6 +26,7 @@ package hosh.runtime;
 import hosh.runtime.CommandResolvers.WindowsCommandResolver;
 import hosh.spi.Command;
 import hosh.spi.State;
+import hosh.spi.VariableName;
 import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -141,7 +142,7 @@ class CommandResolversTest {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
-			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE;.BAT;.CMD"));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isNotPresent();
 		}
@@ -153,7 +154,7 @@ class CommandResolversTest {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
-			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE;.BAT;.CMD"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE;.BAT;.CMD"));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent();
 		}
@@ -206,7 +207,7 @@ class CommandResolversTest {
 		@Test
 		void findExecutableInPathext() throws IOException {
 			assertThat(folder.newFile("TEST.EXE").setExecutable(true)).isTrue();
-			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE"));
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("TEST");
@@ -216,7 +217,7 @@ class CommandResolversTest {
 		@Test
 		void findExecutableNotInPathext() throws IOException {
 			assertThat(folder.newFile("TEST.CMD").setExecutable(true)).isTrue();
-			given(state.getVariables()).willReturn(Map.of("PATHEXT", ".COM;.EXE"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE"));
 			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("TEST");
