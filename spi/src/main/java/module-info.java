@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 module hosh.spi {
-	requires java.logging;
+	requires transitive java.logging;
 
 	requires org.jline.reader;
 	requires org.jline.terminal;
