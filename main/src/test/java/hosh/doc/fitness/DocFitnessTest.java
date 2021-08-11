@@ -58,6 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AnalyzeClasses(packagesOf = Hosh.class)
 public class DocFitnessTest {
 
+	@SuppressWarnings("unused")
 	@ArchTest
 	public final ArchRule commandsAreDocumented =
 		classes()
@@ -66,6 +67,7 @@ public class DocFitnessTest {
 			.should().beAnnotatedWith(Description.class)
 			.andShould().beAnnotatedWith(Examples.class);
 
+	@SuppressWarnings("unused")
 	@ArchTest
 	public final ArchRule commandsHaveSyntacticallyCorrectExamples =
 		classes()

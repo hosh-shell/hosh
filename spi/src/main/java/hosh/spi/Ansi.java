@@ -30,6 +30,7 @@ public class Ansi {
 	private Ansi() {
 	}
 
+	@SuppressWarnings("unused")
 	public enum Style {
 		// special
 		NONE("", ""),
