@@ -40,7 +40,7 @@ simple
 	;
 
 lambda
-	: OPEN_CURLY ID ARROW stmt CLOSE_CURLY
+	: OPEN_CURLY ID ARROW simple CLOSE_CURLY
 	;
 
 // by now compiler requires command (ID) to be statically defined
@@ -78,3 +78,5 @@ expansion
 	: VARIABLE
 	| VARIABLE_OR_FALLBACK
 	;
+
+

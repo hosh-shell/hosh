@@ -158,7 +158,7 @@ public class Compiler {
 	}
 
 	private Statement compileLambda(LambdaContext ctx) {
-		Statement nestedStatement = compileStatement(ctx.stmt());
+		Statement nestedStatement = compileSimple(ctx.simple());
 		String key = ctx.ID().getSymbol().getText();
 		return new Statement(new LambdaCommand(nestedStatement, key), List.of(), "");
 	}
