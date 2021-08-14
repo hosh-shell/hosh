@@ -50,6 +50,7 @@ import java.util.logging.Logger;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.then;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.atLeastOnce;
 
 /**
  * Integration tests against postman-echo.
@@ -85,7 +86,7 @@ class PostmanHttpTest {
 		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
-		then(out).should().send(body.capture());
+		then(out).should(atLeastOnce()).send(body.capture());
 		then(err).shouldHaveNoInteractions();
 		JsonObject result = JsonHelpers.parse(body.getValue());
 		assertThat(result.getJsonObject("args").getString("param")).isEqualTo("42");
@@ -101,7 +102,7 @@ class PostmanHttpTest {
 		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
-		then(out).should().send(body.capture());
+		then(out).should(atLeastOnce()).send(body.capture());
 		then(err).shouldHaveNoInteractions();
 		JsonObject result = JsonHelpers.parse(body.getValue());
 		assertThat(result.getJsonNumber("status").intValue()).isEqualTo(404);
