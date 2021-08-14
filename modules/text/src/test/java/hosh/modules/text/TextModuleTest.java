@@ -95,8 +95,8 @@ class TextModuleTest {
 			sut = new TextModule.Rand();
 		}
 
+		// not a very good test, just checking if rand can be interrupted
 		@Test
-			// not a very good test, just checking if rand can be interrupted
 		void interrupt() {
 			withThread.interrupt();
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);

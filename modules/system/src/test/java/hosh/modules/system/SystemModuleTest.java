@@ -65,6 +65,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -885,10 +886,10 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgInterrupted() {
-			withThread.interrupt();
 			Duration timeout = Duration.ofMillis(200);
 			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(2));
 			given(nestedCommand.run()).willAnswer(commandSlowerThanTimeout);
+			withThread.interrupt();
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
 			assertThat(withThread.isInterrupted()).isTrue();
 			assertThat(result).isError();
