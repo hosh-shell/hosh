@@ -55,13 +55,13 @@
 		<module>test-support</module>
 		<module>spi-test-support</module>
 		<module>spi</module>
+		<module>runtime</module>
 		<module>modules/system</module>
 		<module>modules/text</module>
 		<module>modules/history</module>
 		<module>modules/network</module>
 		<module>modules/terminal</module>
 		<module>modules/filesystem</module>
-		<module>runtime</module>
 		<module>main</module>
 	</modules>
 	<dependencyManagement>

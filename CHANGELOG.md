@@ -6,7 +6,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+- lambda does not allow wrapper or pipeline anymore, only simple command
+  invocations.
+
+  For example:
+  `ls | { path -> walk ${path} | sum size }` is invalid now
+  where `ls | { path -> echo ${path}` is still valid
+
 ## [v0.1.4] - 2021-8-07
+
+### Changed
 - bumped jline to 3.20
 - skipping autocomplete of commands when current line is not empty
 - improving Dockerfile
