@@ -85,33 +85,28 @@ public class MutableState implements State, StateMutator {
 	}
 
 	@Override
-	public State mutateCwd(Path newPath) {
+	public void mutateCwd(Path newPath) {
 		this.cwd = Objects.requireNonNull(newPath).normalize().toAbsolutePath();
-		return this;
 	}
 
 	@Override
-	public State mutatePath(List<Path> newPath) {
+	public void mutatePath(List<Path> newPath) {
 		this.path = Objects.requireNonNull(newPath);
-		return this;
 	}
 
 	@Override
-	public State mutateExit(boolean newExit) {
+	public void mutateExit(boolean newExit) {
 		this.exit = newExit;
-		return this;
 	}
 
 	@Override
-	public State mutateVariables(Map<String, String> newVariables) {
+	public void mutateVariables(Map<String, String> newVariables) {
 		this.variables = Objects.requireNonNull(newVariables);
-		return this;
 	}
 
 	@Override
-	public State mutateCommands(Map<String, Supplier<Command>> newCommands) {
+	public void mutateCommands(Map<String, Supplier<Command>> newCommands) {
 		this.commands = Objects.requireNonNull(newCommands);
-		return this;
 	}
 
 	@Override

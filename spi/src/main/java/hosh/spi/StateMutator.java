@@ -30,13 +30,13 @@ import java.util.function.Supplier;
 
 public interface StateMutator {
 
-	State mutateCwd(Path newPath);
+	void mutateCwd(Path newPath);
 
-	State mutatePath(List<Path> newPath);
+	void mutatePath(List<Path> newPath);
 
-	State mutateVariables(Map<String, String> newVariables);
+	void mutateVariables(Map<String, String> newVariables);
 
-	State mutateCommands(Map<String, Supplier<Command>> newCommands);
+	void mutateCommands(Map<String, Supplier<Command>> newCommands);
 
-	State mutateExit(boolean newExit);
+	void mutateExit(boolean newExit);
 }

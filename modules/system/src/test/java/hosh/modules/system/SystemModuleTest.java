@@ -179,7 +179,7 @@ class SystemModuleTest {
 
 		@Test
 		void clearZeroArg() {
-				ExitStatus exitStatus = sut.run(List.of("clear"), in, out, err);
+			ExitStatus exitStatus = sut.run(List.of("clear"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1696,7 +1696,7 @@ class SystemModuleTest {
 
 	/**
 	 * Factory methods to create arbitrary slow commands (useful to test various time-outs).
- 	 */
+	 */
 	public static class FakeCommands {
 
 		public static Answer<ExitStatus> sleepThenReturnSuccess(Duration sleep) {
