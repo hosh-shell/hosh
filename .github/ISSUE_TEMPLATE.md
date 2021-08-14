@@ -1,5 +1,0 @@
-**Problem**
-
-**Solution**
-
-**Benefit**
