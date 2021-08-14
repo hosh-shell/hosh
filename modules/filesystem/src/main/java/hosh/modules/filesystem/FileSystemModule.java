@@ -51,6 +51,7 @@ import hosh.spi.Values;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UncheckedIOException;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
@@ -732,9 +733,11 @@ public class FileSystemModule implements Module {
 
 		@SuppressWarnings("BusyWait")
 		private void busyWaitForResource(OutputChannel err, RandomAccessFile randomAccessFile) throws IOException, InterruptedException {
-			while (randomAccessFile.getChannel().tryLock() == null) {
-				Thread.sleep(BUSY_WAIT.toMillis());
-				err.send(Errors.message("failed to acquire lock, retry in %sms", BUSY_WAIT.toMillis()));
+			try (FileChannel channel = randomAccessFile.getChannel()) {
+				while (channel.tryLock() == null) {
+					Thread.sleep(BUSY_WAIT.toMillis());
+					err.send(Errors.message("failed to acquire lock, retry in %sms", BUSY_WAIT.toMillis()));
+				}
 			}
 		}
 
