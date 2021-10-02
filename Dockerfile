@@ -1,4 +1,4 @@
-FROM maven:3.8.1-openjdk-11 as builder
+FROM maven:3.8.1-openjdk-17 as builder
 WORKDIR /build
 
 COPY ./pom.xml ./
@@ -31,7 +31,7 @@ RUN mvn --errors --batch-mode clean verify
 LABEL maintainer="Davide Angelocola <davide.angelocola@gmail.com>"
 LABEL org.opencontainers.image.source=https://github.com/hosh-shell/hosh
 
-FROM openjdk:11-jre-slim
+FROM openjdk:17-alpine
 COPY --from=builder /build/main/target/hosh.jar /
 CMD ["java", "-jar", "/hosh.jar"]
 
