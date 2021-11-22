@@ -41,7 +41,7 @@
 		<!-- versions test classpath -->
 		<version.junit>5.8.1</version.junit>
 		<version.assertj>3.21.0</version.assertj>
-		<version.mockito>4.0.0</version.mockito>
+		<version.mockito>4.1.0</version.mockito>
 		<version.equalsverifier>3.7.2</version.equalsverifier>
 		<version.archunit>0.22.0</version.archunit>
 		<version.quicktheories>0.26</version.quicktheories>
