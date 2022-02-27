@@ -45,7 +45,7 @@
 		<version.equalsverifier>3.8.3</version.equalsverifier>
 		<version.archunit>0.22.0</version.archunit>
 		<version.quicktheories>0.26</version.quicktheories>
-		<version.slf4j>1.7.35</version.slf4j>
+		<version.slf4j>1.7.36</version.slf4j>
 	</properties>
 	<modules>
 		<module>test-support</module>
