@@ -33,6 +33,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReaderFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -55,6 +56,7 @@ import static org.mockito.Mockito.atLeastOnce;
 /**
  * Integration tests against postman-echo.
  */
+@Disabled // to be replaced soon with mock-server
 @ExtendWith(MockitoExtension.class)
 class PostmanHttpTest {
 
