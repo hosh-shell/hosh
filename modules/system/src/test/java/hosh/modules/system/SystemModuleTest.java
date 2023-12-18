@@ -65,7 +65,6 @@ import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -873,7 +872,7 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@Mock(stubOnly = true, lenient = true)
+		@Mock(stubOnly = true, strictness = Mock.Strictness.LENIENT)
 		CommandWrapper.NestedCommand nestedCommand;
 
 		SystemModule.WithTimeout sut;
@@ -962,7 +961,7 @@ class SystemModuleTest {
 		@Mock
 		OutputChannel err;
 
-		@Mock(stubOnly = true, lenient = true)
+		@Mock(stubOnly = true, strictness = Mock.Strictness.LENIENT)
 		CommandWrapper.NestedCommand nestedCommand;
 
 		SystemModule.WaitSuccess sut;

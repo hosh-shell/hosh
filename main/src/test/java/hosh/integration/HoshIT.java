@@ -556,6 +556,7 @@ class HoshIT {
 		return scriptPath;
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private Path givenFolder(String... filenames) throws IOException {
 		Path folder = temporaryFolder.newFolder("folder").toPath();
 		for (String filename : filenames) {

@@ -70,7 +70,7 @@ class PipelineCommandTest {
 	@Mock(stubOnly = true)
 	Command command;
 
-	@Mock(stubOnly = true, lenient = true)
+	@Mock(stubOnly = true, strictness = Mock.Strictness.LENIENT)
 	Interpreter interpreter;
 
 	@Test
