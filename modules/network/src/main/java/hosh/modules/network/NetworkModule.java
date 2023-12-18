@@ -121,12 +121,12 @@ public class NetworkModule implements Module {
 	@Examples({
 		@Example(command = "http https://git.io/v9MjZ | take 10", description = "take first 10 lines of https://git.io/v9MjZ ")
 	})
-	@Todo(description = "support additional methods (e.g. POST, DELETE), set headers, gzip support, etc")
+	@Todo(description = "support additional methods (e.g. POST, DELETE), set headers, gzip support, custom proxy, etc")
 	public static class Http implements Command {
 
 		private Requestor requestor = new DefaultRequestor();
 
-		public void setRequestor(Requestor requestor) {
+		void setRequestor(Requestor requestor) {
 			this.requestor = requestor;
 		}
 
@@ -144,10 +144,13 @@ public class NetworkModule implements Module {
 				.build();
 			try {
 				HttpResponse<Stream<String>> response = requestor.send(request);
-				try (Stream<String> body = response.body()) {
-					body.forEach(line -> out.send(Records.singleton(Keys.TEXT, Values.ofText(line))));
+				if (response.statusCode() != 200) {
+					bodyToLines(err, response);
+					return ExitStatus.error();
+				} else {
+					bodyToLines(out, response);
+					return ExitStatus.success();
 				}
-				return ExitStatus.success();
 			} catch (InterruptedException ie) {
 				Thread.currentThread().interrupt();
 				err.send(Errors.message("interrupted"));
@@ -155,6 +158,17 @@ public class NetworkModule implements Module {
 			} catch (IOException ioe) {
 				err.send(Errors.message(ioe));
 				return ExitStatus.error();
+			}
+		}
+
+		// this is really limited support for HTTP response body
+		// it could be JSON / CSV / binary / etc... find a better way to handle this
+		private static void bodyToLines(OutputChannel outputChannel, HttpResponse<Stream<String>> response) {
+			try (Stream<String> body = response.body()) {
+				body.forEach(line -> {
+					Record record = Records.singleton(Keys.TEXT, Values.ofText(line));
+					outputChannel.send(record);
+				});
 			}
 		}
 
@@ -177,7 +191,6 @@ public class NetworkModule implements Module {
 				.version(Version.HTTP_2)
 				.followRedirects(Redirect.NORMAL)
 				.proxy(ProxySelector.getDefault())
-				.executor(Runnable::run)
 				.build();
 
 			public static HttpClient getInstance() {

@@ -137,6 +137,7 @@ class NetworkModuleTest {
 		void oneArg() throws InterruptedException, IOException {
 			given(requestor.send(Mockito.any())).willReturn(response);
 			given(response.body()).willReturn(Stream.of("line1"));
+			given(response.statusCode()).willReturn(200);
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
