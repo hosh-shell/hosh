@@ -458,6 +458,8 @@ public class FileSystemModule implements Module {
 	})
 	public static class Partitions implements Command {
 
+		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
@@ -477,7 +479,7 @@ public class FileSystemModule implements Module {
 							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
 							.build());
 				} catch (IOException e) {
-					throw new UncheckedIOException(e);
+					LOGGER.log(Level.WARNING, "skipping partition " + store.name(), e);
 				}
 			}
 			return ExitStatus.success();
