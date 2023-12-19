@@ -1,7 +1,7 @@
 # Hosh
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/dfa1/hosh/workflows/CI/badge.svg)](https://github.com/dfa1/hosh/actions?query=workflow%3ACI) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hosh-shell_hosh&metric=alert_status)](https://sonarcloud.io/dashboard?id=dfa1_hosh)
- [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dfa1_hosh&metric=coverage)](https://sonarcloud.io/dashboard?id=dfa1_hosh)[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4646/badge)](https://bestpractices.coreinfrastructure.org/projects/4646)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/dfa1/hosh/workflows/CI/badge.svg)](https://github.com/dfa1/hosh/actions?query=workflow%3ACI) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hosh-shell_hosh&metric=alert_status)](https://sonarcloud.io/dashboard?id=hosh-shell_hosh)
+ [![`Coverage`](https://sonarcloud.io/api/project_badges/measure?project=hosh-shell_hosh&metric=coverage)](https://sonarcloud.io/dashboard?id=hosh-shell_hosh)[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4646/badge)](https://bestpractices.coreinfrastructure.org/projects/4646)
 
 Human Oriented SHell, written in Java.
 
