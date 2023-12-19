@@ -187,7 +187,7 @@ public class Hosh {
 			return ExitStatus.success();
 		}
 		if (commandLine.hasOption('v')) {
-			System.out.println("hosh " + version);
+			System.out.println(version.hoshVersion().unwrap(String.class).orElseThrow());
 			return ExitStatus.success();
 		}
 		List<String> remainingArgs = commandLine.getArgList();

@@ -55,7 +55,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Acceptance tests by spawning java -jar hosh.jar.
+ * Acceptance tests by running the packaged jar (i.e. java -jar hosh.jar).
  */
 class HoshIT {
 
@@ -500,7 +500,7 @@ class HoshIT {
 		Process hosh = givenHoshProcess("--version");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).startsWith("hosh ");
+		assertThat(output).startsWith("hosh v");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
@@ -509,7 +509,7 @@ class HoshIT {
 		Process hosh = givenHoshProcess("-v");
 		String output = consumeOutput(hosh);
 		int exitCode = hosh.waitFor();
-		assertThat(output).startsWith("hosh ");
+		assertThat(output).startsWith("hosh v");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
