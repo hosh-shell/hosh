@@ -30,6 +30,7 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
+import hosh.spi.Version;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,6 +73,7 @@ class HttpWithMockServerTest {
     @BeforeEach
     void createSut() {
         sut = new NetworkModule.Http();
+        sut.setVersion(new Version("v1.2.3"));
     }
 
     @Test

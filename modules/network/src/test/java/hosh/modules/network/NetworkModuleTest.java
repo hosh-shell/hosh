@@ -31,18 +31,22 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
+import hosh.spi.Version;
 import hosh.test.support.WithThread;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.stream.Stream;
@@ -113,6 +117,9 @@ class NetworkModuleTest {
 		@Mock(stubOnly = true)
 		NetworkModule.Http.Requestor requestor;
 
+		@Captor
+		ArgumentCaptor<HttpRequest> request;
+
 		@Mock(stubOnly = true)
 		HttpResponse<Stream<String>> response;
 
@@ -122,6 +129,7 @@ class NetworkModuleTest {
 		void setUp() {
 			sut = new NetworkModule.Http();
 			sut.setRequestor(requestor);
+			sut.setVersion(new Version("v1.2.3"));
 		}
 
 		@Test
@@ -135,7 +143,7 @@ class NetworkModuleTest {
 
 		@Test
 		void oneArg() throws InterruptedException, IOException {
-			given(requestor.send(Mockito.any())).willReturn(response);
+			given(requestor.send(request.capture())).willReturn(response);
 			given(response.body()).willReturn(Stream.of("line1"));
 			given(response.statusCode()).willReturn(200);
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
@@ -143,6 +151,11 @@ class NetworkModuleTest {
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
 			then(err).shouldHaveNoInteractions();
+			// finally make sure the HTTP request is correct
+			HttpRequest httpRequest = request.getValue();
+			assertThat(httpRequest.uri().toString()).isEqualTo("https://example.org");
+			assertThat(httpRequest.method()).isEqualTo("GET");
+			assertThat(httpRequest.headers().firstValue("user-agent")).hasValue("hosh v1.2.3");
 		}
 
 		@Test

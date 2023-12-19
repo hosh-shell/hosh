@@ -39,6 +39,7 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Value;
 import hosh.spi.Values;
+import hosh.spi.VersionAware;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -122,9 +123,15 @@ public class NetworkModule implements Module {
 		@Example(command = "http https://git.io/v9MjZ | take 10", description = "take first 10 lines of https://git.io/v9MjZ ")
 	})
 	@Todo(description = "support additional methods (e.g. POST, DELETE), set headers, gzip support, custom proxy, etc")
-	public static class Http implements Command {
+	public static class Http implements Command, VersionAware {
 
+		private hosh.spi.Version version;
 		private Requestor requestor = new DefaultRequestor();
+
+		@Override
+		public void setVersion(hosh.spi.Version version) {
+			this.version = version;
+		}
 
 		void setRequestor(Requestor requestor) {
 			this.requestor = requestor;
@@ -137,9 +144,10 @@ public class NetworkModule implements Module {
 				err.send(Errors.usage("http URL"));
 				return ExitStatus.error();
 			}
+			String userAgent = version.hoshVersion().unwrap(String.class).orElseThrow();
 			HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(args.get(0)))
-				.setHeader("User-Agent", "Hosh")
+				.setHeader("User-Agent", userAgent)
 				.GET()
 				.build();
 			try {
