@@ -25,10 +25,10 @@ module hosh.test.support {
 	requires java.logging;
 
 	requires org.junit.jupiter.api;
+	requires org.junit.jupiter.params;
+
 	requires org.mockito;
 
 	requires com.tngtech.archunit;
 	requires com.tngtech.archunit.junit5.api;
-	requires org.junit.jupiter.params;
-
 }
