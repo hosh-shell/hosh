@@ -43,17 +43,18 @@ import hosh.runtime.Prompt;
 import hosh.runtime.ReplReader;
 import hosh.runtime.VariableExpansionCompleter;
 import hosh.runtime.VersionLoader;
+import hosh.runtime.MutableState;
 import hosh.spi.Ansi;
 import hosh.spi.Command;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
-import hosh.runtime.MutableState;
 import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
+import hosh.spi.Version;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -121,7 +122,7 @@ public class Hosh {
 	}
 
 	public static void main(String[] args) throws Exception {
-		String version = VersionLoader.loadVersion();
+		Version version = VersionLoader.loadVersion();
 		configureLogging();
 		Logger logger = LoggerFactory.forEnclosingClass();
 
@@ -154,7 +155,7 @@ public class Hosh {
 		logger.setLevel(Level.parse(logLevel));
 	}
 
-	private static ExitStatus run(Terminal terminal, String version, Logger logger, String[] args) {
+	private static ExitStatus run(Terminal terminal, Version version, Logger logger, String[] args) {
 		Map<String, Supplier<Command>> commands = new BootstrapBuiltins().registerAllBuiltins();
 		MutableState state = new MutableState();
 		state.mutateCwd(Paths.get("."));
@@ -278,8 +279,8 @@ public class Hosh {
 		}
 	}
 
-	private static void welcome(OutputChannel out, String version) {
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("hosh " + version)));
+	private static void welcome(OutputChannel out, Version version) {
+		out.send(Records.singleton(Keys.TEXT, version.hoshVersion()));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Running on Java " + System.getProperty("java.version"))));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Locale is " + Locale.getDefault().toString())));

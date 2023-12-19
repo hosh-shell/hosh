@@ -23,6 +23,8 @@
  */
 package hosh.runtime;
 
+import hosh.spi.Version;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -32,11 +34,12 @@ public class VersionLoader {
 	private VersionLoader() {
 	}
 
-	public static String loadVersion() throws IOException {
+	public static Version loadVersion() throws IOException {
 		try (InputStream is = VersionLoader.class.getResourceAsStream("/git.properties")) {
 			Properties properties = new Properties();
 			properties.load(is);
-			return properties.getProperty("git.commit.id.describe");
+			String gitDescribe = properties.getProperty("git.commit.id.describe");
+			return new Version(gitDescribe);
 		}
 	}
 }

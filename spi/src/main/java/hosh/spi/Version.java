@@ -21,21 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.spi;
 
-import hosh.spi.*;
-import org.junit.jupiter.api.Test;
+/**
+ * Hosh version as immutable and safe value.
+ */
+public class Version {
 
-import java.io.IOException;
+    private final String value;
 
-import static org.assertj.core.api.Assertions.assertThat;
+    public Version(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("null version");
+        }
+        if (value.isBlank()) {
+            throw new IllegalArgumentException("empty version");
+        }
+        final String[] split = value.split("\\.");
+        if (!split[0].startsWith("v")) {
+            throw new IllegalArgumentException("missing prefix");
+        }
+        if (split.length != 3) { // expecting to follow our maven conventions of major.minor.patch
+            throw new IllegalArgumentException("invalid maven version");
+        }
+        // at this point value is fully validated, but it is never exposed directly
+        this.value = value;
+    }
 
-class VersionLoaderTest {
-
-	@Test
-	void loadVersionViaGit() throws IOException {
-		Version result= VersionLoader.loadVersion();
-		assertThat(result).isNotNull(); // must be always defined
-	}
-
+    /**
+     * A textual representation that be safely printed to screen.
+     */
+    public Value hoshVersion() {
+        return new Values.TextValue("hosh " + value);
+    }
 }

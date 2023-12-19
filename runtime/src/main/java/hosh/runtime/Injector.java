@@ -31,6 +31,8 @@ import hosh.spi.StateAware;
 import hosh.spi.StateMutator;
 import hosh.spi.StateMutatorAware;
 import hosh.spi.TerminalAware;
+import hosh.spi.Version;
+import hosh.spi.VersionAware;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.terminal.Terminal;
@@ -53,6 +55,8 @@ public class Injector {
 
 	private Terminal terminal;
 
+	private Version version;
+
 	public void injectDeps(Command command) {
 		if (command instanceof HistoryAware) {
 			((HistoryAware) command).setHistory(history);
@@ -68,6 +72,9 @@ public class Injector {
 		}
 		if (command instanceof TerminalAware) {
 			((TerminalAware) command).setTerminal(terminal);
+		}
+		if (command instanceof VersionAware) {
+			((VersionAware) command).setVersion(version);
 		}
 	}
 
@@ -91,4 +98,7 @@ public class Injector {
 		this.terminal = terminal;
 	}
 
+	public void setVersion(Version version) {
+		this.version = version;
+	}
 }

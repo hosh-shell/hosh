@@ -27,7 +27,6 @@ import java.util.Optional;
 
 /**
  * The value in @{see Record}.
- *
  * NB: all concrete classes implementing this interface should be value objects.
  */
 public interface Value extends Comparable<Value>, Printable {

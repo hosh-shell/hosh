@@ -21,21 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.spi;
 
-import hosh.spi.*;
-import org.junit.jupiter.api.Test;
+/**
+ * Marker interface to inject the current @{see Version} of Hosh in commands.
+ */
+public interface VersionAware {
 
-import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-class VersionLoaderTest {
-
-	@Test
-	void loadVersionViaGit() throws IOException {
-		Version result= VersionLoader.loadVersion();
-		assertThat(result).isNotNull(); // must be always defined
-	}
-
+    void setVersion(Version version);
 }
