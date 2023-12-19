@@ -46,6 +46,9 @@
 		<version.archunit>1.2.1</version.archunit>
 		<version.quicktheories>0.26</version.quicktheories>
 		<version.slf4j>2.0.9</version.slf4j>
+		<version.joy-classic>2.1.0</version.joy-classic>
+		<version.jakarta-json-api>2.1.1</version.jakarta-json-api>
+		<version.mockserver>5.14.0</version.mockserver>
 	</properties>
 	<modules>
 		<module>test-support</module>
@@ -144,6 +147,21 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-simple</artifactId>
 				<version>${version.slf4j}</version>
+			</dependency>
+			<dependency>
+				<groupId>jakarta.json</groupId>
+				<artifactId>jakarta.json-api</artifactId>
+				<version>${version.jakarta-json-api}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.leadpony.joy</groupId>
+				<artifactId>joy-classic</artifactId>
+				<version>${version.joy-classic}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mock-server</groupId>
+				<artifactId>mockserver-junit-jupiter-no-dependencies</artifactId>
+				<version>${version.mockserver}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
