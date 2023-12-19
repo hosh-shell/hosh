@@ -45,7 +45,7 @@
 		<version.equalsverifier>3.10</version.equalsverifier>
 		<version.archunit>1.2.1</version.archunit>
 		<version.quicktheories>0.26</version.quicktheories>
-		<version.slf4j>1.7.36</version.slf4j>
+		<version.slf4j>2.0.9</version.slf4j>
 	</properties>
 	<modules>
 		<module>test-support</module>
@@ -118,6 +118,13 @@
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
 				<version>${version.assertj}</version>
+				<!-- dependency convergence with mockito: exclude this-->
+				<exclusions>
+					<exclusion>
+						<groupId>net.bytebuddy</groupId>
+						<artifactId>byte-buddy</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.tngtech.archunit</groupId>
@@ -148,6 +155,25 @@
 	</dependencyManagement>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.4.1</version>
+				<executions>
+					<execution>
+						<id>require-explicit-dependency-scope</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<banDuplicatePomDependencyVersions/>
+								<dependencyConvergence/>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
