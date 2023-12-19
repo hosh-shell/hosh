@@ -30,22 +30,22 @@ public class Version {
 
     private final String value;
 
-    public Version(String value) {
-        if (value == null) {
+    public Version(String candidate) {
+        if (candidate == null) {
             throw new IllegalArgumentException("null version");
         }
-        if (value.isBlank()) {
+        if (candidate.isBlank()) {
             throw new IllegalArgumentException("empty version");
         }
-        final String[] split = value.split("\\.");
+        final String[] split = candidate.split("\\.");
         if (!split[0].startsWith("v")) {
-            throw new IllegalArgumentException("missing prefix");
+            throw new IllegalArgumentException("missing prefix: " + candidate);
         }
         if (split.length != 3) { // expecting to follow our maven conventions of major.minor.patch
-            throw new IllegalArgumentException("invalid maven version");
+            throw new IllegalArgumentException("invalid maven version: " + candidate);
         }
-        // at this point value is fully validated, but it is never exposed directly
-        this.value = value;
+        // at this point candidate is fully validated
+        this.value = candidate;
     }
 
     /**
