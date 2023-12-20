@@ -137,6 +137,7 @@ public class Hosh {
 	// enabling logging to $HOME/.hosh.log
 	// if and only if HOSH_LOG_LEVEL is defined
 	// by default logging is disabled
+	@SuppressWarnings("squid:S4792")
 	private static void configureLogging() throws IOException {
 		LogManager logManager = LogManager.getLogManager();
 		logManager.reset();
