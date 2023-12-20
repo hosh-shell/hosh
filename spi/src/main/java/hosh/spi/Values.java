@@ -137,7 +137,7 @@ public class Values {
 			return Objects.hash(value);
 		}
 
-		private static final Comparator<String> BY_TEXT_ALPHA_NUM = new Comparators.AlphaNumericStringComparator();
+		private static final Comparator<String> BY_TEXT_ALPHA_NUM = new Comparators.NaturalSortOrder();
 
 		@Override
 		public int compareTo(Value obj) {
@@ -485,13 +485,13 @@ public class Values {
 			return Optional.empty();
 		}
 
-		private static final Comparator<Path> BY_PATH_ALPHANUM =
-			Comparator.comparing(Path::toString, new Comparators.AlphaNumericStringComparator());
+		private static final Comparator<Path> BY_PATH_NATURAL_ORDER =
+			Comparator.comparing(Path::toString, new Comparators.NaturalSortOrder());
 
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof PathValue that) {
-                return BY_PATH_ALPHANUM.compare(this.path, that.path);
+                return BY_PATH_NATURAL_ORDER.compare(this.path, that.path);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -625,14 +625,14 @@ public class Values {
 		}
 
 		/**
-		 * The Alphanum Algorithm is an improved sorting algorithm for strings
-		 * containing numbers. Instead of sorting numbers in ASCII order like
-		 * a standard sort, this algorithm sorts numbers in numeric order.
-		 * <p>
-		 * The Alphanum Algorithm is discussed at http://www.DaveKoelle.com
-		 */
-		public static Comparator<String> alphanum() {
-			return new AlphaNumericStringComparator();
+         * The natural sort order is an improved sorting algorithm for strings
+         * containing numbers. Instead of sorting numbers in ASCII order like
+         * a standard sort, this algorithm sorts numbers in numeric order.
+         * <p>
+         * See <a href="https://en.wikipedia.org/wiki/Natural_sort_order">wikipedia</a> for more details.
+         */
+		public static Comparator<String> naturalSortOrder() {
+			return new NaturalSortOrder();
 		}
 
 		public static Comparator<Value> noneLast(Comparator<Value> comparator) {
@@ -643,7 +643,7 @@ public class Values {
 			return new NoneFirstComparator(comparator);
 		}
 
-		static class AlphaNumericStringComparator implements Comparator<String> {
+		static class NaturalSortOrder implements Comparator<String> {
 
 			private static final Pattern CHUNK = Pattern.compile("(\\d+)|(\\D+)");
 

@@ -650,9 +650,9 @@ class ValuesTest {
 	class ComparatorsTest {
 
 		@Nested
-		class AlphaNumericStringComparatorTest {
+		class NaturalSortOrderComparatorTest {
 
-			final Comparator<String> sut = Values.Comparators.alphanum();
+			final Comparator<String> sut = Values.Comparators.naturalSortOrder();
 
 			@Test
 			void sortLetters() {
