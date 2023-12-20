@@ -109,8 +109,8 @@ public class Interpreter {
 	}
 
 	private void injectInterpreter(Command command) {
-		if (command instanceof InterpreterAware) {
-			((InterpreterAware) command).setInterpreter(this);
+		if (command instanceof InterpreterAware interpreterAware) {
+			interpreterAware.setInterpreter(this);
 		}
 	}
 

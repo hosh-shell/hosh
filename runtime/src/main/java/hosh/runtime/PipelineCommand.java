@@ -105,8 +105,8 @@ class PipelineCommand implements Command, InterpreterAware {
 			return supervisor.waitForAll();
 		} catch (ExecutionException e) {
 			Throwable cause = e.getCause();
-			if (cause instanceof RuntimeException) {
-				throw (RuntimeException) cause;
+			if (cause instanceof RuntimeException runtimeException) {
+				throw runtimeException;
 			}
 			throw new RuntimeException("caught exception", cause);
 		}
