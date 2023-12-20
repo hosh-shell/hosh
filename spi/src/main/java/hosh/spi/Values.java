@@ -135,7 +135,7 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(value);
+			return Objects.hashCode(value);
 		}
 
 		private static final Comparator<String> BY_TEXT_ALPHA_NUM = new Comparators.NaturalSortOrder();
@@ -390,7 +390,7 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(duration);
+			return Objects.hashCode(duration);
 		}
 	}
 
@@ -436,7 +436,7 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(instant);
+			return Objects.hashCode(instant);
 		}
 	}
 
@@ -472,7 +472,7 @@ public class Values {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(path);
+			return Objects.hashCode(path);
 		}
 
 		@Override

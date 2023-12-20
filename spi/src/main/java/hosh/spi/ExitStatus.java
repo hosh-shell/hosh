@@ -83,7 +83,7 @@ public class ExitStatus {
 
 	@Override
 	public final int hashCode() {
-		return Objects.hash(value);
+		return Objects.hashCode(value);
 	}
 
 	@Override

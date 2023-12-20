@@ -196,7 +196,7 @@ public class Records {
 
 		@Override
 		public final int hashCode() {
-			return Objects.hash(entry);
+			return Objects.hashCode(entry);
 		}
 
 		@Override

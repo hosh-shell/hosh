@@ -141,7 +141,7 @@ public class Keys {
 
 		@Override
 		public String name() {
-			return this.name;
+			return name;
 		}
 
 		@Override
@@ -155,17 +155,17 @@ public class Keys {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.name);
+			return Objects.hashCode(name);
 		}
 
 		@Override
 		public String toString() {
-			return String.format("Key['%s']", this.name);
+			return String.format("Key['%s']", name);
 		}
 
 		@Override
-		public int compareTo(Key o) {
-			return this.name.compareTo(o.name());
+		public int compareTo(Key that) {
+			return this.name.compareTo(that.name());
 		}
 	}
 }
