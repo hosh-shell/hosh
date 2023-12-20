@@ -15,7 +15,7 @@ Website: https://hosh-shell.github.io
 
 ### Requirements
 
-JDK 17
+JDK 17+ (tested with JDK 17 and JDK 21).
 
 ### Build
 
