@@ -73,6 +73,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.IntPredicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -623,10 +624,15 @@ public class FileSystemModule implements Module {
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 		private State state;
+		private IntPredicate watchPredicate = count -> true; // by default, never stop; override for unit tests
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		public void setWatchPredicate(IntPredicate watchPredicate) {
+			this.watchPredicate = watchPredicate;
 		}
 
 		@Override
@@ -635,7 +641,7 @@ public class FileSystemModule implements Module {
 				err.send(Errors.usage("watch directory"));
 				return ExitStatus.error();
 			}
-			Path dir = state.getCwd();
+			Path dir = state.getCwd().resolve(args.get(0));
 			WatchEvent.Kind<?>[] events = {
 					StandardWatchEventKinds.ENTRY_CREATE,
 					StandardWatchEventKinds.ENTRY_DELETE,
@@ -654,13 +660,15 @@ public class FileSystemModule implements Module {
 		}
 
 		private void withService(WatchService watchService, OutputChannel out) throws InterruptedException {
-			while (true) {
+			int count = 0;
+			while (watchPredicate.test(count)) {
 				LOGGER.info("waiting for events");
 				WatchKey key = watchService.take();
 				handle(out, key);
 				if (!key.reset()) {
 					break;
 				}
+				count+=1;
 			}
 		}
 
@@ -672,10 +680,11 @@ public class FileSystemModule implements Module {
 				}
 				@SuppressWarnings("unchecked")
 				WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
-				out.send(Records.builder()
+				Record record = Records.builder()
 						.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
 						.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
-						.build());
+						.build();
+				out.send(record);
 			}
 		}
 	}

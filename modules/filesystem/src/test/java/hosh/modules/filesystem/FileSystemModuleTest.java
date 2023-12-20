@@ -51,12 +51,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -122,9 +124,9 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
-				RecordMatcher.of(
-					Keys.PATH, Values.ofPath(Paths.get("dir")),
-					Keys.SIZE, Values.none()));
+					RecordMatcher.of(
+							Keys.PATH, Values.ofPath(Paths.get("dir")),
+							Keys.SIZE, Values.none()));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -136,8 +138,8 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.ofPath(Paths.get("file")),
-				Keys.SIZE, Values.ofSize(0)));
+					Keys.PATH, Values.ofPath(Paths.get("file")),
+					Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -150,11 +152,11 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.ofPath(Paths.get("file")),
-				Keys.SIZE, Values.ofSize(0)));
+					Keys.PATH, Values.ofPath(Paths.get("file")),
+					Keys.SIZE, Values.ofSize(0)));
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.ofPath(Paths.get("link")),
-				Keys.SIZE, Values.none()));
+					Keys.PATH, Values.ofPath(Paths.get("link")),
+					Keys.SIZE, Values.none()));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoInteractions();
 		}
@@ -201,8 +203,8 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.ofPath(Paths.get("aaa")),
-				Keys.SIZE, Values.ofSize(0)));
+					Keys.PATH, Values.ofPath(Paths.get("aaa")),
+					Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -227,8 +229,8 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.ofPath(Paths.get("aaa")),
-				Keys.SIZE, Values.ofSize(0)));
+					Keys.PATH, Values.ofPath(Paths.get("aaa")),
+					Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
@@ -240,8 +242,8 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
-				Keys.PATH, Values.ofPath(Paths.get("aaa")),
-				Keys.SIZE, Values.ofSize(0)));
+					Keys.PATH, Values.ofPath(Paths.get("aaa")),
+					Keys.SIZE, Values.ofSize(0)));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
@@ -254,16 +256,16 @@ class FileSystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
-				RecordMatcher.of(
-					Keys.PATH, Values.ofPath(Path.of("aaa")),
-					Keys.SIZE, Values.none()));
+					RecordMatcher.of(
+							Keys.PATH, Values.ofPath(Path.of("aaa")),
+							Keys.SIZE, Values.none()));
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 		}
 
 		@DisabledOnOs({
-			OS.WINDOWS,  // File.setReadable() fails on Windows
-			OS.LINUX     // fails on Docker (no error is triggered)
+				OS.WINDOWS,  // File.setReadable() fails on Windows
+				OS.LINUX     // fails on Docker (no error is triggered)
 		})
 		@Bug(description = "check handling of java.nio.file.AccessDeniedException", issue = "https://github.com/dfa1/hosh/issues/74")
 		@Test
@@ -1206,6 +1208,55 @@ class FileSystemModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: watch directory")));
 		}
+
+		@Test
+		void oneArg() {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			sut.setWatchPredicate(count -> false); // exit immediately
+			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toString()), in, out, err);
+			assertThat(result).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		// this test is quite slow (for the sleep) and race condition prone...
+		// perhaps a CountDownLatch could be useful to avoid the race condition?
+		@Test
+		void create() throws InterruptedException {
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			sut.setWatchPredicate(count -> count < 1);
+
+			Thread modifyFileSystem = new Thread(() -> {
+				try {
+					TimeUnit.SECONDS.sleep(2);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+				try {
+					temporaryFolder.newFile("watcher.test");
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			});
+			modifyFileSystem.start();
+
+			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toString()), in, out, err);
+			modifyFileSystem.join();
+			assertThat(result).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).should().send(
+					Records.builder()
+							.entry(Keys.of("type"), Values.ofText("CREATE"))
+							.entry(Keys.PATH, Values.ofPath(Paths.get("watcher.test")))
+							.build()
+			);
+			then(err).shouldHaveNoInteractions();
+
+		}
+
+
 	}
 
 	@Nested
