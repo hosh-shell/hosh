@@ -47,7 +47,7 @@
 		<version.quicktheories>0.26</version.quicktheories>
 		<version.slf4j>2.0.9</version.slf4j>
 		<version.joy-classic>2.1.0</version.joy-classic>
-		<version.jakarta-json-api>2.1.1</version.jakarta-json-api>
+		<version.jakarta-json-api>2.1.3</version.jakarta-json-api>
 		<version.mockserver>5.14.0</version.mockserver>
 	</properties>
 	<modules>
