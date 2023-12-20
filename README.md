@@ -19,7 +19,11 @@ JDK 17+ (tested with JDK 17 and JDK 21).
 
 ### Build
 
+Full build with all fitness and acceptance tests:
 `$ ./mvnw clean verify`
+
+Quick build (2x faster on my machine):
+`$ ./mvnw -Pskip-slow-tests clean verify`
 
 ### Run
 

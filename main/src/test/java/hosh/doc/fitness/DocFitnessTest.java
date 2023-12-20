@@ -25,6 +25,7 @@ package hosh.doc.fitness;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTag;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
@@ -59,6 +60,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DocFitnessTest {
 
 	@SuppressWarnings("unused")
+	@ArchTag("fitness")
 	@ArchTest
 	public final ArchRule commandsAreDocumented =
 		classes()
@@ -68,6 +70,7 @@ public class DocFitnessTest {
 			.andShould().beAnnotatedWith(Examples.class);
 
 	@SuppressWarnings("unused")
+	@ArchTag("fitness")
 	@ArchTest
 	public final ArchRule commandsHaveSyntacticallyCorrectExamples =
 		classes()

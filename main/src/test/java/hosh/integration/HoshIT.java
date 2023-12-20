@@ -28,6 +28,7 @@ import hosh.doc.Bug;
 import hosh.doc.Todo;
 import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -57,6 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Acceptance tests by running the packaged jar (i.e. java -jar hosh.jar).
  */
+@Tag("acceptance")
 class HoshIT {
 
 	@RegisterExtension

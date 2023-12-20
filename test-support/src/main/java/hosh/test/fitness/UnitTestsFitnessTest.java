@@ -24,6 +24,7 @@
 package hosh.test.fitness;
 
 import com.tngtech.archunit.core.domain.JavaField;
+import com.tngtech.archunit.junit.ArchTag;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
@@ -44,6 +45,7 @@ import org.mockito.Mock;
 public abstract class UnitTestsFitnessTest {
 
 	@SuppressWarnings("unused")
+	@ArchTag("fitness")
 	@ArchTest
 	public static final ArchRule UNANNOTATED_METHODS_IN_TESTS_MUST_BE_PRIVATE =
 		ArchRuleDefinition.methods().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Test")
@@ -56,6 +58,7 @@ public abstract class UnitTestsFitnessTest {
 			.orShould().beAnnotatedWith(ParameterizedTest.class);
 
 	@SuppressWarnings("unused")
+	@ArchTag("fitness")
 	@ArchTest
 	public static final ArchRule MOCKS_MUST_BE_USED =
 		ArchRuleDefinition.fields()
