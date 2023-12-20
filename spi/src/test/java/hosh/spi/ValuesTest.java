@@ -749,6 +749,7 @@ class ValuesTest {
 			}
 		}
 
+		@SuppressWarnings("squid:S2245")
 		// creates random lists of values with at least 1 none (in an unspecified position)
 		private Gen<List<Value>> listOfNumericValuesContainingNone() {
 			return lists().of(integers().all().map(Values::ofNumeric))

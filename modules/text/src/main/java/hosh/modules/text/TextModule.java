@@ -587,7 +587,7 @@ public class TextModule implements Module {
 	})
 	public static class Rand implements Command {
 
-		@SuppressWarnings("squid:S2189")
+		@SuppressWarnings("squid:S2245")
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 0) {
