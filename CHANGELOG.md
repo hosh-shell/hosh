@@ -6,12 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.1.5] - 2023-12-20
+
 ### Added
 
 ### Changed
+- catching up with dependencies since 2021 (thanks @dependabot!)
+- restored sonarcloud.io setup
 
 ### Fixed
-- build fixes 
 - removed vestigial files and examples
 
 ### Removed
