@@ -72,6 +72,7 @@ import org.jline.terminal.TerminalBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -286,7 +287,7 @@ public class Hosh {
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("PID is " + ProcessHandle.current().pid())));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Locale is " + Locale.getDefault().toString())));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Timezone is " + TimeZone.getDefault().getID())));
-		out.send(Records.singleton(Keys.TEXT, Values.ofText("Encoding is " + System.getProperty("file.encoding"))));
+		out.send(Records.singleton(Keys.TEXT, Values.ofText("Encoding is " + Charset.defaultCharset().displayName())));
 		out.send(Records.singleton(Keys.TEXT, Values.ofText("Use 'exit' or Ctrl-D (i.e. EOF) to exit")));
 	}
 }

@@ -43,7 +43,6 @@ class RecordsTest {
 	void valueObject() {
 		Record a = Records.empty();
 		Record c = a.append(Keys.NAME, Values.ofText("a"));
-		assertThat(a).isEqualTo(a);
 		assertThat(a).isNotEqualTo(c);
 		assertThat(a).isNotEqualTo(c);
 	}
