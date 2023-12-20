@@ -29,6 +29,8 @@ import hosh.spi.LineReaderAware;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.TerminalAware;
+import hosh.spi.Version;
+import hosh.spi.VersionAware;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.terminal.Terminal;
@@ -56,6 +58,9 @@ class InjectorTest {
 	@Mock(stubOnly = true)
 	Terminal terminal;
 
+	@Mock(stubOnly = true)
+	Version version;
+
 	Injector sut;
 
 	@BeforeEach
@@ -65,6 +70,7 @@ class InjectorTest {
 		sut.setLineReader(lineReader);
 		sut.setState(state);
 		sut.setTerminal(terminal);
+		sut.setVersion(version);
 	}
 
 	@Test
@@ -102,6 +108,14 @@ class InjectorTest {
 		then(command).should().setTerminal(terminal);
 	}
 
+	@Test
+	void injectVersion() {
+		VersionAwareCommand command = Mockito.mock(VersionAwareCommand.class);
+		sut.injectDeps(command);
+		then(command).should().setVersion(version);
+	}
+
+
 	interface HistoryAwareCommand extends Command, HistoryAware {
 	}
 
@@ -112,5 +126,9 @@ class InjectorTest {
 	}
 
 	interface TerminalAwareCommand extends Command, TerminalAware {
+	}
+
+	interface VersionAwareCommand extends Command, VersionAware {
+
 	}
 }

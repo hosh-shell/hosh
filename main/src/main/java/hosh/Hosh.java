@@ -169,6 +169,7 @@ public class Hosh {
 		injector.setState(state);
 		injector.setStateMutator(state);
 		injector.setTerminal(terminal);
+		injector.setVersion(version);
 		CommandResolver commandResolver = CommandResolvers.builtinsThenExternal(state);
 		Compiler compiler = new Compiler(commandResolver);
 		OutputChannel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
