@@ -31,6 +31,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
+import java.io.Serial;
+
 /**
  * Facade for ANTLR4 runtime.
  */
@@ -49,6 +51,7 @@ public class Parser {
 
 	public static class ParseError extends RuntimeException {
 
+		@Serial
 		private static final long serialVersionUID = 1L;
 
 		public ParseError(String message) {

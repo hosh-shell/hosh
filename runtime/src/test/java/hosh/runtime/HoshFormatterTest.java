@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.Serial;
 import java.time.Instant;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -94,8 +95,10 @@ class HoshFormatterTest {
 		assertThat(result).isEqualToNormalizingNewlines("1969-12-31T16:00:00.000 [INFO] - message\n");
 	}
 
-	@SuppressWarnings("serial")
 	static class StackTraceLess extends RuntimeException {
+
+		@Serial
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public synchronized Throwable fillInStackTrace() {

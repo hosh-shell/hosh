@@ -30,6 +30,7 @@ import hosh.doc.Todo;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -365,6 +366,7 @@ public class Compiler {
 
 	public static class CompileError extends RuntimeException {
 
+		@Serial
 		private static final long serialVersionUID = 1L;
 
 		public CompileError(String message) {
@@ -374,6 +376,7 @@ public class Compiler {
 
 	public static class InternalBug extends RuntimeException {
 
+		@Serial
 		private static final long serialVersionUID = 1L;
 
 		public InternalBug(ParseTree parseTree) {

@@ -31,6 +31,7 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 
+import java.io.Serial;
 import java.util.Optional;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
@@ -102,6 +103,7 @@ public class PipelineChannel implements InputChannel, OutputChannel {
 	// to forcibly stop a producer.
 	public static class ProducerPoisonPill extends RuntimeException {
 
+		@Serial
 		private static final long serialVersionUID = 1L;
 
 		@Override
