@@ -479,7 +479,7 @@ class SystemModuleTest {
 		@Examples({
 			@Example(command = "true", description = "returns exit success")
 		})
-		class True implements Command {
+		static class True implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
@@ -488,7 +488,7 @@ class SystemModuleTest {
 		}
 
 		@Description("/bin/false replacement")
-		class False implements Command {
+		static class False implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
@@ -497,7 +497,7 @@ class SystemModuleTest {
 		}
 
 		// no help and no examples
-		class Star implements Command {
+		static class Star implements Command {
 
 			@Override
 			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
