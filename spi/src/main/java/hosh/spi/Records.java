@@ -123,9 +123,8 @@ public class Records {
 
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof Record) {
-				Record that = (Record) obj;
-				return that.size() == 0;
+			if (obj instanceof Record that) {
+                return that.size() == 0;
 			} else {
 				return false;
 			}
@@ -202,9 +201,8 @@ public class Records {
 
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof Record) {
-				Record that = (Record) obj;
-				return that.size() == 1 && Records.equals(this.entries(), that.entries());
+			if (obj instanceof Record that) {
+                return that.size() == 1 && Records.equals(this.entries(), that.entries());
 			} else {
 				return false;
 			}
@@ -285,9 +283,8 @@ public class Records {
 
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof Record) {
-				Record that = (Record) obj;
-				return this.size() == that.size() && Records.equals(this.entries(), that.entries());
+			if (obj instanceof Record that) {
+                return this.size() == that.size() && Records.equals(this.entries(), that.entries());
 			} else {
 				return false;
 			}

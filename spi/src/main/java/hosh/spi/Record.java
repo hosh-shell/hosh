@@ -79,9 +79,8 @@ public interface Record extends Printable {
 
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof Entry) {
-				Entry that = (Entry) obj;
-				return Objects.equals(this.key, that.key) && Objects.equals(this.value, that.value);
+			if (obj instanceof Entry that) {
+                return Objects.equals(this.key, that.key) && Objects.equals(this.value, that.value);
 			} else {
 				return false;
 			}

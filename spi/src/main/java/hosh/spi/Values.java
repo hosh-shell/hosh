@@ -125,9 +125,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof TextValue) {
-				TextValue that = (TextValue) obj;
-				return Objects.equals(this.value, that.value);
+			if (obj instanceof TextValue that) {
+                return Objects.equals(this.value, that.value);
 			} else {
 				return false;
 			}
@@ -142,9 +141,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof TextValue) {
-				TextValue that = (TextValue) obj;
-				return BY_TEXT_ALPHA_NUM.compare(this.value, that.value);
+			if (obj instanceof TextValue that) {
+                return BY_TEXT_ALPHA_NUM.compare(this.value, that.value);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -206,9 +204,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof SizeValue) {
-				SizeValue that = (SizeValue) obj;
-				return this.bytes == that.bytes;
+			if (obj instanceof SizeValue that) {
+                return this.bytes == that.bytes;
 			} else {
 				return false;
 			}
@@ -221,9 +218,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof SizeValue) {
-				SizeValue that = (SizeValue) obj;
-				return Long.compare(this.bytes, that.bytes);
+			if (obj instanceof SizeValue that) {
+                return Long.compare(this.bytes, that.bytes);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -241,9 +237,8 @@ public class Values {
 
 		@Override
 		public Optional<Value> merge(Value value) {
-			if (value instanceof SizeValue) {
-				SizeValue that = (SizeValue) value;
-				return Optional.of(new SizeValue(that.bytes + this.bytes));
+			if (value instanceof SizeValue that) {
+                return Optional.of(new SizeValue(that.bytes + this.bytes));
 			}
 			return value.merge(this);
 		}
@@ -275,9 +270,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof NumericValue) {
-				NumericValue that = (NumericValue) obj;
-				return this.number == that.number;
+			if (obj instanceof NumericValue that) {
+                return this.number == that.number;
 			} else {
 				return false;
 			}
@@ -285,9 +279,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof NumericValue) {
-				NumericValue that = (NumericValue) obj;
-				return Long.compare(this.number, that.number);
+			if (obj instanceof NumericValue that) {
+                return Long.compare(this.number, that.number);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -307,9 +300,8 @@ public class Values {
 
 		@Override
 		public Optional<Value> merge(Value value) {
-			if (value instanceof NumericValue) {
-				NumericValue that = (NumericValue) value;
-				return Optional.of(new NumericValue(that.number + this.number));
+			if (value instanceof NumericValue that) {
+                return Optional.of(new NumericValue(that.number + this.number));
 			}
 			return value.merge(this);
 		}
@@ -369,9 +361,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof DurationValue) {
-				DurationValue that = (DurationValue) obj;
-				return this.duration.compareTo(that.duration);
+			if (obj instanceof DurationValue that) {
+                return this.duration.compareTo(that.duration);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -389,9 +380,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof DurationValue) {
-				DurationValue that = (DurationValue) obj;
-				return Objects.equals(this.duration, that.duration);
+			if (obj instanceof DurationValue that) {
+                return Objects.equals(this.duration, that.duration);
 			} else {
 				return false;
 			}
@@ -416,9 +406,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof InstantValue) {
-				InstantValue that = (InstantValue) obj;
-				return this.instant.compareTo(that.instant);
+			if (obj instanceof InstantValue that) {
+                return this.instant.compareTo(that.instant);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -437,9 +426,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof InstantValue) {
-				InstantValue that = (InstantValue) obj;
-				return Objects.equals(this.instant, that.instant);
+			if (obj instanceof InstantValue that) {
+                return Objects.equals(this.instant, that.instant);
 			} else {
 				return false;
 			}
@@ -474,9 +462,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof PathValue) {
-				PathValue that = (PathValue) obj;
-				return Objects.equals(this.path, that.path);
+			if (obj instanceof PathValue that) {
+                return Objects.equals(this.path, that.path);
 			} else {
 				return false;
 			}
@@ -503,9 +490,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof PathValue) {
-				PathValue that = (PathValue) obj;
-				return BY_PATH_ALPHANUM.compare(this.path, that.path);
+			if (obj instanceof PathValue that) {
+                return BY_PATH_ALPHANUM.compare(this.path, that.path);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -537,18 +523,16 @@ public class Values {
 
 		@Override
 		public int compareTo(Value o) {
-			if (o instanceof BytesValue) {
-				BytesValue that = (BytesValue) o;
-				return Arrays.compare(this.bytes, that.bytes);
+			if (o instanceof BytesValue that) {
+                return Arrays.compare(this.bytes, that.bytes);
 			}
 			return cannotCompare(this, o);
 		}
 
 		@Override
 		public final boolean equals(Object obj) {
-			if (obj instanceof BytesValue) {
-				BytesValue that = (BytesValue) obj;
-				return Arrays.equals(this.bytes, that.bytes);
+			if (obj instanceof BytesValue that) {
+                return Arrays.equals(this.bytes, that.bytes);
 			} else {
 				return false;
 			}
@@ -590,9 +574,8 @@ public class Values {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (obj instanceof StyledValue) {
-				StyledValue that = (StyledValue) obj;
-				return Objects.equals(this.value, that.value) && Objects.equals(this.style, that.style);
+			if (obj instanceof StyledValue that) {
+                return Objects.equals(this.value, that.value) && Objects.equals(this.style, that.style);
 			} else {
 				return false;
 			}
@@ -615,9 +598,8 @@ public class Values {
 
 		@Override
 		public int compareTo(Value obj) {
-			if (obj instanceof StyledValue) {
-				StyledValue that = (StyledValue) obj;
-				return BY_VALUE_AND_STYLE.compare(this, that);
+			if (obj instanceof StyledValue that) {
+                return BY_VALUE_AND_STYLE.compare(this, that);
 			} else {
 				return cannotCompare(this, obj);
 			}

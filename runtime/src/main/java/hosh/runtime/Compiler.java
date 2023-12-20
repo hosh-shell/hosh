@@ -149,9 +149,8 @@ public class Compiler {
 		}
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
-		if (command instanceof CommandWrapper) {
-			CommandWrapper commandWrapper = (CommandWrapper) command;
-			DefaultCommandDecorator decoratedCommand = new DefaultCommandDecorator(nestedStatement, commandWrapper);
+		if (command instanceof CommandWrapper commandWrapper) {
+            DefaultCommandDecorator decoratedCommand = new DefaultCommandDecorator(nestedStatement, commandWrapper);
 			return new Statement(decoratedCommand, arguments, commandName);
 		}
 		throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));

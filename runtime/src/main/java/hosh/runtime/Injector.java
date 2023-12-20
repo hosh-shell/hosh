@@ -58,23 +58,23 @@ public class Injector {
 	private Version version;
 
 	public void injectDeps(Command command) {
-		if (command instanceof HistoryAware) {
-			((HistoryAware) command).setHistory(history);
+		if (command instanceof HistoryAware historyAware) {
+			historyAware.setHistory(history);
 		}
-		if (command instanceof LineReaderAware) {
-			((LineReaderAware) command).setLineReader(lineReader);
+		if (command instanceof LineReaderAware lineReaderAware) {
+			lineReaderAware.setLineReader(lineReader);
 		}
-		if (command instanceof StateAware) {
-			((StateAware) command).setState(state);
+		if (command instanceof StateAware stateAware) {
+			stateAware.setState(state);
 		}
-		if (command instanceof StateMutatorAware) {
-			((StateMutatorAware) command).setStateMutator(stateMutator);
+		if (command instanceof StateMutatorAware stateMutatorAware) {
+			stateMutatorAware.setStateMutator(stateMutator);
 		}
-		if (command instanceof TerminalAware) {
-			((TerminalAware) command).setTerminal(terminal);
+		if (command instanceof TerminalAware terminalAware) {
+			terminalAware.setTerminal(terminal);
 		}
-		if (command instanceof VersionAware) {
-			((VersionAware) command).setVersion(version);
+		if (command instanceof VersionAware versionAware) {
+			versionAware.setVersion(version);
 		}
 	}
 

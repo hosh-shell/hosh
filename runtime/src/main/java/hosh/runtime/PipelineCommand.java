@@ -113,9 +113,8 @@ class PipelineCommand implements Command, InterpreterAware {
 	}
 
 	private void assemblePipeline(Supervisor supervisor, Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
-		if (statement.getCommand() instanceof PipelineCommand) {
-			PipelineCommand pipelineCommand = (PipelineCommand) statement.getCommand();
-			PipelineChannel pipelineChannel = new PipelineChannel();
+		if (statement.getCommand() instanceof PipelineCommand pipelineCommand) {
+            PipelineChannel pipelineChannel = new PipelineChannel();
 			runAsync(supervisor, pipelineCommand.producer, in, pipelineChannel, err, Position.MIDDLE);
 			assemblePipeline(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
 		} else {
@@ -139,23 +138,20 @@ class PipelineCommand implements Command, InterpreterAware {
 	}
 
 	private void pipelinePosition(Position position, Command command) {
-		if (command instanceof ExternalCommand) {
-			ExternalCommand externalCommand = (ExternalCommand) command;
-			externalCommand.pipeline(position);
+		if (command instanceof ExternalCommand externalCommand) {
+            externalCommand.pipeline(position);
 		}
 	}
 
 	private void stopConsumer(OutputChannel out) {
-		if (out instanceof PipelineChannel) {
-			PipelineChannel pipelineChannel = (PipelineChannel) out;
-			pipelineChannel.stopConsumer();
+		if (out instanceof PipelineChannel pipelineChannel) {
+            pipelineChannel.stopConsumer();
 		}
 	}
 
 	private void stopProducer(InputChannel in) {
-		if (in instanceof PipelineChannel) {
-			PipelineChannel pipelineChannel = (PipelineChannel) in;
-			pipelineChannel.stopProducer();
+		if (in instanceof PipelineChannel pipelineChannel) {
+            pipelineChannel.stopProducer();
 		}
 	}
 }
