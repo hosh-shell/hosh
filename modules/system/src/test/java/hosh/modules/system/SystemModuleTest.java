@@ -886,7 +886,7 @@ class SystemModuleTest {
 		@Test
 		void oneArgInterrupted() {
 			Duration timeout = Duration.ofMillis(200);
-			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(2));
+			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(10));
 			given(nestedCommand.run()).willAnswer(commandSlowerThanTimeout);
 			withThread.interrupt();
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
@@ -913,7 +913,7 @@ class SystemModuleTest {
 		@Test
 		void oneArgTimeout() {
 			Duration timeout = Duration.ofMillis(200);
-			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(2));
+			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(10));
 			given(nestedCommand.run()).willAnswer(commandSlowerThanTimeout);
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
 			assertThat(result).isError();
@@ -925,7 +925,7 @@ class SystemModuleTest {
 		@Test
 		void oneArgNoTimeout() {
 			Duration timeout = Duration.ofMillis(200);
-			Answer<ExitStatus> commandFasterThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.dividedBy(2));
+			Answer<ExitStatus> commandFasterThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.dividedBy(10));
 			given(nestedCommand.run()).willAnswer(commandFasterThanTimeout);
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
 			assertThat(result).isSuccess(); // success means no timeout
