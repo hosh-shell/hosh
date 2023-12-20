@@ -631,7 +631,7 @@ public class FileSystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (!args.isEmpty()) {
+			if (args.size() != 1) {
 				err.send(Errors.usage("watch directory"));
 				return ExitStatus.error();
 			}

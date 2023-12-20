@@ -1161,6 +1161,53 @@ class FileSystemModuleTest {
 		}
 	}
 
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	class WatchTest {
+
+		@RegisterExtension
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+		@Mock(stubOnly = true)
+		State state;
+
+		@Mock
+		InputChannel in;
+
+		@Mock
+		OutputChannel out;
+
+		@Mock
+		OutputChannel err;
+
+		FileSystemModule.Watch sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FileSystemModule.Watch();
+			sut.setState(state);
+		}
+
+		@Test
+		void noArgs() {
+			ExitStatus result = sut.run(List.of(), in, out, err);
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: watch directory")));
+		}
+
+		@Test
+		void twoArgs() {
+			ExitStatus result = sut.run(List.of("a", "b"), in, out, err);
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: watch directory")));
+		}
+	}
+
 	@Nested
 	@ExtendWith(MockitoExtension.class)
 	class WithLockTest {
@@ -1212,13 +1259,13 @@ class FileSystemModuleTest {
 		}
 
 		@Test
-			// very weak assertions... please improve them!
 		void lock() {
 			ExitStatus nestedExitStatus = ExitStatus.of(42);
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			ExitStatus result = sut.run(List.of("file.lock"), in, out, err);
 			assertThat(result).isEqualTo(nestedExitStatus);
+			// very weak assertions... please improve them!
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
