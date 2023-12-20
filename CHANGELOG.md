@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+- JDK17 is the minimum requirement
+
+### Fixed
+
+### Removed
+
+
 ## [v0.1.5] - 2023-12-20
 
 ### Added
