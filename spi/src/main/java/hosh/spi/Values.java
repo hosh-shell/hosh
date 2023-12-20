@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HexFormat;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -500,6 +501,9 @@ public class Values {
 
 	static class BytesValue implements Value {
 
+
+		private static final HexFormat HEX_FORMAT = HexFormat.ofDelimiter(":").withLowerCase();
+
 		private final byte[] bytes;
 
 		public BytesValue(byte[] bytes) {
@@ -512,13 +516,8 @@ public class Values {
 
 		@Override
 		public void print(PrintWriter printWriter, Locale locale) {
-			StringBuilder sb = new StringBuilder();
-			for (var b : bytes) {
-				sb.append(String.format("%02x", b));
-				sb.append(':');
-			}
-			sb.setLength(sb.length() - 1); // kill last ':'
-			printWriter.print(sb);
+			String hex = HEX_FORMAT.formatHex(bytes);
+			printWriter.print(hex);
 		}
 
 		@Override
