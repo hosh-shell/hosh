@@ -6,14 +6,3 @@ updates:
     interval: daily
     time: "04:00"
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: org.mockito:mockito-junit-jupiter
-    versions:
-    - 3.9.0
-  - dependency-name: org.mockito:mockito-core
-    versions:
-    - 3.9.0
-  - dependency-name: nl.jqno.equalsverifier:equalsverifier
-    versions:
-    - 3.5.2
-    - 3.5.3
