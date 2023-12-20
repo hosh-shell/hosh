@@ -611,7 +611,7 @@ class HoshIT {
 		return Stream.of(arguments)
 			.filter(s -> s.contains("jacoco"))
 			.limit(1)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	private String consumeOutput(Process hosh) throws IOException {

@@ -33,7 +33,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static hosh.runtime.antlr4.HoshParser.CommandContext;
 import static hosh.runtime.antlr4.HoshParser.DqstringContext;
@@ -168,7 +167,7 @@ public class Compiler {
 			       .expression()
 			       .stream()
 			       .map(this::compileArgument)
-			       .collect(Collectors.toUnmodifiableList());
+			       .toList();
 	}
 
 	private Resolvable compileArgument(ExpressionContext ctx) {

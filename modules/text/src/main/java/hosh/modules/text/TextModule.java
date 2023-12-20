@@ -98,7 +98,7 @@ public class TextModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			List<Key> keys = args.stream().map(Keys::of).collect(Collectors.toUnmodifiableList());
+			List<Key> keys = args.stream().map(Keys::of).toList();
 			for (Record record : InputChannel.iterate(in)) {
 				Records.Builder builder = Records.builder();
 				for (Key k : keys) {

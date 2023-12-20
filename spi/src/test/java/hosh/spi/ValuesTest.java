@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -568,7 +567,7 @@ class ValuesTest {
 					Values.ofInstant(Instant.ofEpochMilli(-100)),
 					Values.ofInstant(Instant.ofEpochMilli(0)))
 				.sorted()
-				.collect(Collectors.toList());
+				.toList();
 			assertThat(sorted).containsExactly(
 				Values.ofInstant(Instant.ofEpochMilli(-100)),
 				Values.ofInstant(Instant.ofEpochMilli(0)),
@@ -582,7 +581,7 @@ class ValuesTest {
 					Values.ofNumeric(-1),
 					Values.ofNumeric(0))
 				.sorted()
-				.collect(Collectors.toList());
+				.toList();
 			assertThat(sorted).containsExactly(
 				Values.ofNumeric(-1),
 				Values.ofNumeric(0),
@@ -596,7 +595,7 @@ class ValuesTest {
 					Values.ofText("a10"),
 					Values.ofText("a1"))
 				.sorted()
-				.collect(Collectors.toList());
+				.toList();
 			assertThat(sorted).containsExactly(
 				Values.ofText("a1"),
 				Values.ofText("a2"),
@@ -610,7 +609,7 @@ class ValuesTest {
 					Values.ofSize(2),
 					Values.ofSize(3))
 				.sorted()
-				.collect(Collectors.toList());
+				.toList();
 			assertThat(sorted).containsExactly(
 				Values.ofSize(1),
 				Values.ofSize(2),
@@ -625,7 +624,7 @@ class ValuesTest {
 					Values.ofPath(Paths.get("a20")),
 					Values.ofPath(Paths.get("a2")))
 				.sorted()
-				.collect(Collectors.toList());
+				.toList();
 			assertThat(sorted).containsExactly(
 				Values.ofPath(Paths.get("a1")),
 				Values.ofPath(Paths.get("a2")),
@@ -639,7 +638,7 @@ class ValuesTest {
 					Values.ofDuration(Duration.ofMillis(1)),
 					Values.ofDuration(Duration.ofMillis(2)))
 				.sorted()
-				.collect(Collectors.toList());
+				.toList();
 			assertThat(sorted).containsExactly(
 				Values.ofDuration(Duration.ofMillis(1)),
 				Values.ofDuration(Duration.ofMillis(2)));

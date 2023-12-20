@@ -29,7 +29,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class PathInitializer {
 
@@ -41,6 +40,6 @@ public class PathInitializer {
 			       .map(String::strip)
 			       .filter(s -> !s.isBlank())
 			       .map(Paths::get)
-			       .collect(Collectors.toList());
+			       .toList();
 	}
 }
