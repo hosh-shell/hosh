@@ -380,7 +380,7 @@
 					${maven.multiModuleProjectDirectory}/main/target/site/jacoco-aggregate/jacoco.xml
 				</sonar.coverage.jacoco.xmlReportPaths>
 				<sonar.exclusions>
-					runtime/target/generated-sources/**,test-support/src/**,spi-test-support/src/**
+					runtime/target/generated-sources/**
 				</sonar.exclusions>
 			</properties>
 			<build>
