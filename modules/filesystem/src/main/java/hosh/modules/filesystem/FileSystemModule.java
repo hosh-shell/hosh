@@ -30,8 +30,8 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Command;
-import hosh.spi.CommandWrapper;
 import hosh.spi.CommandRegistry;
+import hosh.spi.CommandWrapper;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -668,7 +668,7 @@ public class FileSystemModule implements Module {
 				if (!key.reset()) {
 					break;
 				}
-				count+=1;
+				count += 1;
 			}
 		}
 
@@ -684,7 +684,8 @@ public class FileSystemModule implements Module {
 						.entry(Keys.of("type"), Values.ofText(event.kind().name().replace("ENTRY_", "")))
 						.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
 						.build();
-				out.send(record);
+				// using direct send, to prevent any buffering from happening
+				out.send(record, EnumSet.of(OutputChannel.Option.DIRECT));
 			}
 		}
 	}

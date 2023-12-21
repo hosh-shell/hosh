@@ -56,6 +56,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -1250,7 +1251,8 @@ class FileSystemModuleTest {
 					Records.builder()
 							.entry(Keys.of("type"), Values.ofText("CREATE"))
 							.entry(Keys.PATH, Values.ofPath(Paths.get("watcher.test")))
-							.build()
+							.build(),
+					EnumSet.of(OutputChannel.Option.DIRECT)
 			);
 			then(err).shouldHaveNoInteractions();
 

@@ -19,10 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - final hosh.jar is much smaller (3.2MB -> 1.4MB)
 
 ### Fixed
-- regression on "watch directory"
+- watch:
+  - regression on "watch directory"
+  - sending records as soon as possible in the interactive shell 
 
 ### Removed
-
+- JDK11 support
 
 ## [v0.1.5] - 2023-12-20
 
