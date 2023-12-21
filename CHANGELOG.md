@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - JDK17 is the minimum requirement
 - replaced references to "Alphanum" with "Natural Sort Order" as the original website is gone
+- replaced jline JNA with JNI
+  - final hosh.jar is much smaller (3.2MB -> 1.4MB)
 
 ### Fixed
 - regression on "watch directory"

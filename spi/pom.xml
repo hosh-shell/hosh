@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>
-            <artifactId>jline-terminal-jna</artifactId>
+            <artifactId>jline-terminal-jni</artifactId>
             <scope>runtime</scope>
         </dependency>
         <!-- test classpath -->
