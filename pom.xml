@@ -87,6 +87,11 @@
 				<version>${version.jline}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.jline</groupId>
+				<artifactId>jline-style</artifactId>
+				<version>${version.jline}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-runtime</artifactId>
 				<version>${version.antlr}</version>

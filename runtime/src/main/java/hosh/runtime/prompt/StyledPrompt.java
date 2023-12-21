@@ -23,25 +23,17 @@
  */
 package hosh.runtime.prompt;
 
-import hosh.doc.Todo;
-import hosh.spi.Ansi;
-import hosh.spi.State;
+import hosh.doc.Experimental;
+import org.jline.style.StyleExpression;
+import org.jline.utils.AttributedString;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+@Experimental(description = "next gen prompt")
+public class StyledPrompt {
 
-public class DefaultPromptProvider implements PromptProvider {
-
-	@Todo(description = "use StyledPrompt class")
-	@Override
-	public String provide(State state) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		Ansi.Style.FG_GREEN.enable(pw);
-		pw.append("hosh");
-		Ansi.Style.FG_GREEN.disable(pw);
-		pw.append("> ");
-		Ansi.Style.RESET.enable(pw);
-		return sw.toString();
+	public String render(String template) {
+		StyleExpression sut = new StyleExpression();
+		AttributedString result = sut.evaluate(template);
+		return result.toAnsi();
 	}
+
 }

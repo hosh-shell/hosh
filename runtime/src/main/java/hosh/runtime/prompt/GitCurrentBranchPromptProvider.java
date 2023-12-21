@@ -23,6 +23,7 @@
  */
 package hosh.runtime.prompt;
 
+import hosh.doc.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.LoggerFactory;
 import hosh.spi.State;
@@ -61,6 +62,7 @@ public class GitCurrentBranchPromptProvider implements PromptProvider {
 		this.gitExternal = gitExternal;
 	}
 
+	@Todo(description = "use StyledPrompt class")
 	@Override
 	public String provide(State state) {
 		String currentBranch = getCurrentBranch(state);
