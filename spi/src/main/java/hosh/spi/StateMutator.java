@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * Allows a {@link Command} to mutate the current {@link State}, see {@link StateMutatorAware}.
+ */
 public interface StateMutator {
 
 	void mutateCwd(Path newPath);

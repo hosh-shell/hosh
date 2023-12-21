@@ -37,7 +37,6 @@ import java.util.function.Supplier;
 
 /**
  * The state of the shell: it has been modeled as explicit state, in practice this is a global variable.
- *
  * NB: this is a tactical object used during migration to immutable state.
  */
 public class MutableState implements State, StateMutator {

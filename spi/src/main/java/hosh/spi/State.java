@@ -30,7 +30,8 @@ import java.util.function.Supplier;
 
 /**
  * The state of the shell including: cwd (current working directory), path, variables and built-in commands.
- * This is a view on the state, nothing can be changed here. To be able to change the state, a command must implement {@link StateMutatorAware}.
+ * This is a view on the state, nothing can be changed here. To be able to change the state,
+ * a command must implement {@link StateMutatorAware}.
  * <p>
  * State can be also inject in any built-in command to access and change the shell state.
  */
