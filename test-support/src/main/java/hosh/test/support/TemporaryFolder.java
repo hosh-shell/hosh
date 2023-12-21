@@ -30,27 +30,27 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
  * Heavily inspired by JUnit 4.12 TemporaryFolder but with fewer features.
+ * Notes:
+ * - A more appropriate name could be "FileSystemTestHelper" or something like that;
+ * - expose more methods to control file permissions, in a portable way;
+ * - don't expose File in the public interface, whereas it is still ok to use File internally here when it makes sense.
  */
-// we should not expose java.io.File here, tests usually want java.nio.file.Path
 public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEachCallback {
 
-	private File folder;
-
-	public File toFile() {
-		return folder;
-	}
+	private Path folder;
 
 	public Path toPath() {
-		return folder.toPath();
+		return folder;
 	}
 
 	@Override
 	public void beforeEach(ExtensionContext context) throws Exception {
-		folder = createTemporary(null);
+		folder = Files.createTempDirectory("hosh-");
 	}
 
 	@Override
@@ -58,39 +58,30 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 		if (folder == null) {
 			throw new IllegalStateException("folder is still null?");
 		}
-		recursiveDelete(folder);
+		recursiveDelete(folder.toFile());
 	}
 
-	public File newFile(File parent, String fileName) throws IOException {
-		File file = new File(parent, fileName);
-		if (!file.createNewFile()) {
-			throw new IOException("cannot create new file: " + file);
-		}
-		return file;
+	public Path newFile(Path parent, String fileName) throws IOException {
+		return Files.createFile(parent.resolve(fileName));
 	}
 
-	public File newFile(String fileName) throws IOException {
+	public Path newExecutableFile(String fileName) throws IOException {
+		Path path = newFile(folder, fileName);
+		assert path.toFile().setExecutable(true);
+		return path;
+	}
+
+	public Path newFile(String fileName) throws IOException {
 		return newFile(folder, fileName);
 	}
 
-	public File newFile() throws IOException {
-		return File.createTempFile("hosh", null, folder);
-	}
-
-	public File newFolder(String folderName) throws IOException {
+	public Path newFolder(String folderName) throws IOException {
 		return newFolder(folder, folderName);
 	}
 
-	public File newFolder(File parent, String folder) throws IOException {
-		File newFolder = new File(parent, folder);
-		if (!newFolder.mkdir()) {
-			throw new IOException("cannot create new folder: " + newFolder);
-		}
-		return newFolder;
-	}
-
-	public File newFolder() throws IOException {
-		return createTemporary(folder);
+	public Path newFolder(Path parent, String folder) throws IOException {
+		Path newFolder = parent.resolve(folder);
+		return  Files.createDirectory(newFolder);
 	}
 
 	private void recursiveDelete(File fileOrDirectory) {
@@ -100,13 +91,9 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 				recursiveDelete(file);
 			}
 		}
-		fileOrDirectory.delete();
-	}
-
-	private File createTemporary(File parentFolder) throws IOException {
-		File createdFolder = File.createTempFile("hosh", "", parentFolder);
-		createdFolder.delete();
-		createdFolder.mkdir();
-		return createdFolder;
+		boolean deleted = fileOrDirectory.delete();
+		if (!deleted) {
+			throw new IllegalStateException("file not deleted: " + fileOrDirectory);
+		}
 	}
 }

@@ -63,7 +63,7 @@ import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 class ExternalCommandTest {
 
 	@RegisterExtension
-	final TemporaryFolder folder = new TemporaryFolder();
+	final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Mock(stubOnly = true)
 	State state;
@@ -89,7 +89,7 @@ class ExternalCommandTest {
 
 	@BeforeEach
 	void setup() throws IOException {
-		executable = folder.newFile().toPath();
+		executable = temporaryFolder.newFile(temporaryFolder.toPath(), "executable");
 		sut = new ExternalCommand(executable);
 		sut.setProcessFactory(processFactory);
 		sut.setState(state);

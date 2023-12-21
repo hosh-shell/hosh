@@ -31,18 +31,21 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,8 +100,8 @@ class CommandCompleterTest {
 	void builtinOverridesExternal() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		given(parsedLine.wordIndex()).willReturn(0);
-		File file = temporaryFolder.newFile("cmd");
-		assertThat(file.setExecutable(true, true)).isTrue();
+		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "cmd");
+		assertThat(file.toFile().setExecutable(true, true)).isTrue();
 		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
@@ -106,7 +109,7 @@ class CommandCompleterTest {
 			.hasSize(1)
 			.allSatisfy(candidate -> {
 				assertThat(candidate.value()).isEqualTo("cmd");
-				assertThat(candidate.descr()).isEqualTo("built-in, overrides " + file.getAbsolutePath());
+				assertThat(candidate.descr()).isEqualTo("built-in, overrides " + file.toAbsolutePath());
 			});
 	}
 
@@ -123,8 +126,8 @@ class CommandCompleterTest {
 	void pathWithExecutable() throws IOException {
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		given(parsedLine.wordIndex()).willReturn(0);
-		File file = temporaryFolder.newFile("cmd");
-		assertThat(file.setExecutable(true, true)).isTrue();
+		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "cmd");
+		assertThat(file.toFile().setExecutable(true, true)).isTrue();
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates)
@@ -138,8 +141,8 @@ class CommandCompleterTest {
 	@Test
 	void pathWithExecutableAndNonEmptyLine() throws IOException {
 		given(parsedLine.wordIndex()).willReturn(1);  // skipping autocomplete
-		File file = temporaryFolder.newFile("cmd");
-		assertThat(file.setExecutable(true, true)).isTrue();
+		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "cmd");
+		assertThat(file.toFile().setExecutable(true, true)).isTrue();
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates).isEmpty();
@@ -147,8 +150,8 @@ class CommandCompleterTest {
 
 	@Test
 	void skipNonInPathDirectory() throws IOException {
-		File file = temporaryFolder.newFile();
-		given(state.getPath()).willReturn(List.of(file.toPath()));
+		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "aaa");
+		given(state.getPath()).willReturn(List.of(file));
 		given(parsedLine.wordIndex()).willReturn(0);
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
@@ -156,11 +159,11 @@ class CommandCompleterTest {
 	}
 
 	@Test
+	@DisabledOnOs(OS.WINDOWS)
 	void ioErrorsAreIgnored() throws IOException {
-		File bin = temporaryFolder.newFolder("bin");
-		bin.setExecutable(false);
-		bin.setReadable(false); // throws java.nio.file.AccessDeniedException
-		given(state.getPath()).willReturn(List.of(bin.toPath().toAbsolutePath()));
+		Path bin = temporaryFolder.newFolder("bin");
+		assertTrue(bin.toFile().setReadable(false)); // throws java.nio.file.AccessDeniedException, does not work on windows
+		given(state.getPath()).willReturn(List.of(bin.toAbsolutePath()));
 		given(parsedLine.wordIndex()).willReturn(0);
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);

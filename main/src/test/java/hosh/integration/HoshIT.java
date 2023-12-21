@@ -553,14 +553,14 @@ class HoshIT {
 
 	// simple test infrastructure
 	private Path givenScript(String... lines) throws IOException {
-		Path scriptPath = temporaryFolder.newFile("test.hosh").toPath();
+		Path scriptPath = temporaryFolder.newFile("test.hosh");
 		Files.write(scriptPath, List.of(lines));
 		return scriptPath;
 	}
 
 	@SuppressWarnings("SameParameterValue")
 	private Path givenFolder(String... filenames) throws IOException {
-		Path folder = temporaryFolder.newFolder("folder").toPath();
+		Path folder = temporaryFolder.newFolder("folder");
 		for (String filename : filenames) {
 			Files.write(folder.resolve(filename), List.of("some content"));
 		}
