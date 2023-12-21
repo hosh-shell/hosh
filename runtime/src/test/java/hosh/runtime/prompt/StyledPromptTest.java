@@ -23,25 +23,46 @@
  */
 package hosh.runtime.prompt;
 
-import hosh.doc.Todo;
-import hosh.spi.Ansi;
-import hosh.spi.State;
+import org.junit.jupiter.api.Test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class DefaultPromptProvider implements PromptProvider {
+class StyledPromptTest {
 
-	@Todo(description = "use StyledPrompt class")
-	@Override
-	public String provide(State state) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		Ansi.Style.FG_GREEN.enable(pw);
-		pw.append("hosh");
-		Ansi.Style.FG_GREEN.disable(pw);
-		pw.append("> ");
-		Ansi.Style.RESET.enable(pw);
-		return sw.toString();
+	@Test
+	void noStyle() {
+		// Given
+		StyledPrompt sut = new StyledPrompt();
+
+		// When
+		String result = sut.render("hosh> ");
+
+		// Then
+		assertThat(result).isEqualTo("hosh> ");
 	}
+
+	@Test
+	void oneStyle() {
+		// Given
+		StyledPrompt sut = new StyledPrompt();
+
+		// When
+		String result = sut.render("@{fg:green user}> ");
+
+		// Then
+		assertThat(result).isEqualTo("\u001B[32muser\u001B[0m> ");
+	}
+
+	@Test
+	void twoStyles() {
+		// Given
+		StyledPrompt sut = new StyledPrompt();
+
+		// When
+		String result = sut.render("@{fg:green user}@@{fg:red server}> ");
+
+		// Then
+		assertThat(result).isEqualTo("\u001B[32muser\u001B[0m@\u001B[31mserver\u001B[0m> ");
+	}
+
 }

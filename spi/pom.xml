@@ -18,8 +18,7 @@
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>
-            <artifactId>jline-terminal-jni</artifactId>
-            <scope>runtime</scope>
+            <artifactId>jline-style</artifactId>
         </dependency>
         <!-- test classpath -->
         <dependency>

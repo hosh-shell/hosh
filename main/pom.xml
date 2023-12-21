@@ -13,6 +13,11 @@
 			<artifactId>commons-cli</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.jline</groupId>
+			<artifactId>jline-terminal-jni</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
 			<groupId>hosh</groupId>
 			<artifactId>hosh-runtime</artifactId>
 			<version>${project.version}</version>

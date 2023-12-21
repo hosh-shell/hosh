@@ -27,6 +27,7 @@ module hosh.spi {
 
 	requires transitive org.jline.reader;
 	requires transitive org.jline.terminal;
+	requires transitive org.jline.style;
 
 	exports hosh.spi;
 	exports hosh.doc;
