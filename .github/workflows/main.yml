@@ -27,5 +27,6 @@ jobs:
           java-version: ${{ matrix.java }}
           architecture: ${{ matrix.architecture }}
           distribution: 'zulu'
+          cache: 'maven'
       - name: Build project
         run: ./mvnw --batch-mode verify
