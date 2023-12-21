@@ -32,19 +32,25 @@ import hosh.runtime.CommandResolver;
 import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
 import hosh.runtime.Compiler.Program;
+import hosh.runtime.prompt.CompositePromptProvider;
 import hosh.runtime.ConsoleChannel;
+import hosh.runtime.prompt.DefaultPromptProvider;
 import hosh.runtime.DisabledHistory;
 import hosh.runtime.FileSystemCompleter;
+import hosh.runtime.prompt.GitCurrentBranchPromptProvider;
 import hosh.runtime.HoshFormatter;
 import hosh.runtime.HoshHighlighter;
+import hosh.runtime.prompt.HostnamePromptProvider;
 import hosh.runtime.Injector;
 import hosh.runtime.Interpreter;
+import hosh.runtime.prompt.LiteralPromptProvider;
+import hosh.runtime.MutableState;
 import hosh.runtime.PathInitializer;
-import hosh.runtime.Prompt;
+import hosh.runtime.prompt.PromptProvider;
 import hosh.runtime.ReplReader;
+import hosh.runtime.prompt.UserPromptProvider;
 import hosh.runtime.VariableExpansionCompleter;
 import hosh.runtime.VersionLoader;
-import hosh.runtime.MutableState;
 import hosh.spi.Ansi;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -236,22 +242,32 @@ public class Hosh {
 		History history = provideHistory();
 		injector.setHistory(history);
 		LineReader lineReader = LineReaderBuilder
-			.builder()
-			.appName("hosh")
-			.history(history)
-			.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh_history"))
-			.completer(new AggregateCompleter(
-				new CommandCompleter(state),
-				new FileSystemCompleter(state),
-				new VariableExpansionCompleter(state)))
-			.terminal(terminal)
-			.highlighter(new HoshHighlighter(compiler))
-			.build();
-		Prompt prompt = new Prompt();
-		ReplReader reader = new ReplReader(prompt, lineReader);
+				.builder()
+				.appName("hosh")
+				.history(history)
+				.variable(LineReader.HISTORY_FILE, Paths.get(System.getProperty("user.home"), ".hosh_history"))
+				.completer(new AggregateCompleter(
+						new CommandCompleter(state),
+						new FileSystemCompleter(state),
+						new VariableExpansionCompleter(state)))
+				.terminal(terminal)
+				.highlighter(new HoshHighlighter(compiler))
+				.build();
+		PromptProvider promptProvider = new CompositePromptProvider(
+				List.of(
+						new GitCurrentBranchPromptProvider(),
+						new LiteralPromptProvider(" "),
+						new UserPromptProvider(),
+						new LiteralPromptProvider("@"),
+						new HostnamePromptProvider(),
+						new LiteralPromptProvider(" "),
+						new DefaultPromptProvider()
+				)
+		);
+		ReplReader reader = new ReplReader(promptProvider, lineReader);
 		AutoTableChannel autoTableChannel = new AutoTableChannel(out);
 		while (true) {
-			Optional<String> line = reader.read();
+			Optional<String> line = reader.read(state);
 			if (line.isEmpty()) {
 				break;
 			}

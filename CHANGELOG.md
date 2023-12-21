@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- prompt with git branch, hostname and username (#121)
+  - still not configurable, better than nothing... :-)   
 - forward compatibility with JDK21
 
 ### Changed

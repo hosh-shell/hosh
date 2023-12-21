@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * Display records in a table automatically (for interactive shell only).
  * <p>
  * All records are buffered (within a predefined size) to be able to determine the longest value for each key.
- * On buffer overflow all records are sent directly to the next channel.
+ * On buffer overflow, all records are sent directly to the next channel.
  * <p>
  * NB: implementation must be thread-safe since while end() is running, send() could be called.
  */

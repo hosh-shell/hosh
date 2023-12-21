@@ -21,34 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.runtime.prompt;
 
-import hosh.runtime.prompt.PromptProvider;
 import hosh.spi.State;
-import org.jline.reader.EndOfFileException;
-import org.jline.reader.LineReader;
-import org.jline.reader.UserInterruptException;
 
-import java.util.Optional;
+/**
+ * Allows to customize the prompt.
+ */
+public interface PromptProvider {
 
-public class ReplReader {
-
-	private final PromptProvider promptProvider;
-	private final LineReader lineReader;
-
-	public ReplReader(PromptProvider promptProvider, LineReader lineReader) {
-		this.promptProvider = promptProvider;
-		this.lineReader = lineReader;
-	}
-
-	public Optional<String> read(State state) {
-		try {
-			String line = lineReader.readLine(promptProvider.provide(state));
-			return Optional.of(line);
-		} catch (UserInterruptException e) {
-			return Optional.of("");
-		} catch (EndOfFileException e) {
-			return Optional.empty();
-		}
-	}
+	/** Returns null is no prompt is available. */
+	String provide(State state);
 }

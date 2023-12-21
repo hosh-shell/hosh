@@ -21,68 +21,64 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.runtime.prompt;
 
-import hosh.runtime.prompt.DefaultPromptProvider;
+import hosh.runtime.prompt.GitCurrentBranchPromptProvider;
 import hosh.spi.State;
-import org.jline.reader.EndOfFileException;
-import org.jline.reader.LineReader;
-import org.jline.reader.UserInterruptException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
-class ReplReaderTest {
+class GitCurrentBranchPromptProviderTest {
 
 	@Mock(stubOnly = true)
 	State state;
 
 	@Mock(stubOnly = true)
-	LineReader lineReader;
+	GitCurrentBranchPromptProvider.GitExternal gitExternal;
 
-	@Mock(stubOnly = true)
-	DefaultPromptProvider promptProvider;
+	@Mock
+	Process process;
 
-	ReplReader sut;
+	@Test
+	void notWorkingGit() throws IOException {
+		// Given
+		given(gitExternal.create(state)).willThrow(new IOException("simulated exception for 'no git'"));
+		GitCurrentBranchPromptProvider sut = new GitCurrentBranchPromptProvider();
+		sut.setGitExternal(gitExternal);
 
-	@BeforeEach
-	void setup() {
-		sut = new ReplReader(promptProvider, lineReader);
+		// When
+		String result = sut.provide(state);
+
+		// Then
+		assertThat(result).isNull();
 	}
 
 	@Test
-	void oneLine() {
-		given(promptProvider.provide(state)).willReturn("hosh>");
-		given(lineReader.readLine(anyString())).willReturn("1");
-		assertThat(sut.read(state)).hasValue("1");
+	void workingGit() throws IOException {
+		// Given
+		given(gitExternal.create(state)).willReturn(process);
+		given(process.inputReader(StandardCharsets.UTF_8)).willReturn(new BufferedReader(new StringReader("bugfix/npe-main")));
+		GitCurrentBranchPromptProvider sut = new GitCurrentBranchPromptProvider();
+		sut.setGitExternal(gitExternal);
+
+		// When
+		String result = sut.provide(state);
+
+		// Then
+		then(process).should().destroy(); // important to not leak process handlers
+		assertThat(result).isEqualTo("[\u001B[31mgit:bugfix/npe-main\u001B[39m]\u001B[0m");
 	}
 
-	@Test
-	void twoLines() {
-		given(promptProvider.provide(state)).willReturn("hosh>");
-		given(lineReader.readLine(anyString())).willReturn("1", "2");
-		assertThat(sut.read(state)).hasValue("1");
-		assertThat(sut.read(state)).hasValue("2");
-	}
-
-	@Test
-	void killsCurrentLineAtINT() {
-		given(promptProvider.provide(state)).willReturn("hosh>");
-		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated INT"));
-		assertThat(sut.read(state)).hasValue("");
-	}
-
-	@Test
-	void stopsAtEOF() {
-		given(promptProvider.provide(state)).willReturn("hosh>");
-		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
-		assertThat(sut.read(state)).isEmpty();
-	}
 }

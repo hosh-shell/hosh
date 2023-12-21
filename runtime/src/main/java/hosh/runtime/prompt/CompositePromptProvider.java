@@ -21,34 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.runtime.prompt;
 
-import hosh.runtime.prompt.PromptProvider;
 import hosh.spi.State;
-import org.jline.reader.EndOfFileException;
-import org.jline.reader.LineReader;
-import org.jline.reader.UserInterruptException;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.StringJoiner;
 
-public class ReplReader {
+// first attempt to enable composition of prompt, most likely it should be user-configurable
+public class CompositePromptProvider implements PromptProvider {
 
-	private final PromptProvider promptProvider;
-	private final LineReader lineReader;
+	private final List<PromptProvider> providers;
 
-	public ReplReader(PromptProvider promptProvider, LineReader lineReader) {
-		this.promptProvider = promptProvider;
-		this.lineReader = lineReader;
+	public CompositePromptProvider(List<PromptProvider> providers) {
+		this.providers = providers;
 	}
 
-	public Optional<String> read(State state) {
-		try {
-			String line = lineReader.readLine(promptProvider.provide(state));
-			return Optional.of(line);
-		} catch (UserInterruptException e) {
-			return Optional.of("");
-		} catch (EndOfFileException e) {
-			return Optional.empty();
+	@Override
+	public String provide(State state) {
+		StringJoiner result = new StringJoiner("");
+		for (PromptProvider promptProvider: providers) {
+			String prompt = promptProvider.provide(state);
+			if (prompt != null) {
+				result.add(prompt);
+			}
+		}
+		if (result.length() == 0) {
+			return null; // to respect the contract (null is possible)
+		} else {
+			return result.toString();
 		}
 	}
 }
