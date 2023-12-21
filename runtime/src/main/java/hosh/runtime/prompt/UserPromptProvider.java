@@ -21,25 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.runtime.prompt;
 
-import hosh.doc.Todo;
-import hosh.spi.Ansi;
+import hosh.spi.State;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-public class Prompt {
-
-	@Todo(description = "this should be user-configurable", issue = "https://github.com/dfa1/hosh/issues/121")
-	public String compute() {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		Ansi.Style.FG_GREEN.enable(pw);
-		pw.append("hosh");
-		Ansi.Style.FG_GREEN.disable(pw);
-		pw.append("> ");
-		Ansi.Style.RESET.enable(pw);
-		return sw.toString();
+public class UserPromptProvider implements PromptProvider {
+	@Override
+	public String provide(State state) {
+		// important limitation: this will be always the user that started the JVM
+		return System.getProperty("user.name");
 	}
 }

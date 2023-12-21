@@ -23,7 +23,6 @@
  */
 module hosh.runtime {
 	requires hosh.spi;
-
 	requires java.logging;
 
 	requires org.jline.reader;
@@ -32,6 +31,7 @@ module hosh.runtime {
 	requires org.antlr.antlr4.runtime;
 
 	exports hosh.runtime;
+	exports hosh.runtime.prompt;
 
 	uses hosh.spi.Module;
 }

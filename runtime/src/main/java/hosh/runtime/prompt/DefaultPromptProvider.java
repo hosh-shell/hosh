@@ -21,34 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.runtime;
+package hosh.runtime.prompt;
 
-import hosh.runtime.prompt.PromptProvider;
+import hosh.spi.Ansi;
 import hosh.spi.State;
-import org.jline.reader.EndOfFileException;
-import org.jline.reader.LineReader;
-import org.jline.reader.UserInterruptException;
 
-import java.util.Optional;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
-public class ReplReader {
+public class DefaultPromptProvider implements PromptProvider {
 
-	private final PromptProvider promptProvider;
-	private final LineReader lineReader;
-
-	public ReplReader(PromptProvider promptProvider, LineReader lineReader) {
-		this.promptProvider = promptProvider;
-		this.lineReader = lineReader;
-	}
-
-	public Optional<String> read(State state) {
-		try {
-			String line = lineReader.readLine(promptProvider.provide(state));
-			return Optional.of(line);
-		} catch (UserInterruptException e) {
-			return Optional.of("");
-		} catch (EndOfFileException e) {
-			return Optional.empty();
-		}
+	@Override
+	public String provide(State state) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		Ansi.Style.FG_GREEN.enable(pw);
+		pw.append("hosh");
+		Ansi.Style.FG_GREEN.disable(pw);
+		pw.append("> ");
+		Ansi.Style.RESET.enable(pw);
+		return sw.toString();
 	}
 }
