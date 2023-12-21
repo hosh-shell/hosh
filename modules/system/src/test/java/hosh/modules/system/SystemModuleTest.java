@@ -1438,7 +1438,7 @@ class SystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void appendExisting() throws IOException {
-			Path file = temporaryFolder.newFile("filename").toPath();
+			Path file = temporaryFolder.newFile("filename");
 			Files.write(file, List.of("existing line"), StandardCharsets.UTF_8);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(

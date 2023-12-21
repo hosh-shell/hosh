@@ -39,8 +39,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +57,7 @@ class CommandResolversTest {
 	class BuiltinsThenSystemTest {
 
 		@RegisterExtension
-		final TemporaryFolder folder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
 		Command command;
@@ -90,25 +90,24 @@ class CommandResolversTest {
 
 		@Test
 		void validAbsolutePath() throws IOException {
-			File file = folder.newFile("test");
-			assertThat(file.setExecutable(true)).isTrue();
+			Path file = temporaryFolder.newExecutableFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			Optional<Command> result = sut.tryResolve(file.getAbsolutePath());
+			Optional<Command> result = sut.tryResolve(file.toAbsolutePath().toString());
 			assertThat(result).isPresent();
 		}
 
 		@Test
 		void invalidAbsolutePath() throws IOException {
-			File file = folder.newFile("test");
+			Path file = temporaryFolder.newExecutableFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			Optional<Command> result = sut.tryResolve(file.getAbsolutePath() + "_invalid");
+			Optional<Command> result = sut.tryResolve(file.toAbsolutePath() + "_invalid");
 			assertThat(result).isEmpty();
 		}
 
 		@Test
 		void invalidDirectory() throws IOException {
-			folder.newFolder("test");
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			temporaryFolder.newFolder("test");
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			Optional<Command> result = sut.tryResolve("test");
@@ -118,9 +117,9 @@ class CommandResolversTest {
 		@DisabledOnOs(OS.WINDOWS)
 		@Test
 		void foundNonExecutableInPath() throws IOException {
-			assertThat(folder.newFile("test").setExecutable(false)).isTrue();
+			temporaryFolder.newFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isNotPresent();
@@ -128,19 +127,20 @@ class CommandResolversTest {
 
 		@Test
 		void foundExecutableInPath() throws IOException {
-			assertThat(folder.newFile("test").setExecutable(true)).isTrue();
+			temporaryFolder.newExecutableFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent();
 		}
+
 		@Test
 		@EnabledOnOs(OS.WINDOWS)
 		void notFoundInPathAsSpecifiedByPathExt() throws IOException {
-			assertThat(folder.newFile("test.vbs").setExecutable(true)).isTrue(); // VBS in not PATHEXT
+			temporaryFolder.newExecutableFile("test.vbs");// VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE;.BAT;.CMD"));
 			Optional<Command> result = sut.tryResolve("test");
@@ -150,9 +150,9 @@ class CommandResolversTest {
 		@Test
 		@EnabledOnOs(OS.WINDOWS)
 		void foundInPathAsSpecifiedByPathExt() throws IOException {
-			assertThat(folder.newFile("test.exe").setExecutable(true)).isTrue();
+			temporaryFolder.newExecutableFile("test.exe");// VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE;.BAT;.CMD"));
 			Optional<Command> result = sut.tryResolve("test");
@@ -161,9 +161,9 @@ class CommandResolversTest {
 
 		@Test
 		void foundInCwd() throws IOException {
-			assertThat(folder.newFile("test").setExecutable(true)).isTrue();
+			temporaryFolder.newExecutableFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("./test");
 			assertThat(result).isPresent();
@@ -172,7 +172,7 @@ class CommandResolversTest {
 		@Test
 		void notFoundInPath() {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isEmpty();
@@ -184,7 +184,7 @@ class CommandResolversTest {
 	class WindowsCommandResolverTest {
 
 		@RegisterExtension
-		final TemporaryFolder folder = new TemporaryFolder();
+		final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 		@Mock(stubOnly = true)
 		State state;
@@ -198,7 +198,7 @@ class CommandResolversTest {
 
 		@Test
 		void pathExtNotDefined() {
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isEmpty();
@@ -206,9 +206,9 @@ class CommandResolversTest {
 
 		@Test
 		void findExecutableInPathext() throws IOException {
-			assertThat(folder.newFile("TEST.EXE").setExecutable(true)).isTrue();
+			temporaryFolder.newExecutableFile("TEST.EXE");
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE"));
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("TEST");
 			assertThat(result).isNotEmpty();
@@ -216,9 +216,9 @@ class CommandResolversTest {
 
 		@Test
 		void findExecutableNotInPathext() throws IOException {
-			assertThat(folder.newFile("TEST.CMD").setExecutable(true)).isTrue();
+			temporaryFolder.newExecutableFile("test.cmd");
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE"));
-			given(state.getPath()).willReturn(List.of(folder.toPath().toAbsolutePath()));
+			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("TEST");
 			assertThat(result).isEmpty();

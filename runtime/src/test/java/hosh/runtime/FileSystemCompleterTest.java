@@ -40,6 +40,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,7 +89,7 @@ class FileSystemCompleterTest {
 
 	@Test
 	void emptyWordInNonEmptyDir() throws IOException {
-		temporaryFolder.newFile("a");
+		temporaryFolder.newFile(temporaryFolder.toPath(), "a");
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
@@ -127,37 +128,37 @@ class FileSystemCompleterTest {
 
 	@Test
 	void absoluteDirWithoutEndingSeparator() throws IOException {
-		File dir = temporaryFolder.newFolder("dir");
-		File newFile = temporaryFolder.newFile(dir, "aaa");
-		given(line.word()).willReturn(newFile.getParent());
+		Path dir = temporaryFolder.newFolder("dir");
+		Path newFile = temporaryFolder.newFile(dir, "aaa");
+		given(line.word()).willReturn(newFile.getParent().toString());
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
 			.hasSize(1)
 			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isEqualTo(dir.getAbsolutePath() + File.separator);
+				assertThat(candidate.value()).isEqualTo(dir.toAbsolutePath() + File.separator);
 				assertThat(candidate.complete()).isFalse();
 			});
 	}
 
 	@Test
 	void absoluteDirWithEndingSeparator() throws IOException {
-		File dir = temporaryFolder.newFolder("dir");
-		File newFile = temporaryFolder.newFile(dir, "aaa");
+		Path dir = temporaryFolder.newFolder("dir");
+		Path newFile = temporaryFolder.newFile(dir, "aaa");
 		given(line.word()).willReturn(newFile.getParent() + File.separator);
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
 			.hasSize(1)
 			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isEqualTo(newFile.getAbsolutePath());
+				assertThat(candidate.value()).isEqualTo(newFile.toAbsolutePath().toString());
 				assertThat(candidate.complete()).isTrue();
 			});
 	}
 
 	@Test
 	void partialMatchDirectory() throws IOException {
-		temporaryFolder.newFolder(temporaryFolder.newFolder("aaa"), "bbb");
+		temporaryFolder.newFolder(temporaryFolder.newFolder(temporaryFolder.toPath(), "aaa"), "bbb");
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("aaa" + File.separator + "b");
 		List<Candidate> candidates = new ArrayList<>();
