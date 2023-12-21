@@ -25,6 +25,7 @@ package hosh;
 
 import hosh.runtime.AutoTableChannel;
 import hosh.runtime.BootstrapBuiltins;
+import hosh.runtime.BootstrapVariables;
 import hosh.runtime.CancellableChannel;
 import hosh.runtime.CommandCompleter;
 import hosh.runtime.CommandResolver;
