@@ -23,6 +23,10 @@
  */
 package hosh.spi;
 
+import hosh.doc.Experimental;
+
+import java.util.EnumSet;
+
 /**
  * Channel used to communicate with user and other external programs.
  * <p>
@@ -32,4 +36,18 @@ package hosh.spi;
 public interface OutputChannel {
 
 	void send(Record record);
+
+	@Experimental(description = "testing send options")
+	default void send(Record record, EnumSet<Option> ignore) {
+		send(record);
+	}
+
+	@Experimental(description = "testing send options")
+	enum Option {
+		/**
+		 * Send record without any intermediate buffering.
+		 * This is useful for certain commands that cannot tolerate buffering (e.g. watch).
+		 */
+		DIRECT
+	}
 }

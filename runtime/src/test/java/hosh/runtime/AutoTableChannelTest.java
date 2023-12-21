@@ -38,6 +38,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.EnumSet;
+
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -60,7 +62,7 @@ class AutoTableChannelTest {
 
 	@Test
 	void tableWithNoRecords() {
-		sut.end();
+		sut.flush();
 		then(out).shouldHaveNoInteractions();
 	}
 
@@ -68,7 +70,7 @@ class AutoTableChannelTest {
 	void tableWithColumnLongerThanValues() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		sut.send(record);
-		sut.end();
+		sut.flush();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
 			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
@@ -79,7 +81,7 @@ class AutoTableChannelTest {
 	void tableWithColumnShorterThanValues() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("aa")).build();
 		sut.send(record);
-		sut.end();
+		sut.flush();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
 			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text  "), Ansi.Style.FG_MAGENTA)),
@@ -90,7 +92,7 @@ class AutoTableChannelTest {
 	void tableWithNone() {
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		sut.send(record);
-		sut.end();
+		sut.flush();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
 			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
@@ -104,7 +106,7 @@ class AutoTableChannelTest {
 			sut.send(record);
 		}
 		then(out).should(never()).send(records.capture());
-		sut.end();
+		sut.flush();
 		then(out).should(times(AutoTableChannel.OVERFLOW)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsOnly(
 			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
@@ -118,7 +120,16 @@ class AutoTableChannelTest {
 			sut.send(record);
 		}
 		then(out).should(times(AutoTableChannel.OVERFLOW + 1)).send(records.capture());
-		sut.end();
+		sut.flush();
+		then(out).shouldHaveNoMoreInteractions();
+	}
+
+	@Test
+	void directSend() {
+		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
+		sut.send(record, EnumSet.of(OutputChannel.Option.DIRECT));
+		then(out).should().send(records.capture());
+		sut.flush(); // buffer should be empty now
 		then(out).shouldHaveNoMoreInteractions();
 	}
 

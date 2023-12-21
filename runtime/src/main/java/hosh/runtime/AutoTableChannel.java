@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -57,10 +58,10 @@ import java.util.stream.Collectors;
  */
 public class AutoTableChannel implements OutputChannel {
 
-	public static final int COLUMN_PADDING = 2;
-	public static final int OVERFLOW = 1_000;
-
-	private final Logger logger = LoggerFactory.forEnclosingClass();
+	public static final int OVERFLOW = 2_000;
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+	private static final EnumSet<Option> NONE = EnumSet.noneOf(Option.class);
+	private static final int COLUMN_PADDING = 2;
 	private final OutputChannel outputChannel;
 	private final Queue<Record> records;
 	private volatile boolean overflow;
@@ -73,22 +74,27 @@ public class AutoTableChannel implements OutputChannel {
 
 	@Override
 	public void send(Record record) {
-		if (overflow) {
-			// overflow already happened: short circuit
+		send(record, NONE);
+	}
+
+	@Override
+	public void send(Record record, EnumSet<Option> options) {
+		if (overflow || options.contains(Option.DIRECT)) {
+			// if overflow already happened or the record is "direct"; then let's deliver it immediately
 			outputChannel.send(record);
 			return;
 		}
 		records.add(record);
 		if (records.size() >= OVERFLOW) {
-			logger.info(() -> "autotable: overflow after " + records.size());
+			LOGGER.fine(() -> "autotable: overflow after " + records.size());
 			overflow = true;
 			// flush and clear our buffer
 			records.forEach(outputChannel::send);
 		}
 	}
 
-	public void end() {
-		logger.info(() -> "autotable: end with overflow=" + overflow);
+	public void flush() {
+		LOGGER.fine(() -> "autotable: end with overflow=" + overflow);
 		if (!overflow) {
 			Map<Key, Integer> paddings = calculatePaddings(records);
 			outputTable(outputChannel, records, paddings);
@@ -123,7 +129,7 @@ public class AutoTableChannel implements OutputChannel {
 		for (var kv : maxLengthPerColumn.entrySet()) {
 			result.put(kv.getKey(), kv.getValue() + COLUMN_PADDING);
 		}
-		logger.info(() -> "paddings = " + maxLengthPerColumn);
+		LOGGER.fine(() -> "paddings = " + maxLengthPerColumn);
 		return result;
 	}
 

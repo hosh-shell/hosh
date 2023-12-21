@@ -274,7 +274,7 @@ public class Hosh {
 			try {
 				Program program = compiler.compile(line.get());
 				ExitStatus exitStatus = interpreter.eval(program, autoTableChannel, err);
-				autoTableChannel.end();
+				autoTableChannel.flush();
 				if (state.isExit()) {
 					return exitStatus;
 				}

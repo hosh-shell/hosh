@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - prompt with git branch, hostname and username (#121)
   - still not configurable, better than nothing... :-)   
+- experimental support for sending records without buffering
 - forward compatibility with JDK21
 
 ### Changed
