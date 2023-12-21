@@ -48,7 +48,10 @@ public class GitCurrentBranchPromptProvider implements PromptProvider {
 	public interface GitExternal {
 		Process create(State state) throws IOException;
 
-		 static GitExternal defaultImplementation() {
+		@SuppressWarnings("squid:S4036")
+		static GitExternal defaultImplementation() {
+			// sonar is reporting a security vulnerability here:
+			// the command below is not changing the filesystem or running other "write operations"
 			return state -> new ProcessBuilder()
 					.command(List.of("git", "branch", "--show-current"))
 					.directory(state.getCwd().toFile())
@@ -56,6 +59,7 @@ public class GitCurrentBranchPromptProvider implements PromptProvider {
 		}
 
 	}
+
 	private GitExternal gitExternal = GitExternal.defaultImplementation();
 
 	public void setGitExternal(GitExternal gitExternal) {
