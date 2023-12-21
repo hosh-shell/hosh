@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+@SuppressWarnings({ "requires-automatic", "requires-transitive-automatic" })
 module hosh.spi {
 	requires transitive java.logging;
 
-	requires org.jline.reader;
-	requires org.jline.terminal;
+	requires transitive org.jline.reader;
+	requires transitive org.jline.terminal;
 
 	exports hosh.spi;
 	exports hosh.doc;
