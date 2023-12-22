@@ -42,8 +42,6 @@ import hosh.spi.Records;
 import hosh.spi.Value;
 import hosh.spi.Values;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -58,6 +56,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -164,20 +163,13 @@ public class TextModule implements Module {
 			String sep = args.get(0);
 			Locale locale = Locale.getDefault();
 			for (Record record : InputChannel.iterate(in)) {
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
+				StringJoiner stringJoiner = new StringJoiner(sep);
 				Iterator<Value> values = record.values().iterator();
-				boolean skipSep = true;
 				while (values.hasNext()) {
 					Value value = values.next();
-					if (skipSep) {
-						skipSep = false;
-					} else {
-						sw.append(sep);
-					}
-					value.print(pw, locale);
+					stringJoiner.add(value.show(locale));
 				}
-				out.send(Records.singleton(Keys.TEXT, Values.ofText(sw.toString())));
+				out.send(Records.singleton(Keys.TEXT, Values.ofText(stringJoiner.toString())));
 			}
 			return ExitStatus.success();
 		}
@@ -239,12 +231,10 @@ public class TextModule implements Module {
 			Key key = Keys.of(args.get(0));
 			Pattern pattern = Pattern.compile(args.get(1));
 			List<String> groupNames = extractNamedGroups(args.get(1));
+			Locale locale = Locale.getDefault();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
-					StringWriter sw = new StringWriter();
-					PrintWriter pw = new PrintWriter(sw);
-					record.print(pw, Locale.getDefault());
-					Matcher matcher = pattern.matcher(sw.toString());
+					Matcher matcher = pattern.matcher(v.show(locale));
 					Records.Builder builder = Records.builder();
 					if (matcher.find()) {
 						for (String groupName : groupNames) {

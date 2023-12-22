@@ -30,8 +30,6 @@ import hosh.spi.State;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.logging.Level;
@@ -73,15 +71,11 @@ public class GitCurrentBranchPromptProvider implements PromptProvider {
 		if (currentBranch == null) {
 			return null; // nothing to do
 		}
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		pw.append("[");
-		Ansi.Style.FG_RED.enable(pw);
-		pw.append("git:").append(currentBranch);
-		Ansi.Style.FG_RED.disable(pw);
-		pw.append("]");
-		Ansi.Style.RESET.enable(pw);
-		return sw.toString();
+		return "[" +
+				Ansi.Style.FG_RED.enable() +
+				"git:" + currentBranch +
+				Ansi.Style.FG_RED.disable() +
+				"]";
 	}
 
 	private String getCurrentBranch(State state) {

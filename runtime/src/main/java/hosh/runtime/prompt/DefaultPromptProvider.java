@@ -27,21 +27,15 @@ import hosh.doc.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.State;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 public class DefaultPromptProvider implements PromptProvider {
 
 	@Todo(description = "use StyledPrompt class")
 	@Override
 	public String provide(State state) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		Ansi.Style.FG_GREEN.enable(pw);
-		pw.append("hosh");
-		Ansi.Style.FG_GREEN.disable(pw);
-		pw.append("> ");
-		Ansi.Style.RESET.enable(pw);
-		return sw.toString();
+		return Ansi.Style.FG_GREEN.enable() +
+				"hosh" +
+				Ansi.Style.FG_GREEN.disable() +
+				"> " +
+				Ansi.Style.RESET.enable();
 	}
 }

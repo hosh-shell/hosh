@@ -30,6 +30,7 @@ import org.jline.terminal.Terminal;
 
 import java.io.PrintWriter;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class ConsoleChannel implements OutputChannel {
 
@@ -45,10 +46,10 @@ public class ConsoleChannel implements OutputChannel {
 	@Override
 	public void send(Record record) {
 		Locale locale = Locale.getDefault();
-		style.enable(printWriter);
-		record.print(printWriter, locale);
-		style.disable(printWriter);
-		printWriter.append(System.lineSeparator());
+		String line = record
+				.values().map(value -> value.show(locale))
+				.collect(Collectors.joining(" ", style.enable(), style.disable()));
+		printWriter.println(line);
 		printWriter.flush();
 	}
 

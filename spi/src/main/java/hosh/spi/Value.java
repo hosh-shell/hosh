@@ -23,13 +23,16 @@
  */
 package hosh.spi;
 
+import java.util.Locale;
 import java.util.Optional;
 
 /**
  * The value in @{see Record}.
  * NB: all concrete classes implementing this interface should be value objects.
  */
-public interface Value extends Comparable<Value>, Printable {
+public interface Value extends Comparable<Value> {
+
+	String show(Locale locale);
 
 	/**
 	 * Access to the underlying value. This can be used to convert a value to a more primitive type.

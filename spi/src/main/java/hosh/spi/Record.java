@@ -32,7 +32,7 @@ import java.util.stream.Stream;
  * <p>
  * Iteration order is well-defined (i.e. insertion order).
  */
-public interface Record extends Printable {
+public interface Record {
 
 	/**
 	 * Yields a new Record with the specified mapping as last one.
