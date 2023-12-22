@@ -102,13 +102,14 @@ class ExternalCommandTest {
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
-		given(state.getCwd()).willReturn(Paths.get("."));
+		Path cwd = temporaryFolder.toPath();
+		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.emptyList(), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(processFactory).should().create(
 			List.of(executable.toString()),
-			Paths.get("."),
+			cwd,
 			Collections.emptyMap(),
 			Position.SOLE);
 		then(in).should().recv();
@@ -123,13 +124,14 @@ class ExternalCommandTest {
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
-		given(state.getCwd()).willReturn(Paths.get("."));
+		Path cwd = temporaryFolder.toPath();
+		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		then(processFactory).should().create(
 			List.of(executable.toString(), "file.hosh"),
-			Paths.get("."),
+			cwd,
 			Collections.emptyMap(),
 			Position.SOLE);
 		then(in).should().recv();
@@ -144,13 +146,14 @@ class ExternalCommandTest {
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
-		given(state.getCwd()).willReturn(Paths.get("."));
+		Path cwd = temporaryFolder.toPath();
+		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isError();
 		then(processFactory).should().create(
 			List.of(executable.toString(), "file.hosh"),
-			Paths.get("."),
+			cwd,
 			Collections.emptyMap(),
 			Position.SOLE);
 		then(in).should(times(1)).recv();
@@ -165,13 +168,14 @@ class ExternalCommandTest {
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
-		given(state.getCwd()).willReturn(Paths.get("."));
+		Path cwd = temporaryFolder.toPath();
+		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isError();
 		then(processFactory).should().create(
 			List.of(executable.toString(), "file.hosh"),
-			Paths.get("."),
+			cwd,
 			Collections.emptyMap(),
 			Position.SOLE);
 		then(in).should(times(1)).recv();
@@ -202,7 +206,8 @@ class ExternalCommandTest {
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
 		given(process.getErrorStream()).willReturn(new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8)));
-		given(state.getCwd()).willReturn(Paths.get("."));
+		Path cwd = temporaryFolder.toPath();
+		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isSuccess();
@@ -236,7 +241,8 @@ class ExternalCommandTest {
 	@Test
 	void throwsIoException() throws Exception {
 		given(processFactory.create(any(), any(), any(), any())).willThrow(new IOException("simulated error"));
-		given(state.getCwd()).willReturn(Paths.get("."));
+		Path cwd = temporaryFolder.toPath();
+		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		assertThat(exitStatus).isError();
