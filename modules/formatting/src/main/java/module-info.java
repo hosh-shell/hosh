@@ -30,5 +30,6 @@ module hosh.modules.formatting {
 
 	requires com.fasterxml.jackson.core;
 	requires com.fasterxml.jackson.dataformat.csv;
+	requires com.fasterxml.jackson.databind;
 
 }

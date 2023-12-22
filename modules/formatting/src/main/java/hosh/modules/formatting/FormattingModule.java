@@ -23,6 +23,10 @@
  */
 package hosh.modules.formatting;
 
+import com.fasterxml.jackson.databind.SequenceWriter;
+import com.fasterxml.jackson.dataformat.csv.CsvFactory;
+import com.fasterxml.jackson.dataformat.csv.CsvGenerator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
@@ -77,13 +81,15 @@ public class FormattingModule implements Module {
             return ExitStatus.error();
         }
 
+        private static final CsvMapper CSV_MAPPER = new CsvMapper();
+
         // convert incoming records into a single "text" record
         private void handleSave(InputChannel in, OutputChannel out) throws IOException {
-            // use CSV format? it is extremely hard to use...
-            // CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter(',').setHeader().build();
             String header = null;
             StringWriter stringWriter = new StringWriter();
             PrintWriter printWriter = new PrintWriter(stringWriter, true);
+            SequenceWriter sequenceWriter = CSV_MAPPER.writer().writeValues(stringWriter);
+
             for (Record record : InputChannel.iterate(in)) {
                 if (header == null) {
                     header = record.keys().map(Key::name).collect(Collectors.joining(","));
@@ -93,7 +99,7 @@ public class FormattingModule implements Module {
                 while (values.hasNext()) {
                     Value value = values.next();
                     value.print(printWriter, Locale.getDefault());
-                    stringWriter.append(",");
+
                 }
                 stringWriter.getBuffer().setLength(stringWriter.getBuffer().length()-1); // drop last ,
                 String text = stringWriter.toString();
@@ -107,7 +113,6 @@ public class FormattingModule implements Module {
         private void handleLoad(InputChannel in, OutputChannel out) throws IOException {
             for (Record record : InputChannel.iterate(in)) {
                 Optional<Value> value = record.value(Keys.TEXT);
-                CSVParser csvParser = new CSVParser(new StringReader(value.map(v -> v.unwrap(String.class))));
             }
         }
     }
