@@ -48,6 +48,9 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 		return folder;
 	}
 
+	// Sonar is reporting: "Make sure publicly writable directories are used safely here."
+	// since this call is used only for tests, it is fine.
+	@SuppressWarnings("squid:S5443")
 	@Override
 	public void beforeEach(ExtensionContext context) throws Exception {
 		folder = Files.createTempDirectory("hosh-");
@@ -67,7 +70,9 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 
 	public Path newExecutableFile(String fileName) throws IOException {
 		Path path = newFile(folder, fileName);
-		assert path.toFile().setExecutable(true);
+		if (!path.toFile().setExecutable(true)) {
+			throw new IllegalStateException("failed to set executable bit for " + path);
+		}
 		return path;
 	}
 

@@ -166,5 +166,4 @@ class RecordsTest {
 		assertThat(a.prepend(Keys.TEXT, text)).isEqualTo(a.append(Keys.TEXT, text));
 		assertThat(a.append(Keys.TEXT, text)).isEqualTo(a.prepend(Keys.TEXT, text));
 	}
-
 }
