@@ -26,7 +26,7 @@ package hosh.modules.filesystem;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import hosh.test.fitness.UnitTestsFitnessTest;
 
-@AnalyzeClasses(packagesOf = FileSystemModule.class)
-class FileSystemModuleFitnessTest extends UnitTestsFitnessTest {
+@AnalyzeClasses(packagesOf = FormattingModule.class)
+class FormattingModuleFitnessTest extends UnitTestsFitnessTest {
 
 }

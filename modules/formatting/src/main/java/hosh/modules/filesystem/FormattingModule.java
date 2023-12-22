@@ -29,28 +29,13 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
-import hosh.spi.Command;
-import hosh.spi.CommandRegistry;
-import hosh.spi.CommandWrapper;
-import hosh.spi.Errors;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.LoggerFactory;
+import hosh.spi.*;
 import hosh.spi.Module;
-import hosh.spi.OutputChannel;
 import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.StateMutator;
-import hosh.spi.StateMutatorAware;
-import hosh.spi.Value;
-import hosh.spi.Values;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
@@ -72,7 +57,9 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.IntPredicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,33 +67,60 @@ import java.util.stream.Stream;
 
 public class FormattingModule implements Module {
 
-	@Override
-	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("csv", Csv::new);
-	}
+    @Override
+    public void initialize(CommandRegistry registry) {
+        registry.registerCommand("csv", Csv::new);
+    }
 
-	@Description("read or write CSV files")
-	@Examples({
-			@Example(command = "csv read file.csv | take 10", description = "take 10 records out of file.csv"),
-			@Example(command = "ls | csv write file.csv ", description = "write output of a command as csv"),
-	})
-	public static class Csv implements Command, StateAware {
+    @Description("read or write CSV files")
+    @Examples({
+            @Example(command = "csv read file.csv | take 10", description = "take 10 records out of file.csv"),
+            @Example(command = "ls | csv write file.csv ", description = "write output of a command as csv"),
+    })
+    public static class Csv implements Command, StateAware {
 
-		private State state;
+        private State state;
 
-		@Override
-		public void setState(State state) {
-			this.state = state;
-		}
+        @Override
+        public void setState(State state) {
+            this.state = state;
+        }
 
-		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 2) {
-				err.send(Errors.usage("csv write|read file"));
-				return ExitStatus.error();
-			}
-			return ExitStatus.success();
-		}
-	}
+        @Override
+        public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+            if (args.size() != 2) {
+                err.send(Errors.usage("csv write|read file"));
+                return ExitStatus.error();
+            }
+            final Path path = state.getCwd().resolve(args.get(1));
+            if (args.get(0).equals("write")) {
+                try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                    CSVPrinter csvPrinter = null;
+                    Iterable<Record> records = InputChannel.iterate(in);
+                    for (Record record : records) {
+                        if (csvPrinter == null) {
+                            CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter(',').setHeader(record.keys().map(Key::name).toArray(String[]::new)).build();
+                            csvPrinter = csvFormat.print(writer);
+                        }
+                        Iterator<Value> iterator = record.values().iterator();
+                        while (iterator.hasNext()) {
+                            Value value = iterator.next();
+                            String unwrap = value.unwrap(String.class).orElseThrow();
+                            csvPrinter.print(unwrap);
+                        }
+                        csvPrinter.println();
+                    }
+                    return ExitStatus.success();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            } else if (args.get(0).equals("read")) {
+                return ExitStatus.error();
+            } else {
+                err.send(Errors.usage("csv write|read file"));
+                return ExitStatus.error();
+            }
+        }
+    }
 
 }

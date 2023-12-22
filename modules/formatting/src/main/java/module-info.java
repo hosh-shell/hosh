@@ -25,4 +25,5 @@ module hosh.modules.formatting {
 	requires hosh.spi;
 	requires java.logging;
 
+	requires org.apache.commons.csv;
 }
