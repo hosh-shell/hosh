@@ -46,7 +46,6 @@ import static org.mockito.BDDMockito.then;
 
 class FormattingModuleTest {
 
-
 	@Nested
 	@ExtendWith(MockitoExtension.class)
 	class CsvTest {

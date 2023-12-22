@@ -23,12 +23,9 @@
  */
 package hosh.modules.filesystem;
 
-import hosh.doc.Bug;
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
-import hosh.doc.Experimental;
-import hosh.doc.Todo;
 import hosh.spi.*;
 import hosh.spi.Module;
 import hosh.spi.Record;
@@ -36,34 +33,11 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileStore;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitOption;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.NotDirectoryException;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Duration;
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.IntPredicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 public class FormattingModule implements Module {
 
