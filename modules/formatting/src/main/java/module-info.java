@@ -27,4 +27,8 @@ module hosh.modules.formatting {
 	requires java.sql; // used by commons-csv
 
 	requires org.apache.commons.csv;
+
+	requires com.fasterxml.jackson.core;
+	requires com.fasterxml.jackson.dataformat.csv;
+
 }

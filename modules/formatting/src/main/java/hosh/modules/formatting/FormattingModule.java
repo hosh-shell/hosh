@@ -26,32 +26,16 @@ package hosh.modules.formatting;
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
-import hosh.spi.Command;
-import hosh.spi.CommandRegistry;
-import hosh.spi.Errors;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Key;
+import hosh.spi.*;
 import hosh.spi.Module;
-import hosh.spi.OutputChannel;
 import hosh.spi.Record;
-import hosh.spi.State;
-import hosh.spi.StateAware;
-import hosh.spi.Value;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class FormattingModule implements Module {
 
@@ -62,53 +46,68 @@ public class FormattingModule implements Module {
 
     @Description("read or write CSV files")
     @Examples({
-            @Example(command = "csv read file.csv | take 10", description = "take 10 records out of file.csv"),
-            @Example(command = "ls | csv write file.csv ", description = "write output of a command as csv"),
+            @Example(command = "lines file.csv | csv load | take 10", description = "take 10 records out of file.csv"),
+            @Example(command = "ls | csv save | ", description = "write output of a command as csv"),
     })
-    public static class Csv implements Command, StateAware {
-
-        private State state;
-
-        @Override
-        public void setState(State state) {
-            this.state = state;
-        }
+    public static class Csv implements Command {
 
         @Override
         public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-            if (args.size() != 2) {
-                err.send(Errors.usage("csv write|read file"));
-                return ExitStatus.error();
+            if (args.size() != 1) {
+                return usage(err);
             }
-            final Path path = state.getCwd().resolve(args.get(1));
-            if (args.get(0).equals("write")) {
-                try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-                    CSVPrinter csvPrinter = null;
-                    Iterable<Record> records = InputChannel.iterate(in);
-                    for (Record record : records) {
-                        if (csvPrinter == null) {
-                            CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter(',').setHeader(record.keys().map(Key::name).toArray(String[]::new)).build();
-                            csvPrinter = csvFormat.print(writer);
-                        }
-                        Iterator<Value> iterator = record.values().iterator();
-                        while (iterator.hasNext()) {
-                            Value value = iterator.next();
-                            StringWriter stringWriter = new StringWriter();
-                            PrintWriter printWriter = new PrintWriter(stringWriter, true);
-                            value.print(printWriter, Locale.getDefault());
-                            csvPrinter.print(stringWriter.toString());
-                        }
-                        csvPrinter.println();
-                    }
+            String action = args.get(0);
+            try {
+                if (action.equals("load")) {
+                    handleLoad(in, out);
                     return ExitStatus.success();
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
+                } else if (action.equals("save")) {
+                    handleSave(in, out);
+                    return ExitStatus.error();
+                } else {
+                    return usage(err);
                 }
-            } else if (args.get(0).equals("read")) {
-                return ExitStatus.error();
-            } else {
-                err.send(Errors.usage("csv write|read file"));
-                return ExitStatus.error();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
+        private ExitStatus usage(OutputChannel err) {
+            err.send(Errors.usage("csv load|save"));
+            return ExitStatus.error();
+        }
+
+        // convert incoming records into a single "text" record
+        private void handleSave(InputChannel in, OutputChannel out) throws IOException {
+            // use CSV format? it is extremely hard to use...
+            // CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter(',').setHeader().build();
+            String header = null;
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(stringWriter, true);
+            for (Record record : InputChannel.iterate(in)) {
+                if (header == null) {
+                    header = record.keys().map(Key::name).collect(Collectors.joining(","));
+                    out.send(Records.singleton(Keys.TEXT, Values.ofText(header)));
+                }
+                Iterator<Value> values = record.values().iterator();
+                while (values.hasNext()) {
+                    Value value = values.next();
+                    value.print(printWriter, Locale.getDefault());
+                    stringWriter.append(",");
+                }
+                stringWriter.getBuffer().setLength(stringWriter.getBuffer().length()-1); // drop last ,
+                String text = stringWriter.toString();
+                out.send(Records.singleton(Keys.TEXT, Values.ofText(text)));
+                stringWriter.getBuffer().setLength(0);
+            }
+        }
+
+        // converting incoming text records into record
+        // what about types?
+        private void handleLoad(InputChannel in, OutputChannel out) throws IOException {
+            for (Record record : InputChannel.iterate(in)) {
+                Optional<Value> value = record.value(Keys.TEXT);
+                CSVParser csvParser = new CSVParser(new StringReader(value.map(v -> v.unwrap(String.class))));
             }
         }
     }

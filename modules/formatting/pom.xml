@@ -18,6 +18,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-csv</artifactId>
+			<version>2.16.0</version>
+		</dependency>
 		<!-- test classpath -->
 		<dependency>
 			<groupId>hosh</groupId>
