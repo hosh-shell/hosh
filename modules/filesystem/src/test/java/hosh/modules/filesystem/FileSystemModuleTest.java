@@ -35,7 +35,6 @@ import hosh.spi.State;
 import hosh.spi.StateMutator;
 import hosh.spi.Values;
 import hosh.spi.test.support.RecordMatcher;
-import hosh.test.support.IgnoreWindowsUACExceptions;
 import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -72,7 +71,6 @@ class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	@ExtendWith(IgnoreWindowsUACExceptions.class)
 	class ListFilesTest {
 
 		@RegisterExtension
@@ -754,7 +752,6 @@ class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	@ExtendWith(IgnoreWindowsUACExceptions.class)
 	class WalkTest {
 
 		@RegisterExtension
@@ -993,7 +990,6 @@ class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	@ExtendWith(IgnoreWindowsUACExceptions.class)
 	class SymlinkTest {
 
 		@RegisterExtension
@@ -1094,7 +1090,6 @@ class FileSystemModuleTest {
 
 	@Nested
 	@ExtendWith(MockitoExtension.class)
-	@ExtendWith(IgnoreWindowsUACExceptions.class)
 	class ResolveTest {
 
 		@RegisterExtension

@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - JDK11 support
+- old workaround class IgnoreWindowsUACExceptions for UAC exceptions in Windows 7
 
 ## [v0.1.5] - 2023-12-20
 
