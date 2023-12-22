@@ -61,7 +61,7 @@
 					<argLine>
 						@{argLine}
 						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
-						--add-opens hosh.modules.formatting/hosh.modules.filesystem=ALL-UNNAMED
+						--add-opens hosh.modules.formatting/hosh.modules.formatting=ALL-UNNAMED
 					</argLine>
 				</configuration>
 			</plugin>

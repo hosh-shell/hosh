@@ -21,18 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.modules.filesystem;
+package hosh.modules.formatting;
 
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
-import hosh.spi.*;
+import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
+import hosh.spi.Errors;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Key;
 import hosh.spi.Module;
+import hosh.spi.OutputChannel;
 import hosh.spi.Record;
+import hosh.spi.State;
+import hosh.spi.StateAware;
+import hosh.spi.Value;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.modules.filesystem;
+package hosh.modules.formatting;
 
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import hosh.test.fitness.UnitTestsFitnessTest;
