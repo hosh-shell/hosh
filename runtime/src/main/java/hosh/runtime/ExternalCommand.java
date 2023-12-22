@@ -23,7 +23,6 @@
  */
 package hosh.runtime;
 
-import hosh.spi.Command;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -55,7 +54,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // used for any non-built-in commands (e.g. native commands such as 'vim' or 'ssh')
-class ExternalCommand implements Command, StateAware {
+class ExternalCommand implements CompilerCommand, StateAware {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 

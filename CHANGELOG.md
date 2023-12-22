@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - still not configurable, better than nothing... :-)   
 - experimental support for sending records without buffering
 - forward compatibility with JDK21
+- documentation about the internals (see INTERNAL.md). 
 
 ### Changed
 - JDK17 is the minimum requirement
