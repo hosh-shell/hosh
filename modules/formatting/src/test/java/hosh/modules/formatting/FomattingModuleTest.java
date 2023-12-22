@@ -40,8 +40,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 class FormattingModuleTest {
@@ -75,11 +77,46 @@ class FormattingModuleTest {
 
 		@Test
 		void noArgs() {
+			// When
 			ExitStatus result = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: csv write|read file")));
+		}
+
+		@Test
+		void writeEmpty() {
+			// Given
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			given(in.recv()).willReturn(Optional.empty());
+
+			// When
+			ExitStatus result = sut.run(List.of("write", "file.csv"), in, out, err);
+
+			// Then
+			assertThat(result).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void writeOneRecord() {
+			// Given
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.SIZE, Values.ofSize(1))), Optional.empty());
+
+			// When
+			ExitStatus result = sut.run(List.of("write", "file.csv"), in, out, err);
+
+			// Then
+			assertThat(result).isSuccess();
+			then(in).shouldHaveNoMoreInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
 		}
 
 	}
