@@ -43,13 +43,15 @@ import org.apache.commons.csv.CSVPrinter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Locale;
 
 public class FormattingModule implements Module {
 
@@ -91,18 +93,10 @@ public class FormattingModule implements Module {
                         Iterator<Value> iterator = record.values().iterator();
                         while (iterator.hasNext()) {
                             Value value = iterator.next();
-                            Optional<String> asString = value.unwrap(String.class);
-                            if (asString.isPresent()) {
-                                csvPrinter.print(asString.get());
-                            } else {
-                                Optional<Long> asLong = value.unwrap(Long.class);
-                                if (asLong.isPresent()) {
-                                    csvPrinter.print(asLong.get());
-                                } else {
-                                    // not able to get a value
-                                    csvPrinter.print(null);
-                                }
-                            }
+                            StringWriter stringWriter = new StringWriter();
+                            PrintWriter printWriter = new PrintWriter(stringWriter, true);
+                            value.print(printWriter, Locale.getDefault());
+                            csvPrinter.print(stringWriter.toString());
                         }
                         csvPrinter.println();
                     }
