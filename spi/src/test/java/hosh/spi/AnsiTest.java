@@ -34,20 +34,15 @@ class AnsiTest {
 
 	@Test
 	void none() {
-		StringWriter out = new StringWriter();
-		PrintWriter pw = new PrintWriter(out);
-		Ansi.Style.NONE.enable(pw);
-		Ansi.Style.NONE.disable(pw);
-		assertThat(out).hasToString("");
+		assertThat(Ansi.Style.NONE.enable()).isEmpty();
+		assertThat(Ansi.Style.NONE.disable()).isEmpty();
 	}
 
 	@Test
 	void redForeground() {
-		StringWriter out = new StringWriter();
-		PrintWriter pw = new PrintWriter(out);
-		Ansi.Style.FG_RED.enable(pw);
-		Ansi.Style.FG_RED.disable(pw);
-		assertThat(out).hasToString("\u001b[31m\u001b[39m");
+		// this test sucks...
+		assertThat(Ansi.Style.FG_RED.enable() +
+				Ansi.Style.FG_RED.disable()).isEqualTo("\u001b[31m\u001b[39m");
 	}
 
 }

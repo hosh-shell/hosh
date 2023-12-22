@@ -26,10 +26,6 @@ package hosh.spi;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Locale;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RecordsTest {
@@ -169,29 +165,6 @@ class RecordsTest {
 		Value text = Values.ofText("some text");
 		assertThat(a.prepend(Keys.TEXT, text)).isEqualTo(a.append(Keys.TEXT, text));
 		assertThat(a.append(Keys.TEXT, text)).isEqualTo(a.prepend(Keys.TEXT, text));
-	}
-
-	@Test
-	void print() {
-		StringWriter stringWriter = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(stringWriter, true);
-
-		// no keys
-		Record empty = Records.empty();
-		empty.print(printWriter, Locale.getDefault());
-		assertThat(stringWriter.toString()).isEmpty();
-
-		// one key
-		stringWriter.getBuffer().setLength(0);
-		Record single = empty.append(Keys.NAME, Values.ofText("name1"));
-		single.print(printWriter, Locale.getDefault());
-		assertThat(stringWriter.toString()).isEqualTo("name1");
-
-		// two keys
-		stringWriter.getBuffer().setLength(0);
-		Record multi = single.append(Keys.NAME, Values.ofText("name2"));
-		multi.print(printWriter, Locale.getDefault());
-		assertThat(stringWriter.toString()).isEqualTo("name1 name2");
 	}
 
 }

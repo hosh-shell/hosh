@@ -25,11 +25,9 @@ package hosh.spi;
 
 import hosh.spi.Record.Entry;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -135,10 +133,6 @@ public class Records {
 			return "Record[data={}]";
 		}
 
-		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			// no-op
-		}
 	}
 
 	static class Singleton implements Record {
@@ -213,10 +207,6 @@ public class Records {
 			return String.format("Record[data={%s=%s}]", entry.getKey(), entry.getValue());
 		}
 
-		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			entry.getValue().print(printWriter, locale);
-		}
 	}
 
 	static class Generic implements Record {
@@ -299,17 +289,6 @@ public class Records {
 							.collect(Collectors.joining(",")));
 		}
 
-		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			Iterator<Value> iterator = values().iterator();
-			while (iterator.hasNext()) {
-				Value value = iterator.next();
-				value.print(printWriter, locale);
-				if (iterator.hasNext()) {
-					printWriter.append(" ");
-				}
-			}
-		}
 	}
 
 	// size has been checked before calling this method (and that is a very cheap check)

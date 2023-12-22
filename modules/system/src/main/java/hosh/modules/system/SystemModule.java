@@ -45,16 +45,16 @@ import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.StateMutator;
 import hosh.spi.StateMutatorAware;
+import hosh.spi.Value;
 import hosh.spi.Values;
 import hosh.spi.VariableName;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.lang.ProcessHandle.Info;
 import java.nio.charset.StandardCharsets;
@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -77,6 +78,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class SystemModule implements Module {
 
@@ -373,7 +375,7 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Errors.usage("withTime { ... }"));
 				return ExitStatus.error();
 			}
@@ -394,7 +396,7 @@ public class SystemModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Errors.usage("ps"));
 				return ExitStatus.error();
 			}
@@ -539,7 +541,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			Duration sleep;
-			if (args.size() == 0) {
+			if (args.isEmpty()) {
 				sleep = Duration.ofSeconds(1);
 			} else {
 				Optional<Duration> maybeSleep = DurationParsing.parse(args.get(0));
@@ -932,13 +934,14 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
-			StringWriter value = new StringWriter();
-			PrintWriter pw = new PrintWriter(value);
+			StringJoiner stringJoiner = new StringJoiner("");
 			for (Record incoming : InputChannel.iterate(in)) {
-				incoming.print(pw, locale);
+				for (Value value : incoming.values().toList()) {
+					stringJoiner.add(value.show(locale));
+				}
 			}
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(name.get(), value.toString());
+			newVariables.put(name.get(), stringJoiner.toString());
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
@@ -966,10 +969,11 @@ public class SystemModule implements Module {
 			}
 			Locale locale = Locale.getDefault();
 			var path = state.getCwd().resolve(Paths.get(args.get(0)));
-			try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
+			try (var writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
 				for (Record incoming : InputChannel.iterate(in)) {
-					incoming.print(pw, locale);
-					pw.println();
+					String line = incoming.values().map(v -> v.show(locale)).collect(Collectors.joining(" "));
+					writer.append(line);
+					writer.newLine();
 				}
 				return ExitStatus.success();
 			} catch (IOException e) {

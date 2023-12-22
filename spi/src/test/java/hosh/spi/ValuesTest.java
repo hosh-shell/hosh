@@ -27,16 +27,11 @@ import hosh.test.support.WithTimeZone;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.quicktheories.core.Gen;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -51,7 +46,6 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.then;
 import static org.quicktheories.QuickTheory.qt;
 import static org.quicktheories.generators.SourceDSL.integers;
 import static org.quicktheories.generators.SourceDSL.lists;
@@ -59,16 +53,11 @@ import static org.quicktheories.generators.SourceDSL.lists;
 class ValuesTest {
 
 	@Nested
-	@ExtendWith(MockitoExtension.class)
 	class NoneValueTest {
 
-		@Mock
-		PrintWriter printWriter;
-
 		@Test
-		void append() {
-			Values.none().print(printWriter, Locale.ENGLISH);
-			then(printWriter).should().append("");
+		void show() {
+			assertThat(Values.none().show(Locale.ENGLISH)).isEmpty();
 		}
 
 		@Test
@@ -110,16 +99,11 @@ class ValuesTest {
 	}
 
 	@Nested
-	@ExtendWith(MockitoExtension.class)
 	class DurationValueTest {
 
-		@Mock
-		PrintWriter printWriter;
-
 		@Test
-		void append() {
-			Values.ofDuration(Duration.ofMillis(1)).print(printWriter, Locale.ENGLISH);
-			then(printWriter).should().append("PT0.001S");
+		void show() {
+			assertThat(Values.ofDuration(Duration.ofMillis(1)).show(Locale.ENGLISH)).isEqualTo("PT0.001S");
 		}
 
 		@Test
@@ -150,21 +134,15 @@ class ValuesTest {
 	}
 
 	@Nested
-	@ExtendWith(MockitoExtension.class)
 	class InstantValueTest {
 
 		@RegisterExtension
-		final
-		WithTimeZone withTimeZone = new WithTimeZone();
-
-		@Mock
-		PrintWriter printWriter;
+		final WithTimeZone withTimeZone = new WithTimeZone();
 
 		@Test
-		void append() {
+		void show() {
 			withTimeZone.changeTo(TimeZone.getTimeZone("Europe/Zurich"));
-			Values.ofInstant(Instant.EPOCH).print(printWriter, Locale.ENGLISH);
-			then(printWriter).should().append("1970-01-01T01:00:00");
+			assertThat(Values.ofInstant(Instant.EPOCH).show(Locale.ENGLISH)).isEqualTo("1970-01-01T01:00:00");
 		}
 
 		@Test
@@ -195,11 +173,7 @@ class ValuesTest {
 	}
 
 	@Nested
-	@ExtendWith(MockitoExtension.class)
 	class TextValueTest {
-
-		@Mock
-		PrintWriter printWriter;
 
 		@Test
 		void nullIsReject() {
@@ -209,9 +183,8 @@ class ValuesTest {
 		}
 
 		@Test
-		void appendOk() {
-			Values.ofText("aaa").print(printWriter, Locale.getDefault());
-			then(printWriter).should().append("aaa");
+		void show() {
+			assertThat(Values.ofText("aaa").show(Locale.getDefault())).isEqualTo("aaa");
 		}
 
 		@Test
@@ -251,22 +224,16 @@ class ValuesTest {
 	}
 
 	@Nested
-	@ExtendWith(MockitoExtension.class)
 	class NumericValueTest {
 
-		@Mock
-		PrintWriter printWriter;
-
 		@Test
-		void englishLocale() {
-			Values.ofNumeric(1_000_000).print(printWriter, Locale.ENGLISH);
-			then(printWriter).should().append("1,000,000");
+		void showWithEnglishLocale() {
+			assertThat(Values.ofNumeric(1_000_000).show(Locale.ENGLISH)).isEqualTo("1,000,000");
 		}
 
 		@Test
-		void italianLocale() {
-			Values.ofNumeric(1_000_000).print(printWriter, Locale.ITALIAN);
-			then(printWriter).should().append("1.000.000");
+		void showWithItalianLocale() {
+			assertThat(Values.ofNumeric(1_000_000).show(Locale.ITALIAN)).isEqualTo("1.000.000");
 		}
 
 		@Test
@@ -299,11 +266,7 @@ class ValuesTest {
 	}
 
 	@Nested
-	@ExtendWith(MockitoExtension.class)
 	class SizeValueTest {
-
-		@Mock
-		PrintWriter printWriter;
 
 		@ParameterizedTest
 		@CsvSource({
@@ -330,25 +293,21 @@ class ValuesTest {
 				"1099511627780,     1, TB"
 		})
 		void approximateOnPrint(long bytes, String expectedValue, String expectedUnit) {
-			Values.ofSize(bytes).print(printWriter, Locale.US);
-			then(printWriter).should().append(expectedValue);
-			then(printWriter).should().append(expectedUnit);
+			assertThat(Values.ofSize(bytes).show(Locale.US)).isEqualTo(expectedValue + expectedUnit);
 		}
 
 		@Test
-		void appendWithUkLocale() {
+		void showWithUkLocale() {
 			long bytes = 1024 * 2 + 1024 / 2;
-			Values.ofSize(bytes).print(printWriter, Locale.UK);
-			then(printWriter).should().append("2.5");
-			then(printWriter).should().append("KB");
+			String result = Values.ofSize(bytes).show(Locale.UK);
+			assertThat(result).isEqualTo("2.5KB");
 		}
 
 		@Test
-		void appendWithItalianLocale() {
+		void showWithItalianLocale() {
 			long bytes = 1024 * 2 + 1024 / 2;
-			Values.ofSize(bytes).print(printWriter, Locale.ITALIAN);
-			then(printWriter).should().append("2,5");
-			then(printWriter).should().append("KB");
+			String result = Values.ofSize(bytes).show(Locale.ITALIAN);
+			assertThat(result).isEqualTo("2,5KB");
 		}
 
 		@Test
@@ -388,16 +347,12 @@ class ValuesTest {
 	}
 
 	@Nested
-	@ExtendWith(MockitoExtension.class)
 	class PathValueTest {
 
-		@Mock
-		PrintWriter printWriter;
-
 		@Test
-		void appendOk() {
-			Values.ofPath(Paths.get(".")).print(printWriter, Locale.getDefault());
-			then(printWriter).should().append(".");
+		void show() {
+			String result = Values.ofPath(Paths.get(".")).show(Locale.getDefault());
+			assertThat(result).isEqualTo(".");
 		}
 
 		@Test
@@ -449,12 +404,10 @@ class ValuesTest {
 	class BytesTest {
 
 		@Test
-		void appendOk() {
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter(writer);
+		void show() {
 			Value value = Values.ofBytes(new byte[]{-1, 1, 127});
-			value.print(printWriter, Locale.getDefault());
-			assertThat(writer).hasToString("ff:01:7f");
+			String result = value.show(Locale.getDefault());
+			assertThat(result).isEqualTo("ff:01:7f");
 		}
 
 		@Test
@@ -499,12 +452,10 @@ class ValuesTest {
 	class WithStyleTest {
 
 		@Test
-		void appendOk() {
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter(writer);
+		void show() {
 			Value value = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
-			value.print(printWriter, Locale.getDefault());
-			assertThat(writer).hasToString("\u001B[44m1\u001B[49m");
+			String result = value.show(Locale.getDefault());
+			assertThat(result).isEqualTo("\u001B[44m1\u001B[49m");
 		}
 
 		@Test

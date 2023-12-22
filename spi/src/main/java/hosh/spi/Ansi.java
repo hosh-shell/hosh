@@ -23,8 +23,6 @@
  */
 package hosh.spi;
 
-import java.io.PrintWriter;
-
 public class Ansi {
 
 	private Ansi() {
@@ -75,20 +73,20 @@ public class Ansi {
 			this.endCode = endCode;
 		}
 
-		private void output(PrintWriter pw, String code) {
+		private String output(String code) {
 			if (this != NONE) {
-				pw.append(CSI);
-				pw.append(code);
-				pw.append("m");
+				return CSI + code + "m";
+			} else {
+				return "";
 			}
 		}
 
-		public void enable(PrintWriter pw) {
-			output(pw, this.startCode);
+		public String enable() {
+			return output(this.startCode);
 		}
 
-		public void disable(PrintWriter pw) {
-			output(pw, this.endCode);
+		public String disable() {
+			return output(this.endCode);
 		}
 	}
 }

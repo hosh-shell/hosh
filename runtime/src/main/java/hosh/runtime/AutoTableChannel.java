@@ -30,11 +30,8 @@ import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
-import hosh.spi.Value;
 import hosh.spi.Values;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -120,7 +117,7 @@ public class AutoTableChannel implements OutputChannel {
 			Iterator<Record.Entry> entries = record.entries().iterator();
 			while (entries.hasNext()) {
 				Record.Entry entry = entries.next();
-				String formattedValue = valueAsString(entry.getValue());
+				String formattedValue = entry.getValue().show(Locale.getDefault());
 				int valueLength = lengthFor(formattedValue);
 				maxLengthPerColumn.compute(entry.getKey(), (k, v) -> v == null ? Math.max(k.name().length(), valueLength) : Math.max(v, valueLength));
 			}
@@ -131,14 +128,6 @@ public class AutoTableChannel implements OutputChannel {
 		}
 		LOGGER.fine(() -> "paddings = " + maxLengthPerColumn);
 		return result;
-	}
-
-	// there are at least 3 or 4 variants of this method
-	private String valueAsString(Value value) {
-		StringWriter writer = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(writer);
-		value.print(printWriter, Locale.getDefault());
-		return writer.toString();
 	}
 
 	private int lengthFor(String value) {
@@ -157,12 +146,8 @@ public class AutoTableChannel implements OutputChannel {
 		List<String> formattedValues = new ArrayList<>(record.size());
 		while (entries.hasNext()) {
 			Record.Entry entry = entries.next();
-			StringWriter writer = new StringWriter();
-			PrintWriter printWriter = new PrintWriter(writer);
 			formatter.append(formatterFor(paddings.get(entry.getKey())));
-			entry.getValue().print(printWriter, locale);
-			String formattedValue = writer.toString();
-			formattedValues.add(formattedValue);
+			formattedValues.add(entry.getValue().show(locale));
 		}
 		String row = String.format(formatter.toString(), formattedValues.toArray());
 		out.send(Records.singleton(Keys.TEXT, Values.ofText(row)));

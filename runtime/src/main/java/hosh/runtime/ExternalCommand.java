@@ -36,12 +36,13 @@ import hosh.spi.StateAware;
 import hosh.spi.Values;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -52,6 +53,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 // used for any non-built-in commands (e.g. native commands such as 'vim' or 'ssh')
 class ExternalCommand implements CompilerCommand, StateAware {
@@ -125,11 +127,14 @@ class ExternalCommand implements CompilerCommand, StateAware {
 
 	private void pipeChannelToOutputStream(InputChannel in, OutputStream outputStream) {
 		Locale locale = Locale.getDefault();
-		try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
+		try (BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
 			for (Record record : InputChannel.iterate(in)) {
-				record.print(pw, locale);
-				pw.println();
+				String line = record.values().map(v -> v.show(locale)).collect(Collectors.joining(" "));
+				bufferedWriter.append(line);
+				bufferedWriter.append(System.lineSeparator());
 			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 

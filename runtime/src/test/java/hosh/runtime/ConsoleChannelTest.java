@@ -60,23 +60,22 @@ class ConsoleChannelTest {
 	@Test
 	void empty() {
 		sut.send(Records.empty());
-		then(printWriter).should().append(System.lineSeparator());
+		then(printWriter).should().println("");
+		then(printWriter).should().flush();
 	}
 
 	@Test
 	void oneValue() {
 		sut.send(Records.singleton(Keys.NAME, Values.ofText("foo")));
-		then(printWriter).should().append("foo");
-		then(printWriter).should().append(System.lineSeparator());
+		then(printWriter).should().println("foo");
+		then(printWriter).should().flush();
 	}
 
 	@Test
 	void twoValues() {
 		sut.send(Records.builder().entry(Keys.NAME, Values.ofText("foo")).entry(Keys.VALUE, Values.ofText("bar")).build());
-		then(printWriter).should().append("foo");
-		then(printWriter).should().append(" ");
-		then(printWriter).should().append("bar");
-		then(printWriter).should().append(System.lineSeparator());
+		then(printWriter).should().println("foo bar");
+		then(printWriter).should().flush();
 	}
 
 	@Test

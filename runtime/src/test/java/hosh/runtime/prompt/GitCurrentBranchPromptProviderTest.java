@@ -77,7 +77,7 @@ class GitCurrentBranchPromptProviderTest {
 
 		// Then
 		then(process).should().destroy(); // important to not leak process handlers
-		assertThat(result).isEqualTo("[\u001B[31mgit:bugfix/npe-main\u001B[39m]\u001B[0m");
+		assertThat(result).isEqualTo("[\u001B[31mgit:bugfix/npe-main\u001B[39m]");
 	}
 
 }

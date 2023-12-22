@@ -34,6 +34,7 @@ public class DurationParsing {
 
 	/**
 	 * Parsing duration ISO 8601 format with possibility to omit leading 'PT' prefix.
+	 * <p>
 	 * Any invalid input, including null, returns empty.
 	 */
 	public static Optional<Duration> parse(String value) {

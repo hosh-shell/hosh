@@ -23,7 +23,6 @@
  */
 package hosh.spi;
 
-import java.io.PrintWriter;
 import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
@@ -114,9 +113,10 @@ public class Values {
 			this.value = value;
 		}
 
+
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			printWriter.append(value);
+		public String show(Locale locale) {
+			return value;
 		}
 
 		@Override
@@ -181,7 +181,7 @@ public class Values {
 		private static final Unit[] UNITS = {Unit.KB, Unit.MB, Unit.GB, Unit.TB};
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
+		public String show(Locale locale) {
 			double value;
 			Unit unit;
 			if (bytes < KIB) {
@@ -194,8 +194,7 @@ public class Values {
 			}
 			var formatter = new DecimalFormat("#.#", new DecimalFormatSymbols(locale));
 			formatter.setRoundingMode(RoundingMode.HALF_UP);
-			printWriter.append(formatter.format(value));
-			printWriter.append(unit.toString());
+			return formatter.format(value) + unit;
 		}
 
 		@Override
@@ -254,9 +253,9 @@ public class Values {
 		}
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
+		public String show(Locale locale) {
 			NumberFormat instance = NumberFormat.getInstance(locale);
-			printWriter.append(instance.format(number));
+			return instance.format(number);
 		}
 
 		@Override
@@ -311,8 +310,8 @@ public class Values {
 	static final class None implements Value {
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			printWriter.append("");
+		public String show(Locale locale) {
+			return "";
 		}
 
 		@Override
@@ -370,8 +369,8 @@ public class Values {
 		}
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			printWriter.append(duration.toString());
+		public String show(Locale locale) {
+			return duration.toString();
 		}
 
 		@Override
@@ -415,9 +414,9 @@ public class Values {
 		}
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
+		public String show(Locale locale) {
 			LocalDateTime localDateTime = LocalDateTime.ofInstant(instant.truncatedTo(ChronoUnit.SECONDS), TimeZone.getDefault().toZoneId());
-			printWriter.append(localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+			return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 		}
 
 		@Override
@@ -452,8 +451,8 @@ public class Values {
 		}
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			printWriter.append(path.toString());
+		public String show(Locale locale) {
+			return path.toString();
 		}
 
 		@Override
@@ -515,9 +514,8 @@ public class Values {
 		}
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			String hex = HEX_FORMAT.formatHex(bytes);
-			printWriter.print(hex);
+		public String show(Locale locale) {
+			return HEX_FORMAT.formatHex(bytes);
 		}
 
 		@Override
@@ -565,10 +563,8 @@ public class Values {
 		}
 
 		@Override
-		public void print(PrintWriter printWriter, Locale locale) {
-			style.enable(printWriter);
-			value.print(printWriter, locale);
-			style.disable(printWriter);
+		public String show(Locale locale) {
+			return style.enable() + value.show(locale) + style.disable();
 		}
 
 		@Override
