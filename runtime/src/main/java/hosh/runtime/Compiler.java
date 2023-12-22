@@ -50,6 +50,9 @@ import static hosh.runtime.antlr4.HoshParser.StmtContext;
 import static hosh.runtime.antlr4.HoshParser.StringContext;
 import static hosh.runtime.antlr4.HoshParser.WrappedContext;
 
+/**
+ * Translates the incoming Hosh string into a runnable {@link Program}.
+ */
 public class Compiler {
 
 	private final CommandResolver commandResolver;
