@@ -1,0 +1,112 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018-2023 Davide Angelocola
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package hosh.modules.filesystem;
+
+import hosh.doc.Bug;
+import hosh.doc.Description;
+import hosh.doc.Example;
+import hosh.doc.Examples;
+import hosh.doc.Experimental;
+import hosh.doc.Todo;
+import hosh.spi.Command;
+import hosh.spi.CommandRegistry;
+import hosh.spi.CommandWrapper;
+import hosh.spi.Errors;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.LoggerFactory;
+import hosh.spi.Module;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.spi.StateAware;
+import hosh.spi.StateMutator;
+import hosh.spi.StateMutatorAware;
+import hosh.spi.Value;
+import hosh.spi.Values;
+
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.UncheckedIOException;
+import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.function.IntPredicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
+
+public class FormattingModule implements Module {
+
+	@Override
+	public void initialize(CommandRegistry registry) {
+		registry.registerCommand("csv", Csv::new);
+	}
+
+	@Description("read or write CSV files")
+	@Examples({
+			@Example(command = "csv read file.csv | take 10", description = "take 10 records out of file.csv"),
+			@Example(command = "ls | csv write file.csv ", description = "write output of a command as csv"),
+	})
+	public static class Csv implements Command, StateAware {
+
+		private State state;
+
+		@Override
+		public void setState(State state) {
+			this.state = state;
+		}
+
+		@Override
+		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 2) {
+				err.send(Errors.usage("csv write|read file"));
+				return ExitStatus.error();
+			}
+			return ExitStatus.success();
+		}
+	}
+
+}
