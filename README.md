@@ -57,6 +57,10 @@ Build a release with docker:
 
 `./mvnw clean verify sonar:sonar -Psonar -Dsonar.token=MYTOKEN`
 
+### Mutation testing
+
+`./mvnw test-compile org.pitest:pitest-maven:mutationCoverage`
+
 ## Sponsors
 
 [![JetBrains](https://raw.githubusercontent.com/JetBrains/logos/master/web/jetbrains/jetbrains-variant-2.svg)](https://www.jetbrains.com/?from=hosh)
