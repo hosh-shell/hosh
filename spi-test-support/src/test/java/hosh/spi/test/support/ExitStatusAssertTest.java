@@ -23,50 +23,36 @@
  */
 package hosh.spi.test.support;
 
-import hosh.spi.Key;
-import hosh.spi.Record;
-import hosh.spi.Value;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
+import hosh.spi.ExitStatus;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Objects;
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 
-/**
- * Mockito's argument matcher for Record that allows to specify
- * a subset of key/value mappings.
- */
-public class RecordMatcher implements ArgumentMatcher<Record> {
+@SuppressWarnings("MaskedAssertion")
+class ExitStatusAssertTest {
 
-	public static Record of(Key k1, Value v1) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1))));
-	}
-
-	public static Record of(Key k1, Value v1, Key k2, Value v2) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1), new Record.Entry(k2, v2))));
-	}
-
-	private final List<Record.Entry> entries;
-
-	RecordMatcher(List<Record.Entry> entries) {
-		this.entries = entries;
-	}
-
-	@Override
-	public boolean matches(Record argument) {
-		if (argument == null) {
-			return false;
+	@Test
+	void error() {
+		ExitStatus exitStatus = ExitStatus.of(1);
+		assertThat(exitStatus).isError();
+		assertThat(exitStatus).hasExitCode(1);
+		try {
+			assertThat(exitStatus).isSuccess();
+		} catch (AssertionError e) {
+			// all good
 		}
-		for (var entry : entries) {
-			if (argument.entries().noneMatch(e -> Objects.equals(e, entry))) {
-				return false;
-			}
-		}
-		return true;
 	}
 
-	@Override
-	public String toString() {
-		return "wanting entries: " + entries;
+	@Test
+	void success() {
+		ExitStatus exitStatus = ExitStatus.of(0);
+		assertThat(exitStatus).isSuccess();
+		assertThat(exitStatus).hasExitCode(0);
+		try {
+			assertThat(exitStatus).isError();
+		} catch (AssertionError e) {
+			// all good
+		}
 	}
+
 }

@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.logging.Logger;
 
 /**
  * Heavily inspired by JUnit 4.12 TemporaryFolder but with fewer features.
@@ -41,6 +42,8 @@ import java.nio.file.Path;
  * - don't expose File in the public interface, whereas it is still ok to use File internally here when it makes sense.
  */
 public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEachCallback {
+
+	private static final Logger LOGGER = Logger.getLogger(TemporaryFolder.class.getName());
 
 	private Path folder;
 
@@ -98,7 +101,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 		}
 		boolean deleted = fileOrDirectory.delete();
 		if (!deleted) {
-			throw new IllegalStateException("file not deleted: " + fileOrDirectory);
+			LOGGER.info("not deleted: " + fileOrDirectory);
 		}
 	}
 }
