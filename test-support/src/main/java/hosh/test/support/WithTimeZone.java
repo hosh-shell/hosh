@@ -30,6 +30,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 import java.util.TimeZone;
 
+/**
+ * Allows unit testing of code using TimeZone.getDefault.
+ */
 public class WithTimeZone implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
 	private TimeZone backup;
@@ -41,6 +44,7 @@ public class WithTimeZone implements Extension, BeforeTestExecutionCallback, Aft
 
 	@Override
 	public void afterTestExecution(ExtensionContext context) {
+		// restore the previous default to avoid other unit tests to fail
 		TimeZone.setDefault(backup);
 	}
 
