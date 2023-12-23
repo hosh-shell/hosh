@@ -21,10 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+/**
+ * This module contains helpers specifically designed for spi classes.
+ */
 module hosh.spi.test.support {
 	requires hosh.spi;
 
 	requires org.assertj.core;
 	requires org.mockito;
-
 }

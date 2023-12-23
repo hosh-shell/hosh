@@ -21,6 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+/**
+ * This module contains generic test helpers to be used by any modules (including spi).
+ * So, it cannot depend on spi classes.
+ */
 module hosh.test.support {
 	requires java.logging;
 
