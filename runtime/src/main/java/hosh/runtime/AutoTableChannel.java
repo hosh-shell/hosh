@@ -117,9 +117,9 @@ public class AutoTableChannel implements OutputChannel {
 			Iterator<Record.Entry> entries = record.entries().iterator();
 			while (entries.hasNext()) {
 				Record.Entry entry = entries.next();
-				String formattedValue = entry.getValue().show(Locale.getDefault());
+				String formattedValue = entry.value().show(Locale.getDefault());
 				int valueLength = lengthFor(formattedValue);
-				maxLengthPerColumn.compute(entry.getKey(), (k, v) -> v == null ? Math.max(k.name().length(), valueLength) : Math.max(v, valueLength));
+				maxLengthPerColumn.compute(entry.key(), (k, v) -> v == null ? Math.max(k.name().length(), valueLength) : Math.max(v, valueLength));
 			}
 		}
 		Map<Key, Integer> result = new HashMap<>();
@@ -146,8 +146,8 @@ public class AutoTableChannel implements OutputChannel {
 		List<String> formattedValues = new ArrayList<>(record.size());
 		while (entries.hasNext()) {
 			Record.Entry entry = entries.next();
-			formatter.append(formatterFor(paddings.get(entry.getKey())));
-			formattedValues.add(entry.getValue().show(locale));
+			formatter.append(formatterFor(paddings.get(entry.key())));
+			formattedValues.add(entry.value().show(locale));
 		}
 		String row = String.format(formatter.toString(), formattedValues.toArray());
 		out.send(Records.singleton(Keys.TEXT, Values.ofText(row)));

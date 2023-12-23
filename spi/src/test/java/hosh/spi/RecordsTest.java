@@ -85,7 +85,7 @@ class RecordsTest {
 		EqualsVerifier.forClass(Records.Empty.class).verify();
 		EqualsVerifier.forClass(Records.Singleton.class).withNonnullFields("entry").verify();
 		EqualsVerifier.forClass(Records.Generic.class).withNonnullFields("entries").verify();
-		EqualsVerifier.forClass(Record.Entry.class).verify();
+		EqualsVerifier.forClass(Record.Entry.class).withNonnullFields("key", "value").verify();
 	}
 
 	@Test
@@ -155,8 +155,8 @@ class RecordsTest {
 	void entry() {
 		Record.Entry entry = new Record.Entry(Keys.NAME, Values.none());
 		assertThat(entry).hasToString("Entry[key=Key['name'],value=None]");
-		assertThat(entry.getKey()).isEqualTo(Keys.NAME);
-		assertThat(entry.getValue()).isEqualTo(Values.none());
+		assertThat(entry.key()).isEqualTo(Keys.NAME);
+		assertThat(entry.value()).isEqualTo(Values.none());
 	}
 
 	@Test

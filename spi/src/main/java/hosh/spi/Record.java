@@ -34,66 +34,40 @@ import java.util.stream.Stream;
  */
 public interface Record {
 
-	/**
-	 * Yields a new Record with the specified mapping as last one.
-	 */
-	Record append(Key key, Value value);
+    /**
+     * Yields a new Record with the specified mapping as last one.
+     */
+    Record append(Key key, Value value);
 
-	/**
-	 * Yields a new Record with the specified mapping as first one.
-	 */
-	Record prepend(Key key, Value value);
+    /**
+     * Yields a new Record with the specified mapping as first one.
+     */
+    Record prepend(Key key, Value value);
 
-	Stream<Key> keys();
+    Stream<Key> keys();
 
-	Stream<Value> values();
+    Stream<Value> values();
 
-	Stream<Entry> entries();
+    Stream<Entry> entries();
 
-	Optional<Value> value(Key key);
+    Optional<Value> value(Key key);
 
-	int size();
+    int size();
 
-	/**
-	 * An immutable value object representing a key/value pair.
-	 * Key and value cannot be null.
-	 */
-	class Entry {
+    /**
+     * An immutable value object representing a key/value pair.
+     * Key and value cannot be null.
+     */
+    record Entry(Key key, Value value) {
 
-		private final Key key;
+        public Entry {
+            Objects.requireNonNull(key);
+            Objects.requireNonNull(value);
+        }
 
-		private final Value value;
-
-		public Entry(Key key, Value value) {
-			this.key = Objects.requireNonNull(key);
-			this.value = Objects.requireNonNull(value);
-		}
-
-		public Key getKey() {
-			return key;
-		}
-
-		public Value getValue() {
-			return value;
-		}
-
-		@Override
-		public final boolean equals(Object obj) {
-			if (obj instanceof Entry that) {
-				return Objects.equals(this.key, that.key) && Objects.equals(this.value, that.value);
-			} else {
-				return false;
-			}
-		}
-
-		@Override
-		public final int hashCode() {
-			return Objects.hash(key, value);
-		}
-
-		@Override
-		public String toString() {
-			return String.format("Entry[key=%s,value=%s]", key, value);
-		}
-	}
+        @Override
+        public String toString() {
+            return String.format("Entry[key=%s,value=%s]", key, value);
+        }
+    }
 }

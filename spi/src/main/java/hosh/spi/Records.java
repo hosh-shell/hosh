@@ -145,12 +145,12 @@ public class Records {
 
 		@Override
 		public Stream<Key> keys() {
-			return Stream.of(entry).map(Entry::getKey);
+			return Stream.of(entry).map(Entry::key);
 		}
 
 		@Override
 		public Stream<Value> values() {
-			return Stream.of(entry).map(Entry::getValue);
+			return Stream.of(entry).map(Entry::value);
 		}
 
 		@Override
@@ -176,8 +176,8 @@ public class Records {
 
 		@Override
 		public Optional<Value> value(Key wantedKey) {
-			if (Objects.equals(this.entry.getKey(), wantedKey)) {
-				return Optional.of(this.entry.getValue());
+			if (Objects.equals(this.entry.key(), wantedKey)) {
+				return Optional.of(this.entry.value());
 			} else {
 				return Optional.empty();
 			}
@@ -204,7 +204,7 @@ public class Records {
 
 		@Override
 		public String toString() {
-			return String.format("Record[data={%s=%s}]", entry.getKey(), entry.getValue());
+			return String.format("Record[data={%s=%s}]", entry.key(), entry.value());
 		}
 
 	}
@@ -236,14 +236,14 @@ public class Records {
 		public Stream<Key> keys() {
 			return Arrays
 					.stream(entries)
-					.map(Entry::getKey);
+					.map(Entry::key);
 		}
 
 		@Override
 		public Stream<Value> values() {
 			return Arrays
 					.stream(entries)
-					.map(Entry::getValue);
+					.map(Entry::value);
 		}
 
 		@Override
@@ -254,8 +254,8 @@ public class Records {
 		@Override
 		public Optional<Value> value(Key key) {
 			for (Entry entry : entries) {
-				if (entry.getKey().equals(key)) {
-					return Optional.of(entry.getValue());
+				if (entry.key().equals(key)) {
+					return Optional.of(entry.value());
 				}
 			}
 			return Optional.empty();
@@ -285,7 +285,7 @@ public class Records {
 			return String.format("Record[data={%s}]",
 					Arrays
 							.stream(entries)
-							.map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+							.map(e -> String.format("%s=%s", e.key(), e.value()))
 							.collect(Collectors.joining(",")));
 		}
 

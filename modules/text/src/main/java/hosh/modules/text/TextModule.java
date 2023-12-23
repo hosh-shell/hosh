@@ -199,8 +199,8 @@ public class TextModule implements Module {
 			Iterator<Entry> entries = record.entries().iterator();
 			while (entries.hasNext()) {
 				Entry entry = entries.next();
-				if (entry.getKey().equals(key)) {
-					builder = builder.entry(key, trim(entry.getValue()));
+				if (entry.key().equals(key)) {
+					builder = builder.entry(key, trim(entry.value()));
 				} else {
 					builder = builder.entry(entry);
 				}
