@@ -35,9 +35,6 @@ import java.util.Objects;
 /**
  * Mockito's argument matcher for Record that allows to specify
  * a subset of key/value mappings.
- * <p>
- * This has been done to allow unit tests with files in CI,
- * i.e. is it possible to check for a file named "foo.txt" but not the owner of the file.
  */
 public class RecordMatcher implements ArgumentMatcher<Record> {
 
