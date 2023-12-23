@@ -28,17 +28,22 @@ import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import java.util.logging.Logger;
+
 /**
  * To be used to control current thread name or interrupted flag.
  */
 public class WithThread implements Extension, BeforeTestExecutionCallback, AfterTestExecutionCallback {
+
+	private static final Logger LOGGER = Logger.getLogger("WithThread");
 
 	private String backup;
 
 	@Override
 	public void afterTestExecution(ExtensionContext context) {
 		Thread.currentThread().setName(backup);
-		Thread.interrupted();
+		boolean interrupted = Thread.interrupted();
+		LOGGER.info("thread %s with interrupted flag=%s".formatted(Thread.currentThread().getName(), interrupted));
 	}
 
 	@Override
