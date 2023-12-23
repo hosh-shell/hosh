@@ -406,10 +406,10 @@ class SystemModuleTest {
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveNoInteractions();
 			assertThat(records.getAllValues())
-				.containsExactly(
-					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("true - /bin/true replacement"), Ansi.Style.BOLD)),
-					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("Examples"), Ansi.Style.BOLD)),
-					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("true # returns exit success"), Ansi.Style.ITALIC)));
+					.containsExactly(
+							Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("true - /bin/true replacement"), Ansi.Style.BOLD)),
+							Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("Examples"), Ansi.Style.BOLD)),
+							Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("true # returns exit success"), Ansi.Style.ITALIC)));
 		}
 
 		@Test
@@ -421,10 +421,10 @@ class SystemModuleTest {
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
 			then(err).shouldHaveNoInteractions();
 			assertThat(records.getAllValues())
-				.containsExactly(
-					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("false - /bin/false replacement"), Ansi.Style.BOLD)),
-					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("Examples"), Ansi.Style.BOLD)),
-					Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("N/A"), Ansi.Style.FG_RED)));
+					.containsExactly(
+							Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("false - /bin/false replacement"), Ansi.Style.BOLD)),
+							Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("Examples"), Ansi.Style.BOLD)),
+							Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("N/A"), Ansi.Style.FG_RED)));
 		}
 
 		@Test
@@ -453,7 +453,7 @@ class SystemModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(
-				RecordMatcher.of(Keys.NAME, Values.ofText("true"), Keys.DESCRIPTION, Values.ofText("/bin/true replacement")));
+					RecordMatcher.of(Keys.NAME, Values.ofText("true"), Keys.DESCRIPTION, Values.ofText("/bin/true replacement")));
 			then(err).shouldHaveNoInteractions();
 		}
 
@@ -478,7 +478,7 @@ class SystemModuleTest {
 
 		@Description("/bin/true replacement")
 		@Examples({
-			@Example(command = "true", description = "returns exit success")
+				@Example(command = "true", description = "returns exit success")
 		})
 		static class True implements Command {
 
@@ -608,10 +608,10 @@ class SystemModuleTest {
 
 		// sleep 100ms
 		@ValueSource(strings = {
-			"PT0.1S", // ISO 8601
-			"PT0.1s", // same but with lowercase suffix
-			"0.1S",   // our custom format
-			"0.1s",   // our custom format
+				"PT0.1S", // ISO 8601
+				"PT0.1s", // same but with lowercase suffix
+				"0.1S",   // our custom format
+				"0.1s",   // our custom format
 		})
 		@ParameterizedTest
 		void validInput(String input) {
@@ -624,11 +624,11 @@ class SystemModuleTest {
 
 		@EmptySource
 		@ValueSource(strings = {
-			"PT",   // missing value and unit
-			"PT1",  // missing unit
-			"1",    // missing unit
-			"AAA",  // bogus
-			"_",    // bogus
+				"PT",   // missing value and unit
+				"PT1",  // missing unit
+				"1",    // missing unit
+				"AAA",  // bogus
+				"_",    // bogus
 		})
 		@ParameterizedTest
 		void sleepWithValidIso8601(String input) {
@@ -702,13 +702,13 @@ class SystemModuleTest {
 		@Test
 		void noArgs() {
 			assertThatThrownBy(() -> sut.run(List.of(), in, out, err))
-				.hasMessage("please do not report: this is a simulated error")
-				.isInstanceOf(NullPointerException.class)
-				.satisfies(e -> {
-					then(in).shouldHaveNoInteractions();
-					then(out).shouldHaveNoInteractions();
-					then(err).shouldHaveNoInteractions();
-				});
+					.hasMessage("please do not report: this is a simulated error")
+					.isInstanceOf(NullPointerException.class)
+					.satisfies(e -> {
+						then(in).shouldHaveNoInteractions();
+						then(out).shouldHaveNoInteractions();
+						then(err).shouldHaveNoInteractions();
+					});
 		}
 	}
 
@@ -788,7 +788,7 @@ class SystemModuleTest {
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
-				RecordMatcher.of(Keys.COUNT, Values.ofNumeric(10)) // not checking AVERAGE, WORST and BEST
+					RecordMatcher.of(Keys.COUNT, Values.ofNumeric(10)) // not checking AVERAGE, WORST and BEST
 			);
 			then(err).shouldHaveNoInteractions();
 		}
@@ -1317,8 +1317,8 @@ class SystemModuleTest {
 		void captureOneLine() {
 			willReturn(Map.of()).given(state).getVariables();
 			given(in.recv()).willReturn(
-				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
-				Optional.empty());
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
@@ -1332,9 +1332,9 @@ class SystemModuleTest {
 		void captureTwoLines() {
 			willReturn(Map.of()).given(state).getVariables();
 			given(in.recv()).willReturn(
-				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
-				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
-				Optional.empty());
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
+					Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
@@ -1407,8 +1407,8 @@ class SystemModuleTest {
 		void oneLine() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(
-				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
-				Optional.empty());
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
@@ -1423,9 +1423,9 @@ class SystemModuleTest {
 		void twoLines() throws IOException {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(
-				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
-				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
-				Optional.empty());
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
+					Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
@@ -1442,8 +1442,8 @@ class SystemModuleTest {
 			Files.write(file, List.of("existing line"), StandardCharsets.UTF_8);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(
-				Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
-				Optional.empty());
+					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
+					Optional.empty());
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "APPEND"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();

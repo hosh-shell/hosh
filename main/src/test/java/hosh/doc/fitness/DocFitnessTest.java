@@ -31,18 +31,18 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import hosh.Hosh;
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.runtime.BootstrapBuiltins;
-import hosh.Hosh;
 import hosh.runtime.CommandResolvers;
 import hosh.runtime.Compiler;
 import hosh.runtime.Compiler.CompileError;
 import hosh.runtime.Compiler.Program;
+import hosh.runtime.MutableState;
 import hosh.runtime.Parser.ParseError;
 import hosh.spi.Command;
-import hosh.runtime.MutableState;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -52,9 +52,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Fitness function to check that:
- *  - all commands are documented
- *  - all examples are syntactically correct
- *    (by compile execute all examples found as annotations)
+ * - all commands are documented
+ * - all examples are syntactically correct
+ * (by compile execute all examples found as annotations)
  */
 @AnalyzeClasses(packagesOf = Hosh.class)
 public class DocFitnessTest {
@@ -63,20 +63,20 @@ public class DocFitnessTest {
 	@ArchTag("fitness")
 	@ArchTest
 	public final ArchRule commandsAreDocumented =
-		classes()
-			.that().implement(Command.class)
-			.and().arePublic()
-			.should().beAnnotatedWith(Description.class)
-			.andShould().beAnnotatedWith(Examples.class);
+			classes()
+					.that().implement(Command.class)
+					.and().arePublic()
+					.should().beAnnotatedWith(Description.class)
+					.andShould().beAnnotatedWith(Examples.class);
 
 	@SuppressWarnings("unused")
 	@ArchTag("fitness")
 	@ArchTest
 	public final ArchRule commandsHaveSyntacticallyCorrectExamples =
-		classes()
-			.that().areAnnotatedWith(Examples.class)
-			.and().arePublic()
-			.should(beSyntacticallyCorrect());
+			classes()
+					.that().areAnnotatedWith(Examples.class)
+					.and().arePublic()
+					.should(beSyntacticallyCorrect());
 
 	// implementation details
 	private static ArchCondition<JavaClass> beSyntacticallyCorrect() {

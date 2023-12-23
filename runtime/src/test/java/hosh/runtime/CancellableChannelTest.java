@@ -56,6 +56,7 @@ class CancellableChannelTest {
 	void createSut() {
 		sut = new CancellableChannel(channel);
 	}
+
 	@Test
 	void send() {
 		sut.send(record);
@@ -66,7 +67,7 @@ class CancellableChannelTest {
 	void sendInterrupted() {
 		withThread.interrupt();
 		assertThatThrownBy(() -> sut.send(record))
-			.hasMessage("interrupted")
-			.isInstanceOf(CancellationException.class);
+				.hasMessage("interrupted")
+				.isInstanceOf(CancellationException.class);
 	}
 }

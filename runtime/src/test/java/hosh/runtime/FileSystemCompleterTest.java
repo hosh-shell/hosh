@@ -95,11 +95,11 @@ class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-			.hasSize(1)
-			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isEqualTo("a");
-				assertThat(candidate.complete()).isTrue();
-			});
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("a");
+					assertThat(candidate.complete()).isTrue();
+				});
 	}
 
 	@DisabledOnOs(OS.WINDOWS)
@@ -110,8 +110,8 @@ class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-			.isNotEmpty()
-			.allSatisfy(candidate -> assertThat(candidate.value()).isNotBlank());
+				.isNotEmpty()
+				.allSatisfy(candidate -> assertThat(candidate.value()).isNotBlank());
 	}
 
 	@EnabledOnOs(OS.WINDOWS)
@@ -122,8 +122,8 @@ class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-			.isNotEmpty()
-			.allSatisfy(candidate -> assertThat(candidate.value()).isNotBlank());
+				.isNotEmpty()
+				.allSatisfy(candidate -> assertThat(candidate.value()).isNotBlank());
 	}
 
 	@Test
@@ -134,11 +134,11 @@ class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-			.hasSize(1)
-			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isEqualTo(dir.toAbsolutePath() + File.separator);
-				assertThat(candidate.complete()).isFalse();
-			});
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo(dir.toAbsolutePath() + File.separator);
+					assertThat(candidate.complete()).isFalse();
+				});
 	}
 
 	@Test
@@ -149,11 +149,11 @@ class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-			.hasSize(1)
-			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isEqualTo(newFile.toAbsolutePath().toString());
-				assertThat(candidate.complete()).isTrue();
-			});
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo(newFile.toAbsolutePath().toString());
+					assertThat(candidate.complete()).isTrue();
+				});
 	}
 
 	@Test
@@ -164,10 +164,10 @@ class FileSystemCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, line, candidates);
 		assertThat(candidates)
-			.hasSize(1)
-			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isEqualTo("aaa" + File.separator + "bbb" + File.separator);
-				assertThat(candidate.complete()).isFalse();
-			});
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("aaa" + File.separator + "bbb" + File.separator);
+					assertThat(candidate.complete()).isFalse();
+				});
 	}
 }

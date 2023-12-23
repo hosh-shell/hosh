@@ -72,9 +72,9 @@ public class FileSystemCompleter implements Completer {
 	private void listCandidates(Path dir, UnaryOperator<Path> toPath, List<Candidate> candidates) {
 		try (Stream<Path> list = Files.list(dir)) {
 			list
-				.map(toPath)
-				.map(this::toCandidate)
-				.forEach(candidates::add);
+					.map(toPath)
+					.map(this::toCandidate)
+					.forEach(candidates::add);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

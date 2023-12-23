@@ -32,10 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class VersionLoaderTest {
 
-    @Test
-    void loadVersionViaGit() throws IOException {
-        Version result = VersionLoader.loadVersion();
-        assertThat(result).isNotNull(); // must be always defined
-    }
+	@Test
+	void loadVersionViaGit() throws IOException {
+		Version result = VersionLoader.loadVersion();
+		assertThat(result).isNotNull(); // must be always defined
+	}
 
 }

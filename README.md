@@ -1,7 +1,7 @@
 # Hosh
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/hosh-shell/hosh/workflows/CI/badge.svg?branch:master)](https://github.com/hosh-shell/hosh/actions?query=branch:master) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hosh%3Ahosh-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=hosh%3Ahosh-parent)
- [![`Coverage`](https://sonarcloud.io/api/project_badges/measure?project=hosh%3Ahosh-parent&metric=coverage)](https://sonarcloud.io/dashboard?id=hosh%3Ahosh-parent)[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4646/badge)](https://bestpractices.coreinfrastructure.org/projects/4646)
+[![`Coverage`](https://sonarcloud.io/api/project_badges/measure?project=hosh%3Ahosh-parent&metric=coverage)](https://sonarcloud.io/dashboard?id=hosh%3Ahosh-parent)[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4646/badge)](https://bestpractices.coreinfrastructure.org/projects/4646)
 
 Human Oriented SHell, written in Java.
 
@@ -36,7 +36,9 @@ Quick build (2x faster on my machine):
 ### Logging
 
 Hosh uses `java.util.logging` (to not require additional dependencies). `HOSH_LOG_LEVEL` controls
-logging behaviour according to [Level](https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/Level.html). By default, logging is disabled, to enable it:
+logging behaviour according
+to [Level](https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/Level.html). By default,
+logging is disabled, to enable it:
 
 `$ HOSH_LOG_LEVEL=FINE java -jar main/target/hosh.jar`
 

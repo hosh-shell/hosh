@@ -93,9 +93,9 @@ class HistoryModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.builder()
-				                        .entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
-				                        .entry(Keys.TEXT, Values.ofText("cmd"))
-				                        .build());
+					.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
+					.entry(Keys.TEXT, Values.ofText("cmd"))
+					.build());
 			then(err).shouldHaveNoInteractions();
 		}
 

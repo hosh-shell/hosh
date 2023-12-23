@@ -114,7 +114,7 @@ class PipelineCommand implements CompilerCommand, InterpreterAware {
 
 	private void assemblePipeline(Supervisor supervisor, Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
 		if (statement.getCommand() instanceof PipelineCommand pipelineCommand) {
-            PipelineChannel pipelineChannel = new PipelineChannel();
+			PipelineChannel pipelineChannel = new PipelineChannel();
 			runAsync(supervisor, pipelineCommand.producer, in, pipelineChannel, err, Position.MIDDLE);
 			assemblePipeline(supervisor, pipelineCommand.consumer, pipelineChannel, out, err);
 		} else {
@@ -139,19 +139,19 @@ class PipelineCommand implements CompilerCommand, InterpreterAware {
 
 	private void pipelinePosition(Position position, Command command) {
 		if (command instanceof ExternalCommand externalCommand) {
-            externalCommand.pipeline(position);
+			externalCommand.pipeline(position);
 		}
 	}
 
 	private void stopConsumer(OutputChannel out) {
 		if (out instanceof PipelineChannel pipelineChannel) {
-            pipelineChannel.stopConsumer();
+			pipelineChannel.stopConsumer();
 		}
 	}
 
 	private void stopProducer(InputChannel in) {
 		if (in instanceof PipelineChannel pipelineChannel) {
-            pipelineChannel.stopProducer();
+			pipelineChannel.stopProducer();
 		}
 	}
 }

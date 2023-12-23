@@ -40,7 +40,7 @@ public class CompositePromptProvider implements PromptProvider {
 	@Override
 	public String provide(State state) {
 		StringJoiner result = new StringJoiner("");
-		for (PromptProvider promptProvider: providers) {
+		for (PromptProvider promptProvider : providers) {
 			String prompt = promptProvider.provide(state);
 			if (prompt != null) {
 				result.add(prompt);

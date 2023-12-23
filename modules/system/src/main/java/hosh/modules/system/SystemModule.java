@@ -107,7 +107,7 @@ public class SystemModule implements Module {
 
 	@Description("PATH manipulation")
 	@Examples({
-		@Example(command = "path show", description = "show path"),
+			@Example(command = "path show", description = "show path"),
 	})
 	public static class Path implements Command, StateAware, StateMutatorAware {
 
@@ -187,9 +187,9 @@ public class SystemModule implements Module {
 
 	@Description("write arguments to output")
 	@Examples({
-		@Example(command = "echo", description = "write empty line"),
-		@Example(command = "echo hello", description = "write 'hello'"),
-		@Example(command = "echo hello ${USER}", description = "write 'hello dfa', if USER=dfa"),
+			@Example(command = "echo", description = "write empty line"),
+			@Example(command = "echo hello", description = "write 'hello'"),
+			@Example(command = "echo hello ${USER}", description = "write 'hello dfa', if USER=dfa"),
 	})
 	public static class Echo implements Command {
 
@@ -203,7 +203,7 @@ public class SystemModule implements Module {
 
 	@Description("display all variables")
 	@Examples({
-		@Example(command = "env", description = "display all environment variables"),
+			@Example(command = "env", description = "display all environment variables"),
 	})
 	public static class Env implements Command, StateAware {
 
@@ -223,9 +223,9 @@ public class SystemModule implements Module {
 			Map<VariableName, String> variables = state.getVariables();
 			for (var entry : variables.entrySet()) {
 				Record record = Records.builder()
-					.entry(Keys.NAME, Values.ofText(entry.getKey().name()))
-					.entry(Keys.VALUE, Values.ofText(entry.getValue()))
-					.build();
+						.entry(Keys.NAME, Values.ofText(entry.getKey().name()))
+						.entry(Keys.VALUE, Values.ofText(entry.getValue()))
+						.build();
 				out.send(record);
 			}
 			return ExitStatus.success();
@@ -234,9 +234,9 @@ public class SystemModule implements Module {
 
 	@Description("exit current interactive session or script")
 	@Examples({
-		@Example(command = "exit", description = "exit with status 0 (success)"),
-		@Example(command = "exit 1", description = "exit with status 1 (error)"),
-		@Example(command = "exit 0", description = "exit with status 0 (success)"),
+			@Example(command = "exit", description = "exit with status 0 (success)"),
+			@Example(command = "exit 1", description = "exit with status 1 (error)"),
+			@Example(command = "exit 0", description = "exit with status 0 (success)"),
 	})
 	public static class Exit implements Command, StateMutatorAware {
 
@@ -272,8 +272,8 @@ public class SystemModule implements Module {
 
 	@Description("built-in help system")
 	@Examples({
-		@Example(command = "help", description = "print all built-in commands"),
-		@Example(command = "help command", description = "print help for specified command")
+			@Example(command = "help", description = "print all built-in commands"),
+			@Example(command = "help command", description = "print help for specified command")
 	})
 	public static class Help implements Command, StateAware {
 
@@ -291,9 +291,9 @@ public class SystemModule implements Module {
 					Description description = entry.getValue().get().getClass().getAnnotation(Description.class);
 					String name = entry.getKey();
 					Record record = Records.builder()
-						.entry(Keys.NAME, Values.ofText(name))
-						.entry(Keys.DESCRIPTION, Values.ofText(description.value()))
-						.build();
+							.entry(Keys.NAME, Values.ofText(name))
+							.entry(Keys.DESCRIPTION, Values.ofText(description.value()))
+							.build();
 					out.send(record);
 				}
 				return ExitStatus.success();
@@ -330,8 +330,8 @@ public class SystemModule implements Module {
 
 	@Description("suspend execution for given duration")
 	@Examples({
-		@Example(command = "sleep 2s", description = "suspend execution for 2 seconds (using ISO 8061 without PT prefix)"),
-		@Example(command = "sleep PT1M", description = "suspend execution for 1 minute (using ISO 8601)"),
+			@Example(command = "sleep 2s", description = "suspend execution for 2 seconds (using ISO 8061 without PT prefix)"),
+			@Example(command = "sleep PT1M", description = "suspend execution for 1 minute (using ISO 8601)"),
 	})
 	public static class Sleep implements Command {
 
@@ -359,8 +359,8 @@ public class SystemModule implements Module {
 
 	@Description("measure execution time of command or pipeline")
 	@Examples({
-		@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
-		@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
+			@Example(command = "withTime { ls }", description = "measure execution time of 'ls'"),
+			@Example(command = "withTime { ls | sink }", description = "measure execution time of pipeline 'ls | sink'"),
 	})
 	public static class WithTime implements CommandWrapper {
 
@@ -388,7 +388,7 @@ public class SystemModule implements Module {
 
 	@Description("process status")
 	@Examples({
-		@Example(command = "ps", description = "list all running process in the system as the current user"),
+			@Example(command = "ps", description = "list all running process in the system as the current user"),
 	})
 	public static class ProcessList implements Command {
 
@@ -401,12 +401,12 @@ public class SystemModule implements Module {
 			ProcessHandle.allProcesses().forEach(process -> {
 				Info info = process.info();
 				Record result = Records.builder()
-					.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
-					.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
-					.entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
-					.entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
-					.entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
-					.build();
+						.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
+						.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
+						.entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
+						.entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
+						.entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
+						.build();
 				out.send(result);
 			});
 			return ExitStatus.success();
@@ -415,7 +415,7 @@ public class SystemModule implements Module {
 
 	@Description("kill process")
 	@Examples({
-		@Example(command = "kill 38878", description = "kill process with PID 38878"),
+			@Example(command = "kill 38878", description = "kill process with PID 38878"),
 	})
 	public static class KillProcess implements Command {
 
@@ -460,7 +460,7 @@ public class SystemModule implements Module {
 
 	@Description("create a runtime error (exception), mostly for testing purposes")
 	@Examples({
-		@Example(command = "lines file.txt | err", description = "the pipeline will fail")
+			@Example(command = "lines file.txt | err", description = "the pipeline will fail")
 	})
 	public static class Err implements Command {
 
@@ -473,8 +473,8 @@ public class SystemModule implements Module {
 	@Experimental(description = "support same syntax for duration as sleep")
 	@Description("run command with a timeout")
 	@Examples({
-		@Example(command = "withTimeout 5s { walk / } ", description = "try to walk the entire filesystem within 5s timeout"),
-		@Example(command = "withTimeout PT5s { walk / } ", description = "try to walk the entire filesystem within 5s timeout")
+			@Example(command = "withTimeout 5s { walk / } ", description = "try to walk the entire filesystem within 5s timeout"),
+			@Example(command = "withTimeout PT5s { walk / } ", description = "try to walk the entire filesystem within 5s timeout")
 	})
 	public static class WithTimeout implements CommandWrapper {
 
@@ -519,9 +519,9 @@ public class SystemModule implements Module {
 
 	@Description("repeat command until the first success")
 	@Examples({
-		@Example(command = "waitSuccess { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 1s between attempts (default)"),
-		@Example(command = "waitSuccess 5s { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 5s between attempts"),
-		@Example(command = "waitSuccess PS5s { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 5s between attempts")
+			@Example(command = "waitSuccess { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 1s between attempts (default)"),
+			@Example(command = "waitSuccess 5s { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 5s between attempts"),
+			@Example(command = "waitSuccess PS5s { http http://localhost:8080/ } ", description = "waiting for local service on port 8080, waiting 5s between attempts")
 	})
 	public static class WaitSuccess implements CommandWrapper {
 
@@ -570,7 +570,7 @@ public class SystemModule implements Module {
 
 	@Description("measure execution time (best, worst, average) of inner command")
 	@Examples({
-		@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
+			@Example(command = "benchmark 50 { lines file.txt | sink } ", description = "repeat pipeline 50 times, measuring performance")
 	})
 	public static class Benchmark implements CommandWrapper {
 
@@ -614,11 +614,11 @@ public class SystemModule implements Module {
 			int runs = accumulator.results.size();
 			Duration avg = runs == 0 ? Duration.ZERO : accumulator.results.stream().reduce(Duration.ZERO, Duration::plus).dividedBy(runs);
 			out.send(Records.builder()
-				.entry(Keys.COUNT, Values.ofNumeric(runs))
-				.entry(BEST, Values.ofDuration(best))
-				.entry(WORST, Values.ofDuration(worst))
-				.entry(AVERAGE, Values.ofDuration(avg))
-				.build());
+					.entry(Keys.COUNT, Values.ofNumeric(runs))
+					.entry(BEST, Values.ofDuration(best))
+					.entry(WORST, Values.ofDuration(worst))
+					.entry(AVERAGE, Values.ofDuration(avg))
+					.build());
 			return ExitStatus.success();
 		}
 
@@ -647,7 +647,7 @@ public class SystemModule implements Module {
 
 	@Description("consume any record (e.g. like /dev/null)")
 	@Examples({
-		@Example(command = "ls | sink", description = "consume any record produced by ls")
+			@Example(command = "ls | sink", description = "consume any record produced by ls")
 	})
 	public static class Sink implements Command {
 
@@ -667,8 +667,8 @@ public class SystemModule implements Module {
 
 	@Description("create or update a variable binding")
 	@Examples({
-		@Example(command = "set FILE file.txt", description = "create variable FILE"),
-		@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
+			@Example(command = "set FILE file.txt", description = "create variable FILE"),
+			@Example(command = "set FILE another_file.txt", description = "update variable FILE"),
 	})
 	public static class SetVariable implements Command, StateAware, StateMutatorAware {
 
@@ -706,7 +706,7 @@ public class SystemModule implements Module {
 
 	@Description("delete a variable binding")
 	@Examples({
-		@Example(command = "unset FILE", description = "delete variable FILE, cannot be referenced anymore after this command"),
+			@Example(command = "unset FILE", description = "delete variable FILE, cannot be referenced anymore after this command"),
 	})
 	public static class UnsetVariable implements Command, StateAware, StateMutatorAware {
 
@@ -743,7 +743,7 @@ public class SystemModule implements Module {
 
 	@Description("Read a string from standard input and assign result to variable. The trailing newline is stripped.")
 	@Examples({
-		@Example(command = "input FILE", description = "save string read to variable 'FILE'"),
+			@Example(command = "input FILE", description = "save string read to variable 'FILE'"),
 	})
 	public static class Input implements Command, StateAware, StateMutatorAware, LineReaderAware {
 
@@ -800,7 +800,7 @@ public class SystemModule implements Module {
 
 	@Description("Read a string from standard input in a secure way and assign result to variable. The trailing newline is stripped.")
 	@Examples({
-		@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
+			@Example(command = "secret PASSWORD", description = "save string read to variable 'PASSWORD'"),
 	})
 	public static class Secret implements Command, StateAware, StateMutatorAware, LineReaderAware {
 
@@ -858,7 +858,7 @@ public class SystemModule implements Module {
 
 	@Description("Ask a question and wait for a user confirmation (Y/N)")
 	@Examples({
-		@Example(command = "confirm 'continue?'", description = "display question then wait for user input"),
+			@Example(command = "confirm 'continue?'", description = "display question then wait for user input"),
 	})
 	public static class Confirm implements Command, LineReaderAware {
 
@@ -902,7 +902,7 @@ public class SystemModule implements Module {
 
 	@Description("capture output of a command into a variable")
 	@Examples({
-		@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
+			@Example(command = "cwd | capture CWD", description = "create or update CWD variable with the output of 'cwd' command"),
 	})
 	@Experimental(description = "too low level compared to simply VARNAME=$(ls)")
 	public static class Capture implements Command, StateAware, StateMutatorAware {
@@ -946,7 +946,7 @@ public class SystemModule implements Module {
 
 	@Description("send output of a command into a file")
 	@Examples({
-		@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
+			@Example(command = "cwd | open cwd.txt CREATE WRITE ", description = "write output of 'cwd' command to a file named 'whoami.txt'")
 	})
 	@Experimental(description = "too low level compared to simply > file.txt or >> file.txt? too much power for end user (e.g. they could use DSYNC or READ)?")
 	public static class Open implements Command, StateAware {
@@ -979,10 +979,10 @@ public class SystemModule implements Module {
 
 		private OpenOption[] toOpenOptions(List<String> args) {
 			return args
-				.stream()
-				.skip(1)
-				.map(this::parseOption)
-				.toArray(OpenOption[]::new);
+					.stream()
+					.skip(1)
+					.map(this::parseOption)
+					.toArray(OpenOption[]::new);
 		}
 
 		private OpenOption parseOption(String arg) {

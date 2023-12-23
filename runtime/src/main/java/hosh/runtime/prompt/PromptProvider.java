@@ -30,6 +30,8 @@ import hosh.spi.State;
  */
 public interface PromptProvider {
 
-	/** Returns null is no prompt is available. */
+	/**
+	 * Returns null is no prompt is available.
+	 */
 	String provide(State state);
 }

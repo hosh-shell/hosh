@@ -81,8 +81,8 @@ class ValuesTest {
 			Value a = Values.none();
 			Value b = Values.ofText("2");
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare None with Text[2]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare None with Text[2]");
 		}
 
 		@Test
@@ -135,8 +135,8 @@ class ValuesTest {
 		@Test
 		void nullDuration() {
 			assertThatThrownBy(() -> Values.ofDuration(null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("duration cannot be null");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("duration cannot be null");
 		}
 
 		@Test
@@ -144,8 +144,8 @@ class ValuesTest {
 			Value a = Values.ofDuration(Duration.ofHours(1));
 			Value b = Values.ofText("2");
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Duration[PT1H] with Text[2]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Duration[PT1H] with Text[2]");
 		}
 	}
 
@@ -180,8 +180,8 @@ class ValuesTest {
 		@Test
 		void nullDuration() {
 			assertThatThrownBy(() -> Values.ofInstant(null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("instant cannot be null");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("instant cannot be null");
 		}
 
 		@Test
@@ -189,8 +189,8 @@ class ValuesTest {
 			Value a = Values.ofInstant(Instant.EPOCH);
 			Value b = Values.ofText("2");
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Instant[1970-01-01T00:00:00Z] with Text[2]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Instant[1970-01-01T00:00:00Z] with Text[2]");
 		}
 	}
 
@@ -204,8 +204,8 @@ class ValuesTest {
 		@Test
 		void nullIsReject() {
 			assertThatThrownBy(() -> Values.ofText(null))
-				.hasMessage("text cannot be null")
-				.isInstanceOf(IllegalArgumentException.class);
+					.hasMessage("text cannot be null")
+					.isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test
@@ -217,7 +217,7 @@ class ValuesTest {
 		@Test
 		void equalsContract() {
 			EqualsVerifier.forClass(Values.TextValue.class)
-				.verify();
+					.verify();
 		}
 
 		@Test
@@ -230,15 +230,15 @@ class ValuesTest {
 			Value a = Values.ofText("2");
 			Value b = Values.ofDuration(Duration.ofHours(1));
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Text[2] with Duration[PT1H]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Text[2] with Duration[PT1H]");
 		}
 
 		@Test
 		void nullText() {
 			assertThatThrownBy(() -> Values.ofText(null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("text cannot be null");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("text cannot be null");
 		}
 
 		@Test
@@ -284,8 +284,8 @@ class ValuesTest {
 			Value a = Values.ofNumeric(42);
 			Value b = Values.ofText("2");
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Numeric[42] with Text[2]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Numeric[42] with Text[2]");
 		}
 
 		@Test
@@ -307,27 +307,27 @@ class ValuesTest {
 
 		@ParameterizedTest
 		@CsvSource({
-			"            0,     0,  B",
-			"            1,     1,  B",
-			"            2,     2,  B",
-			"           10,    10,  B",
-			"         1023,  1023,  B",
-			"         1024,     1, KB",
-			"         2047,     2, KB",
-			"         2048,     2, KB",
-			"         4096,     4, KB",
-			"         8192,     8, KB",
-			"        16384,    16, KB",
-			"      1048576,     1, MB",
-			"      2097152,     2, MB",
-			"     11048576,  10.5, MB",
-			"    134217728,   128, MB",
-			"    199999999, 190.7, MB",
-			"    200000001, 190.7, MB",
-			"   1073741824,     1, GB",
-			"  17179869184,    16, GB",
-			" 274877906944,   256, GB",
-			"1099511627780,     1, TB"
+				"            0,     0,  B",
+				"            1,     1,  B",
+				"            2,     2,  B",
+				"           10,    10,  B",
+				"         1023,  1023,  B",
+				"         1024,     1, KB",
+				"         2047,     2, KB",
+				"         2048,     2, KB",
+				"         4096,     4, KB",
+				"         8192,     8, KB",
+				"        16384,    16, KB",
+				"      1048576,     1, MB",
+				"      2097152,     2, MB",
+				"     11048576,  10.5, MB",
+				"    134217728,   128, MB",
+				"    199999999, 190.7, MB",
+				"    200000001, 190.7, MB",
+				"   1073741824,     1, GB",
+				"  17179869184,    16, GB",
+				" 274877906944,   256, GB",
+				"1099511627780,     1, TB"
 		})
 		void approximateOnPrint(long bytes, String expectedValue, String expectedUnit) {
 			Values.ofSize(bytes).print(printWriter, Locale.US);
@@ -361,8 +361,8 @@ class ValuesTest {
 		@Test
 		void size() {
 			assertThatThrownBy(() -> Values.ofSize(-1))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("negative size");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("negative size");
 		}
 
 		@Test
@@ -375,8 +375,8 @@ class ValuesTest {
 			Value a = Values.ofSize(1000);
 			Value b = Values.ofText("2");
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Size[1000B] with Text[2]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Size[1000B] with Text[2]");
 		}
 
 		@Test
@@ -424,15 +424,15 @@ class ValuesTest {
 			Value a = Values.ofPath(Paths.get("file"));
 			Value b = Values.ofText("2");
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Path[file] with Text[2]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Path[file] with Text[2]");
 		}
 
 		@Test
 		void nullPath() {
 			assertThatThrownBy(() -> Values.ofPath(null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("path cannot be null");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("path cannot be null");
 		}
 
 		@Test
@@ -460,8 +460,8 @@ class ValuesTest {
 		@Test
 		void nullValue() {
 			assertThatThrownBy(() -> Values.ofBytes(null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("bytes cannot be null");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("bytes cannot be null");
 		}
 
 		@Test
@@ -478,8 +478,8 @@ class ValuesTest {
 			Value a = Values.ofBytes(new byte[]{-1, -1});
 			Value b = Values.ofText("2");
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare Bytes[[-1, -1]] with Text[2]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare Bytes[[-1, -1]] with Text[2]");
 		}
 
 		@Test
@@ -510,16 +510,16 @@ class ValuesTest {
 		@Test
 		void nullValue() {
 			assertThatThrownBy(() -> Values.withStyle(null, Ansi.Style.BG_BLUE))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("value cannot be null");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("value cannot be null");
 		}
 
 		@Test
 		void nullStyle() {
 			Value text = Values.ofText("text");
 			assertThatThrownBy(() -> Values.withStyle(text, null))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("style cannot be null");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("style cannot be null");
 		}
 
 		@Test
@@ -535,8 +535,8 @@ class ValuesTest {
 			Value a = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
 			Value b = Values.ofText("2");
 			assertThatThrownBy(() -> a.compareTo(b))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessage("cannot compare StyledValue[value=Numeric[1],style='BG_BLUE'] with Text[2]");
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("cannot compare StyledValue[value=Numeric[1],style='BG_BLUE'] with Text[2]");
 		}
 
 		@Test
@@ -563,85 +563,85 @@ class ValuesTest {
 		@Test
 		void instant() {
 			List<Value> sorted = Stream.of(
-					Values.ofInstant(Instant.ofEpochMilli(100)),
-					Values.ofInstant(Instant.ofEpochMilli(-100)),
-					Values.ofInstant(Instant.ofEpochMilli(0)))
-				.sorted()
-				.toList();
+							Values.ofInstant(Instant.ofEpochMilli(100)),
+							Values.ofInstant(Instant.ofEpochMilli(-100)),
+							Values.ofInstant(Instant.ofEpochMilli(0)))
+					.sorted()
+					.toList();
 			assertThat(sorted).containsExactly(
-				Values.ofInstant(Instant.ofEpochMilli(-100)),
-				Values.ofInstant(Instant.ofEpochMilli(0)),
-				Values.ofInstant(Instant.ofEpochMilli(100)));
+					Values.ofInstant(Instant.ofEpochMilli(-100)),
+					Values.ofInstant(Instant.ofEpochMilli(0)),
+					Values.ofInstant(Instant.ofEpochMilli(100)));
 		}
 
 		@Test
 		void numeric() {
 			List<Value> sorted = Stream.of(
-					Values.ofNumeric(1),
-					Values.ofNumeric(-1),
-					Values.ofNumeric(0))
-				.sorted()
-				.toList();
+							Values.ofNumeric(1),
+							Values.ofNumeric(-1),
+							Values.ofNumeric(0))
+					.sorted()
+					.toList();
 			assertThat(sorted).containsExactly(
-				Values.ofNumeric(-1),
-				Values.ofNumeric(0),
-				Values.ofNumeric(1));
+					Values.ofNumeric(-1),
+					Values.ofNumeric(0),
+					Values.ofNumeric(1));
 		}
 
 		@Test
 		void text() {
 			List<Value> sorted = Stream.of(
-					Values.ofText("a2"),
-					Values.ofText("a10"),
-					Values.ofText("a1"))
-				.sorted()
-				.toList();
+							Values.ofText("a2"),
+							Values.ofText("a10"),
+							Values.ofText("a1"))
+					.sorted()
+					.toList();
 			assertThat(sorted).containsExactly(
-				Values.ofText("a1"),
-				Values.ofText("a2"),
-				Values.ofText("a10"));
+					Values.ofText("a1"),
+					Values.ofText("a2"),
+					Values.ofText("a10"));
 		}
 
 		@Test
 		void size() {
 			List<Value> sorted = Stream.of(
+							Values.ofSize(1),
+							Values.ofSize(2),
+							Values.ofSize(3))
+					.sorted()
+					.toList();
+			assertThat(sorted).containsExactly(
 					Values.ofSize(1),
 					Values.ofSize(2),
-					Values.ofSize(3))
-				.sorted()
-				.toList();
-			assertThat(sorted).containsExactly(
-				Values.ofSize(1),
-				Values.ofSize(2),
-				Values.ofSize(3));
+					Values.ofSize(3));
 		}
 
 		@Test
 		void path() {
 			List<Value> sorted = Stream.of(
-					Values.ofPath(Paths.get("a10")),
-					Values.ofPath(Paths.get("a1")),
-					Values.ofPath(Paths.get("a20")),
-					Values.ofPath(Paths.get("a2")))
-				.sorted()
-				.toList();
+							Values.ofPath(Paths.get("a10")),
+							Values.ofPath(Paths.get("a1")),
+							Values.ofPath(Paths.get("a20")),
+							Values.ofPath(Paths.get("a2")))
+					.sorted()
+					.toList();
 			assertThat(sorted).containsExactly(
-				Values.ofPath(Paths.get("a1")),
-				Values.ofPath(Paths.get("a2")),
-				Values.ofPath(Paths.get("a10")),
-				Values.ofPath(Paths.get("a20")));
+					Values.ofPath(Paths.get("a1")),
+					Values.ofPath(Paths.get("a2")),
+					Values.ofPath(Paths.get("a10")),
+					Values.ofPath(Paths.get("a20")));
 		}
 
 		@Test
 		void duration() {
 			List<Value> sorted = Stream.of(
-					Values.ofDuration(Duration.ofMillis(1)),
-					Values.ofDuration(Duration.ofMillis(2)))
-				.sorted()
-				.toList();
+							Values.ofDuration(Duration.ofMillis(1)),
+							Values.ofDuration(Duration.ofMillis(2)))
+					.sorted()
+					.toList();
 			assertThat(sorted).containsExactly(
-				Values.ofDuration(Duration.ofMillis(1)),
-				Values.ofDuration(Duration.ofMillis(2)));
+					Values.ofDuration(Duration.ofMillis(1)),
+					Values.ofDuration(Duration.ofMillis(2)));
 		}
 
 	}
@@ -726,10 +726,10 @@ class ValuesTest {
 			@Test
 			void noneLast() {
 				qt().forAll(listOfNumericValuesContainingNone())
-					.checkAssert(candidate -> {
-						candidate.sort(sut);
-						assertThat(candidate).last().isEqualTo(Values.none());
-					});
+						.checkAssert(candidate -> {
+							candidate.sort(sut);
+							assertThat(candidate).last().isEqualTo(Values.none());
+						});
 			}
 		}
 
@@ -741,10 +741,10 @@ class ValuesTest {
 			@Test
 			void noneFirst() {
 				qt().forAll(listOfNumericValuesContainingNone())
-					.checkAssert(candidate -> {
-						candidate.sort(sut);
-						assertThat(candidate).first().isEqualTo(Values.none());
-					});
+						.checkAssert(candidate -> {
+							candidate.sort(sut);
+							assertThat(candidate).first().isEqualTo(Values.none());
+						});
 			}
 		}
 
@@ -752,12 +752,12 @@ class ValuesTest {
 		// creates random lists of values with at least 1 none (in an unspecified position)
 		private Gen<List<Value>> listOfNumericValuesContainingNone() {
 			return lists().of(integers().all().map(Values::ofNumeric))
-				.ofSizeBetween(1, 20)
-				.mutate((base, r) -> {
-					int randomIndex = ThreadLocalRandom.current().nextInt(base.size() + 1);
-					base.add(randomIndex, Values.none());
-					return base;
-				});
+					.ofSizeBetween(1, 20)
+					.mutate((base, r) -> {
+						int randomIndex = ThreadLocalRandom.current().nextInt(base.size() + 1);
+						base.add(randomIndex, Values.none());
+						return base;
+					});
 		}
 
 	}

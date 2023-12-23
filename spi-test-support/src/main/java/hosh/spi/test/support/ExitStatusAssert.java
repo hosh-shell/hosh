@@ -53,7 +53,7 @@ public class ExitStatusAssert extends AbstractAssert<ExitStatusAssert, ExitStatu
 	public void hasExitCode(int expectedCode) {
 		isNotNull();
 		if (expectedCode != actual.value()) {
-			failWithMessage("expected %d but as %d", expectedCode,  actual.value());
+			failWithMessage("expected %d but as %d", expectedCode, actual.value());
 		}
 	}
 }

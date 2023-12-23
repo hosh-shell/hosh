@@ -174,9 +174,9 @@ public class AutoTableChannel implements OutputChannel {
 
 	private void sendHeader(Map<Key, Integer> paddings, Record record, OutputChannel out) {
 		String format = record.keys()
-			.map(paddings::get)
-			.map(this::formatterFor)
-			.collect(Collectors.joining());
+				.map(paddings::get)
+				.map(this::formatterFor)
+				.collect(Collectors.joining());
 		String header = String.format(format, record.keys().map(Key::name).toArray());
 		out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(header), Ansi.Style.FG_MAGENTA)));
 	}

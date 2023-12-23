@@ -43,11 +43,11 @@ public class VariableExpansionCompleter implements Completer {
 	public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
 		if (line.word().startsWith("${")) {
 			state.getVariables()
-				.keySet()
-				.stream()
-				.map(variableName -> "${" + variableName.name() + "}")
-				.map(Candidates::complete)
-				.forEach(candidates::add);
+					.keySet()
+					.stream()
+					.map(variableName -> "${" + variableName.name() + "}")
+					.map(Candidates::complete)
+					.forEach(candidates::add);
 		}
 	}
 }

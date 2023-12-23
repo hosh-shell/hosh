@@ -51,7 +51,7 @@ public class HistoryModule implements Module {
 
 	@Description("display the history with timestamp, index and text")
 	@Examples({
-		@Example(command = "history", description = "show all history")
+			@Example(command = "history", description = "show all history")
 	})
 	public static class ListHistory implements Command, HistoryAware {
 
@@ -70,9 +70,9 @@ public class HistoryModule implements Module {
 			}
 			for (var entry : history) {
 				Record record = Records.builder()
-					                .entry(Keys.TIMESTAMP, Values.ofInstant(entry.time()))
-					                .entry(Keys.TEXT, Values.ofText(entry.line()))
-					                .build();
+						.entry(Keys.TIMESTAMP, Values.ofInstant(entry.time()))
+						.entry(Keys.TEXT, Values.ofText(entry.line()))
+						.build();
 				out.send(record);
 			}
 			return ExitStatus.success();

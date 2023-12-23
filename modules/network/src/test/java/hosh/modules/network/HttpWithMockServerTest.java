@@ -56,59 +56,59 @@ import static org.mockserver.model.HttpRequest.request;
 @ExtendWith({MockitoExtension.class, MockServerExtension.class})
 class HttpWithMockServerTest {
 
-    @Mock
-    InputChannel in;
+	@Mock
+	InputChannel in;
 
-    @Mock
-    OutputChannel out;
+	@Mock
+	OutputChannel out;
 
-    @Mock
-    OutputChannel err;
+	@Mock
+	OutputChannel err;
 
-    @Captor
-    ArgumentCaptor<Record> body;
+	@Captor
+	ArgumentCaptor<Record> body;
 
-    NetworkModule.Http sut;
+	NetworkModule.Http sut;
 
-    @BeforeEach
-    void createSut() {
-        sut = new NetworkModule.Http();
-        sut.setVersion(new Version("v1.2.3"));
-    }
+	@BeforeEach
+	void createSut() {
+		sut = new NetworkModule.Http();
+		sut.setVersion(new Version("v1.2.3"));
+	}
 
-    @Test
-    void ok(ClientAndServer clientAndServer) {
-        // Given
-        clientAndServer.when(
-                        request().withMethod("GET").withPath("/path")
-                )
-                .respond(
-                        HttpResponse.response().withStatusCode(200)
-                                .withBody("line1\nline2")
-                );
-        // When
-        String arg = String.format("http://localhost:%d/path", clientAndServer.getLocalPort());
-        ExitStatus exitStatus = sut.run(List.of(arg), in, out, err);
-        // Then
-        assertThat(exitStatus).isSuccess();
-        then(in).shouldHaveNoInteractions();
-        then(out).should(atLeastOnce()).send(body.capture());
-        then(err).shouldHaveNoInteractions();
-        assertThat(body.getAllValues()).containsExactly(Records.singleton(Keys.TEXT, Values.ofText("line1")), Records.singleton(Keys.TEXT, Values.ofText("line2")));
-    }
+	@Test
+	void ok(ClientAndServer clientAndServer) {
+		// Given
+		clientAndServer.when(
+						request().withMethod("GET").withPath("/path")
+				)
+				.respond(
+						HttpResponse.response().withStatusCode(200)
+								.withBody("line1\nline2")
+				);
+		// When
+		String arg = String.format("http://localhost:%d/path", clientAndServer.getLocalPort());
+		ExitStatus exitStatus = sut.run(List.of(arg), in, out, err);
+		// Then
+		assertThat(exitStatus).isSuccess();
+		then(in).shouldHaveNoInteractions();
+		then(out).should(atLeastOnce()).send(body.capture());
+		then(err).shouldHaveNoInteractions();
+		assertThat(body.getAllValues()).containsExactly(Records.singleton(Keys.TEXT, Values.ofText("line1")), Records.singleton(Keys.TEXT, Values.ofText("line2")));
+	}
 
-    @Test
-    void notFound(ClientAndServer clientAndServer) {
-        // Given
-        // no url is expected in the mockserver
-        // When
-        String arg = String.format("http://localhost:%d/not-found", clientAndServer.getLocalPort());
-        ExitStatus exitStatus = sut.run(List.of(arg), in, out, err);
-        // Then
-        assertThat(exitStatus).isError();
-        then(in).shouldHaveNoInteractions();
-        then(out).shouldHaveNoInteractions();
-        then(err).shouldHaveNoInteractions();
-    }
+	@Test
+	void notFound(ClientAndServer clientAndServer) {
+		// Given
+		// no url is expected in the mockserver
+		// When
+		String arg = String.format("http://localhost:%d/not-found", clientAndServer.getLocalPort());
+		ExitStatus exitStatus = sut.run(List.of(arg), in, out, err);
+		// Then
+		assertThat(exitStatus).isError();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
+	}
 
 }

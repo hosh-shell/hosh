@@ -54,7 +54,7 @@ public class TerminalModule implements Module {
 
 	@Description("dump terminal info")
 	@Examples({
-		@Example(command = "dump", description = "output current terminal information (similar to stty -a)"),
+			@Example(command = "dump", description = "output current terminal information (similar to stty -a)"),
 	})
 	public static class Dump implements Command, TerminalAware {
 
@@ -73,21 +73,21 @@ public class TerminalModule implements Module {
 			}
 			Attributes attributes = terminal.getAttributes();
 			out.send(Records
-				         .builder()
-				         .entry(Keys.of("type"), Values.ofText(terminal.getType()))
-				         .entry(Keys.of("lflags"), Values.ofText(attributes.getLocalFlags().toString()))
-				         .entry(Keys.of("iflags"), Values.ofText(attributes.getInputFlags().toString()))
-				         .entry(Keys.of("oflags"), Values.ofText(attributes.getOutputFlags().toString()))
-				         .entry(Keys.of("cflags"), Values.ofText(attributes.getControlFlags().toString()))
-				         .entry(Keys.of("cchars"), Values.ofText(attributes.getControlChars().toString()))
-				         .build());
+					.builder()
+					.entry(Keys.of("type"), Values.ofText(terminal.getType()))
+					.entry(Keys.of("lflags"), Values.ofText(attributes.getLocalFlags().toString()))
+					.entry(Keys.of("iflags"), Values.ofText(attributes.getInputFlags().toString()))
+					.entry(Keys.of("oflags"), Values.ofText(attributes.getOutputFlags().toString()))
+					.entry(Keys.of("cflags"), Values.ofText(attributes.getControlFlags().toString()))
+					.entry(Keys.of("cchars"), Values.ofText(attributes.getControlChars().toString()))
+					.build());
 			return ExitStatus.success();
 		}
 	}
 
 	@Description("clear the terminal screen")
 	@Examples({
-		@Example(command = "clear", description = "clear terminal screen"),
+			@Example(command = "clear", description = "clear terminal screen"),
 	})
 	public static class Clear implements Command, TerminalAware {
 
@@ -112,7 +112,7 @@ public class TerminalModule implements Module {
 
 	@Description("ring/bell the terminal screen")
 	@Examples({
-		@Example(command = "bell", description = "send 'bell' command to the terminal"),
+			@Example(command = "bell", description = "send 'bell' command to the terminal"),
 	})
 	public static class Bell implements Command, TerminalAware {
 

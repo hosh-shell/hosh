@@ -75,11 +75,11 @@ class RecordsTest {
 		Value anotherValue = Values.ofText("another_value");
 		Value lastValue = Values.ofText("lastValue");
 		Record a = Records
-			           .empty()
-			           .append(Keys.of("key"), value)
-			           .append(Keys.of("anotherkey"), anotherValue)
-			           .prepend(Keys.of("first"), value)
-			           .append(Keys.of("last"), lastValue);
+				.empty()
+				.append(Keys.of("key"), value)
+				.append(Keys.of("anotherkey"), anotherValue)
+				.prepend(Keys.of("first"), value)
+				.append(Keys.of("last"), lastValue);
 		assertThat(a.keys()).containsExactly(Keys.of("first"), Keys.of("key"), Keys.of("anotherkey"), Keys.of("last"));
 		assertThat(a.values()).containsExactly(value, value, anotherValue, lastValue);
 	}

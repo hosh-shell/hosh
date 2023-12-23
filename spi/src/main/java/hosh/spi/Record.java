@@ -80,7 +80,7 @@ public interface Record extends Printable {
 		@Override
 		public final boolean equals(Object obj) {
 			if (obj instanceof Entry that) {
-                return Objects.equals(this.key, that.key) && Objects.equals(this.value, that.value);
+				return Objects.equals(this.key, that.key) && Objects.equals(this.value, that.value);
 			} else {
 				return false;
 			}

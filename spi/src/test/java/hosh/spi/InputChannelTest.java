@@ -74,7 +74,7 @@ class InputChannelTest {
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		Iterator<Record> iterator = iterable.iterator();
 		assertThatThrownBy(iterator::next)
-			.isInstanceOf(NoSuchElementException.class);
+				.isInstanceOf(NoSuchElementException.class);
 	}
 
 	@SuppressWarnings("unchecked")

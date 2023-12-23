@@ -49,8 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -120,7 +120,7 @@ class InterpreterTest {
 	@Test
 	void handleCancellations() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-			.willThrow(new CancellationException("simulated cancellation"));
+				.willThrow(new CancellationException("simulated cancellation"));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
@@ -132,7 +132,7 @@ class InterpreterTest {
 	@Test
 	void handleExceptionWithoutMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-			.willThrow(new NullPointerException());
+				.willThrow(new NullPointerException());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
@@ -145,7 +145,7 @@ class InterpreterTest {
 	@Test
 	void handleExceptionWithMessage() {
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
-			.willThrow(new IllegalArgumentException("simulated error"));
+				.willThrow(new IllegalArgumentException("simulated error"));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());

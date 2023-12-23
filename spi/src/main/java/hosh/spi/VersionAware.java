@@ -28,5 +28,5 @@ package hosh.spi;
  */
 public interface VersionAware {
 
-    void setVersion(Version version);
+	void setVersion(Version version);
 }

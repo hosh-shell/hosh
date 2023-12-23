@@ -63,10 +63,10 @@ public class CommandCompleter implements Completer {
 
 	private void completeBuiltinsExcludingOverrides(List<Candidate> candidates, Set<String> builtinOverrides) {
 		state.getCommands().keySet()
-			.stream()
-			.filter(command -> !builtinOverrides.contains(command))
-			.map(command -> Candidates.completeWithDescription(command, "built-in"))
-			.forEach(candidates::add);
+				.stream()
+				.filter(command -> !builtinOverrides.contains(command))
+				.map(command -> Candidates.completeWithDescription(command, "built-in"))
+				.forEach(candidates::add);
 	}
 
 	private void completeExternals(List<Candidate> candidates, Set<String> builtinOverrides) {
@@ -80,9 +80,9 @@ public class CommandCompleter implements Completer {
 	private void executableInPath(Path dir, List<Candidate> candidates, Set<String> builtinOverrides) {
 		try (Stream<Path> list = Files.list(dir)) {
 			list
-				.filter(Files::isExecutable)
-				.map(p -> toCandidate(p, builtinOverrides))
-				.forEach(candidates::add);
+					.filter(Files::isExecutable)
+					.map(p -> toCandidate(p, builtinOverrides))
+					.forEach(candidates::add);
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, e, () -> String.format("got exception while listing %s", dir));
 		}

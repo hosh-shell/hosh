@@ -159,8 +159,8 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		var result = Assertions.assertThatThrownBy(() -> sut.run(List.of(), in, out, err));
 		result
-			.hasNoSuppressedExceptions()
-			.isSameAs(runtimeException);
+				.hasNoSuppressedExceptions()
+				.isSameAs(runtimeException);
 	}
 
 	@Test
@@ -174,9 +174,9 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		var result = Assertions.assertThatThrownBy(() -> sut.run(List.of(), in, out, err));
 		result
-			.hasNoSuppressedExceptions()
-			.isNotSameAs(error)
-			.isInstanceOf(RuntimeException.class);
+				.hasNoSuppressedExceptions()
+				.isNotSameAs(error)
+				.isInstanceOf(RuntimeException.class);
 	}
 
 

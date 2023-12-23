@@ -48,23 +48,23 @@ public abstract class UnitTestsFitnessTest {
 	@ArchTag("fitness")
 	@ArchTest
 	public static final ArchRule UNANNOTATED_METHODS_IN_TESTS_MUST_BE_PRIVATE =
-		ArchRuleDefinition.methods().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Test")
-			.or().areDeclaredInClassesThat().haveSimpleNameEndingWith("IT")
-			.and().areNotPrivate()
-			.and().areNotStatic()
-			.should().beAnnotatedWith(Test.class)
-			.orShould().beAnnotatedWith(BeforeEach.class)
-			.orShould().beAnnotatedWith(AfterEach.class)
-			.orShould().beAnnotatedWith(ParameterizedTest.class);
+			ArchRuleDefinition.methods().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Test")
+					.or().areDeclaredInClassesThat().haveSimpleNameEndingWith("IT")
+					.and().areNotPrivate()
+					.and().areNotStatic()
+					.should().beAnnotatedWith(Test.class)
+					.orShould().beAnnotatedWith(BeforeEach.class)
+					.orShould().beAnnotatedWith(AfterEach.class)
+					.orShould().beAnnotatedWith(ParameterizedTest.class);
 
 	@SuppressWarnings("unused")
 	@ArchTag("fitness")
 	@ArchTest
 	public static final ArchRule MOCKS_MUST_BE_USED =
-		ArchRuleDefinition.fields()
-			.that()
-			.areNotStatic().and().areAnnotatedWith(Mock.class)
-			.should(haveAccesses());
+			ArchRuleDefinition.fields()
+					.that()
+					.areNotStatic().and().areAnnotatedWith(Mock.class)
+					.should(haveAccesses());
 
 	// implementation details
 	private static HaveAccesses haveAccesses() {

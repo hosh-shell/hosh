@@ -92,7 +92,7 @@ public class TextModule implements Module {
 
 	@Description("select a subset of keys from a record")
 	@Examples({
-		@Example(description = "select some keys from TSV file", command = "lines file.tsv | split text '\\t' | select 1 2 3"),
+			@Example(description = "select some keys from TSV file", command = "lines file.tsv | split text '\\t' | select 1 2 3"),
 	})
 	public static class Select implements Command {
 
@@ -112,7 +112,7 @@ public class TextModule implements Module {
 
 	@Description("convert a line to record with numerical keys by splitting")
 	@Examples({
-		@Example(description = "tab separated file to records", command = "lines file.tsv | split text '\\t'"),
+			@Example(description = "tab separated file to records", command = "lines file.tsv | split text '\\t'"),
 	})
 	public static class Split implements Command {
 
@@ -127,8 +127,8 @@ public class TextModule implements Module {
 			Map<Integer, Key> cachedKeys = new HashMap<>();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key)
-					.flatMap(v -> v.unwrap(String.class))
-					.ifPresent(str -> out.send(split(pattern, str, cachedKeys))); // side effect
+						.flatMap(v -> v.unwrap(String.class))
+						.ifPresent(str -> out.send(split(pattern, str, cachedKeys))); // side effect
 			}
 			return ExitStatus.success();
 		}
@@ -151,7 +151,7 @@ public class TextModule implements Module {
 
 	@Description("join record into a single-keyed text record")
 	@Examples({
-		@Example(description = "record to string", command = "lines file.tsv | split text '\\t' | join ','"),
+			@Example(description = "record to string", command = "lines file.tsv | split text '\\t' | join ','"),
 	})
 	public static class Join implements Command {
 
@@ -185,7 +185,7 @@ public class TextModule implements Module {
 
 	@Description("trim strings")
 	@Examples({
-		@Example(command = "lines pom.xml | trim text", description = "trim")
+			@Example(command = "lines pom.xml | trim text", description = "trim")
 	})
 	public static class Trim implements Command {
 
@@ -218,15 +218,15 @@ public class TextModule implements Module {
 
 		private Value trim(Value value) {
 			return value.unwrap(String.class)
-				.map(String::trim)
-				.map(Values::ofText)
-				.orElse(value);
+					.map(String::trim)
+					.map(Values::ofText)
+					.orElse(value);
 		}
 	}
 
 	@Description("convert a line to a record using a regex with named groups")
 	@Examples({
-		@Example(description = "parse k=v format into record", command = "echo \"aaa=bbb\" | regex value '(?<name>.+)=(?<value>.+)' | schema"),
+			@Example(description = "parse k=v format into record", command = "echo \"aaa=bbb\" | regex value '(?<name>.+)=(?<value>.+)' | schema"),
 	})
 	public static class Regex implements Command {
 
@@ -270,8 +270,8 @@ public class TextModule implements Module {
 
 	@Description("output keys of incoming records")
 	@Examples({
-		@Example(command = "ls | schema", description = "output 'path size'"),
-		@Example(command = "ls | count | schema", description = "output 'count'"),
+			@Example(command = "ls | schema", description = "output 'path size'"),
+			@Example(command = "ls | count | schema", description = "output 'count'"),
 	})
 	public static class Schema implements Command {
 
@@ -291,7 +291,7 @@ public class TextModule implements Module {
 
 	@Description("copy incoming records to the output only if they match a regex")
 	@Examples({
-		@Example(command = "lines file.txt | filter text '.*The.*' ", description = "output only lines containing 'The' somewhere"),
+			@Example(command = "lines file.txt | filter text '.*The.*' ", description = "output only lines containing 'The' somewhere"),
 	})
 	public static class Filter implements Command {
 
@@ -306,9 +306,9 @@ public class TextModule implements Module {
 			for (Record record : InputChannel.iterate(in)) {
 				// this could be allocation intensive but let's see
 				record.value(key)
-					.flatMap(v -> v.unwrap(String.class))
-					.filter(s -> pattern.matcher(s).matches())
-					.ifPresent(v -> out.send(record)); // side effect
+						.flatMap(v -> v.unwrap(String.class))
+						.filter(s -> pattern.matcher(s).matches())
+						.ifPresent(v -> out.send(record)); // side effect
 			}
 			return ExitStatus.success();
 		}
@@ -316,7 +316,7 @@ public class TextModule implements Module {
 
 	@Description("prepend 'index' key to all incoming records")
 	@Examples({
-		@Example(command = "lines file.txt | enumerate", description = "similar to 'cat -n'"),
+			@Example(command = "lines file.txt | enumerate", description = "similar to 'cat -n'"),
 	})
 	public static class Enumerate implements Command {
 
@@ -337,7 +337,7 @@ public class TextModule implements Module {
 
 	@Description("prepend 'timestamp' key to all incoming records")
 	@Examples({
-		@Example(command = "watch | timestamp", description = "tag each event with current timestamp"),
+			@Example(command = "watch | timestamp", description = "tag each event with current timestamp"),
 	})
 	public static class Timestamp implements Command {
 
@@ -362,7 +362,7 @@ public class TextModule implements Module {
 
 	@Description("only output records that are not repeated in the input according to the specified key")
 	@Examples({
-		@Example(command = "lines file.txt | distinct text", description = "output all unique lines in 'file.txt'")
+			@Example(command = "lines file.txt | distinct text", description = "output all unique lines in 'file.txt'")
 	})
 	public static class Distinct implements Command {
 
@@ -388,7 +388,7 @@ public class TextModule implements Module {
 
 	@Description("only output records that are repeated in the input, according to the specified key")
 	@Examples({
-		@Example(command = "lines file.txt | duplicated text", description = "output all non-unique lines in 'file.txt'")
+			@Example(command = "lines file.txt | duplicated text", description = "output all non-unique lines in 'file.txt'")
 	})
 	public static class Duplicated implements Command {
 
@@ -414,9 +414,9 @@ public class TextModule implements Module {
 
 	@Description("sort records according to the specified key")
 	@Examples({
-		@Example(command = "lines file.txt | sort text", description = "sort lines in 'file.txt' in ascending order"),
-		@Example(command = "lines file.txt | sort text desc", description = "sort lines in 'file.txt' in descending order"),
-		@Example(command = "lines file.txt | sort text asc", description = "sort lines in 'file.txt' in ascending order")
+			@Example(command = "lines file.txt | sort text", description = "sort lines in 'file.txt' in ascending order"),
+			@Example(command = "lines file.txt | sort text desc", description = "sort lines in 'file.txt' in descending order"),
+			@Example(command = "lines file.txt | sort text asc", description = "sort lines in 'file.txt' in ascending order")
 	})
 	public static class Sort implements Command {
 
@@ -487,7 +487,7 @@ public class TextModule implements Module {
 
 	@Description("take first n records, discarding everything else")
 	@Examples({
-		@Example(command = "lines file.txt | take 1", description = "output first line of 'file.txt'")
+			@Example(command = "lines file.txt | take 1", description = "output first line of 'file.txt'")
 	})
 	public static class Take implements Command {
 
@@ -515,7 +515,7 @@ public class TextModule implements Module {
 
 	@Description("drop first n records, then keep everything else")
 	@Examples({
-		@Example(command = "lines file.txt | drop 1", description = "output 'file.txt', except the first line")
+			@Example(command = "lines file.txt | drop 1", description = "output 'file.txt', except the first line")
 	})
 	public static class Drop implements Command {
 
@@ -543,7 +543,7 @@ public class TextModule implements Module {
 
 	@Description("keep last n records")
 	@Examples({
-		@Example(command = "lines file.txt | last 1", description = "output only last line of 'file.txt'")
+			@Example(command = "lines file.txt | last 1", description = "output only last line of 'file.txt'")
 	})
 	public static class Last implements Command {
 
@@ -583,7 +583,7 @@ public class TextModule implements Module {
 
 	@Description("create an infinite sequence of random numbers, remember to always limit it with '| take n'")
 	@Examples({
-		@Example(command = "rand | enumerate | take 3", description = "create 3 random records")
+			@Example(command = "rand | enumerate | take 3", description = "create 3 random records")
 	})
 	public static class Rand implements Command {
 
@@ -606,7 +606,7 @@ public class TextModule implements Module {
 
 	@Description("count incoming records")
 	@Examples({
-		@Example(command = "rand | take 3 | count", description = "output 3")
+			@Example(command = "rand | take 3 | count", description = "output 3")
 	})
 	public static class Count implements Command {
 
@@ -627,8 +627,8 @@ public class TextModule implements Module {
 
 	@Description("calculate sum")
 	@Examples({
-		@Example(command = "ls /tmp | sum size", description = "calculate size of /tmp directory (non-recursively)"),
-		@Example(command = "walk /tmp | sum size", description = "calculate size of /tmp directory (recursively)")
+			@Example(command = "ls /tmp | sum size", description = "calculate size of /tmp directory (non-recursively)"),
+			@Example(command = "walk /tmp | sum size", description = "calculate size of /tmp directory (recursively)")
 	})
 	public static class Sum implements Command {
 
@@ -658,7 +658,7 @@ public class TextModule implements Module {
 
 	@Description("calculate frequency of values")
 	@Examples({
-		@Example(command = "lines files.txt | freq text", description = "replaces 'sort file.txt | uniq -c | sort -rn' in UNIX"),
+			@Example(command = "lines files.txt | freq text", description = "replaces 'sort file.txt | uniq -c | sort -rn' in UNIX"),
 	})
 	public static class Freq implements Command {
 
@@ -678,7 +678,7 @@ public class TextModule implements Module {
 			Map<Value, Long> result = new HashMap<>();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key)
-					.ifPresent(value -> result.compute(value, (k, count) -> count == null ? 1 : count + 1));
+						.ifPresent(value -> result.compute(value, (k, count) -> count == null ? 1 : count + 1));
 			}
 			return result;
 		}
@@ -686,9 +686,9 @@ public class TextModule implements Module {
 		private void output(OutputChannel out, Map<Value, Long> countByValue) {
 			for (var kv : countByValue.entrySet()) {
 				Record record = Records.builder()
-					.entry(Keys.VALUE, kv.getKey())
-					.entry(Keys.COUNT, Values.ofNumeric(kv.getValue()))
-					.build();
+						.entry(Keys.VALUE, kv.getKey())
+						.entry(Keys.COUNT, Values.ofNumeric(kv.getValue()))
+						.build();
 				out.send(record);
 			}
 		}
@@ -697,7 +697,7 @@ public class TextModule implements Module {
 
 	@Description("calculate min of value")
 	@Examples({
-		@Example(command = "ps | min timestamp", description = "calculate minimum timestamp"),
+			@Example(command = "ps | min timestamp", description = "calculate minimum timestamp"),
 	})
 	public static class Min implements Command {
 
@@ -732,7 +732,7 @@ public class TextModule implements Module {
 	@Todo(description = "share implementation with min")
 	@Description("calculate max of value")
 	@Examples({
-		@Example(command = "ps | max pid", description = "calculate max pid"),
+			@Example(command = "ps | max pid", description = "calculate max pid"),
 	})
 	public static class Max implements Command {
 

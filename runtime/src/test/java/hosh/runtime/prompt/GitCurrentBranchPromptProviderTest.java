@@ -23,7 +23,6 @@
  */
 package hosh.runtime.prompt;
 
-import hosh.runtime.prompt.GitCurrentBranchPromptProvider;
 import hosh.spi.State;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

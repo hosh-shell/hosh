@@ -91,10 +91,10 @@ public class Supervisor implements AutoCloseable {
 
 	private ExitStatus deriveExitStatus(List<ExitStatus> results) {
 		return results
-			.stream()
-			.filter(ExitStatus::isError)
-			.findFirst()
-			.orElse(ExitStatus.success());
+				.stream()
+				.filter(ExitStatus::isError)
+				.findFirst()
+				.orElse(ExitStatus.success());
 	}
 
 	private List<ExitStatus> waitForCompletion() throws InterruptedException, ExecutionException {

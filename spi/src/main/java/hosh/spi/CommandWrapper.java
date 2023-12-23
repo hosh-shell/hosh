@@ -29,13 +29,13 @@ package hosh.spi;
  */
 public interface CommandWrapper extends Command {
 
-    void setNestedCommand(NestedCommand nestedCommand);
+	void setNestedCommand(NestedCommand nestedCommand);
 
-    /**
-     * The inner block 'cmd' of 'benchmark { cmd }'.
-     */
-    interface NestedCommand {
+	/**
+	 * The inner block 'cmd' of 'benchmark { cmd }'.
+	 */
+	interface NestedCommand {
 
-        ExitStatus run();
-    }
+		ExitStatus run();
+	}
 }

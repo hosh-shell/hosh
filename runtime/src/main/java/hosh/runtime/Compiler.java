@@ -98,7 +98,7 @@ public class Compiler {
 		}
 		if (ctx.getChildCount() == 2) { // unfinished pipeline such as "command | "
 			throw new CompileError(String.format("line %d:%d: incomplete pipeline near '%s'", ctx.getStart().getLine(),
-				ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
+					ctx.getStop().getCharPositionInLine(), ctx.getStop().getText()));
 		}
 		if (ctx.getChildCount() == 3) { // pipeline
 			Statement producer = compileCommand(ctx.command());
@@ -127,7 +127,7 @@ public class Compiler {
 		String commandName = token.getText();
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
-			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
+				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command", token.getLine(), commandName)));
 		if (command instanceof CommandWrapper) {
 			throw new CompileError(String.format("line %d: '%s' is a command wrapper", token.getLine(), commandName));
 		}
@@ -144,7 +144,7 @@ public class Compiler {
 		String commandName = token.getText();
 		Optional<Command> resolvedCommand = commandResolver.tryResolve(commandName);
 		Command command = resolvedCommand
-			                  .orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
+				.orElseThrow(() -> new CompileError(String.format("line %d: '%s' unknown command wrapper", token.getLine(), commandName)));
 
 		if (ctx.stmt() == null) {
 			int line = ctx.start.getLine();
@@ -153,7 +153,7 @@ public class Compiler {
 		Statement nestedStatement = compileStatement(ctx.stmt());
 		List<Resolvable> arguments = compileArguments(ctx.invocation());
 		if (command instanceof CommandWrapper commandWrapper) {
-            DefaultCommandDecorator decoratedCommand = new DefaultCommandDecorator(nestedStatement, commandWrapper);
+			DefaultCommandDecorator decoratedCommand = new DefaultCommandDecorator(nestedStatement, commandWrapper);
 			return new Statement(decoratedCommand, arguments, commandName);
 		}
 		throw new CompileError(String.format("line %d: '%s' is not a command wrapper", token.getLine(), commandName));
@@ -167,10 +167,10 @@ public class Compiler {
 
 	private List<Resolvable> compileArguments(InvocationContext ctx) {
 		return ctx
-			       .expression()
-			       .stream()
-			       .map(this::compileArgument)
-			       .toList();
+				.expression()
+				.stream()
+				.map(this::compileArgument)
+				.toList();
 	}
 
 	private Resolvable compileArgument(ExpressionContext ctx) {

@@ -76,7 +76,7 @@ class SimpleCommandRegistryTest {
 		Supplier<Command> commandSupplier = () -> command;
 		sut.registerCommand("foo", commandSupplier);
 		assertThatThrownBy(() -> sut.registerCommand("foo", () -> anotherCommand)).hasMessage("command with same name already registered: foo")
-			.isInstanceOf(IllegalArgumentException.class);
+				.isInstanceOf(IllegalArgumentException.class);
 		// make sure first mapping is still in place
 		assertThat(sut.getCommands()).containsEntry("foo", commandSupplier);
 	}

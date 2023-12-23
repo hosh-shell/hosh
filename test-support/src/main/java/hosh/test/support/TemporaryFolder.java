@@ -86,7 +86,7 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 
 	public Path newFolder(Path parent, String folder) throws IOException {
 		Path newFolder = parent.resolve(folder);
-		return  Files.createDirectory(newFolder);
+		return Files.createDirectory(newFolder);
 	}
 
 	private void recursiveDelete(File fileOrDirectory) {

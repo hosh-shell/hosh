@@ -742,10 +742,10 @@ class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(Records.builder()
-				.entry(Keys.of("1"), Values.ofText("a"))
-				.entry(Keys.of("2"), Values.ofText("b"))
-				.entry(Keys.of("3"), Values.ofText("c"))
-				.build());
+					.entry(Keys.of("1"), Values.ofText("a"))
+					.entry(Keys.of("2"), Values.ofText("b"))
+					.entry(Keys.of("3"), Values.ofText("c"))
+					.build());
 			then(err).shouldHaveNoInteractions();
 		}
 	}
@@ -1021,10 +1021,10 @@ class TextModuleTest {
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(
-				Records.builder()
-					.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
-					.entry(Keys.TEXT, Values.ofText("some data"))
-					.build());
+					Records.builder()
+							.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
+							.entry(Keys.TEXT, Values.ofText("some data"))
+							.build());
 			then(err).shouldHaveNoMoreInteractions();
 		}
 

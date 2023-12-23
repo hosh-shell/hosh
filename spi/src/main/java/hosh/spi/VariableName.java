@@ -61,6 +61,7 @@ public final class VariableName {
 
 	/**
 	 * Named constructor that throws if name is invalid. To be used programmatically (e.g. well-known variables names, tests, etc.)
+	 *
 	 * @param name the name of the variable
 	 * @return the new variable name
 	 */
@@ -90,7 +91,7 @@ public final class VariableName {
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof VariableName that) {
-            return Objects.equals(this.name, that.name);
+			return Objects.equals(this.name, that.name);
 		}
 		return false;
 	}

@@ -46,8 +46,8 @@ class MutableStateTest {
 		// transform path to a cwd
 		Path cwd = sut.getCwd();
 		assertThat(cwd)
-			.isAbsolute()
-			.isNormalized();
+				.isAbsolute()
+				.isNormalized();
 	}
 
 }

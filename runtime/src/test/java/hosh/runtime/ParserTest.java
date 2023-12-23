@@ -23,9 +23,9 @@
  */
 package hosh.runtime;
 
-import hosh.runtime.antlr4.HoshParser.ProgramContext;
 import hosh.doc.Bug;
 import hosh.runtime.Parser.ParseError;
+import hosh.runtime.antlr4.HoshParser.ProgramContext;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,13 +49,13 @@ class ParserTest {
 	@Test
 	void lexerError() {
 		assertThatThrownBy(() -> sut.parse("!")).isInstanceOf(ParseError.class)
-			.hasMessage("line 1:0: token recognition error at: '!'");
+				.hasMessage("line 1:0: token recognition error at: '!'");
 	}
 
 	@Test
 	void refuseSpaceInsideVariableExpansion() {
 		assertThatThrownBy(() -> sut.parse("${ EXECUTABLE }")).isInstanceOf(ParseError.class)
-			.hasMessage("line 1:0: token recognition error at: '${ '");
+				.hasMessage("line 1:0: token recognition error at: '${ '");
 	}
 
 	@ParameterizedTest
@@ -63,116 +63,116 @@ class ParserTest {
 	void valid(String line) {
 		ProgramContext parse = sut.parse(line);
 		Assertions.assertThat(parse)
-			.as("valid")
-			.isNotNull();
+				.as("valid")
+				.isNotNull();
 	}
 
 	static Stream<String> all() {
 		return Stream.of(commands(), newLines(), comments(), pipelines(), incompletePipelines())
-			       .flatMap(List::stream);
+				.flatMap(List::stream);
 	}
 
 	static List<String> commands() {
 		return List.of(
-			"",
-			"/usr/bin/git; ls",
-			"/usr/bin/git; ls;",
-			"/usr/bin/git",
-			"/usr/bin/git --help",
-			"   /usr/bin/git",
-			"/usr/bin/git   ",
-			"   /usr/bin/git    ",
-			"\t/usr/bin/git\t",
-			"\t/usr/bin/git",
-			"git",
-			"git\n",
-			"git status\n",
-			"git commit --amend\n",
-			"cd ..\n",
-			"cd /tmp\n",
-			"cd c:\\temp\n",
-			"cd c:/temp\n",
-			"cd ${DIR}",
-			"vim 'filename with spaces'",
-			"vim 'filename with newline\n'",
-			"vim \"filename with spaces\"",
-			"git commit -am \"commit message\"",
-			"withTime { git push }",
-			"withTime { git push | sink }",
-			"withTime { git push | sink; }",
-			"withTime { git push ; clear }",
-			"withTime { git push ; clear; }",
-			"withLock /tmp/push.lock { git push }",
-			"withLock /tmp/push.lock { git push; git push --tags }",
-			"withTime { withLock /tmp/push.lock { git push } }",
-			"cd C:\\Users\\VSSADM~1\\AppData\\Local\\Temp\\junit16864313966026428034",
-			"regex line '\\w+'",
-			"regex line \"\\w+\"",
-			"ls ${VAR!/tmp}",
-			"echo ${HELLO}${WHO}",
-			"ls ${JAVA_HOME}/bin",
-			"ls ${JAVA_HOME}/${JVM_BINARY}",
-			"ls \"${JAVA_HOME}\"",
-			"ls \"${JAVA_HOME}/${JVM_BINARY}\"",
-			"echo 'òàù\"è+ì|!£$%&/()=?^'",
-			"echo \"òàù'è+ì|!£&/()=?^\"",
-			"echo '{}|'",
-			"echo \"{}|\"",
-			"echo ''", // empty string
-			"echo '       '" // spaces
+				"",
+				"/usr/bin/git; ls",
+				"/usr/bin/git; ls;",
+				"/usr/bin/git",
+				"/usr/bin/git --help",
+				"   /usr/bin/git",
+				"/usr/bin/git   ",
+				"   /usr/bin/git    ",
+				"\t/usr/bin/git\t",
+				"\t/usr/bin/git",
+				"git",
+				"git\n",
+				"git status\n",
+				"git commit --amend\n",
+				"cd ..\n",
+				"cd /tmp\n",
+				"cd c:\\temp\n",
+				"cd c:/temp\n",
+				"cd ${DIR}",
+				"vim 'filename with spaces'",
+				"vim 'filename with newline\n'",
+				"vim \"filename with spaces\"",
+				"git commit -am \"commit message\"",
+				"withTime { git push }",
+				"withTime { git push | sink }",
+				"withTime { git push | sink; }",
+				"withTime { git push ; clear }",
+				"withTime { git push ; clear; }",
+				"withLock /tmp/push.lock { git push }",
+				"withLock /tmp/push.lock { git push; git push --tags }",
+				"withTime { withLock /tmp/push.lock { git push } }",
+				"cd C:\\Users\\VSSADM~1\\AppData\\Local\\Temp\\junit16864313966026428034",
+				"regex line '\\w+'",
+				"regex line \"\\w+\"",
+				"ls ${VAR!/tmp}",
+				"echo ${HELLO}${WHO}",
+				"ls ${JAVA_HOME}/bin",
+				"ls ${JAVA_HOME}/${JVM_BINARY}",
+				"ls \"${JAVA_HOME}\"",
+				"ls \"${JAVA_HOME}/${JVM_BINARY}\"",
+				"echo 'òàù\"è+ì|!£$%&/()=?^'",
+				"echo \"òàù'è+ì|!£&/()=?^\"",
+				"echo '{}|'",
+				"echo \"{}|\"",
+				"echo ''", // empty string
+				"echo '       '" // spaces
 		);
 	}
 
 	static List<String> newLines() {
 		return List.of(
-			"\n",
-			"\n\n",
-			"\r\n",
-			"\r\n\n",
-			"\n\r\n");
+				"\n",
+				"\n\n",
+				"\r\n",
+				"\r\n\n",
+				"\n\r\n");
 	}
 
 	static List<String> comments() {
 		return List.of(
-			"#\n",
-			"#\r\n",
-			"# comment\n",
-			"# comment\r\n",
-			"ls # comment\n",
-			"ls # comment\r\n",
-			"ls # comment",
-			"benchmark { ls | sink } # comment");
+				"#\n",
+				"#\r\n",
+				"# comment\n",
+				"# comment\r\n",
+				"ls # comment\n",
+				"ls # comment\r\n",
+				"ls # comment",
+				"benchmark { ls | sink } # comment");
 	}
 
 	static List<String> pipelines() {
 		return List.of(
-			"env | sink",
-			"git config --list | sink",
-			"git config --list | grep -v author",
-			"git config --list |\ngrep -v author",
-			"/usr/bin/git diff | grep /regexp/",
-			"env | grep /regexp/",
-			"cat file.txt | grep /regexp/",
-			"cat file.txt | grep /regexp/ | wc -l",
-			"withTime { cat file.txt | grep /regexp/ | wc -l }",
-			"withTime { cat file.txt } | schema",
-			"withTime { cat file.txt | grep /regexp/ } | schema",
-			"walk . | glob '*'",
-			"walk . | glob '*.{jar,war}'", // regression test for #205
-			"walk . | glob '*.[ch]'",
-			"ls | { _PATH -> echo ${_PATH} }",
-			"ls | { path -> echo ${path} }",
-			"ls | { path -> echo }",
-     		"{ path -> echo }"
+				"env | sink",
+				"git config --list | sink",
+				"git config --list | grep -v author",
+				"git config --list |\ngrep -v author",
+				"/usr/bin/git diff | grep /regexp/",
+				"env | grep /regexp/",
+				"cat file.txt | grep /regexp/",
+				"cat file.txt | grep /regexp/ | wc -l",
+				"withTime { cat file.txt | grep /regexp/ | wc -l }",
+				"withTime { cat file.txt } | schema",
+				"withTime { cat file.txt | grep /regexp/ } | schema",
+				"walk . | glob '*'",
+				"walk . | glob '*.{jar,war}'", // regression test for #205
+				"walk . | glob '*.[ch]'",
+				"ls | { _PATH -> echo ${_PATH} }",
+				"ls | { path -> echo ${path} }",
+				"ls | { path -> echo }",
+				"{ path -> echo }"
 		);
 	}
 
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "accepted by parser but rejected by the compiler")
 	static List<String> incompletePipelines() {
 		return List.of(
-			"ls | ",
-			"ls -a | ",
-			"ls | take 1 | ",
-			"ls | take | ");
+				"ls | ",
+				"ls -a | ",
+				"ls | take 1 | ",
+				"ls | take | ");
 	}
 }

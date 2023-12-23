@@ -96,9 +96,9 @@ public class Interpreter {
 		} catch (ExecutionException e) {
 			LOGGER.log(Level.SEVERE, "caught exception", e);
 			Record record = Records.builder()
-				                .entry(Keys.LOCATION, Values.ofText(statement.getLocation()))
-				                .entry(Keys.ERROR, Values.ofText(messageFor(e)))
-				                .build();
+					.entry(Keys.LOCATION, Values.ofText(statement.getLocation()))
+					.entry(Keys.ERROR, Values.ofText(messageFor(e)))
+					.build();
 			err.send(record);
 			return ExitStatus.error();
 		}
@@ -129,9 +129,9 @@ public class Interpreter {
 
 	private List<String> resolveArguments(List<Compiler.Resolvable> arguments) {
 		return arguments
-			       .stream()
-			       .map(resolvable -> resolvable.resolve(state))
-			       .toList();
+				.stream()
+				.map(resolvable -> resolvable.resolve(state))
+				.toList();
 	}
 
 	private String messageFor(ExecutionException e) {

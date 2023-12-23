@@ -63,21 +63,21 @@ class ExitStatusTest {
 	@Test
 	void validLiterals() {
 		qt()
-			.forAll(strings().numeric())
-			.check(value -> {
-				Optional<ExitStatus> parsed = ExitStatus.parse(String.valueOf(value));
-				return parsed.isPresent();
-			});
+				.forAll(strings().numeric())
+				.check(value -> {
+					Optional<ExitStatus> parsed = ExitStatus.parse(String.valueOf(value));
+					return parsed.isPresent();
+				});
 	}
 
 	@Test
 	void invalidLiteral() {
 		qt()
-			.forAll(strings().basicLatinAlphabet().ofLengthBetween(0, 10))
-			.assuming(value -> value.matches(".*[a-zA-Z].*"))
-			.check(value -> {
-				Optional<ExitStatus> parsed = ExitStatus.parse(value);
-				return parsed.isEmpty();
-			});
+				.forAll(strings().basicLatinAlphabet().ofLengthBetween(0, 10))
+				.assuming(value -> value.matches(".*[a-zA-Z].*"))
+				.check(value -> {
+					Optional<ExitStatus> parsed = ExitStatus.parse(value);
+					return parsed.isEmpty();
+				});
 	}
 }

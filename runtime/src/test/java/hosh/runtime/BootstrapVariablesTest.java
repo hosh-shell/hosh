@@ -58,7 +58,7 @@ class BootstrapVariablesTest {
 		assertThat(result)
 				.hasSize(1)
 				.containsEntry(VariableName.constant("FOO"), "value")
-				;
+		;
 	}
 
 	@Test

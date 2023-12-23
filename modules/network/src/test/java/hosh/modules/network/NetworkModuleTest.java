@@ -52,9 +52,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class NetworkModuleTest {
 

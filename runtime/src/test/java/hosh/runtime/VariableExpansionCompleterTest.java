@@ -75,11 +75,11 @@ class VariableExpansionCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates)
-			.hasSize(1)
-			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).isEqualTo("${FOO}");
-				assertThat(candidate.descr()).isNull();
-			});
+				.hasSize(1)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).isEqualTo("${FOO}");
+					assertThat(candidate.descr()).isNull();
+				});
 	}
 
 	@Test
@@ -89,10 +89,10 @@ class VariableExpansionCompleterTest {
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates)
-			.hasSize(2)
-			.allSatisfy(candidate -> {
-				assertThat(candidate.value()).matches("\\Q${FOO}\\E|\\Q${BAR}\\E");
-				assertThat(candidate.descr()).isNull();
-			});
+				.hasSize(2)
+				.allSatisfy(candidate -> {
+					assertThat(candidate.value()).matches("\\Q${FOO}\\E|\\Q${BAR}\\E");
+					assertThat(candidate.descr()).isNull();
+				});
 	}
 }

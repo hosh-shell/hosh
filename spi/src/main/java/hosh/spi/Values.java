@@ -127,7 +127,7 @@ public class Values {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof TextValue that) {
-                return Objects.equals(this.value, that.value);
+				return Objects.equals(this.value, that.value);
 			} else {
 				return false;
 			}
@@ -143,7 +143,7 @@ public class Values {
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof TextValue that) {
-                return BY_TEXT_ALPHA_NUM.compare(this.value, that.value);
+				return BY_TEXT_ALPHA_NUM.compare(this.value, that.value);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -206,7 +206,7 @@ public class Values {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof SizeValue that) {
-                return this.bytes == that.bytes;
+				return this.bytes == that.bytes;
 			} else {
 				return false;
 			}
@@ -220,7 +220,7 @@ public class Values {
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof SizeValue that) {
-                return Long.compare(this.bytes, that.bytes);
+				return Long.compare(this.bytes, that.bytes);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -239,7 +239,7 @@ public class Values {
 		@Override
 		public Optional<Value> merge(Value value) {
 			if (value instanceof SizeValue that) {
-                return Optional.of(new SizeValue(that.bytes + this.bytes));
+				return Optional.of(new SizeValue(that.bytes + this.bytes));
 			}
 			return value.merge(this);
 		}
@@ -272,7 +272,7 @@ public class Values {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof NumericValue that) {
-                return this.number == that.number;
+				return this.number == that.number;
 			} else {
 				return false;
 			}
@@ -281,7 +281,7 @@ public class Values {
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof NumericValue that) {
-                return Long.compare(this.number, that.number);
+				return Long.compare(this.number, that.number);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -302,7 +302,7 @@ public class Values {
 		@Override
 		public Optional<Value> merge(Value value) {
 			if (value instanceof NumericValue that) {
-                return Optional.of(new NumericValue(that.number + this.number));
+				return Optional.of(new NumericValue(that.number + this.number));
 			}
 			return value.merge(this);
 		}
@@ -363,7 +363,7 @@ public class Values {
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof DurationValue that) {
-                return this.duration.compareTo(that.duration);
+				return this.duration.compareTo(that.duration);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -382,7 +382,7 @@ public class Values {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof DurationValue that) {
-                return Objects.equals(this.duration, that.duration);
+				return Objects.equals(this.duration, that.duration);
 			} else {
 				return false;
 			}
@@ -408,7 +408,7 @@ public class Values {
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof InstantValue that) {
-                return this.instant.compareTo(that.instant);
+				return this.instant.compareTo(that.instant);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -428,7 +428,7 @@ public class Values {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof InstantValue that) {
-                return Objects.equals(this.instant, that.instant);
+				return Objects.equals(this.instant, that.instant);
 			} else {
 				return false;
 			}
@@ -464,7 +464,7 @@ public class Values {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof PathValue that) {
-                return Objects.equals(this.path, that.path);
+				return Objects.equals(this.path, that.path);
 			} else {
 				return false;
 			}
@@ -487,12 +487,12 @@ public class Values {
 		}
 
 		private static final Comparator<Path> BY_PATH_NATURAL_ORDER =
-			Comparator.comparing(Path::toString, new Comparators.NaturalSortOrder());
+				Comparator.comparing(Path::toString, new Comparators.NaturalSortOrder());
 
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof PathValue that) {
-                return BY_PATH_NATURAL_ORDER.compare(this.path, that.path);
+				return BY_PATH_NATURAL_ORDER.compare(this.path, that.path);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -523,7 +523,7 @@ public class Values {
 		@Override
 		public int compareTo(Value o) {
 			if (o instanceof BytesValue that) {
-                return Arrays.compare(this.bytes, that.bytes);
+				return Arrays.compare(this.bytes, that.bytes);
 			}
 			return cannotCompare(this, o);
 		}
@@ -531,7 +531,7 @@ public class Values {
 		@Override
 		public final boolean equals(Object obj) {
 			if (obj instanceof BytesValue that) {
-                return Arrays.equals(this.bytes, that.bytes);
+				return Arrays.equals(this.bytes, that.bytes);
 			} else {
 				return false;
 			}
@@ -574,7 +574,7 @@ public class Values {
 		@Override
 		public boolean equals(Object obj) {
 			if (obj instanceof StyledValue that) {
-                return Objects.equals(this.value, that.value) && Objects.equals(this.style, that.style);
+				return Objects.equals(this.value, that.value) && Objects.equals(this.style, that.style);
 			} else {
 				return false;
 			}
@@ -591,14 +591,14 @@ public class Values {
 		}
 
 		private static final Comparator<StyledValue> BY_VALUE_AND_STYLE =
-			Comparator
-				.comparing(StyledValue::value)
-				.thenComparing(StyledValue::style);
+				Comparator
+						.comparing(StyledValue::value)
+						.thenComparing(StyledValue::style);
 
 		@Override
 		public int compareTo(Value obj) {
 			if (obj instanceof StyledValue that) {
-                return BY_VALUE_AND_STYLE.compare(this, that);
+				return BY_VALUE_AND_STYLE.compare(this, that);
 			} else {
 				return cannotCompare(this, obj);
 			}
@@ -624,12 +624,12 @@ public class Values {
 		}
 
 		/**
-         * The natural sort order is an improved sorting algorithm for strings
-         * containing numbers. Instead of sorting numbers in ASCII order like
-         * a standard sort, this algorithm sorts numbers in numeric order.
-         * <p>
-         * See <a href="https://en.wikipedia.org/wiki/Natural_sort_order">wikipedia</a> for more details.
-         */
+		 * The natural sort order is an improved sorting algorithm for strings
+		 * containing numbers. Instead of sorting numbers in ASCII order like
+		 * a standard sort, this algorithm sorts numbers in numeric order.
+		 * <p>
+		 * See <a href="https://en.wikipedia.org/wiki/Natural_sort_order">wikipedia</a> for more details.
+		 */
 		public static Comparator<String> naturalSortOrder() {
 			return new NaturalSortOrder();
 		}

@@ -124,7 +124,7 @@ public class Records {
 		@Override
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record that) {
-                return that.size() == 0;
+				return that.size() == 0;
 			} else {
 				return false;
 			}
@@ -167,17 +167,17 @@ public class Records {
 		@Override
 		public Record append(Key newKey, Value newValue) {
 			return new Builder()
-				.entry(entry)
-				.entry(newKey, newValue)
-				.build();
+					.entry(entry)
+					.entry(newKey, newValue)
+					.build();
 		}
 
 		@Override
 		public Record prepend(Key newKey, Value newValue) {
 			return new Builder()
-				.entry(newKey, newValue)
-				.entry(entry)
-				.build();
+					.entry(newKey, newValue)
+					.entry(entry)
+					.build();
 		}
 
 		@Override
@@ -202,7 +202,7 @@ public class Records {
 		@Override
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record that) {
-                return that.size() == 1 && Records.equals(this.entries(), that.entries());
+				return that.size() == 1 && Records.equals(this.entries(), that.entries());
 			} else {
 				return false;
 			}
@@ -245,15 +245,15 @@ public class Records {
 		@Override
 		public Stream<Key> keys() {
 			return Arrays
-				.stream(entries)
-				.map(Entry::getKey);
+					.stream(entries)
+					.map(Entry::getKey);
 		}
 
 		@Override
 		public Stream<Value> values() {
 			return Arrays
-				.stream(entries)
-				.map(Entry::getValue);
+					.stream(entries)
+					.map(Entry::getValue);
 		}
 
 		@Override
@@ -284,7 +284,7 @@ public class Records {
 		@Override
 		public final boolean equals(Object obj) {
 			if (obj instanceof Record that) {
-                return this.size() == that.size() && Records.equals(this.entries(), that.entries());
+				return this.size() == that.size() && Records.equals(this.entries(), that.entries());
 			} else {
 				return false;
 			}
@@ -293,10 +293,10 @@ public class Records {
 		@Override
 		public String toString() {
 			return String.format("Record[data={%s}]",
-				Arrays
-					.stream(entries)
-					.map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
-					.collect(Collectors.joining(",")));
+					Arrays
+							.stream(entries)
+							.map(e -> String.format("%s=%s", e.getKey(), e.getValue()))
+							.collect(Collectors.joining(",")));
 		}
 
 		@Override

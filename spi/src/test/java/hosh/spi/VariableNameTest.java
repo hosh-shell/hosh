@@ -48,15 +48,15 @@ class VariableNameTest {
 
 	@ParameterizedTest
 	@ValueSource(strings = {
-		"A",
-		"Z",
-		"a",
-		"z",
-		"_",
-		"__FOO__",
-		"VARIABLE",
-		"variable",
-		"__FOO_BAR__"
+			"A",
+			"Z",
+			"a",
+			"z",
+			"_",
+			"__FOO__",
+			"VARIABLE",
+			"variable",
+			"__FOO_BAR__"
 	})
 	void validVariableNames(String userInput) {
 		Optional<VariableName> from = VariableName.from(userInput);
@@ -67,28 +67,28 @@ class VariableNameTest {
 	@ParameterizedTest
 	@NullSource
 	@ValueSource(strings = {
-		"-",
-		"/",
-		".",
-		"..",
-		"  ",
-		"",
-		"a.",
-		"z/",
-		"%45",
+			"-",
+			"/",
+			".",
+			"..",
+			"  ",
+			"",
+			"a.",
+			"z/",
+			"%45",
 	})
 	void invalidVariableNames(String userInput) {
 		Optional<VariableName> from = VariableName.from(userInput);
 		assertThat(from).isEmpty();
 		assertThatThrownBy(() -> VariableName.constant(userInput))
-			.isInstanceOf(IllegalArgumentException.class);
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
 	void veryLongVariableName() {
 		String userInput = "a".repeat(257);
 		assertThatThrownBy(() -> VariableName.constant(userInput))
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("variable name too long");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("variable name too long");
 	}
 }

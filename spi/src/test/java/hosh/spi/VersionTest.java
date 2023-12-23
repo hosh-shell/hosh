@@ -24,40 +24,42 @@
 package hosh.spi;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class VersionTest {
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "v1.1.0", // git describe with tag
-            "v0.1.14", // git describe with tag
-            "v0.1.14-89-ge38fe101", // git describe without tag
-            "v0.1.14-89-ge38fe101-dirty", // git describe without tag and with uncommitted changes
-    })
-    void validVersion(String candidate) {
-        Version result = new Version(candidate);
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"v1.1.0", // git describe with tag
+			"v0.1.14", // git describe with tag
+			"v0.1.14-89-ge38fe101", // git describe without tag
+			"v0.1.14-89-ge38fe101-dirty", // git describe without tag and with uncommitted changes
+	})
+	void validVersion(String candidate) {
+		Version result = new Version(candidate);
 
-        assertThat(result.hoshVersion())
-                .isEqualTo(Values.ofText("hosh " + candidate))
-        ;
-    }
+		assertThat(result.hoshVersion())
+				.isEqualTo(Values.ofText("hosh " + candidate))
+		;
+	}
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {
-            "1.0.1",    // missing starting "v" and too
-            "0.1.14",   // missing starting "v"
-            "v1",       // too few components
-            "v1.2",     // too few components
-            "v1.2.3.4", // too many components
-    })
-    void invalidVersion(String candidate) {
-        var result = assertThatThrownBy(() -> new Version(candidate));
+	@ParameterizedTest
+	@NullAndEmptySource
+	@ValueSource(strings = {
+			"1.0.1",    // missing starting "v" and too
+			"0.1.14",   // missing starting "v"
+			"v1",       // too few components
+			"v1.2",     // too few components
+			"v1.2.3.4", // too many components
+	})
+	void invalidVersion(String candidate) {
+		var result = assertThatThrownBy(() -> new Version(candidate));
 
-        result.isInstanceOf(IllegalArgumentException.class);
-    }
+		result.isInstanceOf(IllegalArgumentException.class);
+	}
 
 }

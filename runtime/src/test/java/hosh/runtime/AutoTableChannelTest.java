@@ -73,8 +73,8 @@ class AutoTableChannelTest {
 		sut.flush();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
-			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
-			Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      whatever  ")));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      whatever  ")));
 	}
 
 	@Test
@@ -84,8 +84,8 @@ class AutoTableChannelTest {
 		sut.flush();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
-			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text  "), Ansi.Style.FG_MAGENTA)),
-			Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      aa    ")));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text  "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("2      aa    ")));
 	}
 
 	@Test
@@ -95,8 +95,8 @@ class AutoTableChannelTest {
 		sut.flush();
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
-			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
-			Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
 	}
 
 	@Test
@@ -109,8 +109,8 @@ class AutoTableChannelTest {
 		sut.flush();
 		then(out).should(times(AutoTableChannel.OVERFLOW)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsOnly(
-			Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
-			Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
+				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
+				Records.singleton(Keys.TEXT, /*            */ Values.ofText("       whatever  ")));
 	}
 
 	@Test

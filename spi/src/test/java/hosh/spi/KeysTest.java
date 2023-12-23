@@ -35,28 +35,28 @@ class KeysTest {
 	@Test
 	void nullKey() {
 		assertThatThrownBy(() -> Keys.of(null))
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("name must be not null");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("name must be not null");
 	}
 
 	@Test
 	void emptyKey() {
 		assertThatThrownBy(() -> Keys.of(""))
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("name must be not blank");
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("name must be not blank");
 	}
 
 	@Test
 	void asString() {
 		assertThat(Keys.of("name"))
-			.hasToString("Key['name']");
+				.hasToString("Key['name']");
 	}
 
 	@Test
 	void equalContract() {
 		EqualsVerifier.configure()
-			.forClass(StringKey.class)
-			.verify();
+				.forClass(StringKey.class)
+				.verify();
 	}
 
 	@Test

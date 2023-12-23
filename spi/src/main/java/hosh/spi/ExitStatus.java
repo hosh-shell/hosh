@@ -75,7 +75,7 @@ public class ExitStatus {
 	@Override
 	public final boolean equals(Object obj) {
 		if (obj instanceof ExitStatus that) {
-            return this.value == that.value;
+			return this.value == that.value;
 		} else {
 			return false;
 		}
