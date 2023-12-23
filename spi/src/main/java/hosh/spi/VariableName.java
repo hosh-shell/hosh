@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  */
 public final class VariableName {
 
-	private static final int MAX_VARIABLE_LENGTH = 256;
+	static final int MAX_VARIABLE_LENGTH = 256;
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 

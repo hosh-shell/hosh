@@ -131,6 +131,16 @@ class ValuesTest {
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Duration[PT1H] with Text[2]");
 		}
+
+		@Test
+		void compareToSameValueType() {
+			Value a = Values.ofDuration(Duration.ofHours(1));
+			Value b = Values.ofDuration(Duration.ofHours(2));
+			Value c = Values.ofDuration(Duration.ofHours(1));
+			assertThat(a.compareTo(b)).isEqualTo(-1);
+			assertThat(b.compareTo(a)).isEqualTo(1);
+			assertThat(a.compareTo(c)).isEqualTo(0);
+		}
 	}
 
 	@Nested
@@ -270,30 +280,38 @@ class ValuesTest {
 
 		@ParameterizedTest
 		@CsvSource({
-				"            0,     0,  B",
-				"            1,     1,  B",
-				"            2,     2,  B",
-				"           10,    10,  B",
-				"         1023,  1023,  B",
-				"         1024,     1, KB",
-				"         2047,     2, KB",
-				"         2048,     2, KB",
-				"         4096,     4, KB",
-				"         8192,     8, KB",
-				"        16384,    16, KB",
-				"      1048576,     1, MB",
-				"      2097152,     2, MB",
-				"     11048576,  10.5, MB",
-				"    134217728,   128, MB",
-				"    199999999, 190.7, MB",
-				"    200000001, 190.7, MB",
-				"   1073741824,     1, GB",
-				"  17179869184,    16, GB",
-				" 274877906944,   256, GB",
-				"1099511627780,     1, TB"
+				"            0,      0B",
+				"            1,      1B",
+				"            2,      2B",
+				"           10,     10B",
+				"         1023,   1023B",
+				"         1024,     1KB",
+				"         1025,     1KB",
+				"         1026,     1KB",
+				"         1027,     1KB",
+				"         1028,     1KB",
+				"         2047,     2KB",
+				"         2048,     2KB",
+				"         4096,     4KB",
+				"         8192,     8KB",
+				"        16384,    16KB",
+				"      1048576,     1MB",
+				"      2097152,     2MB",
+				"     11048576,  10.5MB",
+				"    134217728,   128MB",
+				"    199999999, 190.7MB",
+				"    200000001, 190.7MB",
+				"    200001000, 190.7MB",
+				"    201000000, 191.7MB",
+				"    205000000, 195.5MB",
+				"    210000000, 200.3MB",
+				"   1073741824,     1GB",
+				"  17179869184,    16GB",
+				" 274877906944,   256GB",
+				"1099511627780,     1TB"
 		})
-		void approximateOnPrint(long bytes, String expectedValue, String expectedUnit) {
-			assertThat(Values.ofSize(bytes).show(Locale.US)).isEqualTo(expectedValue + expectedUnit);
+		void approximateOnPrint(long bytes, String expectedValue) {
+			assertThat(Values.ofSize(bytes).show(Locale.US)).isEqualTo(expectedValue);
 		}
 
 		@Test
@@ -336,6 +354,16 @@ class ValuesTest {
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Size[1000B] with Text[2]");
+		}
+
+		@Test
+		void compareToSameValueType() {
+			Value a = Values.ofSize(100);
+			Value b = Values.ofSize(10);
+			Value c = Values.ofSize(100);
+			assertThat(a.compareTo(b)).isEqualTo(1);
+			assertThat(b.compareTo(a)).isEqualTo(-1);
+			assertThat(a.compareTo(c)).isEqualTo(0);
 		}
 
 		@Test
@@ -502,7 +530,7 @@ class ValuesTest {
 
 		@Test
 		void unwrap() {
-			Value value = Values.ofPath(Paths.get("."));
+			Value value = Values.withStyle(Values.ofPath(Paths.get(".")), Ansi.Style.FG_RED);
 			assertThat(value.unwrap(Path.class)).isPresent();
 			assertThat(value.unwrap(Integer.class)).isEmpty();
 		}
@@ -700,11 +728,17 @@ class ValuesTest {
 		}
 
 		@SuppressWarnings("squid:S2245")
-		// creates random lists of values with at least 1 none (in an unspecified position)
+		// creates random lists of values with 3 None elements
 		private Gen<List<Value>> listOfNumericValuesContainingNone() {
-			return lists().of(integers().all().map(Values::ofNumeric))
+			return lists()
+					.of(integers().all().map(Values::ofNumeric))
 					.ofSizeBetween(1, 20)
 					.mutate((base, r) -> {
+						// add None as first element
+						base.add(0, Values.none());
+						// add None as last element
+						base.add(Values.none());
+						// add one at random position
 						int randomIndex = ThreadLocalRandom.current().nextInt(base.size() + 1);
 						base.add(randomIndex, Values.none());
 						return base;

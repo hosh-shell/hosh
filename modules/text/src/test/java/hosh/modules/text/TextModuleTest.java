@@ -101,7 +101,7 @@ class TextModuleTest {
 			withThread.interrupt();
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
-			then(in).shouldHaveNoMoreInteractions();
+			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
 		}

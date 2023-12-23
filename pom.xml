@@ -266,6 +266,8 @@
 						<param>hosh.integration.*</param>
 						<param>hosh.runtime.PipelineCommandTest</param>
 						<param>hosh.runtime.PipelineChannelTest</param>
+						<param>hosh.runtime.InterpreterTest</param>
+						<param>hosh.runtime.SupervisorTest</param>
 					</excludedTestClasses>
 					<threads>2</threads>
 				</configuration>

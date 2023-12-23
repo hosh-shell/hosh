@@ -60,8 +60,7 @@ class VariableNameTest {
 	})
 	void validVariableNames(String userInput) {
 		Optional<VariableName> from = VariableName.from(userInput);
-		VariableName of = VariableName.constant(userInput);
-		assertThat(from).hasValue(of);
+		assertThat(from).map(VariableName::name).hasValue(userInput);
 	}
 
 	@ParameterizedTest
@@ -85,8 +84,15 @@ class VariableNameTest {
 	}
 
 	@Test
+	void longVariableName() {
+		String userInput = "a".repeat(VariableName.MAX_VARIABLE_LENGTH); // still valid as it is exactly the length
+		Optional<VariableName> from = VariableName.from(userInput);
+		assertThat(from).map(VariableName::name).hasValue(userInput);
+	}
+
+	@Test
 	void veryLongVariableName() {
-		String userInput = "a".repeat(257);
+		String userInput = "a".repeat(VariableName.MAX_VARIABLE_LENGTH + 1); // too long
 		assertThatThrownBy(() -> VariableName.constant(userInput))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("variable name too long");

@@ -145,7 +145,7 @@ public class Values {
 			if (obj instanceof TextValue that) {
 				return BY_TEXT_ALPHA_NUM.compare(this.value, that.value);
 			} else {
-				return cannotCompare(this, obj);
+				throw new IllegalArgumentException("cannot compare " + this + " with " + obj);
 			}
 		}
 
@@ -221,7 +221,7 @@ public class Values {
 			if (obj instanceof SizeValue that) {
 				return Long.compare(this.bytes, that.bytes);
 			} else {
-				return cannotCompare(this, obj);
+				throw new IllegalArgumentException("cannot compare " + this + " with " + obj);
 			}
 		}
 
@@ -282,7 +282,7 @@ public class Values {
 			if (obj instanceof NumericValue that) {
 				return Long.compare(this.number, that.number);
 			} else {
-				return cannotCompare(this, obj);
+				throw new IllegalArgumentException("cannot compare " + this + " with " + obj);
 			}
 		}
 
@@ -334,7 +334,7 @@ public class Values {
 			if (obj instanceof None) {
 				return 0;
 			} else {
-				return cannotCompare(this, obj);
+				throw new IllegalArgumentException("cannot compare " + this + " with " + obj);
 			}
 		}
 
@@ -364,7 +364,7 @@ public class Values {
 			if (obj instanceof DurationValue that) {
 				return this.duration.compareTo(that.duration);
 			} else {
-				return cannotCompare(this, obj);
+				throw new IllegalArgumentException("cannot compare " + this + " with " + obj);
 			}
 		}
 
@@ -409,7 +409,7 @@ public class Values {
 			if (obj instanceof InstantValue that) {
 				return this.instant.compareTo(that.instant);
 			} else {
-				return cannotCompare(this, obj);
+				throw new IllegalArgumentException("cannot compare " + this + " with " + obj);
 			}
 		}
 
@@ -493,13 +493,12 @@ public class Values {
 			if (obj instanceof PathValue that) {
 				return BY_PATH_NATURAL_ORDER.compare(this.path, that.path);
 			} else {
-				return cannotCompare(this, obj);
+				throw new IllegalArgumentException("cannot compare " + this + " with " + obj);
 			}
 		}
 	}
 
 	static class BytesValue implements Value {
-
 
 		private static final HexFormat HEX_FORMAT = HexFormat.ofDelimiter(":").withLowerCase();
 
@@ -523,7 +522,7 @@ public class Values {
 			if (o instanceof BytesValue that) {
 				return Arrays.compare(this.bytes, that.bytes);
 			}
-			return cannotCompare(this, o);
+			throw new IllegalArgumentException("cannot compare " + this + " with " + o);
 		}
 
 		@Override
@@ -596,7 +595,7 @@ public class Values {
 			if (obj instanceof StyledValue that) {
 				return BY_VALUE_AND_STYLE.compare(this, that);
 			} else {
-				return cannotCompare(this, obj);
+				throw new IllegalArgumentException("cannot compare " + this + " with " + obj);
 			}
 		}
 
@@ -712,10 +711,5 @@ public class Values {
 			}
 		}
 
-	}
-
-	// generic error for compareTo, when types are not compatible
-	private static int cannotCompare(Value a, Value b) {
-		throw new IllegalArgumentException("cannot compare " + a + " with " + b);
 	}
 }
