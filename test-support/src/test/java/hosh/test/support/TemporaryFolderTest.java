@@ -21,52 +21,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi.test.support;
+package hosh.test.support;
 
-import hosh.spi.Key;
-import hosh.spi.Record;
-import hosh.spi.Value;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.util.List;
-import java.util.Objects;
+import java.io.IOException;
 
-/**
- * Mockito's argument matcher for Record that allows to specify
- * a subset of key/value mappings.
- */
-public class RecordMatcher implements ArgumentMatcher<Record> {
+import static org.assertj.core.api.Assertions.assertThat;
 
-	public static Record of(Key k1, Value v1) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1))));
+class TemporaryFolderTest {
+
+	@RegisterExtension
+	final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Test
+	void usage() throws IOException {
+		// must always provide a good base directory
+		assertThat(temporaryFolder.toPath())
+				.isNotNull()
+				.exists()
+				.isDirectory()
+		;
+
+		// create a new directory
+		assertThat(temporaryFolder.newFolder("folder"))
+				.isNotNull()
+				.exists()
+				.isDirectory()
+		;
+
+		// create a new file
+		assertThat(temporaryFolder.newFile("file.txt"))
+				.isNotNull()
+				.exists()
+				.isEmptyFile()
+		;
+
+		// create a new file under a new directory
+		assertThat(temporaryFolder.newFile(temporaryFolder.newFolder("sub-folder"), "file.txt"))
+				.isNotNull()
+				.exists()
+				.isEmptyFile()
+		;
+
+		// cleanup
+		temporaryFolder.afterEach(null);
+		assertThat(temporaryFolder.toPath()).doesNotExist();
 	}
 
-	public static Record of(Key k1, Value v1, Key k2, Value v2) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1), new Record.Entry(k2, v2))));
-	}
-
-	private final List<Record.Entry> entries;
-
-	RecordMatcher(List<Record.Entry> entries) {
-		this.entries = entries;
-	}
-
-	@Override
-	public boolean matches(Record argument) {
-		if (argument == null) {
-			return false;
-		}
-		for (var entry : entries) {
-			if (argument.entries().noneMatch(e -> Objects.equals(e, entry))) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "wanting entries: " + entries;
-	}
 }

@@ -21,52 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi.test.support;
+package hosh.test.support;
 
-import hosh.spi.Key;
-import hosh.spi.Record;
-import hosh.spi.Value;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.TimeZone;
 
-/**
- * Mockito's argument matcher for Record that allows to specify
- * a subset of key/value mappings.
- */
-public class RecordMatcher implements ArgumentMatcher<Record> {
+import static org.assertj.core.api.Assertions.assertThat;
 
-	public static Record of(Key k1, Value v1) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1))));
-	}
+class WithTimeZoneTest {
 
-	public static Record of(Key k1, Value v1, Key k2, Value v2) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1), new Record.Entry(k2, v2))));
-	}
+	@RegisterExtension
+	final WithTimeZone withTimeZone = new WithTimeZone();
 
-	private final List<Record.Entry> entries;
+	@Test
+	void lifeCycle() {
+		TimeZone zurich = TimeZone.getTimeZone("Europe/Zurich");
+		withTimeZone.changeTo(zurich);
+		assertThat(TimeZone.getDefault()).isEqualTo(zurich);
 
-	RecordMatcher(List<Record.Entry> entries) {
-		this.entries = entries;
-	}
-
-	@Override
-	public boolean matches(Record argument) {
-		if (argument == null) {
-			return false;
-		}
-		for (var entry : entries) {
-			if (argument.entries().noneMatch(e -> Objects.equals(e, entry))) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "wanting entries: " + entries;
+		TimeZone utc = TimeZone.getTimeZone("UTC");
+		withTimeZone.changeTo(utc);
+		assertThat(TimeZone.getDefault()).isEqualTo(utc);
 	}
 }

@@ -21,52 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package hosh.spi.test.support;
+package hosh.test.support;
 
-import hosh.spi.Key;
-import hosh.spi.Record;
-import hosh.spi.Value;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
-/**
- * Mockito's argument matcher for Record that allows to specify
- * a subset of key/value mappings.
- */
-public class RecordMatcher implements ArgumentMatcher<Record> {
+import static org.mockito.BDDMockito.then;
 
-	public static Record of(Key k1, Value v1) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1))));
+@ExtendWith(MockitoExtension.class)
+class WithExecutorTest {
+
+	@Mock
+	ExecutorService executorService;
+
+	@Test
+	void usage() {
+		WithExecutor sut = new WithExecutor(executorService);
+
+		// submit task
+		Runnable runnable = () -> System.out.println("test");
+		sut.submit(runnable);
+		then(executorService).should().submit(runnable);
+
+		// close after usage
+		sut.afterAll(null);
+		then(executorService).should().shutdown();
 	}
 
-	public static Record of(Key k1, Value v1, Key k2, Value v2) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1), new Record.Entry(k2, v2))));
-	}
-
-	private final List<Record.Entry> entries;
-
-	RecordMatcher(List<Record.Entry> entries) {
-		this.entries = entries;
-	}
-
-	@Override
-	public boolean matches(Record argument) {
-		if (argument == null) {
-			return false;
-		}
-		for (var entry : entries) {
-			if (argument.entries().noneMatch(e -> Objects.equals(e, entry))) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "wanting entries: " + entries;
-	}
 }

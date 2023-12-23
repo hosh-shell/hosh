@@ -23,50 +23,32 @@
  */
 package hosh.spi.test.support;
 
-import hosh.spi.Key;
+import hosh.spi.Keys;
 import hosh.spi.Record;
-import hosh.spi.Value;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
+import hosh.spi.Records;
+import hosh.spi.Values;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Objects;
 
-/**
- * Mockito's argument matcher for Record that allows to specify
- * a subset of key/value mappings.
- */
-public class RecordMatcher implements ArgumentMatcher<Record> {
+import static org.assertj.core.api.Assertions.assertThat;
 
-	public static Record of(Key k1, Value v1) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1))));
-	}
+class RecordMatcherTest {
 
-	public static Record of(Key k1, Value v1, Key k2, Value v2) {
-		return Mockito.argThat(new RecordMatcher(List.of(new Record.Entry(k1, v1), new Record.Entry(k2, v2))));
-	}
+	@Test
+	void usage() {
+		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
 
-	private final List<Record.Entry> entries;
+		Record empty = Records.empty();
+		assertThat(sut.matches(empty)).isFalse();
 
-	RecordMatcher(List<Record.Entry> entries) {
-		this.entries = entries;
-	}
+		Record mario = empty.append(Keys.NAME, Values.ofText("mario"));
+		assertThat(sut.matches(mario)).isTrue();
 
-	@Override
-	public boolean matches(Record argument) {
-		if (argument == null) {
-			return false;
-		}
-		for (var entry : entries) {
-			if (argument.entries().noneMatch(e -> Objects.equals(e, entry))) {
-				return false;
-			}
-		}
-		return true;
-	}
+		Record marioAndCount = mario.append(Keys.COUNT, Values.ofNumeric(42));
+		assertThat(sut.matches(marioAndCount)).isTrue(); // still true, as the required key/value is still there
 
-	@Override
-	public String toString() {
-		return "wanting entries: " + entries;
+		Record luigi = empty.append(Keys.NAME, Values.ofText("luigi"));
+		assertThat(sut.matches(luigi)).isFalse(); // not matching the required key/value (mario)
 	}
 }
