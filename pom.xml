@@ -344,6 +344,7 @@
 					<goals>clean verify</goals>
 					<localCheckout>true</localCheckout>
 					<tagNameFormat>v@{project.version}</tagNameFormat>
+					<signTag>true</signTag>
 				</configuration>
 			</plugin>
 		</plugins>
