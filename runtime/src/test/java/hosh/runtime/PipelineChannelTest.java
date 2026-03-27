@@ -23,7 +23,6 @@
  */
 package hosh.runtime;
 
-import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.test.support.WithExecutor;
 import hosh.test.support.WithThread;
@@ -39,6 +38,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 class PipelineChannelTest {
@@ -82,14 +82,13 @@ class PipelineChannelTest {
 	}
 
 	@Test
-	void sendAfterStopProducerReturnsDone() {
+	void sendAfterStopProducerThrows() {
 		// Given
 		PipelineChannel sut = new PipelineChannel();
 		sut.stopProducer();
-		// When
-		SendResult result = sut.send(record);
-		// Then
-		assertThat(result).isEqualTo(SendResult.DONE);
+		// When / Then
+		assertThatThrownBy(() -> sut.send(record))
+				.isInstanceOf(PipelineChannel.ProducerPoisonPill.class);
 	}
 
 	@Test
@@ -99,7 +98,7 @@ class PipelineChannelTest {
 		withThread.interrupt();
 		// When
 		sut.send(record);
-		// Then - interrupt flag is preserved
+		// Then - record is delivered and interrupt flag is preserved
 		assertThat(withThread.isInterrupted()).isTrue();
 	}
 

@@ -127,6 +127,8 @@ class PipelineCommand implements CompilerCommand, InterpreterAware {
 			pipelinePosition(position, command);
 			try {
 				return interpreter.eval(statement, in, out, err);
+			} catch (PipelineChannel.ProducerPoisonPill e) {
+				return ExitStatus.success();
 			} finally {
 				stopProducer(in);
 				stopConsumer(out);
