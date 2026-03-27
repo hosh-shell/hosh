@@ -32,6 +32,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
@@ -85,6 +88,35 @@ class SupervisorTest {
 		sut.submit(ExitStatus::error);
 		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isError();
+	}
+
+	@Test
+	void concurrentSubmit() throws ExecutionException, InterruptedException {
+		// Given - many virtual threads submitting tasks simultaneously
+		int count = 100;
+		CountDownLatch ready = new CountDownLatch(count);
+		CountDownLatch go = new CountDownLatch(1);
+		List<Thread> threads = new ArrayList<>();
+		for (int i = 0; i < count; i++) {
+			threads.add(Thread.ofVirtual().start(() -> {
+				ready.countDown();
+				try {
+					go.await();
+					sut.submit(ExitStatus::success);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+			}));
+		}
+		// When
+		ready.await();
+		go.countDown();
+		for (Thread t : threads) {
+			t.join();
+		}
+		ExitStatus exitStatus = sut.waitForAll();
+		// Then
+		assertThat(exitStatus).isSuccess();
 	}
 
 }

@@ -29,6 +29,7 @@ import jdk.internal.misc.Signal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -53,7 +54,7 @@ public class Supervisor implements AutoCloseable {
 
 	private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
-	private final List<Future<ExitStatus>> futures = new ArrayList<>();
+	private final List<Future<ExitStatus>> futures = new CopyOnWriteArrayList<>();
 
 	private boolean handleSignals = true;
 
