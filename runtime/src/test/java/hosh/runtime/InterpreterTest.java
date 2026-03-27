@@ -31,6 +31,7 @@ import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.State;
+import hosh.spi.StateAware;
 import hosh.spi.StateMutator;
 import hosh.spi.Values;
 import hosh.spi.VariableName;
@@ -67,9 +68,6 @@ class InterpreterTest {
 	StateMutator stateMutator;
 
 	@Mock
-	Injector injector;
-
-	@Mock
 	InputChannel in;
 
 	@Mock
@@ -91,18 +89,22 @@ class InterpreterTest {
 
 	@BeforeEach
 	void setup() {
-		sut = new Interpreter(state, stateMutator, injector);
+		sut = new Interpreter(state, stateMutator);
 	}
 
 	@Test
 	void injectDependencies() {
+		// Given - a command that is also StateAware
 		given(state.getVariables()).willReturn(Map.of());
-		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		StateAwareCommand stateAwareCommand = Mockito.mock(StateAwareCommand.class);
+		given(stateAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
-		given(statement.getCommand()).willReturn(command);
+		given(statement.getCommand()).willReturn(stateAwareCommand);
 		given(statement.getArguments()).willReturn(List.of());
+		// When
 		sut.eval(program, out, err);
-		then(injector).should().injectDeps(command);
+		// Then - state was injected
+		then(stateAwareCommand).should().setState(state);
 	}
 
 	@Test
@@ -217,5 +219,9 @@ class InterpreterTest {
 		sut.eval(statement, in, out, err);
 		assertThat(withThread.currentName()).isEqualTo("command='java'");
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
+	}
+
+	// Helper interface for testing injection of StateAware commands
+	interface StateAwareCommand extends Command, StateAware {
 	}
 }
