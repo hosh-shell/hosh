@@ -35,11 +35,15 @@ import java.util.EnumSet;
  */
 public interface OutputChannel {
 
-	void send(Record record);
+	enum SendResult {
+		ACCEPTED, DONE
+	}
+
+	SendResult send(Record record);
 
 	@Experimental(description = "testing send options")
-	default void send(Record record, EnumSet<Option> ignore) {
-		send(record);
+	default SendResult send(Record record, EnumSet<Option> ignore) {
+		return send(record);
 	}
 
 	@Experimental(description = "testing send options")

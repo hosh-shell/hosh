@@ -29,6 +29,7 @@ import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
+import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
@@ -156,8 +157,8 @@ public class Interpreter {
 		}
 
 		@Override
-		public void send(Record record) {
-			channel.send(record.prepend(Keys.LOCATION, Values.ofText(location)));
+		public SendResult send(Record record) {
+			return channel.send(record.prepend(Keys.LOCATION, Values.ofText(location)));
 		}
 	}
 }

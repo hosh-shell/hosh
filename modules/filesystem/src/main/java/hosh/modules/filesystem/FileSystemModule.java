@@ -39,6 +39,7 @@ import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
 import hosh.spi.Module;
 import hosh.spi.OutputChannel;
+import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
@@ -140,7 +141,9 @@ public class FileSystemModule implements Module {
 							.entry(Keys.MODIFIED, Values.ofInstant(attributes.lastModifiedTime().toInstant()))
 							.entry(Keys.ACCESSED, Values.ofInstant(attributes.lastAccessTime().toInstant()))
 							.build();
-					out.send(entry);
+					if (out.send(entry) == SendResult.DONE) {
+						return ExitStatus.success();
+					}
 				}
 				return ExitStatus.success();
 			} catch (NotDirectoryException e) {
@@ -240,7 +243,11 @@ public class FileSystemModule implements Module {
 				return ExitStatus.error();
 			}
 			try (Stream<String> lines = Files.lines(source, StandardCharsets.UTF_8)) {
-				lines.forEach(line -> out.send(Records.singleton(Keys.TEXT, Values.ofText(line))));
+				for (String line : (Iterable<String>) lines::iterator) {
+					if (out.send(Records.singleton(Keys.TEXT, Values.ofText(line))) == SendResult.DONE) {
+						return ExitStatus.success();
+					}
+				}
 				return ExitStatus.success();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
@@ -304,12 +311,12 @@ public class FileSystemModule implements Module {
 
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-				out.send(Records
+				SendResult result = out.send(Records
 						.builder()
 						.entry(Keys.PATH, Values.ofPath(file))
 						.entry(Keys.SIZE, Values.ofSize(attrs.size()))
 						.build());
-				return FileVisitResult.CONTINUE;
+				return result == SendResult.DONE ? FileVisitResult.TERMINATE : FileVisitResult.CONTINUE;
 			}
 
 			@Override
@@ -349,11 +356,16 @@ public class FileSystemModule implements Module {
 			String pattern = args.getFirst();
 			PathMatcher pathMatcher = state.getCwd().getFileSystem().getPathMatcher("glob:" + pattern);
 			for (Record record : InputChannel.iterate(in)) {
-				record.value(Keys.PATH)
+				boolean matches = record.value(Keys.PATH)
 						.flatMap(v -> v.unwrap(Path.class))
 						.map(Path::getFileName)
 						.filter(pathMatcher::matches)
-						.ifPresent(p -> out.send(record)); // side effect
+						.isPresent();
+				if (matches) {
+					if (out.send(record) == SendResult.DONE) {
+						return ExitStatus.success();
+					}
+				}
 			}
 			return ExitStatus.success();
 		}
@@ -469,7 +481,7 @@ public class FileSystemModule implements Module {
 			}
 			for (FileStore store : FileSystems.getDefault().getFileStores()) {
 				try {
-					out.send(Records
+					SendResult result = out.send(Records
 							.builder()
 							.entry(Keys.of("name"), Values.ofText(store.name()))
 							.entry(Keys.of("type"), Values.ofText(store.type()))
@@ -479,6 +491,9 @@ public class FileSystemModule implements Module {
 							.entry(Keys.of("blocksize"), Values.ofSize(store.getBlockSize()))
 							.entry(Keys.of("readonly"), Values.ofText(store.isReadOnly() ? "yes" : "no"))
 							.build());
+					if (result == SendResult.DONE) {
+						return ExitStatus.success();
+					}
 				} catch (IOException e) {
 					LOGGER.log(Level.WARNING, "skipping partition " + store.name(), e);
 				}
@@ -685,7 +700,9 @@ public class FileSystemModule implements Module {
 						.entry(Keys.PATH, Values.ofPath(pathEvent.context()))
 						.build();
 				// using direct send, to prevent any buffering from happening
-				out.send(record, EnumSet.of(OutputChannel.Option.DIRECT));
+				if (out.send(record, EnumSet.of(OutputChannel.Option.DIRECT)) == SendResult.DONE) {
+					return;
+				}
 			}
 		}
 	}

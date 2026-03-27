@@ -35,6 +35,7 @@ import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.Module;
 import hosh.spi.OutputChannel;
+import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
@@ -73,7 +74,9 @@ public class HistoryModule implements Module {
 						.entry(Keys.TIMESTAMP, Values.ofInstant(entry.time()))
 						.entry(Keys.TEXT, Values.ofText(entry.line()))
 						.build();
-				out.send(record);
+				if (out.send(record) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 			}
 			return ExitStatus.success();
 		}
