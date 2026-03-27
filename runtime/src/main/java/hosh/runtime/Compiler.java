@@ -28,7 +28,6 @@ import hosh.spi.CommandWrapper;
 import hosh.spi.State;
 import hosh.spi.VariableName;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.Serial;
 import java.util.ArrayList;
@@ -76,7 +75,7 @@ public class Compiler {
 		if (ctx.sequence() != null) {
 			return compileSequence(ctx.sequence());
 		}
-		throw new InternalBug(ctx);
+		throw new InternalBug(ctx.getText());
 	}
 
 	private Statement compileSequence(SequenceContext ctx) {
@@ -89,7 +88,7 @@ public class Compiler {
 			SequenceCommand command = new SequenceCommand(first, second);
 			return new Statement(command, List.of(), "");
 		}
-		throw new InternalBug(ctx);
+		throw new InternalBug(ctx.getText());
 	}
 
 	private Statement compilePipeline(PipelineContext ctx) {
@@ -106,7 +105,7 @@ public class Compiler {
 			PipelineCommand command = new PipelineCommand(producer, consumer);
 			return new Statement(command, List.of(), "");
 		}
-		throw new InternalBug(ctx);
+		throw new InternalBug(ctx.getText());
 	}
 
 	private Statement compileCommand(CommandContext ctx) {
@@ -119,7 +118,7 @@ public class Compiler {
 		if (ctx.lambda() != null) {
 			return compileLambda(ctx.lambda());
 		}
-		throw new InternalBug(ctx);
+		throw new InternalBug(ctx.getText());
 	}
 
 	private Statement compileSimple(SimpleContext ctx) {
@@ -185,7 +184,7 @@ public class Compiler {
 		if (ctx.string() != null) {
 			return compileString(ctx.string());
 		}
-		throw new InternalBug(ctx);
+		throw new InternalBug(ctx.getText());
 	}
 
 	private Resolvable compileString(StringContext ctx) {
@@ -195,7 +194,7 @@ public class Compiler {
 		if (ctx.dqstring() != null) {
 			return compileDoubleQuotedString(ctx.dqstring());
 		}
-		throw new InternalBug(ctx);
+		throw new InternalBug(ctx.getText());
 	}
 
 	private Resolvable compileDoubleQuotedString(DqstringContext ctx) {
@@ -212,7 +211,7 @@ public class Compiler {
 				String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
 				result.add(new VariableOrFallback(VariableName.constant(nameAndFallback[0]), nameAndFallback[1]));
 			} else {
-				throw new InternalBug(ctx);
+				throw new InternalBug(ctx.getText());
 			}
 		}
 		return new Composite(result);
@@ -237,7 +236,7 @@ public class Compiler {
 			String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
 			return new VariableOrFallback(VariableName.constant(nameAndFallback[0]), nameAndFallback[1]);
 		}
-		throw new InternalBug(ctx);
+		throw new InternalBug(ctx.getText());
 	}
 
 	// ${VARIABLE} -> VARIABLE
@@ -380,8 +379,8 @@ public class Compiler {
 		@Serial
 		private static final long serialVersionUID = 1L;
 
-		public InternalBug(ParseTree parseTree) {
-			super("internal bug in compiler near: " + parseTree.getText());
+		public InternalBug(String message) {
+			super("internal bug in compiler near: " + message);
 		}
 	}
 
