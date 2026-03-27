@@ -22,7 +22,7 @@ Multi-module Maven project:
 
 ## Requirements
 
-JDK 21+
+JDK 25
 
 ## Build
 
