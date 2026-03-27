@@ -35,6 +35,7 @@ import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.Module;
 import hosh.spi.OutputChannel;
+import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Value;
@@ -90,7 +91,9 @@ public class NetworkModule implements Module {
 							.entry(Keys.of("hwaddress"), hwAddress(ni.getHardwareAddress()))
 							.entry(Keys.of("address"), firstAddress(ni))
 							.build();
-					out.send(record);
+					if (out.send(record) == SendResult.DONE) {
+						return ExitStatus.success();
+					}
 				}
 				return ExitStatus.success();
 			} catch (IOException e) {
@@ -173,10 +176,12 @@ public class NetworkModule implements Module {
 		// it could be JSON / CSV / binary / etc... find a better way to handle this
 		private static void bodyToLines(OutputChannel outputChannel, HttpResponse<Stream<String>> response) {
 			try (Stream<String> body = response.body()) {
-				body.forEach(line -> {
+				for (String line : (Iterable<String>) body::iterator) {
 					Record record = Records.singleton(Keys.TEXT, Values.ofText(line));
-					outputChannel.send(record);
-				});
+					if (outputChannel.send(record) == SendResult.DONE) {
+						return;
+					}
+				}
 			}
 		}
 

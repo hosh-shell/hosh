@@ -36,6 +36,7 @@ import hosh.spi.Key;
 import hosh.spi.Keys;
 import hosh.spi.Module;
 import hosh.spi.OutputChannel;
+import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.spi.Record.Entry;
 import hosh.spi.Records;
@@ -103,7 +104,9 @@ public class TextModule implements Module {
 				for (Key k : keys) {
 					record.value(k).ifPresent(v -> builder.entry(k, v)); // side effect
 				}
-				out.send(builder.build());
+				if (out.send(builder.build()) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 			}
 			return ExitStatus.success();
 		}
@@ -169,7 +172,9 @@ public class TextModule implements Module {
 					Value value = values.next();
 					stringJoiner.add(value.show(locale));
 				}
-				out.send(Records.singleton(Keys.TEXT, Values.ofText(stringJoiner.toString())));
+				if (out.send(Records.singleton(Keys.TEXT, Values.ofText(stringJoiner.toString()))) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 			}
 			return ExitStatus.success();
 		}
@@ -189,7 +194,9 @@ public class TextModule implements Module {
 			}
 			Key key = Keys.of(args.getFirst());
 			for (Record record : InputChannel.iterate(in)) {
-				out.send(trimByKey(record, key));
+				if (out.send(trimByKey(record, key)) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 			}
 			return ExitStatus.success();
 		}
@@ -273,7 +280,9 @@ public class TextModule implements Module {
 			}
 			for (Record record : InputChannel.iterate(in)) {
 				String schema = record.keys().map(Key::name).collect(Collectors.joining(" "));
-				out.send(Records.singleton(Keys.of("schema"), Values.ofText(schema)));
+				if (out.send(Records.singleton(Keys.of("schema"), Values.ofText(schema))) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 			}
 			return ExitStatus.success();
 		}
@@ -318,7 +327,9 @@ public class TextModule implements Module {
 			}
 			long index = 1;
 			for (Record record : InputChannel.iterate(in)) {
-				out.send(record.prepend(Keys.INDEX, Values.ofNumeric(index)));
+				if (out.send(record.prepend(Keys.INDEX, Values.ofNumeric(index))) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 				index += 1;
 			}
 			return ExitStatus.success();
@@ -344,7 +355,9 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			for (Record record : InputChannel.iterate(in)) {
-				out.send(record.prepend(Keys.TIMESTAMP, Values.ofInstant(clock.instant())));
+				if (out.send(record.prepend(Keys.TIMESTAMP, Values.ofInstant(clock.instant()))) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 			}
 			return ExitStatus.success();
 		}
@@ -470,7 +483,9 @@ public class TextModule implements Module {
 
 		private void output(OutputChannel out, List<Record> records) {
 			for (Record record : records) {
-				out.send(record);
+				if (out.send(record) == SendResult.DONE) {
+					return;
+				}
 			}
 		}
 	}
@@ -496,7 +511,9 @@ public class TextModule implements Module {
 				if (take == 0) {
 					break;
 				}
-				out.send(record);
+				if (out.send(record) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 				take--;
 			}
 			return ExitStatus.success();
@@ -524,7 +541,9 @@ public class TextModule implements Module {
 				if (drop > 0) {
 					drop--;
 				} else {
-					out.send(record);
+					if (out.send(record) == SendResult.DONE) {
+						return ExitStatus.success();
+					}
 				}
 			}
 			return ExitStatus.success();
@@ -555,7 +574,9 @@ public class TextModule implements Module {
 
 		private void output(OutputChannel out, Queue<Record> queue) {
 			for (Record record : queue) {
-				out.send(record);
+				if (out.send(record) == SendResult.DONE) {
+					return;
+				}
 			}
 		}
 
@@ -588,7 +609,9 @@ public class TextModule implements Module {
 			while (!Thread.interrupted()) {
 				long next = random.nextLong();
 				Record of = Records.singleton(Keys.RAND, Values.ofNumeric(next));
-				out.send(of);
+				if (out.send(of) == SendResult.DONE) {
+					return ExitStatus.success();
+				}
 			}
 			return ExitStatus.success();
 		}
@@ -679,7 +702,9 @@ public class TextModule implements Module {
 						.entry(Keys.VALUE, kv.getKey())
 						.entry(Keys.COUNT, Values.ofNumeric(kv.getValue()))
 						.build();
-				out.send(record);
+				if (out.send(record) == SendResult.DONE) {
+					return;
+				}
 			}
 		}
 
