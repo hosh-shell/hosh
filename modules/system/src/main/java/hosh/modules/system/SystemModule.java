@@ -132,7 +132,7 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("path [show|clear|append path|prepend path]"));
 				return ExitStatus.error();
 			}
-			String command = args.get(0);
+			String command = args.getFirst();
 			switch (command) {
 				case "show": {
 					if (args.size() != 1) {
@@ -256,7 +256,7 @@ public class SystemModule implements Module {
 					stateMutator.mutateExit(true);
 					return ExitStatus.success();
 				case 1:
-					String arg = args.get(0);
+					String arg = args.getFirst();
 					Optional<ExitStatus> exitStatus = ExitStatus.parse(arg);
 					if (exitStatus.isPresent()) {
 						stateMutator.mutateExit(true);
@@ -300,7 +300,7 @@ public class SystemModule implements Module {
 				}
 				return ExitStatus.success();
 			} else if (args.size() == 1) {
-				String commandName = args.get(0);
+				String commandName = args.getFirst();
 				Supplier<Command> commandSupplier = state.getCommands().get(commandName);
 				if (commandSupplier == null) {
 					err.send(Errors.message("command not found: %s", commandName));
@@ -343,9 +343,9 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("sleep duration"));
 				return ExitStatus.error();
 			}
-			Optional<Duration> duration = DurationParsing.parse(args.get(0));
+			Optional<Duration> duration = DurationParsing.parse(args.getFirst());
 			if (duration.isEmpty()) {
-				err.send(Errors.message("invalid duration: '%s'", args.get(0)));
+				err.send(Errors.message("invalid duration: '%s'", args.getFirst()));
 				return ExitStatus.error();
 			}
 			try {
@@ -441,11 +441,11 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("kill process"));
 				return ExitStatus.error();
 			}
-			if (!args.get(0).matches("[0-9]+")) {
-				err.send(Errors.message("not a valid pid: %s", args.get(0)));
+			if (!args.getFirst().matches("[0-9]+")) {
+				err.send(Errors.message("not a valid pid: %s", args.getFirst()));
 				return ExitStatus.error();
 			}
-			long pid = Long.parseLong(args.get(0));
+			long pid = Long.parseLong(args.getFirst());
 			Optional<ProcessHandle> process = processLookup.of(pid);
 			if (process.isEmpty()) {
 				err.send(Errors.message("cannot find pid: %s", pid));
@@ -493,9 +493,9 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("withTimeout duration { ... }"));
 				return ExitStatus.error();
 			}
-			Optional<Duration> timeout = DurationParsing.parse(args.get(0));
+			Optional<Duration> timeout = DurationParsing.parse(args.getFirst());
 			if (timeout.isEmpty()) {
-				err.send(Errors.message("invalid duration: '%s'", args.get(0)));
+				err.send(Errors.message("invalid duration: '%s'", args.getFirst()));
 				return ExitStatus.error();
 			}
 			ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
@@ -544,9 +544,9 @@ public class SystemModule implements Module {
 			if (args.isEmpty()) {
 				sleep = Duration.ofSeconds(1);
 			} else {
-				Optional<Duration> maybeSleep = DurationParsing.parse(args.get(0));
+				Optional<Duration> maybeSleep = DurationParsing.parse(args.getFirst());
 				if (maybeSleep.isEmpty()) {
-					err.send(Errors.message("invalid duration: '%s'", args.get(0)));
+					err.send(Errors.message("invalid duration: '%s'", args.getFirst()));
 					return ExitStatus.error();
 				} else {
 					sleep = maybeSleep.get();
@@ -596,7 +596,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 
-			int repeat = Integer.parseInt(args.get(0));
+			int repeat = Integer.parseInt(args.getFirst());
 
 			if (repeat <= 0) {
 				err.send(Errors.message("number must be >= 0"));
@@ -693,7 +693,7 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("set variable value"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.get(0));
+			Optional<VariableName> name = VariableName.from(args.getFirst());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -731,7 +731,7 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("unset variable"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.get(0));
+			Optional<VariableName> name = VariableName.from(args.getFirst());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -776,7 +776,7 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("input variable"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.get(0));
+			Optional<VariableName> name = VariableName.from(args.getFirst());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -833,7 +833,7 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("secret variable"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.get(0));
+			Optional<VariableName> name = VariableName.from(args.getFirst());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -877,7 +877,7 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("confirm message"));
 				return ExitStatus.error();
 			}
-			String message = args.get(0);
+			String message = args.getFirst();
 			Optional<String> maybeAnswer = readAnswer(message + " (Y/N)? ");
 			if (maybeAnswer.isEmpty()) {
 				return ExitStatus.error();
@@ -928,7 +928,7 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("capture variable"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.get(0));
+			Optional<VariableName> name = VariableName.from(args.getFirst());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -968,7 +968,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
-			var path = state.getCwd().resolve(Paths.get(args.get(0)));
+			var path = state.getCwd().resolve(Paths.get(args.getFirst()));
 			try (var writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
 				for (Record incoming : InputChannel.iterate(in)) {
 					String line = incoming.values().map(v -> v.show(locale)).collect(Collectors.joining(" "));

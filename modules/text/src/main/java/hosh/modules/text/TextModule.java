@@ -121,7 +121,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("split key regex"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			Pattern pattern = Pattern.compile(args.get(1));
 			Map<Integer, Key> cachedKeys = new HashMap<>();
 			for (Record record : InputChannel.iterate(in)) {
@@ -160,7 +160,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("join separator"));
 				return ExitStatus.error();
 			}
-			String sep = args.get(0);
+			String sep = args.getFirst();
 			Locale locale = Locale.getDefault();
 			for (Record record : InputChannel.iterate(in)) {
 				StringJoiner stringJoiner = new StringJoiner(sep);
@@ -187,7 +187,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("trim key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			for (Record record : InputChannel.iterate(in)) {
 				out.send(trimByKey(record, key));
 			}
@@ -228,7 +228,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("regex key regex"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			Pattern pattern = Pattern.compile(args.get(1));
 			List<String> groupNames = extractNamedGroups(args.get(1));
 			Locale locale = Locale.getDefault();
@@ -267,7 +267,7 @@ public class TextModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Errors.usage("schema"));
 				return ExitStatus.error();
 			}
@@ -291,7 +291,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("filter key regex"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			Pattern pattern = Pattern.compile(args.get(1));
 			for (Record record : InputChannel.iterate(in)) {
 				// this could be allocation intensive but let's see
@@ -312,7 +312,7 @@ public class TextModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Errors.usage("enumerate"));
 				return ExitStatus.error();
 			}
@@ -339,7 +339,7 @@ public class TextModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Errors.usage("timestamp"));
 				return ExitStatus.error();
 			}
@@ -363,7 +363,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
 					boolean neverSeenBefore = seen.add(v);
@@ -389,7 +389,7 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
 					boolean seenBefore = !seen.add(v);
@@ -415,12 +415,12 @@ public class TextModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() == 0 || args.size() > 2) {
+			if (args.isEmpty() || args.size() > 2) {
 				err.send(Errors.usage("sort key [%s|%s]", ASC, DESC));
 				return ExitStatus.error();
 			}
 			String direction;
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			if (args.size() == 1) {
 				direction = ASC;
 			} else { // implies size == 2
@@ -487,7 +487,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("take number"));
 				return ExitStatus.error();
 			}
-			long take = Long.parseLong(args.get(0));
+			long take = Long.parseLong(args.getFirst());
 			if (take < 0) {
 				err.send(Errors.message("number must be >= 0"));
 				return ExitStatus.error();
@@ -515,7 +515,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("drop number"));
 				return ExitStatus.error();
 			}
-			long drop = Long.parseLong(args.get(0));
+			long drop = Long.parseLong(args.getFirst());
 			if (drop < 0) {
 				err.send(Errors.message("number must be >= 0"));
 				return ExitStatus.error();
@@ -543,7 +543,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("last number"));
 				return ExitStatus.error();
 			}
-			long n = Long.parseLong(args.get(0));
+			long n = Long.parseLong(args.getFirst());
 			if (n < 1) {
 				err.send(Errors.message("number must be >= 1"));
 				return ExitStatus.error();
@@ -580,7 +580,7 @@ public class TextModule implements Module {
 		@SuppressWarnings("squid:S2245")
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Errors.usage("rand"));
 				return ExitStatus.error();
 			}
@@ -602,7 +602,7 @@ public class TextModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Errors.usage("count"));
 				return ExitStatus.error();
 			}
@@ -628,7 +628,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("sum key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			Optional<Value> result = Optional.empty();
 			for (Record record : InputChannel.iterate(in)) {
 				Optional<Value> value = record.value(key);
@@ -658,7 +658,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("freq key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			Map<Value, Long> countByValue = countByValue(in, key);
 			output(out, countByValue);
 			return ExitStatus.success();
@@ -699,7 +699,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("min key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			Comparator<Value> comparator = Values.Comparators.noneLast(Comparator.naturalOrder());
 			Value min = Values.none();
 			for (Record record : InputChannel.iterate(in)) {
@@ -734,7 +734,7 @@ public class TextModule implements Module {
 				err.send(Errors.usage("max key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.get(0));
+			Key key = Keys.of(args.getFirst());
 			Value max = Values.none();
 			Comparator<Value> comparator = Values.Comparators.noneFirst(Comparator.naturalOrder());
 			for (Record record : InputChannel.iterate(in)) {

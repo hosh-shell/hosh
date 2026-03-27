@@ -64,7 +64,7 @@ public class HistoryModule implements Module {
 
 		@Override
 		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.size() != 0) {
+			if (!args.isEmpty()) {
 				err.send(Errors.usage("history"));
 				return ExitStatus.error();
 			}

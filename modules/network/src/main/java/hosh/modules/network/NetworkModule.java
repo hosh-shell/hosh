@@ -113,7 +113,7 @@ public class NetworkModule implements Module {
 			if (interfaceAddresses.isEmpty()) {
 				return Values.none();
 			}
-			return Values.ofText(interfaceAddresses.get(0).getAddress().getHostAddress());
+			return Values.ofText(interfaceAddresses.getFirst().getAddress().getHostAddress());
 		}
 
 	}
@@ -146,7 +146,7 @@ public class NetworkModule implements Module {
 			}
 			String userAgent = version.hoshVersion().unwrap(String.class).orElseThrow();
 			HttpRequest request = HttpRequest.newBuilder()
-					.uri(URI.create(args.get(0)))
+					.uri(URI.create(args.getFirst()))
 					.setHeader("User-Agent", userAgent)
 					.GET()
 					.build();
