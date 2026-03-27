@@ -48,7 +48,7 @@ public final class VariableName {
 			throw new IllegalArgumentException("variable name must be not null");
 		}
 		if (name.isBlank()) {
-			throw new IllegalArgumentException("variable name must be blank");
+			throw new IllegalArgumentException("variable name must not be blank");
 		}
 		if (name.length() > MAX_VARIABLE_LENGTH) { // arbitrary short name, just to avoid names 2 GB long...
 			throw new IllegalArgumentException("variable name too long");
