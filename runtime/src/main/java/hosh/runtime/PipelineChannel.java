@@ -34,7 +34,6 @@ import hosh.spi.Values;
 import java.io.Serial;
 import java.util.Optional;
 import java.util.concurrent.LinkedTransferQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 class PipelineChannel implements InputChannel, OutputChannel {
@@ -75,17 +74,7 @@ class PipelineChannel implements InputChannel, OutputChannel {
 		if (done) {
 			throw new ProducerPoisonPill();
 		}
-		try {
-			do {
-				boolean transferred = queue.tryTransfer(record, 50, TimeUnit.MILLISECONDS);
-				if (transferred) {
-					return;
-				}
-				LOGGER.finer("send failed, retry...");
-			} while (queue.hasWaitingConsumer());
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
+		queue.put(record);
 	}
 
 	public void stopProducer() {
