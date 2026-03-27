@@ -498,7 +498,7 @@ public class SystemModule implements Module {
 				err.send(Errors.message("invalid duration: '%s'", args.get(0)));
 				return ExitStatus.error();
 			}
-			ExecutorService executorService = Executors.newSingleThreadExecutor();
+			ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 			Future<ExitStatus> future = executorService.submit(nestedCommand::run);
 			try {
 				return future.get(timeout.get().toMillis(), TimeUnit.MILLISECONDS);

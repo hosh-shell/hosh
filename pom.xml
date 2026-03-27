@@ -186,7 +186,7 @@
 								<banDuplicatePomDependencyVersions />
 								<dependencyConvergence />
 								<requireJavaVersion>
-									<version>17</version>
+									<version>21</version>
 								</requireJavaVersion>
 								<requireNoRepositories>
 									<message>Best Practice is to never define repositories in pom.xml (use a repository
@@ -208,8 +208,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.12.1</version>
 				<configuration>
-					<source>17</source>
-					<target>17</target>
+					<source>21</source>
+					<target>21</target>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 					<useIncrementalCompilation>false</useIncrementalCompilation>
