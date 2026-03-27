@@ -28,7 +28,6 @@ import hosh.spi.Key;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
-import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
@@ -71,23 +70,23 @@ public class AutoTableChannel implements OutputChannel {
 	}
 
 	@Override
-	public SendResult send(Record record) {
-		return send(record, NONE);
+	public void send(Record record) {
+		send(record, NONE);
 	}
 
 	@Override
-	public SendResult send(Record record, EnumSet<Option> options) {
+	public void send(Record record, EnumSet<Option> options) {
 		if (overflow.get() || options.contains(Option.DIRECT)) {
 			// if overflow already happened or the record is "direct"; then let's deliver it immediately
-			return outputChannel.send(record);
+			outputChannel.send(record);
+			return;
 		}
 		records.add(record);
 		if (records.size() >= OVERFLOW && overflow.compareAndSet(false, true)) {
 			LOGGER.fine(() -> "autotable: overflow after " + records.size());
 			// flush and clear our buffer
-			records.forEach(r -> outputChannel.send(r));
+			records.forEach(outputChannel::send);
 		}
-		return SendResult.ACCEPTED;
 	}
 
 	public void flush() {

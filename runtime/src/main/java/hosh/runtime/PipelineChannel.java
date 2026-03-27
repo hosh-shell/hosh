@@ -27,11 +27,11 @@ import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
-import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
 
+import java.io.Serial;
 import java.util.Optional;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.logging.Logger;
@@ -69,13 +69,12 @@ class PipelineChannel implements InputChannel, OutputChannel {
 	}
 
 	@Override
-	public SendResult send(Record record) {
+	public void send(Record record) {
 		LOGGER.finer("sending record");
 		if (done) {
-			return SendResult.DONE;
+			throw new ProducerPoisonPill();
 		}
 		queue.put(record);
-		return SendResult.ACCEPTED;
 	}
 
 	public void stopProducer() {
@@ -89,4 +88,17 @@ class PipelineChannel implements InputChannel, OutputChannel {
 		queue.add(POISON_PILL);
 	}
 
+	// Since send() is a void method an exception is needed
+	// to forcibly stop a producer.
+	public static class ProducerPoisonPill extends RuntimeException {
+
+		@Serial
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public synchronized Throwable fillInStackTrace() {
+			// this is really control-flow exception, no need for stacktrace
+			return this;
+		}
+	}
 }

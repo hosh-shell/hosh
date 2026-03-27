@@ -25,7 +25,6 @@ package hosh.runtime;
 
 import hosh.spi.Ansi;
 import hosh.spi.OutputChannel;
-import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import org.jline.terminal.Terminal;
 
@@ -45,14 +44,13 @@ public class ConsoleChannel implements OutputChannel {
 	}
 
 	@Override
-	public SendResult send(Record record) {
+	public void send(Record record) {
 		Locale locale = Locale.getDefault();
 		String line = record
 				.values().map(value -> value.show(locale))
 				.collect(Collectors.joining(" ", style.enable(), style.disable()));
 		printWriter.println(line);
 		printWriter.flush();
-		return SendResult.ACCEPTED;
 	}
 
 	@Override

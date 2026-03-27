@@ -39,7 +39,6 @@ import hosh.spi.Keys;
 import hosh.spi.LineReaderAware;
 import hosh.spi.Module;
 import hosh.spi.OutputChannel;
-import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
@@ -141,9 +140,7 @@ public class SystemModule implements Module {
 						return ExitStatus.error();
 					}
 					for (var path : state.getPath()) {
-						if (out.send(Records.singleton(Keys.PATH, Values.ofPath(path))) == SendResult.DONE) {
-							return ExitStatus.success();
-						}
+						out.send(Records.singleton(Keys.PATH, Values.ofPath(path)));
 					}
 					return ExitStatus.success();
 				}
@@ -231,9 +228,7 @@ public class SystemModule implements Module {
 						.entry(Keys.NAME, Values.ofText(entry.getKey().name()))
 						.entry(Keys.VALUE, Values.ofText(entry.getValue()))
 						.build();
-				if (out.send(record) == SendResult.DONE) {
-					return ExitStatus.success();
-				}
+				out.send(record);
 			}
 			return ExitStatus.success();
 		}
@@ -301,9 +296,7 @@ public class SystemModule implements Module {
 							.entry(Keys.NAME, Values.ofText(name))
 							.entry(Keys.DESCRIPTION, Values.ofText(description.value()))
 							.build();
-					if (out.send(record) == SendResult.DONE) {
-						return ExitStatus.success();
-					}
+					out.send(record);
 				}
 				return ExitStatus.success();
 			} else if (args.size() == 1) {
@@ -324,9 +317,7 @@ public class SystemModule implements Module {
 				out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("Examples"), Style.BOLD)));
 				if (examples != null) {
 					for (Example ex : examples.value()) {
-						if (out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(ex.command() + " # " + ex.description()), Style.ITALIC))) == SendResult.DONE) {
-							return ExitStatus.success();
-						}
+						out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText(ex.command() + " # " + ex.description()), Style.ITALIC)));
 					}
 				} else {
 					out.send(Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("N/A"), Style.FG_RED)));
@@ -409,21 +400,17 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("ps"));
 				return ExitStatus.error();
 			}
-			try (var processes = ProcessHandle.allProcesses()) {
-				for (ProcessHandle process : (Iterable<ProcessHandle>) processes::iterator) {
-					Info info = process.info();
-					Record result = Records.builder()
-							.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
-							.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
-							.entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
-							.entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
-							.entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
-							.build();
-					if (out.send(result) == SendResult.DONE) {
-						return ExitStatus.success();
-					}
-				}
-			}
+			ProcessHandle.allProcesses().forEach(process -> {
+				Info info = process.info();
+				Record result = Records.builder()
+						.entry(Keys.of("pid"), Values.ofNumeric(process.pid()))
+						.entry(Keys.of("user"), Values.ofText(info.user().orElse("-")))
+						.entry(Keys.TIMESTAMP, info.startInstant().map(Values::ofInstant).orElse(Values.none()))
+						.entry(Keys.of("command"), Values.ofText(info.command().orElse("-")))
+						.entry(Keys.of("arguments"), Values.ofText(String.join(" ", info.arguments().orElse(new String[0]))))
+						.build();
+				out.send(result);
+			});
 			return ExitStatus.success();
 		}
 	}

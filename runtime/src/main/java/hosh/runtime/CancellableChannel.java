@@ -24,7 +24,6 @@
 package hosh.runtime;
 
 import hosh.spi.OutputChannel;
-import hosh.spi.OutputChannel.SendResult;
 import hosh.spi.Record;
 
 import java.util.concurrent.CancellationException;
@@ -44,10 +43,10 @@ public class CancellableChannel implements OutputChannel {
 	}
 
 	@Override
-	public SendResult send(Record record) {
+	public void send(Record record) {
 		if (Thread.interrupted()) {
 			throw new CancellationException("interrupted");
 		}
-		return channel.send(record);
+		channel.send(record);
 	}
 }

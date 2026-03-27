@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
+import hosh.runtime.PipelineChannel.ProducerPoisonPill;
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -112,6 +113,36 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.error()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
+	}
+
+	@Test
+	void producerPoisonPill() {
+		PipelineCommand sut = new PipelineCommand(producer, consumer);
+		sut.setInterpreter(interpreter);
+		given(producer.getCommand()).willReturn(command);
+		given(consumer.getCommand()).willReturn(command);
+		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(producer), any(), any(), any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		assertThat(exitStatus).isSuccess();
+		then(in).shouldHaveNoInteractions();
+		then(out).shouldHaveNoInteractions();
+		then(err).shouldHaveNoInteractions();
+	}
+
+	@Test
+	void consumerPoisonPill() {
+		PipelineCommand sut = new PipelineCommand(producer, consumer);
+		sut.setInterpreter(interpreter);
+		given(producer.getCommand()).willReturn(command);
+		given(consumer.getCommand()).willReturn(command);
+		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();

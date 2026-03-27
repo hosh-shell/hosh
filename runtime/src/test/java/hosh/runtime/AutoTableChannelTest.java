@@ -141,7 +141,7 @@ class AutoTableChannelTest {
 	void overflowIsTriggeredExactlyOnceUnderConcurrentLoad() throws InterruptedException {
 		// Given - a thread-safe collector and a channel backed by it
 		List<Record> received = new CopyOnWriteArrayList<>();
-		AutoTableChannel channel = new AutoTableChannel(record -> { received.add(record); return OutputChannel.SendResult.ACCEPTED; });
+		AutoTableChannel channel = new AutoTableChannel(received::add);
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("x")).build();
 		int threads = 4;
 		int recordsPerThread = AutoTableChannel.OVERFLOW;
