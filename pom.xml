@@ -311,18 +311,22 @@
 				<version>4.3</version>
 				<inherited>false</inherited>
 				<configuration>
-					<header>${project.basedir}/LICENSE.md</header>
 					<aggregate>true</aggregate>
 					<failIfMissing>true</failIfMissing>
 					<encoding>${project.build.sourceEncoding}</encoding>
-					<includes>
-						<include>**/main/java/**/*.java</include>
-						<include>**/test/java/**/*.java</include>
-					</includes>
 					<strictCheck>true</strictCheck>
 					<mapping>
 						<java>SLASHSTAR_STYLE</java>
 					</mapping>
+					<licenseSets>
+						<licenseSet>
+							<header>${project.basedir}/LICENSE.md</header>
+							<includes>
+								<include>**/main/java/**/*.java</include>
+								<include>**/test/java/**/*.java</include>
+							</includes>
+						</licenseSet>
+					</licenseSets>
 				</configuration>
 				<executions>
 					<execution>
