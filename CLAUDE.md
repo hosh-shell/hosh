@@ -75,7 +75,6 @@ Sonar analysis:
 - Pipeline stages run concurrently; `Supervisor` manages virtual threads (`Executors.newVirtualThreadPerTaskExecutor()`).
 - Inter-stage data flows through `PipelineChannel` backed by `LinkedTransferQueue`.
 - Strict error handling by default — equivalent to `set -euo pipefail` in bash.
-- Uses `jdk.internal.misc.Signal` for SIGINT handling (requires `--add-exports` compiler flag, already configured in `pom.xml`).
 - Uses Java Platform Module System (`module-info.java` in every module).
 
 ## Testing

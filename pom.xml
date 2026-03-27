@@ -186,7 +186,7 @@
 								<banDuplicatePomDependencyVersions />
 								<dependencyConvergence />
 								<requireJavaVersion>
-									<version>21</version>
+									<version>25</version>
 								</requireJavaVersion>
 								<requireNoRepositories>
 									<message>Best Practice is to never define repositories in pom.xml (use a repository
@@ -208,7 +208,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.12.1</version>
 				<configuration>
-					<release>21</release>
+					<release>25</release>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 					<useIncrementalCompilation>false</useIncrementalCompilation>
@@ -227,7 +227,6 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
-					<argLine>@{argLine} --add-exports java.base/jdk.internal.misc=hosh.runtime</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
