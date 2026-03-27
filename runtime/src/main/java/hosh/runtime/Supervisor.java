@@ -23,10 +23,8 @@
  */
 package hosh.runtime;
 
-import hosh.doc.Todo;
 import hosh.spi.ExitStatus;
 import hosh.spi.LoggerFactory;
-import jdk.internal.misc.Signal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Manages execution of built-in commands as well as external commands via @{see
- * {@link Supervisor#submit(Callable)}
+ * Manages execution of built-in commands as well as external commands via {@link Supervisor#submit(Callable)}
  * while providing a synchronization point via {@link Supervisor#waitForAll()}.
  * <p>
  * SIGINT is handled as well, if requested.
@@ -51,8 +48,7 @@ public class Supervisor implements AutoCloseable {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
-	@Todo(description = "this usage of internal API cannot be avoided as far as I know")
-	private static final Signal INT = new Signal("INT");
+	private Thread shutdownHook;
 
 	private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -109,24 +105,28 @@ public class Supervisor implements AutoCloseable {
 	}
 
 	private void restoreDefaultSigintHandler() {
-		if (handleSignals) {
+		if (handleSignals && shutdownHook != null) {
 			LOGGER.fine("restoring default INT signal handler");
-			jdk.internal.misc.Signal.handle(INT, Signal.Handler.SIG_DFL);
+			try {
+				Runtime.getRuntime().addShutdownHook(shutdownHook);
+			} catch (IllegalStateException e) {
+				LOGGER.log(Level.INFO, "got cancellation", e);
+			}
 		}
 	}
 
 	private void cancelFuturesOnSigint() {
-		if (handleSignals) {
+		if (handleSignals && shutdownHook != null) {
 			LOGGER.fine("register INT signal handler");
-			jdk.internal.misc.Signal.handle(INT, this::cancelFutures);
-		}
-	}
-
-	private void cancelFutures(Signal signal) {
-		LOGGER.info(() -> String.format("got %s signal", signal));
-		for (Future<ExitStatus> future : futures) {
-			LOGGER.finer(() -> String.format("cancelling future %s", future));
-			future.cancel(true);
+			this.shutdownHook = Thread.ofVirtual().unstarted(() -> {
+				LOGGER.info("SIGINT received, shutting down...");
+				for (Future<ExitStatus> future : futures) {
+					LOGGER.finer(() -> String.format("cancelling future %s", future));
+					future.cancel(true);
+				}
+				shutdownHook = null;
+			});
+			Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 		}
 	}
 
