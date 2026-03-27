@@ -25,16 +25,26 @@ package hosh.runtime;
 
 import hosh.spi.Command;
 import hosh.spi.ExitStatus;
+import hosh.spi.HistoryAware;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
+import hosh.spi.LineReaderAware;
 import hosh.spi.LoggerFactory;
 import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
+import hosh.spi.StateAware;
 import hosh.spi.StateMutator;
+import hosh.spi.StateMutatorAware;
+import hosh.spi.TerminalAware;
 import hosh.spi.Values;
 import hosh.spi.VariableName;
+import hosh.spi.Version;
+import hosh.spi.VersionAware;
+import org.jline.reader.History;
+import org.jline.reader.LineReader;
+import org.jline.terminal.Terminal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,12 +64,31 @@ public class Interpreter {
 
 	private final State state;
 	private final StateMutator stateMutator;
-	private final Injector injector;
+	private History history;
+	// this is a "private" LineReader to be injected in commands: it has no history and no auto-complete
+	private LineReader lineReader;
+	private Terminal terminal;
+	private Version version;
 
-	public Interpreter(State state, StateMutator stateMutator, Injector injector) {
+	public Interpreter(State state, StateMutator stateMutator) {
 		this.state = state;
 		this.stateMutator = stateMutator;
-		this.injector = injector;
+	}
+
+	public void setHistory(History history) {
+		this.history = history;
+	}
+
+	public void setLineReader(LineReader lineReader) {
+		this.lineReader = lineReader;
+	}
+
+	public void setTerminal(Terminal terminal) {
+		this.terminal = terminal;
+	}
+
+	public void setVersion(Version version) {
+		this.version = version;
 	}
 
 	public ExitStatus eval(Compiler.Program program, OutputChannel out, OutputChannel err) {
@@ -90,7 +119,7 @@ public class Interpreter {
 	}
 
 	private ExitStatus evalUnderSupervision(Compiler.Statement statement, OutputChannel out, OutputChannel err) {
-		try (Supervisor supervisor = new Supervisor(injector.getTerminal())) {
+		try (Supervisor supervisor = new Supervisor(terminal)) {
 			supervisor.submit(() -> eval(statement, new NullChannel(), out, err));
 			return supervisor.waitForAll();
 		} catch (ExecutionException e) {
@@ -106,16 +135,33 @@ public class Interpreter {
 
 	protected ExitStatus eval(Compiler.Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
 		Command command = statement.getCommand();
-		injectInterpreter(command);
-		injector.injectDeps(command);
+		inject(command);
 		List<String> resolvedArguments = resolveArguments(statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
 		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
 	}
 
-	private void injectInterpreter(Command command) {
+	private void inject(Command command) {
 		if (command instanceof InterpreterAware interpreterAware) {
 			interpreterAware.setInterpreter(this);
+		}
+		if (command instanceof HistoryAware historyAware) {
+			historyAware.setHistory(history);
+		}
+		if (command instanceof LineReaderAware lineReaderAware) {
+			lineReaderAware.setLineReader(lineReader);
+		}
+		if (command instanceof StateAware stateAware) {
+			stateAware.setState(state);
+		}
+		if (command instanceof StateMutatorAware stateMutatorAware) {
+			stateMutatorAware.setStateMutator(stateMutator);
+		}
+		if (command instanceof TerminalAware terminalAware) {
+			terminalAware.setTerminal(terminal);
+		}
+		if (command instanceof VersionAware versionAware) {
+			versionAware.setVersion(version);
 		}
 	}
 

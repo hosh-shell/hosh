@@ -37,7 +37,6 @@ import hosh.runtime.DisabledHistory;
 import hosh.runtime.FileSystemCompleter;
 import hosh.runtime.HoshFormatter;
 import hosh.runtime.HoshHighlighter;
-import hosh.runtime.Injector;
 import hosh.runtime.Interpreter;
 import hosh.runtime.MutableState;
 import hosh.runtime.PathInitializer;
@@ -167,17 +166,14 @@ public class Hosh {
 		state.mutateCommands(new BootstrapBuiltins().registerAllBuiltins());
 		state.mutateVariables(new BootstrapVariables().fromEnv(System.getenv()));
 		state.mutatePath(new PathInitializer().initializePath(System.getenv("PATH")));
-		Injector injector = new Injector();
-		injector.setLineReader(LineReaderBuilder.builder().terminal(terminal).build());
-		injector.setState(state);
-		injector.setStateMutator(state);
-		injector.setTerminal(terminal);
-		injector.setVersion(version);
 		CommandResolver commandResolver = CommandResolvers.builtinsThenExternal(state);
 		Compiler compiler = new Compiler(commandResolver);
 		OutputChannel out = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.NONE));
 		OutputChannel err = new CancellableChannel(new ConsoleChannel(terminal, Ansi.Style.FG_RED));
-		Interpreter interpreter = new Interpreter(state, state, injector);
+		Interpreter interpreter = new Interpreter(state, state);
+		interpreter.setLineReader(LineReaderBuilder.builder().terminal(terminal).build());
+		interpreter.setTerminal(terminal);
+		interpreter.setVersion(version);
 		CommandLine commandLine;
 		Options options = createOptions();
 		CommandLineParser parser = new DefaultParser();
@@ -199,11 +195,11 @@ public class Hosh {
 		List<String> remainingArgs = commandLine.getArgList();
 		if (remainingArgs.isEmpty()) {
 			welcome(out, version);
-			return repl(state, terminal, compiler, interpreter, injector, out, err, logger);
+			return repl(state, terminal, compiler, interpreter, out, err, logger);
 		}
 		if (remainingArgs.size() == 1) {
 			String filePath = args[0];
-			return script(filePath, compiler, interpreter, injector, out, err, logger);
+			return script(filePath, compiler, interpreter, out, err, logger);
 		}
 		System.err.println("hosh: too many scripts");
 		return ExitStatus.error();
@@ -216,11 +212,11 @@ public class Hosh {
 		return options;
 	}
 
-	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, Injector injector, OutputChannel out, OutputChannel err, Logger logger) {
+	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, OutputChannel out, OutputChannel err, Logger logger) {
 		try {
 			String script = loadScript(Paths.get(path));
 			Program program = compiler.compile(script);
-			injector.setHistory(new DisabledHistory());
+			interpreter.setHistory(new DisabledHistory());
 			return interpreter.eval(program, out, err);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "caught exception", e);
@@ -237,10 +233,10 @@ public class Hosh {
 		}
 	}
 
-	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter, Injector injector,
+	private static ExitStatus repl(State state, Terminal terminal, Compiler compiler, Interpreter interpreter,
 								   OutputChannel out, OutputChannel err, Logger logger) {
 		History history = provideHistory();
-		injector.setHistory(history);
+		interpreter.setHistory(history);
 		LineReader lineReader = LineReaderBuilder
 				.builder()
 				.appName("hosh")
