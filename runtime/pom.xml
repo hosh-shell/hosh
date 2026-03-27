@@ -93,7 +93,6 @@
 						@{argLine}
 						--add-opens hosh.spi/hosh.spi=ALL-UNNAMED
 						--add-opens hosh.runtime/hosh.runtime=ALL-UNNAMED
-						--add-exports java.base/jdk.internal.misc=hosh.runtime
 					</argLine>
 				</configuration>
 			</plugin>
