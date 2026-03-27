@@ -25,9 +25,6 @@ package hosh.spi;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AnsiTest {

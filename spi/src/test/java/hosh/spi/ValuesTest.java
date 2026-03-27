@@ -735,7 +735,7 @@ class ValuesTest {
 					.ofSizeBetween(1, 20)
 					.mutate((base, r) -> {
 						// add None as first element
-						base.add(0, Values.none());
+						base.addFirst(Values.none());
 						// add None as last element
 						base.add(Values.none());
 						// add one at random position
