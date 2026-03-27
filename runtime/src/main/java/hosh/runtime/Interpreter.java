@@ -133,15 +133,22 @@ public class Interpreter {
 		}
 	}
 
-	protected ExitStatus eval(Compiler.Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
+	// Scoped evaluation: runs a statement with an overridden State without mutating
+	// the global shell state. Used by LambdaCommand to bind per-record variables
+	// (e.g. 'ls | { path -> echo ${path} }') safely across concurrent virtual threads.
+	protected ExitStatus eval(Compiler.Statement statement, InputChannel in, OutputChannel out, OutputChannel err, State newState) {
 		Command command = statement.getCommand();
-		inject(command);
-		List<String> resolvedArguments = resolveArguments(statement.getArguments());
+		inject(command, newState);
+		List<String> resolvedArguments = resolveArguments(newState, statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
 		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
 	}
 
-	private void inject(Command command) {
+	protected ExitStatus eval(Compiler.Statement statement, InputChannel in, OutputChannel out, OutputChannel err) {
+		return eval(statement, in, out, err, state);
+	}
+
+	private void inject(Command command, State newState) {
 		if (command instanceof InterpreterAware interpreterAware) {
 			interpreterAware.setInterpreter(this);
 		}
@@ -151,8 +158,9 @@ public class Interpreter {
 		if (command instanceof LineReaderAware lineReaderAware) {
 			lineReaderAware.setLineReader(lineReader);
 		}
+		// state is passed explicitly
 		if (command instanceof StateAware stateAware) {
-			stateAware.setState(state);
+			stateAware.setState(newState);
 		}
 		if (command instanceof StateMutatorAware stateMutatorAware) {
 			stateMutatorAware.setStateMutator(stateMutator);
@@ -173,7 +181,7 @@ public class Interpreter {
 		Thread.currentThread().setName(name);
 	}
 
-	private List<String> resolveArguments(List<Compiler.Resolvable> arguments) {
+	private static List<String> resolveArguments(State state, List<Compiler.Resolvable> arguments) {
 		return arguments
 				.stream()
 				.map(resolvable -> resolvable.resolve(state))

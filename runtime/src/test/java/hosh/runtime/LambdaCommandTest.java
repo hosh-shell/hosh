@@ -47,6 +47,8 @@ import java.util.Optional;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -71,16 +73,12 @@ class LambdaCommandTest {
 	@Mock(stubOnly = true)
 	State state;
 
-	@Mock
-	StateMutator stateMutator;
-
 	LambdaCommand sut;
 
 	@BeforeEach
 	void setUp() {
 		sut = new LambdaCommand(statement, Keys.PATH.name());
 		sut.setState(state);
-		sut.setStateMutator(stateMutator);
 		sut.setInterpreter(interpreter);
 	}
 
@@ -89,13 +87,11 @@ class LambdaCommandTest {
 	void presentKeyWithInnerCommandSuccess() {
 		Map<VariableName, String> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
-		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.success());
+		given(interpreter.eval(eq(statement), eq(in), eq(out), eq(err), any(State.class))).willReturn(ExitStatus.success());
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isSuccess();
 		assertThat(variables).isEmpty();
-		then(stateMutator).should().mutateVariables(Collections.singletonMap(VariableName.constant("path"), "file"));
-		then(stateMutator).should().mutateVariables(variables);
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -106,13 +102,11 @@ class LambdaCommandTest {
 	void presentKeyWithInnerCommandError() {
 		Map<VariableName, String> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
-		given(interpreter.eval(statement, in, out, err)).willReturn(ExitStatus.error());
+		given(interpreter.eval(eq(statement), eq(in), eq(out), eq(err), any(State.class))).willReturn(ExitStatus.error());
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
 		assertThat(variables).isEmpty();
-		then(stateMutator).should().mutateVariables(Collections.singletonMap(VariableName.constant("path"), "file"));
-		then(stateMutator).should().mutateVariables(variables);
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -126,7 +120,6 @@ class LambdaCommandTest {
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 		assertThat(exitStatus).isError();
 		assertThat(variables).isEmpty();
-		then(stateMutator).shouldHaveNoInteractions();
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("missing key 'path'")));
