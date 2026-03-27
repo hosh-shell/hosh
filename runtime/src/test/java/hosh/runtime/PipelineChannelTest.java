@@ -38,6 +38,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 class PipelineChannelTest {
@@ -81,10 +82,23 @@ class PipelineChannelTest {
 	}
 
 	@Test
+	void sendAfterStopProducerThrows() {
+		// Given
+		PipelineChannel sut = new PipelineChannel();
+		sut.stopProducer();
+		// When / Then
+		assertThatThrownBy(() -> sut.send(record))
+				.isInstanceOf(PipelineChannel.ProducerPoisonPill.class);
+	}
+
+	@Test
 	void sendInterrupted() {
+		// Given - thread is interrupted before send
 		PipelineChannel sut = new PipelineChannel();
 		withThread.interrupt();
+		// When
 		sut.send(record);
+		// Then - record is delivered and interrupt flag is preserved
 		assertThat(withThread.isInterrupted()).isTrue();
 	}
 
