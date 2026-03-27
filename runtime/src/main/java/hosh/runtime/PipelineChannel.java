@@ -40,7 +40,7 @@ class PipelineChannel implements InputChannel, OutputChannel {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
-	private final Record poisonPill = Records.singleton(Keys.of("poisonpill"), Values.none());
+	private static final Record POISON_PILL = Records.singleton(Keys.of("poisonpill"), Values.none());
 
 	private final LinkedTransferQueue<Record> queue;
 
@@ -56,7 +56,7 @@ class PipelineChannel implements InputChannel, OutputChannel {
 		try {
 			LOGGER.finer("waiting for record...");
 			Record record = queue.take();
-			if (record == poisonPill) {
+			if (record == POISON_PILL) {
 				LOGGER.finer("got poison pill");
 				return Optional.empty();
 			}
@@ -86,7 +86,7 @@ class PipelineChannel implements InputChannel, OutputChannel {
 	public void stopConsumer() {
 		LOGGER.fine("consumer stop requested");
 		done = true;
-		queue.add(poisonPill);
+		queue.add(POISON_PILL);
 	}
 
 }
