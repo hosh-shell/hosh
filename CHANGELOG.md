@@ -6,14 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Added
 
+### Added
 
 ### Changed
 
+- JDK 25 is now the minimum requirement
+- Maven upgraded to 3.9.9; JVM flags for native access and `sun.misc.Unsafe` moved to `.mvn/jvm.config`
 
 ### Fixed
 
+- Several race conditions across `MutableState` (volatile fields), `LambdaCommand` (synchronized compound mutation), and `AutoTableChannel` (atomic overflow detection)
 
 ### Removed
 
