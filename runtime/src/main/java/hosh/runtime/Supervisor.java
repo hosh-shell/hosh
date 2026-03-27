@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import hosh.doc.Todo;
 import hosh.spi.ExitStatus;
 import hosh.spi.LoggerFactory;
 import jdk.internal.misc.Signal;
@@ -50,6 +51,7 @@ public class Supervisor implements AutoCloseable {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
+	@Todo(description = "this usage of internal API cannot be avoided as far as I know")
 	private static final Signal INT = new Signal("INT");
 
 	private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
