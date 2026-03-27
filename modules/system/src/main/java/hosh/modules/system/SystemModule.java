@@ -174,7 +174,7 @@ public class SystemModule implements Module {
 					}
 					java.nio.file.Path pathToAppend = Paths.get(args.get(1));
 					List<java.nio.file.Path> newPath = new ArrayList<>(state.getPath());
-					newPath.add(0, pathToAppend);
+					newPath.addFirst(pathToAppend);
 					stateMutator.mutatePath(newPath);
 					return ExitStatus.success();
 				}
