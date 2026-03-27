@@ -98,7 +98,6 @@ class PipelineCommand implements CompilerCommand, InterpreterAware {
 	@Override
 	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
 		try (Supervisor supervisor = new Supervisor()) {
-			supervisor.setHandleSignals(false);
 			PipelineChannel pipelineChannel = new PipelineChannel();
 			runAsync(supervisor, producer, in, pipelineChannel, err, Position.FIRST);
 			assemblePipeline(supervisor, consumer, pipelineChannel, out, err);

@@ -97,6 +97,10 @@ public class Injector {
 		this.stateMutator = stateMutator;
 	}
 
+	public Terminal getTerminal() {
+		return terminal;
+	}
+
 	public void setTerminal(Terminal terminal) {
 		this.terminal = terminal;
 	}

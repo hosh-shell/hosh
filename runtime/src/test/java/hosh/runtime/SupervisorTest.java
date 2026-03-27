@@ -25,25 +25,35 @@ package hosh.runtime;
 
 import hosh.spi.ExitStatus;
 import hosh.test.support.WithThread;
+import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SupervisorTest {
 
 	@RegisterExtension
 	final WithThread withThread = new WithThread();
+
+	@Mock
+	Terminal terminal;
 
 	Supervisor sut;
 
@@ -88,6 +98,43 @@ class SupervisorTest {
 		sut.submit(ExitStatus::error);
 		ExitStatus exitStatus = sut.waitForAll();
 		assertThat(exitStatus).isError();
+	}
+
+	@Test
+	void sigintCancelsPendingTasks() throws Exception {
+		// Given - a Supervisor with terminal-based SIGINT handling, and a task that blocks until interrupted
+		ArgumentCaptor<Terminal.SignalHandler> handlerCaptor = ArgumentCaptor.forClass(Terminal.SignalHandler.class);
+		when(terminal.handle(eq(Terminal.Signal.INT), handlerCaptor.capture())).thenReturn(Terminal.SignalHandler.SIG_DFL);
+		CountDownLatch taskStarted = new CountDownLatch(1);
+		CountDownLatch taskCancelled = new CountDownLatch(1);
+		try (Supervisor sutWithTerminal = new Supervisor(terminal)) {
+			sutWithTerminal.submit(() -> {
+				taskStarted.countDown();
+				try {
+					Thread.sleep(10_000); // NOSONAR
+				} catch (InterruptedException e) {
+					taskCancelled.countDown();
+					Thread.currentThread().interrupt();
+				}
+				return ExitStatus.success();
+			});
+			taskStarted.await();
+			// When - waitForAll installs the handler; run it in background, then simulate SIGINT
+			Thread waiter = Thread.ofVirtual().start(() -> {
+				try {
+					sutWithTerminal.waitForAll();
+				} catch (ExecutionException e) {
+					Thread.currentThread().interrupt();
+				}
+			});
+			Thread.sleep(100); // let waitForAll install the handler
+			Terminal.SignalHandler handler = handlerCaptor.getValue();
+			assertThat(handler).as("SIGINT handler must be installed by waitForAll").isNotNull();
+			handler.handle(Terminal.Signal.INT);
+			waiter.join(1_000);
+		}
+		// Then - the task was cancelled by the handler
+		assertThat(taskCancelled.await(1, TimeUnit.SECONDS)).isTrue();
 	}
 
 	@Test
