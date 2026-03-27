@@ -84,18 +84,20 @@ class LambdaCommand implements CompilerCommand, InterpreterAware, StateAware, St
 				return ExitStatus.error();
 			}
 			Value value = lambdaParameter.orElseThrow(IllegalArgumentException::new);
-			var original = state.getVariables();
-			var modified = new HashMap<>(original);
-			modified.put(variableName, value.unwrap(String.class).orElse("unwrap failed"));
-			stateMutator.mutateVariables(modified); // beware: global state is mutated here, this change should be local
-			try {
-				ExitStatus eval = interpreter.eval(statement, in, out, err);
-				if (eval.isError()) {
-					return eval;
+			synchronized (stateMutator) {
+				var original = state.getVariables();
+				var modified = new HashMap<>(original);
+				modified.put(variableName, value.unwrap(String.class).orElse("unwrap failed"));
+				stateMutator.mutateVariables(modified); // beware: global state is mutated here, this change should be local
+				try {
+					ExitStatus eval = interpreter.eval(statement, in, out, err);
+					if (eval.isError()) {
+						return eval;
+					}
+				} finally {
+					// any change made by inner statement to variable will be lost here
+					stateMutator.mutateVariables(original);
 				}
-			} finally {
-				// any change made by inner statement to variable will be lost here
-				stateMutator.mutateVariables(original);
 			}
 		}
 		return ExitStatus.success();
