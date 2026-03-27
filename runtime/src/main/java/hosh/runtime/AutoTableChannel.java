@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -61,12 +62,11 @@ public class AutoTableChannel implements OutputChannel {
 	private static final int COLUMN_PADDING = 2;
 	private final OutputChannel outputChannel;
 	private final Queue<Record> records;
-	private volatile boolean overflow;
+	private final AtomicBoolean overflow = new AtomicBoolean(false);
 
 	public AutoTableChannel(OutputChannel outputChannel) {
 		this.outputChannel = outputChannel;
 		this.records = new ConcurrentLinkedDeque<>();
-		this.overflow = false;
 	}
 
 	@Override
@@ -76,28 +76,27 @@ public class AutoTableChannel implements OutputChannel {
 
 	@Override
 	public void send(Record record, EnumSet<Option> options) {
-		if (overflow || options.contains(Option.DIRECT)) {
+		if (overflow.get() || options.contains(Option.DIRECT)) {
 			// if overflow already happened or the record is "direct"; then let's deliver it immediately
 			outputChannel.send(record);
 			return;
 		}
 		records.add(record);
-		if (records.size() >= OVERFLOW) {
+		if (records.size() >= OVERFLOW && overflow.compareAndSet(false, true)) {
 			LOGGER.fine(() -> "autotable: overflow after " + records.size());
-			overflow = true;
 			// flush and clear our buffer
 			records.forEach(outputChannel::send);
 		}
 	}
 
 	public void flush() {
-		LOGGER.fine(() -> "autotable: end with overflow=" + overflow);
-		if (!overflow) {
+		LOGGER.fine(() -> "autotable: end with overflow=" + overflow.get());
+		if (!overflow.get()) {
 			Map<Key, Integer> paddings = calculatePaddings(records);
 			outputTable(outputChannel, records, paddings);
 		}
 		records.clear();
-		overflow = false;
+		overflow.set(false);
 	}
 
 	private void outputTable(OutputChannel out, Collection<Record> records, Map<Key, Integer> paddings) {

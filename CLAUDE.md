@@ -83,3 +83,4 @@ Sonar analysis:
 - all features are covered by unit tests
 - tests are written in JUnit5, mockito and assertj
 - all tests have // Given // When // Then sections
+- the instance of the class under test is always called "sut" (system under test)

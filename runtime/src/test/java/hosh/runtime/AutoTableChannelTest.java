@@ -38,7 +38,11 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
@@ -131,6 +135,41 @@ class AutoTableChannelTest {
 		then(out).should().send(records.capture());
 		sut.flush(); // buffer should be empty now
 		then(out).shouldHaveNoMoreInteractions();
+	}
+
+	@Test
+	void overflowIsTriggeredExactlyOnceUnderConcurrentLoad() throws InterruptedException {
+		// Given - a thread-safe collector and a channel backed by it
+		List<Record> received = new CopyOnWriteArrayList<>();
+		AutoTableChannel channel = new AutoTableChannel(received::add);
+		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("x")).build();
+		int threads = 4;
+		int recordsPerThread = AutoTableChannel.OVERFLOW;
+		CountDownLatch ready = new CountDownLatch(threads);
+		CountDownLatch go = new CountDownLatch(1);
+		List<Thread> workers = new ArrayList<>();
+		for (int i = 0; i < threads; i++) {
+			workers.add(Thread.ofVirtual().start(() -> {
+				ready.countDown();
+				try {
+					go.await();
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+				for (int j = 0; j < recordsPerThread; j++) {
+					channel.send(record);
+				}
+			}));
+		}
+		// When
+		ready.await();
+		go.countDown();
+		for (Thread t : workers) {
+			t.join();
+		}
+		channel.flush();
+		// Then - every record is delivered exactly once (no double-flush)
+		Assertions.assertThat(received).hasSize(threads * recordsPerThread);
 	}
 
 }
