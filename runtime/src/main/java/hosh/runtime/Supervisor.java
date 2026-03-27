@@ -25,12 +25,13 @@ package hosh.runtime;
 
 import hosh.spi.ExitStatus;
 import hosh.spi.LoggerFactory;
+import org.jline.terminal.Terminal;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,7 +43,9 @@ import java.util.logging.Logger;
  * Manages execution of built-in commands as well as external commands via {@link Supervisor#submit(Callable)}
  * while providing a synchronization point via {@link Supervisor#waitForAll()}.
  * <p>
- * SIGINT is handled as well, if requested.
+ * SIGINT is handled via JLine's Terminal.handle() when a Terminal is provided.
+ * This intercepts the signal before the JVM acts on it, allowing the shell to
+ * cancel the current pipeline and return to the prompt rather than exiting.
  */
 class Supervisor implements AutoCloseable {
 
@@ -50,17 +53,19 @@ class Supervisor implements AutoCloseable {
 
 	private final ExecutorService executor;
 	private final List<Future<ExitStatus>> futures;
-	private boolean handleSignals;
-	private Thread shutdownHook;
+	private final Terminal terminal;
+	private Terminal.SignalHandler previousSigintHandler;
 
+	// No signal handling — used inside PipelineCommand where the outer Supervisor already handles signals.
 	public Supervisor() {
-		this.handleSignals = true;
-		this.futures = new CopyOnWriteArrayList<>();
-		this.executor = Executors.newVirtualThreadPerTaskExecutor();
+		this(null);
 	}
 
-	public void setHandleSignals(boolean handleSignals) {
-		this.handleSignals = handleSignals;
+	// With JLine-based SIGINT interception — used in Interpreter for top-level command execution.
+	public Supervisor(Terminal terminal) {
+		this.terminal = terminal;
+		this.futures = new CopyOnWriteArrayList<>();
+		this.executor = Executors.newVirtualThreadPerTaskExecutor();
 	}
 
 	@Override
@@ -75,7 +80,7 @@ class Supervisor implements AutoCloseable {
 	}
 
 	public ExitStatus waitForAll() throws ExecutionException {
-		cancelFuturesOnSigint();
+		installSigintHandler();
 		try {
 			List<ExitStatus> results = waitForCompletion();
 			return deriveExitStatus(results);
@@ -107,30 +112,24 @@ class Supervisor implements AutoCloseable {
 		return results;
 	}
 
-	private void restoreDefaultSigintHandler() {
-		if (handleSignals && shutdownHook != null) {
-			LOGGER.fine("restoring default INT signal handler");
-			try {
-				Runtime.getRuntime().addShutdownHook(shutdownHook);
-			} catch (IllegalStateException e) {
-				LOGGER.log(Level.INFO, "got cancellation", e);
-			}
-		}
-	}
-
-	private void cancelFuturesOnSigint() {
-		if (handleSignals && shutdownHook != null) {
+	private void installSigintHandler() {
+		if (terminal != null) {
 			LOGGER.fine("register INT signal handler");
-			this.shutdownHook = Thread.ofVirtual().unstarted(() -> {
-				LOGGER.info("SIGINT received, shutting down...");
+			previousSigintHandler = terminal.handle(Terminal.Signal.INT, signal -> {
+				LOGGER.info("SIGINT received, cancelling futures...");
 				for (Future<ExitStatus> future : futures) {
 					LOGGER.finer(() -> String.format("cancelling future %s", future));
 					future.cancel(true);
 				}
-				shutdownHook = null;
 			});
-			Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 		}
 	}
 
+	private void restoreDefaultSigintHandler() {
+		if (terminal != null && previousSigintHandler != null) {
+			LOGGER.fine("restoring default INT signal handler");
+			terminal.handle(Terminal.Signal.INT, previousSigintHandler);
+			previousSigintHandler = null;
+		}
+	}
 }

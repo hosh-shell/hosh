@@ -90,7 +90,7 @@ public class Interpreter {
 	}
 
 	private ExitStatus evalUnderSupervision(Compiler.Statement statement, OutputChannel out, OutputChannel err) {
-		try (Supervisor supervisor = new Supervisor()) {
+		try (Supervisor supervisor = new Supervisor(injector.getTerminal())) {
 			supervisor.submit(() -> eval(statement, new NullChannel(), out, err));
 			return supervisor.waitForAll();
 		} catch (ExecutionException e) {
