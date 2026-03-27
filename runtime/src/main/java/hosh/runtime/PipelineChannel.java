@@ -37,7 +37,7 @@ import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class PipelineChannel implements InputChannel, OutputChannel {
+class PipelineChannel implements InputChannel, OutputChannel {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 

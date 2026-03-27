@@ -38,6 +38,9 @@ import java.io.Serial;
  */
 public class Parser {
 
+	public Parser() {
+	}
+
 	HoshParser.ProgramContext parse(String input) {
 		HoshLexer lexer = new HoshLexer(CharStreams.fromString(input));
 		lexer.removeErrorListeners();

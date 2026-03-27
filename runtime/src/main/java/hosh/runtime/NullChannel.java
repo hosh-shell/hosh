@@ -28,7 +28,7 @@ import hosh.spi.Record;
 
 import java.util.Optional;
 
-public class NullChannel implements InputChannel {
+class NullChannel implements InputChannel {
 
 	@Override
 	public Optional<Record> recv() {

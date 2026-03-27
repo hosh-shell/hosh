@@ -58,7 +58,11 @@ public class GitCurrentBranchPromptProvider implements PromptProvider {
 
 	}
 
-	private GitExternal gitExternal = GitExternal.defaultImplementation();
+	private GitExternal gitExternal;
+
+	public GitCurrentBranchPromptProvider() {
+		this.gitExternal = GitExternal.defaultImplementation();
+	}
 
 	public void setGitExternal(GitExternal gitExternal) {
 		this.gitExternal = gitExternal;

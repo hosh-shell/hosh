@@ -32,6 +32,9 @@ import java.util.Optional;
 
 public class PathInitializer {
 
+	public PathInitializer() {
+	}
+
 	public List<Path> initializePath(String path) {
 		return Optional.ofNullable(path)
 				.stream()

@@ -26,6 +26,10 @@ package hosh.runtime.prompt;
 import hosh.spi.State;
 
 public class UserPromptProvider implements PromptProvider {
+
+	public UserPromptProvider() {
+	}
+
 	@Override
 	public String provide(State state) {
 		// important limitation: this will be always the user that started the JVM

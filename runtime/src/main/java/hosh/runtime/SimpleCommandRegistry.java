@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public class SimpleCommandRegistry implements CommandRegistry {
+class SimpleCommandRegistry implements CommandRegistry {
 
 	private final Map<String, Supplier<Command>> commands = new HashMap<>();
 

@@ -29,6 +29,9 @@ import hosh.spi.State;
 
 public class DefaultPromptProvider implements PromptProvider {
 
+	public DefaultPromptProvider() {
+	}
+
 	@Todo(description = "use StyledPrompt class")
 	@Override
 	public String provide(State state) {

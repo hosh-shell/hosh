@@ -42,19 +42,27 @@ import java.util.function.Supplier;
 public class MutableState implements State, StateMutator {
 
 	// variables
-	private volatile Map<VariableName, String> variables = Map.of();
+	private volatile Map<VariableName, String> variables;
 
 	// built-in commands
-	private volatile Map<String, Supplier<Command>> commands = Map.of();
+	private volatile Map<String, Supplier<Command>> commands;
 
 	// current working directory
-	private volatile Path cwd = Paths.get("");
+	private volatile Path cwd;
 
-	// PATH
-	private volatile List<Path> path = List.of();
+	// where to look for commands (e.g. the "PATH" variable)
+	private volatile List<Path> path;
 
 	// request exit shell before executing next command
-	private volatile boolean exit = false;
+	private volatile boolean exit;
+
+	public MutableState() {
+		variables = Map.of();
+		commands = Map.of();
+		cwd = Paths.get("");
+		path = List.of();
+		exit = false;
+	}
 
 	@Override
 	public Path getCwd() {
