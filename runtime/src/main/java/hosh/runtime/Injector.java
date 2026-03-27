@@ -57,6 +57,9 @@ public class Injector {
 
 	private Version version;
 
+	public Injector() {
+	}
+
 	public void injectDeps(Command command) {
 		if (command instanceof HistoryAware historyAware) {
 			historyAware.setHistory(history);

@@ -31,6 +31,9 @@ import java.util.Optional;
 
 public class BootstrapVariables {
 
+	public BootstrapVariables() {
+	}
+
 	// attempt to import system variables as Hosh variables
 	// any invalid name will be logged and skipped
 	public Map<VariableName, String> fromEnv(Map<String, String> env) {

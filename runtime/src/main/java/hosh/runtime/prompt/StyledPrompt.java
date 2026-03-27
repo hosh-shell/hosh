@@ -28,7 +28,7 @@ import org.jline.style.StyleExpression;
 import org.jline.utils.AttributedString;
 
 @Experimental(description = "next gen prompt")
-public class StyledPrompt {
+class StyledPrompt {
 
 	public String render(String template) {
 		StyleExpression sut = new StyleExpression();

@@ -44,17 +44,20 @@ import java.util.logging.Logger;
  * <p>
  * SIGINT is handled as well, if requested.
  */
-public class Supervisor implements AutoCloseable {
+class Supervisor implements AutoCloseable {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
+	private final ExecutorService executor;
+	private final List<Future<ExitStatus>> futures;
+	private boolean handleSignals;
 	private Thread shutdownHook;
 
-	private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-
-	private final List<Future<ExitStatus>> futures = new CopyOnWriteArrayList<>();
-
-	private boolean handleSignals = true;
+	public Supervisor() {
+		this.handleSignals = true;
+		this.futures = new CopyOnWriteArrayList<>();
+		this.executor = Executors.newVirtualThreadPerTaskExecutor();
+	}
 
 	public void setHandleSignals(boolean handleSignals) {
 		this.handleSignals = handleSignals;

@@ -36,6 +36,9 @@ import java.util.ListIterator;
  */
 public class DisabledHistory implements History {
 
+	public DisabledHistory() {
+	}
+
 	@Override
 	public void attach(LineReader reader) {
 		// no-op

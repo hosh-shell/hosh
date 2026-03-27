@@ -30,6 +30,9 @@ import java.net.UnknownHostException;
 
 public class HostnamePromptProvider implements PromptProvider {
 
+	public HostnamePromptProvider() {
+	}
+
 	@Override
 	public String provide(State state) {
 		try {

@@ -37,6 +37,9 @@ public class HoshFormatter extends Formatter {
 
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS");
 
+	public HoshFormatter() {
+	}
+
 	@Override
 	public String format(LogRecord logRecord) {
 		StringWriter sw = new StringWriter();

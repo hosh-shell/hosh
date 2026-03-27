@@ -38,13 +38,16 @@ import java.util.logging.Logger;
  */
 public class BootstrapBuiltins {
 
-	private final Logger logger = LoggerFactory.forEnclosingClass();
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
+
+	public BootstrapBuiltins() {
+	}
 
 	public Map<String, Supplier<Command>> registerAllBuiltins() {
 		SimpleCommandRegistry commandRegistry = new SimpleCommandRegistry();
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {
-			logger.log(Level.INFO, () -> String.format("registering %s", module.getClass().getCanonicalName()));
+			LOGGER.log(Level.INFO, () -> String.format("registering %s", module.getClass().getCanonicalName()));
 			module.initialize(commandRegistry);
 		}
 		return commandRegistry.getCommands();
