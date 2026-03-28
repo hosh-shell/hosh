@@ -34,7 +34,7 @@ Quick build (2x faster on my machine):
 
 ### Debug
 
-`$ java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar main/target/hosh.jar`
+`$ java -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar main/target/hosh.jar`
 
 ### Logging
 
