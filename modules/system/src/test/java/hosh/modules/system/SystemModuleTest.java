@@ -426,14 +426,10 @@ class SystemModuleTest {
 
 		@Test
 		void noArgsWithSomeEnvVariables() {
-<<<<<<< HEAD
-			given(state.getVariables()).willReturn(Map.of(VariableName.constant("HOSH_VERSION"), Values.ofText("1.0")));
-=======
 			// Given
-			given(state.getVariables()).willReturn(Map.of(VariableName.constant("HOSH_VERSION"), "1.0"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("HOSH_VERSION"), Values.ofText("1.0")));
 
 			// When
->>>>>>> e981a540 (switching to //Given//When//Test tests, part 1)
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 
 			// Then
