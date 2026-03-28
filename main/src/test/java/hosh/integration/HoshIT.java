@@ -71,175 +71,223 @@ class HoshIT {
 
 	@Test
 	void initializeWithoutSystemEnv() throws Exception {
+		// Given
 		ProcessBuilder hoshBuilder = givenHoshProcessBuilder();
 		hoshBuilder.environment().clear();
-		Process hosh = hoshBuilder.start();
-		closeInput(hosh);
-		int exitCode = hosh.waitFor();
+		// When
+		Process sut = hoshBuilder.start();
+		closeInput(sut);
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void interactiveEndOfFile() throws Exception {
-		Process hosh = givenHoshProcess();
-		closeInput(hosh);
-		int exitCode = hosh.waitFor();
+		// Given
+		Process sut = givenHoshProcess();
+		// When
+		closeInput(sut);
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void interactiveScriptThenExit() throws Exception {
-		Process hosh = givenHoshProcess();
-		sendInput(hosh, "ls", "exit");
-		int exitCode = hosh.waitFor();
+		// Given
+		Process sut = givenHoshProcess();
+		// When
+		sendInput(sut, "ls", "exit");
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void interactiveExitSuccess() throws Exception {
-		Process hosh = givenHoshProcess();
-		sendInput(hosh, "exit");
-		int exitCode = hosh.waitFor();
+		// Given
+		Process sut = givenHoshProcess();
+		// When
+		sendInput(sut, "exit");
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void interactiveExitFailure() throws Exception {
-		Process hosh = givenHoshProcess();
-		sendInput(hosh, "exit 42");
-		int exitCode = hosh.waitFor();
+		// Given
+		Process sut = givenHoshProcess();
+		// When
+		sendInput(sut, "exit 42");
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isEqualTo(42);
 	}
 
 	@Test
 	void scriptWithCdAndCwd() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"cd " + temporaryFolder.toPath().toAbsolutePath(),
 				"cwd"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains(temporaryFolder.toPath().toAbsolutePath().toString());
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains(temporaryFolder.toPath().toAbsolutePath().toString());
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void scriptWithOsVar() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"echo ${OS_ENV_VARIABLE}"//
 		);
-		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("hello world!");
+		Process sut = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("hello world!");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void scriptWithMissingOsVar() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"echo ${OS_ENV_VARIABLE}"//
 		);
-		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("cannot resolve variable: OS_ENV_VARIABLE");
+		Process sut = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("cannot resolve variable: OS_ENV_VARIABLE");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void scriptWithMissingOsVarWithFallback() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"echo ${OS_ENV_VARIABLE!fallback}"//
 		);
-		Process hosh = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("fallback");
+		Process sut = givenHoshProcess(Collections.emptyMap(), scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("fallback");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void scriptWithImplicitExit() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"echo hello"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).isEqualTo("hello");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEqualTo("hello");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void scriptWithExplicitExit() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"exit 1"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		int exitCode = hosh.waitFor();
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void scriptParsedThenExecuted() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"exit 0",
 				"AAAAB"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		int exitCode = hosh.waitFor();
-		String output = consumeOutput(hosh);
-		assertThat(output).contains("line 2: 'AAAAB' unknown command");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("line 2: 'AAAAB' unknown command");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void nonPipelineExternalCommand() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"git --version"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		int exitCode = hosh.waitFor();
-		String output = consumeOutput(hosh);
-		assertThat(output).startsWith("git version");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).startsWith("git version");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void pipelineWithInternalCommand() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"rand | take 1 | count"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		int exitCode = hosh.waitFor();
-		String output = consumeOutput(hosh);
-		assertThat(output).isEqualTo("1");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEqualTo("1");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void pipelineReadFromExternalCommand() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"git --version | take 1 | count"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		int exitCode = hosh.waitFor();
-		String output = consumeOutput(hosh);
-		assertThat(output).isEqualTo("1");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEqualTo("1");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void pipelineWriteToExternalCommand() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"echo some_random_hash | git cat-file --batch" //
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		int exitCode = hosh.waitFor();
-		String output = consumeOutput(hosh);
-		assertThat(output).isEqualTo("some_random_hash missing");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEqualTo("some_random_hash missing");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
@@ -247,195 +295,243 @@ class HoshIT {
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/212")
 	@Test
 	void pipelineWithMiddleExternalCommands() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"git tag | wc -l | wc -l" //
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		int exitCode = hosh.waitFor();
-		String output = consumeOutput(hosh);
-		assertThat(output).isEqualToIgnoringWhitespace("1");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEqualToIgnoringWhitespace("1");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void missingScript() throws Exception {
+		// Given
 		Path scriptPath = Paths.get("missing.hosh");
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("unable to load: missing.hosh");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("unable to load: missing.hosh");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
 	void pipelinesDoNotExpandVariables() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"echo ${OS_ENV_VARIABLE} | take 1"//
 		);
-		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).isEqualTo("hello world!");
+		Process sut = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEqualTo("hello world!");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/23")
 	@Test
 	void wrappersDoNotExpandVariables() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"withTime { echo ${OS_ENV_VARIABLE} } "//
 		);
-		Process hosh = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("hello world!");
+		Process sut = givenHoshProcess(Map.of("OS_ENV_VARIABLE", "hello world!"), scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("hello world!");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void errorInSimpleCommand() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"err"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("please do not report");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("please do not report");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void errorInProducer() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"err | ls"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("please do not report");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("please do not report");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void errorInConsumer() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"ls | err"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("please do not report");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("please do not report");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void consumerAndProducerBothInError() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"err | err"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("please do not report");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("please do not report");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void consumeInfiniteProducer() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"rand | take 100 | count"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).isEqualTo("100");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEqualTo("100");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void benchmark() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"benchmark 2 { rand | take 100 | count } "//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).matches("100\r?\n100\r?\n2 PT\\d+.\\d+S PT\\d+.\\d+S PT\\d+.\\d+S");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).matches("100\r?\n100\r?\n2 PT\\d+.\\d+S PT\\d+.\\d+S PT\\d+.\\d+S");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void unknownCommandInScript() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"FOOBAR"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("line 1: 'FOOBAR' unknown command");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("line 1: 'FOOBAR' unknown command");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void unknownCommandInteractive() throws Exception {
-		Process hosh = givenHoshProcess();
-		sendInput(hosh, "FOOBAR\nexit\n");
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("'FOOBAR' unknown command");
+		// Given
+		Process sut = givenHoshProcess();
+		// When
+		sendInput(sut, "FOOBAR\nexit\n");
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("'FOOBAR' unknown command");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/71")
 	@Test
 	void commandWrapperCapturesOutput() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"benchmark 1 { cwd } | schema"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("path", "count best worst average");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("path", "count best worst average");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void redirectOutputToVariable() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"echo 'world' | capture WHO", // this is WHO=$(echo 'world')
 				"echo hello ${WHO}"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isEqualTo(0);
-		assertThat(output).contains("hello world");
+		assertThat(result).contains("hello world");
 	}
 
 	@Test
 	void comments() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"# echo 'hello'",
 				"# ls",
 				"exit 42"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).isEmpty();
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEmpty();
 		assertThat(exitCode).isEqualTo(42);
 	}
 
 	@Test
 	void sequence() throws Exception {
+		// Given
 		Path scriptPath = givenScript(
 				"echo a ; echo b"//
 		);
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).contains("a", "b");
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).contains("a", "b");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
@@ -443,10 +539,13 @@ class HoshIT {
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
 	void interruptBuiltInCommand() throws Exception {
+		// Given
 		Path scriptPath = givenScript("rand");
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		sendSigint(hosh);
-		int exitCode = hosh.waitFor();
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		sendSigint(sut);
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isNotEqualTo(0);
 	}
 
@@ -454,10 +553,13 @@ class HoshIT {
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
 	void interruptExternalCommand() throws Exception {
+		// Given
 		Path scriptPath = givenScript("git cat-file --batch");
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		sendSigint(hosh);
-		int exitCode = hosh.waitFor();
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		sendSigint(sut);
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isNotEqualTo(0);
 	}
 
@@ -465,10 +567,13 @@ class HoshIT {
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
 	void interruptPipeline() throws Exception {
+		// Given
 		Path scriptPath = givenScript("rand | count");
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		sendSigint(hosh);
-		int exitCode = hosh.waitFor();
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		sendSigint(sut);
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isNotEqualTo(0);
 	}
 
@@ -476,21 +581,27 @@ class HoshIT {
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/53", description = "signal handling")
 	@Test
 	void interruptCommandWrapperWithPipeline() throws Exception {
+		// Given
 		Path scriptPath = givenScript("benchmark 10000 { rand | take 10000 | count }");
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		sendSigint(hosh);
-		int exitCode = hosh.waitFor();
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		sendSigint(sut);
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isNotEqualTo(0);
 	}
 
 	@Test
 	void lambdaAfterGlobExpansion() throws Exception {
+		// Given
 		Path path = givenFolder("A.class", "B.class", "C.java");
 		Path scriptPath = givenScript("walk " + path.toAbsolutePath() + " | glob '*.class' | { path -> rm ${path} }");
-		Process hosh = givenHoshProcess(scriptPath.toString());
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).isEmpty();
+		Process sut = givenHoshProcess(scriptPath.toString());
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).isEmpty();
 		assertThat(path.resolve("A.class")).doesNotExist();
 		assertThat(path.resolve("B.class")).doesNotExist();
 		assertThat(path.resolve("C.java")).exists();
@@ -499,55 +610,73 @@ class HoshIT {
 
 	@Test
 	void versionLongOption() throws Exception {
-		Process hosh = givenHoshProcess("--version");
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).startsWith("hosh v");
+		// Given
+		Process sut = givenHoshProcess("--version");
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).startsWith("hosh v");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void versionShortOption() throws Exception {
-		Process hosh = givenHoshProcess("-v");
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).startsWith("hosh v");
+		// Given
+		Process sut = givenHoshProcess("-v");
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).startsWith("hosh v");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void helpLongOption() throws Exception {
-		Process hosh = givenHoshProcess("--help");
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
+		// Given
+		Process sut = givenHoshProcess("--help");
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
 		assertThat(exitCode).isEqualTo(0);
-		assertThat(output).startsWith("usage: ");
+		assertThat(result).startsWith("usage: ");
 	}
 
 	@Test
 	void helpShortOption() throws Exception {
-		Process hosh = givenHoshProcess("-h");
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).startsWith("usage: ");
+		// Given
+		Process sut = givenHoshProcess("-h");
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).startsWith("usage: ");
 		assertThat(exitCode).isEqualTo(0);
 	}
 
 	@Test
 	void invalidOption() throws Exception {
-		Process hosh = givenHoshProcess("--blahblah");
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).startsWith("hosh: Unrecognized option: --blahblah");
+		// Given
+		Process sut = givenHoshProcess("--blahblah");
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).startsWith("hosh: Unrecognized option: --blahblah");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
 	@Test
 	void tooManyScripts() throws Exception {
-		Process hosh = givenHoshProcess("aaa.hosh", "bbb.hosh");
-		String output = consumeOutput(hosh);
-		int exitCode = hosh.waitFor();
-		assertThat(output).startsWith("hosh: too many scripts");
+		// Given
+		Process sut = givenHoshProcess("aaa.hosh", "bbb.hosh");
+		// When
+		String result = consumeOutput(sut);
+		int exitCode = sut.waitFor();
+		// Then
+		assertThat(result).startsWith("hosh: too many scripts");
 		assertThat(exitCode).isEqualTo(1);
 	}
 
@@ -616,14 +745,14 @@ class HoshIT {
 				.toList();
 	}
 
-	private String consumeOutput(Process hosh) throws IOException {
-		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(hosh.getInputStream(), StandardCharsets.UTF_8))) {
+	private String consumeOutput(Process sut) throws IOException {
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(sut.getInputStream(), StandardCharsets.UTF_8))) {
 			return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
 		}
 	}
 
-	private void sendInput(Process hosh, String... lines) throws IOException {
-		try (Writer writer = new OutputStreamWriter(hosh.getOutputStream(), StandardCharsets.UTF_8)) {
+	private void sendInput(Process sut, String... lines) throws IOException {
+		try (Writer writer = new OutputStreamWriter(sut.getOutputStream(), StandardCharsets.UTF_8)) {
 			for (String line : lines) {
 				writer.write(line);
 				writer.write(System.lineSeparator());
@@ -632,17 +761,17 @@ class HoshIT {
 		}
 	}
 
-	private void closeInput(Process hosh) throws IOException {
-		hosh.getOutputStream().close();
+	private void closeInput(Process sut) throws IOException {
+		sut.getOutputStream().close();
 	}
 
 	@Todo(description = "use https://github.com/alirdn/windows-kill")
-	private void sendSigint(Process hosh) throws InterruptedException, IOException {
+	private void sendSigint(Process sut) throws InterruptedException, IOException {
 		// wait some time to start the process and then send a SIGINT
-		boolean terminated = hosh.waitFor(1, TimeUnit.SECONDS);
+		boolean terminated = sut.waitFor(1, TimeUnit.SECONDS);
 		assertThat(terminated).isFalse();
 		int waitFor = new ProcessBuilder()
-				.command("kill", "-INT", Long.toString(hosh.pid()))
+				.command("kill", "-INT", Long.toString(sut.pid()))
 				.start()
 				.waitFor();
 		assertThat(waitFor).isEqualTo(0);
