@@ -501,25 +501,24 @@ public class SystemModule implements Module {
 				err.send(Errors.message("invalid duration: '%s'", args.getFirst()));
 				return ExitStatus.error();
 			}
-			ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
-			Future<ExitStatus> future = executorService.submit(nestedCommand::run);
-			try {
-				return future.get(timeout.get().toMillis(), TimeUnit.MILLISECONDS);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				err.send(Errors.message("interrupted"));
-				return ExitStatus.error();
-			} catch (TimeoutException e) {
-				err.send(Errors.message("timeout"));
-				return ExitStatus.error();
-			} catch (ExecutionException e) {
-				err.send(Errors.message(e));
-				return ExitStatus.error();
-			} finally {
-				executorService.shutdownNow();
+			try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+				Future<ExitStatus> future = executorService.submit(nestedCommand::run);
+				try {
+					return future.get(timeout.get().toMillis(), TimeUnit.MILLISECONDS);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					err.send(Errors.message("interrupted"));
+					return ExitStatus.error();
+				} catch (TimeoutException e) {
+					future.cancel(true);
+					err.send(Errors.message("timeout"));
+					return ExitStatus.error();
+				} catch (ExecutionException e) {
+					err.send(Errors.message(e));
+					return ExitStatus.error();
+				}
 			}
 		}
-
 	}
 
 	@Description("repeat command until the first success")
