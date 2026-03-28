@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.LoggerFactory;
 import hosh.spi.Module;
 
@@ -44,7 +45,7 @@ public class BootstrapBuiltins {
 		// for module boundaries
 	}
 
-	public Map<String, Supplier<Command>> registerAllBuiltins() {
+	public Map<CommandName, Supplier<Command>> registerAllBuiltins() {
 		SimpleCommandRegistry commandRegistry = new SimpleCommandRegistry();
 		ServiceLoader<Module> modules = ServiceLoader.load(Module.class);
 		for (Module module : modules) {

@@ -39,7 +39,7 @@ public interface StateMutator {
 
 	void mutateVariables(Map<VariableName, String> newVariables);
 
-	void mutateCommands(Map<String, Supplier<Command>> newCommands);
+	void mutateCommands(Map<CommandName, Supplier<Command>> newCommands);
 
 	void mutateExit(boolean newExit);
 }

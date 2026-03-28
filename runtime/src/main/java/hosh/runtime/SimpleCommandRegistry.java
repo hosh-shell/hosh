@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 
 import java.util.HashMap;
@@ -33,14 +34,14 @@ import java.util.function.Supplier;
 
 class SimpleCommandRegistry implements CommandRegistry {
 
-	private final Map<String, Supplier<Command>> commands = new HashMap<>();
+	private final Map<CommandName, Supplier<Command>> commands = new HashMap<>();
 
-	public Map<String, Supplier<Command>> getCommands() {
+	public Map<CommandName, Supplier<Command>> getCommands() {
 		return commands;
 	}
 
 	@Override
-	public void registerCommand(String name, Supplier<Command> command) {
+	public void registerCommand(CommandName name, Supplier<Command> command) {
 		Objects.requireNonNull(name, "name cannot be null");
 		Objects.requireNonNull(command, "command cannot be null");
 		if (commands.containsKey(name)) {

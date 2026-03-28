@@ -43,6 +43,7 @@ import hosh.runtime.Compiler.Program;
 import hosh.runtime.MutableState;
 import hosh.runtime.Parser.ParseError;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -90,7 +91,7 @@ public class DocFitnessTest {
 		private BeSyntacticallyCorrect() {
 			super("be syntactically correct");
 			BootstrapBuiltins bootstrapBuiltins = new BootstrapBuiltins();
-			Map<String, Supplier<Command>> commands = bootstrapBuiltins.registerAllBuiltins();
+			Map<CommandName, Supplier<Command>> commands = bootstrapBuiltins.registerAllBuiltins();
 			assertThat(commands).isNotEmpty();
 			MutableState state = new MutableState();
 			state.mutateCommands(commands);

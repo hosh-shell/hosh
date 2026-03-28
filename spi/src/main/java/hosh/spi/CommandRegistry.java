@@ -27,5 +27,5 @@ import java.util.function.Supplier;
 
 public interface CommandRegistry {
 
-	void registerCommand(String name, Supplier<Command> command);
+	void registerCommand(CommandName name, Supplier<Command> command);
 }

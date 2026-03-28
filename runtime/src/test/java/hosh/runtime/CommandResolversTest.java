@@ -25,6 +25,7 @@ package hosh.runtime;
 
 import hosh.runtime.CommandResolvers.WindowsCommandResolver;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.State;
 import hosh.spi.VariableName;
 import hosh.test.support.TemporaryFolder;
@@ -83,7 +84,7 @@ class CommandResolversTest {
 
 		@Test
 		void builtin() {
-			given(state.getCommands()).willReturn(Map.of("test", () -> command));
+			given(state.getCommands()).willReturn(Map.of(CommandName.constant("test"), () -> command));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent().hasValue(command);
 		}

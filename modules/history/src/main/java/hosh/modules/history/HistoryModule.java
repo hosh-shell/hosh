@@ -27,6 +27,7 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -46,7 +47,7 @@ public class HistoryModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("history", ListHistory::new);
+		registry.registerCommand(CommandName.constant("history"), ListHistory::new);
 	}
 
 	@Description("display the history with timestamp, index and text")

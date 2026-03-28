@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import hosh.spi.CommandName;
 import hosh.spi.LoggerFactory;
 import hosh.spi.State;
 import org.jline.reader.Candidate;
@@ -64,8 +65,8 @@ public class CommandCompleter implements Completer {
 	private void completeBuiltinsExcludingOverrides(List<Candidate> candidates, Set<String> builtinOverrides) {
 		state.getCommands().keySet()
 				.stream()
-				.filter(command -> !builtinOverrides.contains(command))
-				.map(command -> Candidates.completeWithDescription(command, "built-in"))
+				.filter(command -> !builtinOverrides.contains(command.name()))
+				.map(command -> Candidates.completeWithDescription(command.name(), "built-in"))
 				.forEach(candidates::add);
 	}
 
@@ -91,7 +92,7 @@ public class CommandCompleter implements Completer {
 	private Candidate toCandidate(Path p, Set<String> builtinOverrides) {
 		String name = p.getFileName().toString();
 		String description;
-		if (state.getCommands().containsKey(name)) {
+		if (CommandName.from(name).map(state.getCommands()::containsKey).orElse(false)) {
 			description = "built-in, overrides " + p.toAbsolutePath();
 			builtinOverrides.add(name);
 		} else {

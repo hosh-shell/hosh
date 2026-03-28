@@ -46,6 +46,7 @@ import hosh.modules.system.SystemModule.UnsetVariable;
 import hosh.modules.system.SystemModule.WithTime;
 import hosh.spi.Ansi;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.CommandWrapper;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -399,7 +400,7 @@ class SystemModuleTest {
 
 		@Test
 		void specificCommandWithExamples() {
-			given(state.getCommands()).willReturn(Map.of("true", True::new));
+			given(state.getCommands()).willReturn(Map.of(CommandName.constant("true"), True::new));
 			ExitStatus exitStatus = sut.run(List.of("true"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -414,7 +415,7 @@ class SystemModuleTest {
 
 		@Test
 		void specificCommandWithoutExamples() {
-			given(state.getCommands()).willReturn(Map.of("false", False::new));
+			given(state.getCommands()).willReturn(Map.of(CommandName.constant("false"), False::new));
 			ExitStatus exitStatus = sut.run(List.of("false"), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -438,7 +439,7 @@ class SystemModuleTest {
 
 		@Test
 		void commandWithoutHelpAnnotation() {
-			given(state.getCommands()).willReturn(Map.of("*", Star::new));
+			given(state.getCommands()).willReturn(Map.of(CommandName.constant("*"), Star::new));
 			ExitStatus exitStatus = sut.run(List.of("*"), in, out, err);
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
@@ -448,7 +449,7 @@ class SystemModuleTest {
 
 		@Test
 		void listAllCommands() {
-			given(state.getCommands()).willReturn(Map.of("true", True::new));
+			given(state.getCommands()).willReturn(Map.of(CommandName.constant("true"), True::new));
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
