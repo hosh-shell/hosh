@@ -27,6 +27,7 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
@@ -34,14 +35,12 @@ import hosh.spi.ExitStatus;
 import hosh.spi.HistoryAware;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
-import hosh.spi.Module;
 import hosh.spi.OutputChannel;
-import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
+import hosh.spi.Module;
+import hosh.spi.Record;
 import org.jline.reader.History;
-
-import java.util.List;
 
 public class HistoryModule implements Module {
 
@@ -64,7 +63,7 @@ public class HistoryModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("history"));
 				return ExitStatus.error();

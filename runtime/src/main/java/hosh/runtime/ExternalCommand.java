@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import hosh.spi.CommandArguments;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -88,10 +89,12 @@ class ExternalCommand implements CompilerCommand, StateAware {
 	}
 
 	@Override
-	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+	public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 		List<String> processArgs = new ArrayList<>(args.size() + 1);
 		processArgs.add(path.toAbsolutePath().toString());
-		processArgs.addAll(args);
+		for (CommandArguments.CommandArgument arg : args) {
+			processArgs.add(arg.asString());
+		}
 		Path cwd = state.getCwd();
 		LOGGER.fine(() -> String.format("executing '%s' in directory %s", processArgs, cwd));
 		LOGGER.fine(() -> String.format("in '%s', out '%s', err '%s'", in, out, err));

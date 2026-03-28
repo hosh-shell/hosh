@@ -27,15 +27,8 @@ import hosh.modules.formats.FormatsModule.FromCsv;
 import hosh.modules.formats.FormatsModule.FromJson;
 import hosh.modules.formats.FormatsModule.ToCsv;
 import hosh.modules.formats.FormatsModule.ToJson;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
 import hosh.spi.Values;
-import hosh.test.support.TemporaryFolder;
+import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -48,10 +41,17 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.test.support.TemporaryFolder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -90,7 +90,7 @@ class FormatsModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -103,7 +103,7 @@ class FormatsModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of("a.json", "b.json"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("a.json", "b.json"), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -116,7 +116,7 @@ class FormatsModuleTest {
 			// Given
 			Path dir = temporaryFolder.toPath().toAbsolutePath();
 			// When
-			ExitStatus result = sut.run(List.of(dir.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(dir.toString()), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -129,7 +129,7 @@ class FormatsModuleTest {
 			// Given
 			Path missing = temporaryFolder.toPath().resolve("missing.json").toAbsolutePath();
 			// When
-			ExitStatus result = sut.run(List.of(missing.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(missing.toString()), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -143,7 +143,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.newFile("data.json");
 			Files.writeString(file, "[]", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -159,7 +159,7 @@ class FormatsModuleTest {
 					[{"name":"alice","age":30},{"name":"bob","age":25}]
 					""", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -176,7 +176,7 @@ class FormatsModuleTest {
 					[{"name":null}]
 					""", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -192,7 +192,7 @@ class FormatsModuleTest {
 					[{"active":true,"deleted":false}]
 					""", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -208,7 +208,7 @@ class FormatsModuleTest {
 					{"name":"alice"}
 					""", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -222,7 +222,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.newFile("data.json");
 			Files.writeString(file, "not json", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -237,7 +237,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.newFile("data.json");
 			Files.writeString(file, "[]", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -278,7 +278,7 @@ class FormatsModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -291,7 +291,7 @@ class FormatsModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of("a.csv", "b.csv"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("a.csv", "b.csv"), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -304,7 +304,7 @@ class FormatsModuleTest {
 			// Given
 			Path dir = temporaryFolder.toPath().toAbsolutePath();
 			// When
-			ExitStatus result = sut.run(List.of(dir.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(dir.toString()), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -317,7 +317,7 @@ class FormatsModuleTest {
 			// Given
 			Path missing = temporaryFolder.toPath().resolve("missing.csv").toAbsolutePath();
 			// When
-			ExitStatus result = sut.run(List.of(missing.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(missing.toString()), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -331,7 +331,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.newFile("data.csv");
 			Files.writeString(file, "name,age\r\n", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -345,7 +345,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.newFile("data.csv");
 			Files.writeString(file, "name,age\r\nalice,30\r\nbob,25\r\n", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -360,7 +360,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.newFile("data.csv");
 			Files.writeString(file, "name,address\r\n\"Smith, Jr.\",\"123 Main St\"\r\n", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -375,7 +375,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.newFile("data.csv");
 			Files.writeString(file, "name\r\n", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(file.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -416,7 +416,7 @@ class FormatsModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -429,7 +429,7 @@ class FormatsModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of("a.json", "b.json"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("a.json", "b.json"), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -444,7 +444,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.toPath().resolve("output.json");
 			given(in.recv()).willReturn(Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -460,7 +460,7 @@ class FormatsModuleTest {
 			Record record = Records.builder().entry(Keys.of("name"), Values.ofText("alice")).entry(Keys.of("age"), Values.ofNumeric(30)).build();
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -477,7 +477,7 @@ class FormatsModuleTest {
 			Record record = Records.builder().entry(Keys.of("name"), Values.none()).build();
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -491,7 +491,7 @@ class FormatsModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of("output.json"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("output.json"), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -532,7 +532,7 @@ class FormatsModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -545,7 +545,7 @@ class FormatsModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of("a.csv", "b.csv"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("a.csv", "b.csv"), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -560,7 +560,7 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.toPath().resolve("output.csv");
 			given(in.recv()).willReturn(Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -576,7 +576,7 @@ class FormatsModuleTest {
 			Record record = Records.builder().entry(Keys.of("name"), Values.ofText("alice")).entry(Keys.of("age"), Values.ofNumeric(30)).build();
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -593,7 +593,7 @@ class FormatsModuleTest {
 			Record bob = Records.builder().entry(Keys.of("name"), Values.ofText("bob")).entry(Keys.of("age"), Values.ofNumeric(25)).build();
 			given(in.recv()).willReturn(Optional.of(alice), Optional.of(bob), Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -609,7 +609,7 @@ class FormatsModuleTest {
 			Record record = Records.builder().entry(Keys.of("name"), Values.ofText("Smith, Jr.")).build();
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -623,7 +623,7 @@ class FormatsModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of("output.csv"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("output.csv"), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();

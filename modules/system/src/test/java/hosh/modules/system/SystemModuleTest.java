@@ -44,24 +44,10 @@ import hosh.modules.system.SystemModule.Sink;
 import hosh.modules.system.SystemModule.Sleep;
 import hosh.modules.system.SystemModule.UnsetVariable;
 import hosh.modules.system.SystemModule.WithTime;
-import hosh.spi.Ansi;
-import hosh.spi.Command;
-import hosh.spi.CommandName;
-import hosh.spi.CommandWrapper;
-import hosh.spi.Errors;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
 import hosh.spi.State;
-import hosh.spi.StateMutator;
-import hosh.spi.Values;
-import hosh.spi.VariableName;
 import hosh.spi.test.support.RecordMatcher;
-import hosh.test.support.TemporaryFolder;
 import hosh.test.support.WithThread;
+import hosh.spi.CommandArguments;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
@@ -93,6 +79,21 @@ import java.util.Map;
 import java.util.Optional;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.Ansi;
+import hosh.spi.Command;
+import hosh.spi.CommandName;
+import hosh.spi.CommandWrapper;
+import hosh.spi.Errors;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.StateMutator;
+import hosh.spi.Values;
+import hosh.spi.VariableName;
+import hosh.test.support.TemporaryFolder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -135,7 +136,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -151,7 +152,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("whatever"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("whatever"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -170,7 +171,7 @@ class SystemModuleTest {
 			given(state.getPath()).willReturn(List.of(sbin, bin));
 
 			// When
-			ExitStatus result = sut.run(List.of("show"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("show"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -188,7 +189,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("show", "anotherArg"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("show", "anotherArg"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -204,7 +205,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("clear"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("clear"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -219,7 +220,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("clear", "anotherArg"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("clear", "anotherArg"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -237,7 +238,7 @@ class SystemModuleTest {
 			willReturn(List.of(bin)).given(state).getPath();
 
 			// When
-			ExitStatus result = sut.run(List.of("append", "/usr/local/bin"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("append", "/usr/local/bin"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -252,7 +253,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("append"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("append"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -270,7 +271,7 @@ class SystemModuleTest {
 			willReturn(List.of(bin)).given(state).getPath();
 
 			// When
-			ExitStatus result = sut.run(List.of("prepend", "/usr/local/bin"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("prepend", "/usr/local/bin"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -285,7 +286,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("prepend"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("prepend"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -326,7 +327,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).hasExitCode(0);
@@ -341,7 +342,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("21"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("21"), in, out, err);
 
 			// Then
 			assertThat(result).hasExitCode(21);
@@ -356,7 +357,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("asd"), in, out, err);
 
 			// Then
 			assertThat(result).hasExitCode(1);
@@ -371,7 +372,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("asd", "fgh"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("asd", "fgh"), in, out, err);
 
 			// Then
 			assertThat(result).hasExitCode(1);
@@ -415,7 +416,7 @@ class SystemModuleTest {
 			given(state.getVariables()).willReturn(Collections.emptyMap());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -430,7 +431,7 @@ class SystemModuleTest {
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("HOSH_VERSION"), Values.ofText("1.0")));
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -446,7 +447,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("1"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("1"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -489,7 +490,7 @@ class SystemModuleTest {
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("true"), True::new));
 
 			// When
-			ExitStatus result = sut.run(List.of("true"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("true"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -509,7 +510,7 @@ class SystemModuleTest {
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("false"), False::new));
 
 			// When
-			ExitStatus result = sut.run(List.of("false"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("false"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -528,7 +529,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("test"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("test"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -543,7 +544,7 @@ class SystemModuleTest {
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("*"), Star::new));
 
 			// When
-			ExitStatus result = sut.run(List.of("*"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("*"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -558,7 +559,7 @@ class SystemModuleTest {
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("true"), True::new));
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -574,7 +575,7 @@ class SystemModuleTest {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -588,7 +589,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("test", "aaa"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("test", "aaa"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -604,7 +605,7 @@ class SystemModuleTest {
 		static class True implements Command {
 
 			@Override
-			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 				return ExitStatus.success();
 			}
 		}
@@ -613,7 +614,7 @@ class SystemModuleTest {
 		static class False implements Command {
 
 			@Override
-			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 				return ExitStatus.error();
 			}
 		}
@@ -622,7 +623,7 @@ class SystemModuleTest {
 		static class Star implements Command {
 
 			@Override
-			public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+			public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 				return ExitStatus.of(42);
 			}
 		}
@@ -653,7 +654,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -667,7 +668,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("a"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("a"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -681,7 +682,7 @@ class SystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("a", "b"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("a", "b"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -720,7 +721,7 @@ class SystemModuleTest {
 			withThread.interrupt();
 
 			// When
-			ExitStatus result = sut.run(List.of("1s"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("1s"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -735,7 +736,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("1", "seconds"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("1", "seconds"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -750,7 +751,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -772,7 +773,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(input), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(input), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -795,7 +796,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(input), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(input), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -831,7 +832,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -846,7 +847,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("1"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("1"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -882,7 +883,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When / Then
-			assertThatThrownBy(() -> sut.run(List.of(), in, out, err))
+			assertThatThrownBy(() -> sut.run(CommandArguments.of(), in, out, err))
 					.hasMessage("please do not report: this is a simulated error")
 					.isInstanceOf(NullPointerException.class)
 					.satisfies(_ -> {
@@ -922,7 +923,7 @@ class SystemModuleTest {
 			given(in.recv()).willReturn(Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -938,7 +939,7 @@ class SystemModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -978,7 +979,7 @@ class SystemModuleTest {
 			given(nestedCommand.run()).willReturn(ExitStatus.success());
 
 			// When
-			ExitStatus result = sut.run(List.of("10"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("10"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -995,7 +996,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1010,7 +1011,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("0"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("0"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1051,7 +1052,7 @@ class SystemModuleTest {
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
@@ -1066,7 +1067,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("arg"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("arg"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1112,7 +1113,7 @@ class SystemModuleTest {
 			withThread.interrupt();
 
 			// When
-			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(timeout.toString()), in, out, err);
 
 			// Then
 			assertThat(withThread.isInterrupted()).isTrue();
@@ -1131,7 +1132,7 @@ class SystemModuleTest {
 			});
 
 			// When
-			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(timeout.toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1148,7 +1149,7 @@ class SystemModuleTest {
 			given(nestedCommand.run()).willAnswer(commandSlowerThanTimeout);
 
 			// When
-			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(timeout.toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1165,7 +1166,7 @@ class SystemModuleTest {
 			given(nestedCommand.run()).willAnswer(commandFasterThanTimeout);
 
 			// When
-			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(timeout.toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess(); // success means no timeout
@@ -1180,7 +1181,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1227,7 +1228,7 @@ class SystemModuleTest {
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 
 			// When
-			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(sleep.toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1245,7 +1246,7 @@ class SystemModuleTest {
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 
 			// When
-			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(sleep.toString()), in, out, err);
 
 			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
@@ -1262,7 +1263,7 @@ class SystemModuleTest {
 			given(nestedCommand.run()).willReturn(ExitStatus.error(), nestedExitStatus);
 
 			// When
-			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(sleep.toString()), in, out, err);
 
 			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
@@ -1279,7 +1280,7 @@ class SystemModuleTest {
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
@@ -1294,7 +1295,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("first", "second"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("first", "second"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1338,7 +1339,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1354,7 +1355,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1370,7 +1371,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO", "bar"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO", "bar"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1386,7 +1387,7 @@ class SystemModuleTest {
 			willReturn(Map.of(VariableName.constant("FOO"), "bar")).given(state).getVariables();
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO", "baz"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO", "baz"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1402,7 +1403,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("${", "baz"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("${", "baz"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1447,7 +1448,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1463,7 +1464,7 @@ class SystemModuleTest {
 			willReturn(Map.of(VariableName.constant("FOO"), "BAR")).given(state).getVariables();
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1479,7 +1480,7 @@ class SystemModuleTest {
 			willReturn(Map.of(VariableName.constant("FOO"), Values.ofText("BAR"))).given(state).getVariables();
 
 			// When
-			ExitStatus result = sut.run(List.of("BAZ"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("BAZ"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1523,7 +1524,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1538,7 +1539,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1553,7 +1554,7 @@ class SystemModuleTest {
 			given(processLookup.of(42L)).willReturn(Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("42"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("42"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1569,7 +1570,7 @@ class SystemModuleTest {
 			given(processHandle.destroy()).willReturn(false);
 
 			// When
-			ExitStatus result = sut.run(List.of("42"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("42"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1585,7 +1586,7 @@ class SystemModuleTest {
 			given(processHandle.destroy()).willReturn(true);
 
 			// When
-			ExitStatus result = sut.run(List.of("42"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("42"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1629,7 +1630,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1645,7 +1646,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("$AAA"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("$AAA"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1662,7 +1663,7 @@ class SystemModuleTest {
 			given(in.recv()).willReturn(Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1682,7 +1683,7 @@ class SystemModuleTest {
 					Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1703,7 +1704,7 @@ class SystemModuleTest {
 					Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1747,7 +1748,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1762,7 +1763,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("filename"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("filename"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1778,7 +1779,7 @@ class SystemModuleTest {
 			given(in.recv()).willReturn(Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("filename", "WRITE", "CREATE"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1799,7 +1800,7 @@ class SystemModuleTest {
 					Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("filename", "WRITE", "CREATE"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1821,7 +1822,7 @@ class SystemModuleTest {
 					Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("filename", "WRITE", "CREATE"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1844,7 +1845,7 @@ class SystemModuleTest {
 					Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("filename", "WRITE", "APPEND"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("filename", "WRITE", "APPEND"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1894,7 +1895,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1910,7 +1911,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("$"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("$"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1927,7 +1928,7 @@ class SystemModuleTest {
 			given(lineReader.readLine(Mockito.eq("input> "))).willReturn("1");
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1943,7 +1944,7 @@ class SystemModuleTest {
 			given(lineReader.readLine(Mockito.eq("input> "))).willThrow(new EndOfFileException("simulated"));
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1992,7 +1993,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -2008,7 +2009,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("$"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("$"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -2025,7 +2026,7 @@ class SystemModuleTest {
 			given(lineReader.readLine(Mockito.eq('\0'))).willReturn("1");
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -2042,7 +2043,7 @@ class SystemModuleTest {
 			given(lineReader.readLine(Mockito.eq('\0'))).willThrow(new EndOfFileException("simulated"));
 
 			// When
-			ExitStatus result = sut.run(List.of("FOO"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -2084,7 +2085,7 @@ class SystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -2100,7 +2101,7 @@ class SystemModuleTest {
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
 
 			// When
-			ExitStatus result = sut.run(List.of("question"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("question"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -2116,7 +2117,7 @@ class SystemModuleTest {
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
 
 			// When
-			ExitStatus result = sut.run(List.of("question"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("question"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -2132,7 +2133,7 @@ class SystemModuleTest {
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
 
 			// When
-			ExitStatus result = sut.run(List.of("question"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("question"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -2147,7 +2148,7 @@ class SystemModuleTest {
 			given(lineReader.readLine("question (Y/N)? ")).willThrow(new UserInterruptException("simulated"));
 
 			// When
-			ExitStatus result = sut.run(List.of("question"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("question"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -2162,7 +2163,7 @@ class SystemModuleTest {
 			given(lineReader.readLine("question (Y/N)? ")).willThrow(new EndOfFileException("simulated"));
 
 			// When
-			ExitStatus result = sut.run(List.of("question"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("question"), in, out, err);
 
 			// Then
 			assertThat(result).isError();

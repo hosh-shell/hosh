@@ -27,22 +27,21 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
-import hosh.spi.Module;
 import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.TerminalAware;
 import hosh.spi.Values;
+import hosh.spi.Module;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
-
-import java.util.List;
 
 public class TerminalModule implements Module {
 
@@ -67,7 +66,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("dump"));
 				return ExitStatus.error();
@@ -100,7 +99,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("clear"));
 				return ExitStatus.error();
@@ -125,7 +124,7 @@ public class TerminalModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("bell"));
 				return ExitStatus.error();

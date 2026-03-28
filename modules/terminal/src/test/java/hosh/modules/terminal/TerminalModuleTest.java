@@ -26,13 +26,8 @@ package hosh.modules.terminal;
 import hosh.modules.terminal.TerminalModule.Bell;
 import hosh.modules.terminal.TerminalModule.Clear;
 import hosh.modules.terminal.TerminalModule.Dump;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Records;
-import hosh.spi.Values;
-import org.jline.terminal.Attributes;
+import hosh.spi.*;
+import hosh.spi.CommandArguments;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -46,6 +41,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Records;
+import hosh.spi.Values;
+import org.jline.terminal.Attributes;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -80,7 +82,7 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -97,7 +99,7 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("asd"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -138,7 +140,7 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -155,7 +157,7 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("asd"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -198,7 +200,7 @@ class TerminalModuleTest {
 			given(terminal.getAttributes()).willReturn(new Attributes());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -212,7 +214,7 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("asd"), in, out, err);
 
 			// Then
 			assertThat(result).isError();

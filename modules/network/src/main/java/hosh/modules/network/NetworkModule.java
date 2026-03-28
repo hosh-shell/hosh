@@ -28,19 +28,20 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
-import hosh.spi.Module;
 import hosh.spi.OutputChannel;
-import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Value;
 import hosh.spi.Values;
 import hosh.spi.VersionAware;
+import hosh.spi.Module;
+import hosh.spi.Record;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -54,7 +55,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Iterator;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class NetworkModule implements Module {
@@ -72,7 +72,7 @@ public class NetworkModule implements Module {
 	public static class Network implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("network"));
 				return ExitStatus.error();
@@ -140,14 +140,14 @@ public class NetworkModule implements Module {
 
 		@Todo(description = "add version to user agent (e.g. hosh/0.0.29)")
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("http URL"));
 				return ExitStatus.error();
 			}
 			String userAgent = version.hoshVersion().unwrap(String.class).orElseThrow();
 			HttpRequest request = HttpRequest.newBuilder()
-					.uri(URI.create(args.getFirst()))
+					.uri(URI.create(args.get(0).asString()))
 					.setHeader("User-Agent", userAgent)
 					.GET()
 					.build();

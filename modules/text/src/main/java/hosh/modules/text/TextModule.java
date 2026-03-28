@@ -28,6 +28,7 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
@@ -35,13 +36,13 @@ import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Key;
 import hosh.spi.Keys;
-import hosh.spi.Module;
 import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Record.Entry;
 import hosh.spi.Records;
 import hosh.spi.Value;
 import hosh.spi.Values;
+import hosh.spi.Module;
+import hosh.spi.Record;
+import hosh.spi.Record.Entry;
 
 import java.time.Clock;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -97,8 +99,8 @@ public class TextModule implements Module {
 	public static class Select implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			List<Key> keys = args.stream().map(Keys::of).toList();
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
+			List<Key> keys = args.stream().map(CommandArguments.CommandArgument::asKey).toList();
 			for (Record record : InputChannel.iterate(in)) {
 				Records.Builder builder = Records.builder();
 				for (Key k : keys) {
@@ -117,13 +119,13 @@ public class TextModule implements Module {
 	public static class Split implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("split key regex"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.getFirst());
-			Pattern pattern = Pattern.compile(args.get(1));
+			Key key = args.get(0).asKey();
+			Pattern pattern = Pattern.compile(args.get(1).asString());
 			Map<Integer, Key> cachedKeys = new HashMap<>();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key)
@@ -156,12 +158,12 @@ public class TextModule implements Module {
 	public static class Join implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("join separator"));
 				return ExitStatus.error();
 			}
-			String sep = args.getFirst();
+			String sep = args.get(0).asString();
 			Locale locale = Locale.getDefault();
 			for (Record record : InputChannel.iterate(in)) {
 				StringJoiner stringJoiner = new StringJoiner(sep);
@@ -183,12 +185,12 @@ public class TextModule implements Module {
 	public static class Trim implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("trim key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.getFirst());
+			Key key = args.get(0).asKey();
 			for (Record record : InputChannel.iterate(in)) {
 				out.send(trimByKey(record, key));
 			}
@@ -224,14 +226,14 @@ public class TextModule implements Module {
 	public static class Regex implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("regex key regex"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.getFirst());
-			Pattern pattern = Pattern.compile(args.get(1));
-			List<String> groupNames = extractNamedGroups(args.get(1));
+			Key key = args.get(0).asKey();
+			Pattern pattern = Pattern.compile(args.get(1).asString());
+			List<String> groupNames = extractNamedGroups(args.get(1).asString());
 			Locale locale = Locale.getDefault();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
@@ -267,7 +269,7 @@ public class TextModule implements Module {
 	public static class Schema implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("schema"));
 				return ExitStatus.error();
@@ -287,13 +289,13 @@ public class TextModule implements Module {
 	public static class Filter implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("filter key regex"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.getFirst());
-			Pattern pattern = Pattern.compile(args.get(1));
+			Key key = args.get(0).asKey();
+			Pattern pattern = Pattern.compile(args.get(1).asString());
 			for (Record record : InputChannel.iterate(in)) {
 				// this could be allocation intensive but let's see
 				record.value(key)
@@ -312,7 +314,7 @@ public class TextModule implements Module {
 	public static class Enumerate implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("enumerate"));
 				return ExitStatus.error();
@@ -339,7 +341,7 @@ public class TextModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("timestamp"));
 				return ExitStatus.error();
@@ -358,13 +360,13 @@ public class TextModule implements Module {
 	public static class Distinct implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("distinct key"));
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
-			Key key = Keys.of(args.getFirst());
+			Key key = args.get(0).asKey();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
 					boolean neverSeenBefore = seen.add(v);
@@ -384,13 +386,13 @@ public class TextModule implements Module {
 	public static class Duplicated implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("duplicated key"));
 				return ExitStatus.error();
 			}
 			Set<Value> seen = new HashSet<>();
-			Key key = Keys.of(args.getFirst());
+			Key key = args.get(0).asKey();
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(key).ifPresent(v -> {
 					boolean seenBefore = !seen.add(v);
@@ -415,17 +417,17 @@ public class TextModule implements Module {
 		private static final String DESC = "desc";
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.isEmpty() || args.size() > 2) {
 				err.send(Errors.usage("sort key [%s|%s]", ASC, DESC));
 				return ExitStatus.error();
 			}
 			String direction;
-			Key key = Keys.of(args.getFirst());
+			Key key = args.get(0).asKey();
 			if (args.size() == 1) {
 				direction = ASC;
 			} else { // implies size == 2
-				String order = args.get(1);
+				String order = args.get(1).asString();
 				Optional<String> validate = validate(order);
 				if (validate.isEmpty()) {
 					err.send(Errors.message("must be '%s' or '%s'", ASC, DESC));
@@ -483,12 +485,17 @@ public class TextModule implements Module {
 	public static class Take implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("take number"));
 				return ExitStatus.error();
 			}
-			long take = Long.parseLong(args.getFirst());
+			OptionalLong takeOpt = args.get(0).asLong();
+			if (takeOpt.isEmpty()) {
+				err.send(Errors.message("not a valid number: %s", args.get(0).asString()));
+				return ExitStatus.error();
+			}
+			long take = takeOpt.getAsLong();
 			if (take < 0) {
 				err.send(Errors.message("number must be >= 0"));
 				return ExitStatus.error();
@@ -511,12 +518,17 @@ public class TextModule implements Module {
 	public static class Drop implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("drop number"));
 				return ExitStatus.error();
 			}
-			long drop = Long.parseLong(args.getFirst());
+			OptionalLong dropOpt = args.get(0).asLong();
+			if (dropOpt.isEmpty()) {
+				err.send(Errors.message("not a valid number: %s", args.get(0).asString()));
+				return ExitStatus.error();
+			}
+			long drop = dropOpt.getAsLong();
 			if (drop < 0) {
 				err.send(Errors.message("number must be >= 0"));
 				return ExitStatus.error();
@@ -539,12 +551,17 @@ public class TextModule implements Module {
 	public static class Last implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("last number"));
 				return ExitStatus.error();
 			}
-			long n = Long.parseLong(args.getFirst());
+			OptionalLong nOpt = args.get(0).asLong();
+			if (nOpt.isEmpty()) {
+				err.send(Errors.message("not a valid number: %s", args.get(0).asString()));
+				return ExitStatus.error();
+			}
+			long n = nOpt.getAsLong();
 			if (n < 1) {
 				err.send(Errors.message("number must be >= 1"));
 				return ExitStatus.error();
@@ -580,7 +597,7 @@ public class TextModule implements Module {
 
 		@SuppressWarnings("squid:S2245")
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("rand"));
 				return ExitStatus.error();
@@ -602,7 +619,7 @@ public class TextModule implements Module {
 	public static class Count implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("count"));
 				return ExitStatus.error();
@@ -624,12 +641,12 @@ public class TextModule implements Module {
 	public static class Sum implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("sum key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.getFirst());
+			Key key = args.get(0).asKey();
 			Optional<Value> result = Optional.empty();
 			for (Record record : InputChannel.iterate(in)) {
 				Optional<Value> value = record.value(key);
@@ -654,12 +671,12 @@ public class TextModule implements Module {
 	public static class Freq implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("freq key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.getFirst());
+			Key key = args.get(0).asKey();
 			Map<Value, Long> countByValue = countByValue(in, key);
 			output(out, countByValue);
 			return ExitStatus.success();
@@ -695,12 +712,12 @@ public class TextModule implements Module {
 		public static final Key MIN = Keys.of("min");
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("min key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.getFirst());
+			Key key = args.get(0).asKey();
 			Comparator<Value> comparator = Values.Comparators.noneLast(Comparator.naturalOrder());
 			Value min = Values.none();
 			for (Record record : InputChannel.iterate(in)) {
@@ -730,12 +747,12 @@ public class TextModule implements Module {
 		public static final Key MAX = Keys.of("max");
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("max key"));
 				return ExitStatus.error();
 			}
-			Key key = Keys.of(args.getFirst());
+			Key key = args.get(0).asKey();
 			Value max = Values.none();
 			Comparator<Value> comparator = Values.Comparators.noneFirst(Comparator.naturalOrder());
 			for (Record record : InputChannel.iterate(in)) {

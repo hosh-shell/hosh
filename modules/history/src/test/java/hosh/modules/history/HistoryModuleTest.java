@@ -23,13 +23,8 @@
  */
 package hosh.modules.history;
 
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Records;
 import hosh.spi.Values;
-import org.jline.reader.History;
+import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,6 +37,12 @@ import java.util.Collections;
 import java.util.List;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Records;
+import org.jline.reader.History;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -80,7 +81,7 @@ class HistoryModuleTest {
 			given(history.iterator()).willReturn(Collections.emptyListIterator());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -97,7 +98,7 @@ class HistoryModuleTest {
 			given(entry.line()).willReturn("cmd");
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -114,7 +115,7 @@ class HistoryModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("whatever"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("whatever"), in, out, err);
 
 			// Then
 			assertThat(result).isError();

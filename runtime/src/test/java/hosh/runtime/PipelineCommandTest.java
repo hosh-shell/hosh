@@ -25,11 +25,8 @@ package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
 import hosh.runtime.PipelineChannel.ProducerPoisonPill;
-import hosh.spi.Command;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
-import org.assertj.core.api.Assertions;
+import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -38,6 +35,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.Command;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import org.assertj.core.api.Assertions;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willReturn;
@@ -83,7 +84,7 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -101,7 +102,7 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.error()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
 		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();
@@ -119,7 +120,7 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.error()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
 		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();
@@ -137,7 +138,7 @@ class PipelineCommandTest {
 		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -155,7 +156,7 @@ class PipelineCommandTest {
 		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -174,7 +175,7 @@ class PipelineCommandTest {
 		willThrow(runtimeException).given(interpreter).eval(eq(consumer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		// When
-		var result = Assertions.assertThatThrownBy(() -> sut.run(List.of(), in, out, err));
+		var result = Assertions.assertThatThrownBy(() -> sut.run(CommandArguments.of(), in, out, err));
 		// Then
 		result
 				.hasNoSuppressedExceptions()
@@ -192,7 +193,7 @@ class PipelineCommandTest {
 		willThrow(error).given(interpreter).eval(eq(consumer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		// When
-		var result = Assertions.assertThatThrownBy(() -> sut.run(List.of(), in, out, err));
+		var result = Assertions.assertThatThrownBy(() -> sut.run(CommandArguments.of(), in, out, err));
 		// Then
 		result
 				.hasNoSuppressedExceptions()
@@ -213,7 +214,7 @@ class PipelineCommandTest {
 		willReturn(downStream).given(consumerProducer).getCommand();
 		willReturn(ExitStatus.success()).given(interpreter).eval(any(), any(), any(), any());
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 	}
@@ -231,7 +232,7 @@ class PipelineCommandTest {
 		downStream.setInterpreter(interpreter);
 		given(interpreter.eval(any(), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(a).should().pipeline(PipelineCommand.Position.FIRST);

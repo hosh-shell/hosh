@@ -24,9 +24,11 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
 import hosh.spi.Value;
+import hosh.spi.Values;
 import hosh.spi.VariableName;
 import org.antlr.v4.runtime.Token;
 
@@ -211,7 +213,7 @@ public class Compiler {
 			} else if (part.DQUOTE_VARIABLE_OR_FALLBACK() != null) {
 				Token token = part.DQUOTE_VARIABLE_OR_FALLBACK().getSymbol();
 				String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
-				result.add(new VariableOrFallback(VariableName.constant(nameAndFallback[0]), nameAndFallback[1]));
+				result.add(new VariableOrFallback(VariableName.constant(nameAndFallback[0]), Values.ofText(nameAndFallback[1])));
 			} else {
 				throw new InternalBug(ctx.getText());
 			}
@@ -236,7 +238,7 @@ public class Compiler {
 		if (ctx.VARIABLE_OR_FALLBACK() != null) {
 			Token token = ctx.VARIABLE_OR_FALLBACK().getSymbol();
 			String[] nameAndFallback = dropDeref(token.getText()).split("!", 2);
-			return new VariableOrFallback(VariableName.constant(nameAndFallback[0]), nameAndFallback[1]);
+			return new VariableOrFallback(VariableName.constant(nameAndFallback[0]), Values.ofText(nameAndFallback[1]));
 		}
 		throw new InternalBug(ctx.getText());
 	}
@@ -296,7 +298,7 @@ public class Compiler {
 	public interface Resolvable {
 
 		// resolve or throw
-		String resolve(State state);
+		CommandArguments.CommandArgument resolve(State state);
 	}
 
 	public static class Composite implements Resolvable {
@@ -308,12 +310,12 @@ public class Compiler {
 		}
 
 		@Override
-		public String resolve(State state) {
+		public CommandArguments.CommandArgument resolve(State state) {
 			StringBuilder result = new StringBuilder();
 			for (Resolvable resolvable : resolvables) {
-				result.append(resolvable.resolve(state));
+				result.append(resolvable.resolve(state).asString());
 			}
-			return result.toString();
+			return CommandArguments.CommandArgument.of(result.toString());
 		}
 	}
 
@@ -326,8 +328,8 @@ public class Compiler {
 		}
 
 		@Override
-		public String resolve(State state) {
-			return value;
+		public CommandArguments.CommandArgument resolve(State state) {
+			return CommandArguments.CommandArgument.of(value);
 		}
 	}
 
@@ -340,12 +342,12 @@ public class Compiler {
 		}
 
 		@Override
-		public String resolve(State state) {
+		public CommandArguments.CommandArgument resolve(State state) {
 			Value value = state.getVariables().get(name);
 			if (value == null) {
 				throw new IllegalStateException(String.format("cannot resolve variable: %s", name.name()));
 			}
-			return value.show(Locale.ROOT);
+			return CommandArguments.CommandArgument.of(value.show(Locale.ROOT));
 		}
 	}
 
@@ -353,17 +355,16 @@ public class Compiler {
 
 		private final VariableName name;
 
-		private final String fallback;
+		private final Value fallback;
 
-		public VariableOrFallback(VariableName name, String fallback) {
+		public VariableOrFallback(VariableName name, Value fallback) {
 			this.name = name;
 			this.fallback = fallback;
 		}
 
 		@Override
-		public String resolve(State state) {
-			Value value = state.getVariables().get(name);
-			return value != null ? value.show(Locale.ROOT) : fallback;
+		public CommandArguments.CommandArgument resolve(State state) {
+			return CommandArguments.CommandArgument.of(state.getVariables().getOrDefault(name, fallback).show(Locale.ROOT));
 		}
 	}
 

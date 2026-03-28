@@ -27,8 +27,8 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Experimental;
-import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.CommandWrapper;
@@ -38,9 +38,7 @@ import hosh.spi.InputChannel;
 import hosh.spi.Key;
 import hosh.spi.Keys;
 import hosh.spi.LineReaderAware;
-import hosh.spi.Module;
 import hosh.spi.OutputChannel;
-import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
@@ -49,6 +47,9 @@ import hosh.spi.StateMutatorAware;
 import hosh.spi.Value;
 import hosh.spi.Values;
 import hosh.spi.VariableName;
+import hosh.spi.Ansi.Style;
+import hosh.spi.Module;
+import hosh.spi.Record;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
@@ -71,6 +72,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.StringJoiner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -128,12 +131,12 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.isEmpty()) {
 				err.send(Errors.usage("path [show|clear|append path|prepend path]"));
 				return ExitStatus.error();
 			}
-			String command = args.getFirst();
+			String command = args.get(0).asString();
 			switch (command) {
 				case "show": {
 					if (args.size() != 1) {
@@ -161,7 +164,7 @@ public class SystemModule implements Module {
 						err.send(Errors.usage("path append path"));
 						return ExitStatus.error();
 					}
-					java.nio.file.Path pathToAppend = Paths.get(args.get(1));
+					java.nio.file.Path pathToAppend = Paths.get(args.get(1).asString());
 					List<java.nio.file.Path> newPath = new ArrayList<>(state.getPath());
 					newPath.add(pathToAppend);
 					stateMutator.mutatePath(newPath);
@@ -173,7 +176,7 @@ public class SystemModule implements Module {
 						err.send(Errors.usage("path prepend path"));
 						return ExitStatus.error();
 					}
-					java.nio.file.Path pathToAppend = Paths.get(args.get(1));
+					java.nio.file.Path pathToAppend = Paths.get(args.get(1).asString());
 					List<java.nio.file.Path> newPath = new ArrayList<>(state.getPath());
 					newPath.addFirst(pathToAppend);
 					stateMutator.mutatePath(newPath);
@@ -197,9 +200,9 @@ public class SystemModule implements Module {
 	public static class Echo implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			Record record = Records.singleton(Keys.VALUE, Values.ofText(String.join(" ", args)));
-			out.send(record);
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
+			String output = args.stream().map(CommandArguments.CommandArgument::asString).collect(Collectors.joining(" "));
+			out.send(Records.singleton(Keys.VALUE, Values.ofText(output)));
 			return ExitStatus.success();
 		}
 	}
@@ -218,7 +221,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("env"));
 				return ExitStatus.error();
@@ -251,13 +254,13 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			switch (args.size()) {
 				case 0:
 					stateMutator.mutateExit(true);
 					return ExitStatus.success();
 				case 1:
-					String arg = args.getFirst();
+					String arg = args.get(0).asString();
 					Optional<ExitStatus> exitStatus = ExitStatus.parse(arg);
 					if (exitStatus.isPresent()) {
 						stateMutator.mutateExit(true);
@@ -288,7 +291,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.isEmpty()) {
 				for (var entry : state.getCommands().entrySet()) {
 					Description description = entry.getValue().get().getClass().getAnnotation(Description.class);
@@ -301,7 +304,7 @@ public class SystemModule implements Module {
 				}
 				return ExitStatus.success();
 			} else if (args.size() == 1) {
-				String commandName = args.getFirst();
+				String commandName = args.get(0).asString();
 				Supplier<Command> commandSupplier = CommandName.from(commandName)
 					.map(state.getCommands()::get)
 					.orElse(null);
@@ -341,14 +344,14 @@ public class SystemModule implements Module {
 	public static class Sleep implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("sleep duration"));
 				return ExitStatus.error();
 			}
-			Optional<Duration> duration = DurationParsing.parse(args.getFirst());
+			Optional<Duration> duration = args.get(0).asDuration();
 			if (duration.isEmpty()) {
-				err.send(Errors.message("invalid duration: '%s'", args.getFirst()));
+				err.send(Errors.message("invalid duration: '%s'", args.get(0).asString()));
 				return ExitStatus.error();
 			}
 			try {
@@ -377,7 +380,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("withTime { ... }"));
 				return ExitStatus.error();
@@ -398,7 +401,7 @@ public class SystemModule implements Module {
 	public static class ProcessList implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("ps"));
 				return ExitStatus.error();
@@ -439,16 +442,17 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("kill process"));
 				return ExitStatus.error();
 			}
-			if (!args.getFirst().matches("[0-9]+")) {
-				err.send(Errors.message("not a valid pid: %s", args.getFirst()));
+			OptionalLong pidOpt = args.get(0).asLong();
+			if (pidOpt.isEmpty() || pidOpt.getAsLong() < 0) {
+				err.send(Errors.message("not a valid pid: %s", args.get(0).asString()));
 				return ExitStatus.error();
 			}
-			long pid = Long.parseLong(args.getFirst());
+			long pid = pidOpt.getAsLong();
 			Optional<ProcessHandle> process = processLookup.of(pid);
 			if (process.isEmpty()) {
 				err.send(Errors.message("cannot find pid: %s", pid));
@@ -470,7 +474,7 @@ public class SystemModule implements Module {
 	public static class Err implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			throw new NullPointerException("please do not report: this is a simulated error");
 		}
 	}
@@ -491,14 +495,14 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("withTimeout duration { ... }"));
 				return ExitStatus.error();
 			}
-			Optional<Duration> timeout = DurationParsing.parse(args.getFirst());
+			Optional<Duration> timeout = args.get(0).asDuration();
 			if (timeout.isEmpty()) {
-				err.send(Errors.message("invalid duration: '%s'", args.getFirst()));
+				err.send(Errors.message("invalid duration: '%s'", args.get(0).asString()));
 				return ExitStatus.error();
 			}
 			try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
@@ -537,7 +541,7 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() >= 2) {
 				err.send(Errors.usage("waitSuccess [duration] { ... }"));
 				return ExitStatus.error();
@@ -546,9 +550,9 @@ public class SystemModule implements Module {
 			if (args.isEmpty()) {
 				sleep = Duration.ofSeconds(1);
 			} else {
-				Optional<Duration> maybeSleep = DurationParsing.parse(args.getFirst());
+				Optional<Duration> maybeSleep = args.get(0).asDuration();
 				if (maybeSleep.isEmpty()) {
-					err.send(Errors.message("invalid duration: '%s'", args.getFirst()));
+					err.send(Errors.message("invalid duration: '%s'", args.get(0).asString()));
 					return ExitStatus.error();
 				} else {
 					sleep = maybeSleep.get();
@@ -592,14 +596,18 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("benchmark number { ... }"));
 				return ExitStatus.error();
 			}
 
-			int repeat = Integer.parseInt(args.getFirst());
-
+			OptionalInt repeatOpt = args.get(0).asInt();
+			if (repeatOpt.isEmpty()) {
+				err.send(Errors.message("not a valid number: %s", args.get(0).asString()));
+				return ExitStatus.error();
+			}
+			int repeat = repeatOpt.getAsInt();
 			if (repeat <= 0) {
 				err.send(Errors.message("number must be >= 0"));
 				return ExitStatus.error();
@@ -656,7 +664,7 @@ public class SystemModule implements Module {
 	public static class Sink implements Command {
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			for (Record ignored : InputChannel.iterate(in)) {
 				blackHole(ignored);
 			}
@@ -690,17 +698,17 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("set variable value"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.getFirst());
+			Optional<VariableName> name = VariableName.from(args.get(0).asString());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
 			}
-			String value = args.get(1);
+			String value = args.get(1).asString();
 			var newVariables = new HashMap<>(state.getVariables());
 			newVariables.put(name.get(), Values.ofText(value));
 			stateMutator.mutateVariables(newVariables);
@@ -728,12 +736,12 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("unset variable"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.getFirst());
+			Optional<VariableName> name = VariableName.from(args.get(0).asString());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -773,12 +781,12 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("input variable"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.getFirst());
+			Optional<VariableName> name = VariableName.from(args.get(0).asString());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -830,12 +838,12 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("secret variable"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.getFirst());
+			Optional<VariableName> name = VariableName.from(args.get(0).asString());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -874,12 +882,12 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("confirm message"));
 				return ExitStatus.error();
 			}
-			String message = args.getFirst();
+			String message = args.get(0).asString();
 			Optional<String> maybeAnswer = readAnswer(message + " (Y/N)? ");
 			if (maybeAnswer.isEmpty()) {
 				return ExitStatus.error();
@@ -926,12 +934,12 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("capture variable"));
 				return ExitStatus.error();
 			}
-			Optional<VariableName> name = VariableName.from(args.getFirst());
+			Optional<VariableName> name = VariableName.from(args.get(0).asString());
 			if (name.isEmpty()) {
 				err.send(Errors.message("invalid variable name"));
 				return ExitStatus.error();
@@ -965,13 +973,13 @@ public class SystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() <= 2) {
 				err.send(Errors.usage("open file [WRITE|APPEND|...]"));
 				return ExitStatus.error();
 			}
 			Locale locale = Locale.getDefault();
-			var path = state.getCwd().resolve(Paths.get(args.getFirst()));
+			var path = state.getCwd().resolve(Paths.get(args.get(0).asString()));
 			try (var writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(path, toOpenOptions(args)), StandardCharsets.UTF_8))) {
 				for (Record incoming : InputChannel.iterate(in)) {
 					String line = incoming.values().map(v -> v.show(locale)).collect(Collectors.joining(" "));
@@ -984,9 +992,9 @@ public class SystemModule implements Module {
 			}
 		}
 
-		private OpenOption[] toOpenOptions(List<String> args) {
-			return args
-					.stream()
+		private OpenOption[] toOpenOptions(CommandArguments args) {
+			return args.stream()
+					.map(CommandArguments.CommandArgument::asString)
 					.skip(1)
 					.map(this::parseOption)
 					.toArray(OpenOption[]::new);

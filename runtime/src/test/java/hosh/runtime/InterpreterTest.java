@@ -26,6 +26,7 @@ package hosh.runtime;
 import hosh.runtime.Compiler.Program;
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -180,7 +181,7 @@ class InterpreterTest {
 		// When
 		sut.eval(program, out, err);
 		// Then
-		then(command).should().run(Mockito.eq(List.of("file")), Mockito.any(), Mockito.any(), Mockito.any());
+		then(command).should().run(Mockito.eq(CommandArguments.of("file")), Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -199,7 +200,7 @@ class InterpreterTest {
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
-		then(command).should().run(Mockito.eq(List.of("1")), Mockito.any(), Mockito.any(), Mockito.any());
+		then(command).should().run(Mockito.eq(CommandArguments.of("1")), Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test

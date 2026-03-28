@@ -26,6 +26,7 @@ package hosh.runtime;
 import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandName;
+import hosh.spi.LoggerFactory;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
 import hosh.spi.Value;
@@ -39,12 +40,16 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 /**
- * The state of the shell: it has been modeled as explicit state, in practice this is a global variable.
+ * The state of the shell: it has been modeled as explicit object. It can be inspected or even changed by commands.
+ * In practice, it is a global read/write variable, but it is easy to inspect the mutations.
  */
 @Todo(description = "NB: this is a tactical object used during migration to immutable state.")
 public class MutableState implements State, StateMutator {
+
+	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 	// variables
 	private final AtomicReference<Map<VariableName, Value>> variables;
@@ -94,28 +99,34 @@ public class MutableState implements State, StateMutator {
 		return exit.get();
 	}
 
+	@Todo(description = "add a CurrentWorkingDirectory/CWD class that maintains the invariant normalized and absolute + resolve files (see TODO items)")
 	@Override
 	public void mutateCwd(Path newPath) {
+		LOGGER.fine(() -> "mutating cwd %s".formatted(newPath));
 		cwd.set(Objects.requireNonNull(newPath).normalize().toAbsolutePath());
 	}
 
 	@Override
 	public void mutatePath(List<Path> newPath) {
+		LOGGER.fine(() -> "mutating path %s".formatted(newPath));
 		path.set(List.copyOf(Objects.requireNonNull(newPath)));
 	}
 
 	@Override
 	public void mutateExit(boolean newExit) {
+		LOGGER.fine(() -> "mutating exit %s".formatted(newExit));
 		exit.set(newExit);
 	}
 
 	@Override
 	public void mutateVariables(Map<VariableName, Value> newVariables) {
+		LOGGER.fine(() -> "mutating variables %s".formatted(newVariables));
 		variables.set(Map.copyOf(Objects.requireNonNull(newVariables)));
 	}
 
 	@Override
 	public void mutateCommands(Map<CommandName, Supplier<Command>> newCommands) {
+		LOGGER.fine(() -> "mutating commands %s".formatted(newCommands));
 		commands.set(Map.copyOf(Objects.requireNonNull(newCommands)));
 	}
 

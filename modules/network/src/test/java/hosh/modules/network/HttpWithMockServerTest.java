@@ -23,15 +23,8 @@
  */
 package hosh.modules.network;
 
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.Values;
 import hosh.spi.Version;
-import org.junit.jupiter.api.BeforeEach;
+import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -45,6 +38,14 @@ import org.mockserver.model.HttpResponse;
 import java.util.List;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.Values;
+import org.junit.jupiter.api.BeforeEach;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
@@ -88,7 +89,7 @@ class HttpWithMockServerTest {
 				);
 		// When
 		String arg = String.format("http://localhost:%d/path", clientAndServer.getLocalPort());
-		ExitStatus result = sut.run(List.of(arg), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(arg), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
@@ -103,7 +104,7 @@ class HttpWithMockServerTest {
 		// no url is expected in the mockserver
 		// When
 		String arg = String.format("http://localhost:%d/not-found", clientAndServer.getLocalPort());
-		ExitStatus result = sut.run(List.of(arg), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(arg), in, out, err);
 		// Then
 		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();

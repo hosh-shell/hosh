@@ -24,18 +24,8 @@
 package hosh.modules.filesystem;
 
 import hosh.doc.Bug;
-import hosh.spi.CommandWrapper;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.StateMutator;
-import hosh.spi.Values;
 import hosh.spi.test.support.RecordMatcher;
-import hosh.test.support.TemporaryFolder;
+import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -55,11 +45,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.CommandWrapper;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.spi.StateMutator;
+import hosh.spi.Values;
+import hosh.test.support.TemporaryFolder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -100,7 +100,7 @@ class FileSystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("dir1", "dir2"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("dir1", "dir2"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -115,7 +115,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -131,7 +131,7 @@ class FileSystemModuleTest {
 			temporaryFolder.newFolder("dir");
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -150,7 +150,7 @@ class FileSystemModuleTest {
 			temporaryFolder.newFile("file");
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -169,7 +169,7 @@ class FileSystemModuleTest {
 			Files.createSymbolicLink(Paths.get(state.getCwd().toString(), "link"), file);
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -191,7 +191,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of(file.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -207,7 +207,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(cwd);
 
 			// When
-			ExitStatus result = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("."), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -224,7 +224,7 @@ class FileSystemModuleTest {
 			Files.createFile(cwd.resolve("aaa"));
 
 			// When
-			ExitStatus result = sut.run(List.of(cwd.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(cwd.toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -241,7 +241,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(cwd);
 
 			// When
-			ExitStatus result = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("."), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -260,7 +260,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -277,7 +277,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 
 			// When
-			ExitStatus result = sut.run(List.of(cwd.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(cwd.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -295,7 +295,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 
 			// When
-			ExitStatus result = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("."), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -314,7 +314,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(cwd.toAbsolutePath());
 
 			// When
-			ExitStatus result = sut.run(List.of(".."), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(".."), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -341,7 +341,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -388,7 +388,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -403,7 +403,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("asd", "asd"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("asd", "asd"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -419,7 +419,7 @@ class FileSystemModuleTest {
 			Path newFolder = temporaryFolder.newFolder("dir");
 
 			// When
-			ExitStatus result = sut.run(List.of("dir"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("dir"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -435,7 +435,7 @@ class FileSystemModuleTest {
 			Path newFolder = temporaryFolder.newFolder("dir");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFolder.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFolder.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -452,7 +452,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -496,7 +496,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -511,7 +511,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("asd"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -554,7 +554,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("data.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -570,7 +570,7 @@ class FileSystemModuleTest {
 			Files.writeString(newFile, "a 1\nb 2\n", StandardCharsets.UTF_8);
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -589,7 +589,7 @@ class FileSystemModuleTest {
 			Files.writeString(newFile, "a 1\n");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -605,7 +605,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -620,7 +620,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -663,7 +663,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -678,7 +678,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("source.txt"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("source.txt"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -696,7 +696,7 @@ class FileSystemModuleTest {
 			Files.delete(target);
 
 			// When
-			ExitStatus result = sut.run(List.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -715,7 +715,7 @@ class FileSystemModuleTest {
 			Files.delete(target);
 
 			// When
-			ExitStatus result = sut.run(List.of(source.toString(), target.toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(source.toString(), target.toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -760,7 +760,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -775,7 +775,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("source.txt"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("source.txt"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -793,7 +793,7 @@ class FileSystemModuleTest {
 			Files.delete(target);
 
 			// When
-			ExitStatus result = sut.run(List.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -812,7 +812,7 @@ class FileSystemModuleTest {
 			Files.delete(target);
 
 			// When
-			ExitStatus result = sut.run(List.of(source.toAbsolutePath().toString(), target.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(source.toAbsolutePath().toString(), target.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -857,7 +857,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -873,7 +873,7 @@ class FileSystemModuleTest {
 			Path target = temporaryFolder.newFile("target.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(target.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(target.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -889,7 +889,7 @@ class FileSystemModuleTest {
 			Path target = temporaryFolder.newFile("target.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(target.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(target.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -926,7 +926,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -941,7 +941,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("asd"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -984,7 +984,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -999,7 +999,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("."), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1015,7 +1015,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("."), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1030,7 +1030,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of("path"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("path"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1045,7 +1045,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1060,7 +1060,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1079,7 +1079,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath()); // previous method could fail by UAC and Mockito will throw UnnecessaryStubbingException
 
 			// When
-			ExitStatus result = sut.run(List.of(symlink.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(symlink.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1122,7 +1122,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1138,7 +1138,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1154,7 +1154,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.ppp");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.getFileName().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1197,7 +1197,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1215,7 +1215,7 @@ class FileSystemModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("*.java"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("*.java"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1233,7 +1233,7 @@ class FileSystemModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("*.java"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("*.java"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1251,7 +1251,7 @@ class FileSystemModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 
 			// When
-			ExitStatus result = sut.run(List.of("*.c"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("*.c"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1295,7 +1295,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1311,7 +1311,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.getFileName().toString(), "link"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.getFileName().toString(), "link"), in, out, err);
 
 			// Then
 			Path link = temporaryFolder.toPath().resolve("link");
@@ -1356,7 +1356,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1372,7 +1372,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.getFileName().toString(), "link"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.getFileName().toString(), "link"), in, out, err);
 
 			// Then
 			Path link = temporaryFolder.toPath().resolve("link");
@@ -1417,7 +1417,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1433,7 +1433,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of("file.txt"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("file.txt"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1449,7 +1449,7 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus result = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(newFile.toAbsolutePath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1466,7 +1466,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of("link"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("link"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1510,7 +1510,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1525,7 +1525,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of("a", "b"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("a", "b"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1538,10 +1538,10 @@ class FileSystemModuleTest {
 		void oneArg() {
 			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-			sut.setWatchPredicate(count -> false); // exit immediately
+			sut.setWatchPredicate(_ -> false); // exit immediately
 
 			// When
-			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(temporaryFolder.toPath().toString()), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -1572,7 +1572,7 @@ class FileSystemModuleTest {
 			modifyFileSystem.start();
 
 			// When
-			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(temporaryFolder.toPath().toString()), in, out, err);
 			modifyFileSystem.join();
 
 			// Then
@@ -1629,7 +1629,7 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1644,7 +1644,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of("../missing_directory/file.lock"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("../missing_directory/file.lock"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -1661,7 +1661,7 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus result = sut.run(List.of("file.lock"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("file.lock"), in, out, err);
 
 			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);

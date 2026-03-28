@@ -23,11 +23,10 @@
  */
 package hosh.runtime;
 
+import hosh.spi.CommandArguments;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
-
-import java.util.List;
 
 /**
  * Runtime representation of a sequence expression ({@code cmd1 ; cmd2}).
@@ -53,7 +52,7 @@ class SequenceCommand implements CompilerCommand, InterpreterAware {
 	}
 
 	@Override
-	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+	public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 		ExitStatus exitStatus = interpreter.eval(first, in, out, err);
 		if (exitStatus.isError()) {
 			return exitStatus;

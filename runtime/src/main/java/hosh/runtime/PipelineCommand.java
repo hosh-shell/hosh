@@ -25,11 +25,11 @@ package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -104,7 +104,7 @@ class PipelineCommand implements CompilerCommand, InterpreterAware {
 	}
 
 	@Override
-	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+	public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 		try (Supervisor supervisor = new Supervisor()) {
 			PipelineChannel pipelineChannel = new PipelineChannel();
 			runAsync(supervisor, producer, in, pipelineChannel, err, Position.FIRST);

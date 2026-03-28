@@ -27,18 +27,19 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
-import hosh.spi.Module;
 import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.Values;
+import hosh.spi.Module;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
@@ -89,12 +90,12 @@ public class FormatsModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("from-json file"));
 				return ExitStatus.error();
 			}
-			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path source = args.get(0).asPath(state);
 			if (!Files.exists(source)) {
 				err.send(Errors.message("file not found: %s", source));
 				return ExitStatus.error();
@@ -157,12 +158,12 @@ public class FormatsModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("from-csv file"));
 				return ExitStatus.error();
 			}
-			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path source = args.get(0).asPath(state);
 			if (!Files.exists(source)) {
 				err.send(Errors.message("file not found: %s", source));
 				return ExitStatus.error();
@@ -207,12 +208,12 @@ public class FormatsModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("to-json file"));
 				return ExitStatus.error();
 			}
-			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path target = args.get(0).asPath(state);
 			Locale locale = Locale.getDefault();
 			JsonWriterFactory writerFactory = jakarta.json.Json.createWriterFactory(Map.of(JsonGenerator.PRETTY_PRINTING, true));
 			try (Writer writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8);
@@ -253,12 +254,12 @@ public class FormatsModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("to-csv file"));
 				return ExitStatus.error();
 			}
-			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path target = args.get(0).asPath(state);
 			Locale locale = Locale.getDefault();
 			boolean headerWritten = false;
 			try (Writer writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8)) {
@@ -279,14 +280,4 @@ public class FormatsModule implements Module {
 		}
 	}
 
-	private static Path resolveAsAbsolutePath(Path cwd, Path file) {
-		if (file.isAbsolute()) {
-			return normalized(file);
-		}
-		return normalized(cwd.resolve(file));
-	}
-
-	private static Path normalized(Path path) {
-		return path.normalize().toAbsolutePath();
-	}
 }

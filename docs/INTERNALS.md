@@ -193,6 +193,27 @@ process environment.
 
 `hosh.runtime.PathInitializer` resolves the initial working directory.
 
+Domain primitives
+---
+
+Several core types in `hosh.spi` are designed as **domain primitives** — narrow, immutable value objects
+that carry only what is needed and nothing more. This pattern is described in
+*Secure by Design* (Johnsson, Deogun, Sawano; Manning, 2019) as a way to make invalid states
+unrepresentable and eliminate entire classes of bugs at the type level.
+
+Examples in Hosh:
+
+- `Key` — an opaque, validated record key; cannot be constructed with a null or blank name.
+- `Value` (and subtypes `TextValue`, `NumericValue`, `PathValue`, …) — typed, immutable record values;
+  rendering is always explicit via `show(Locale)` rather than implicit `toString()`.
+- `ExitStatus` — wraps an integer exit code; `success()` and `error()` factory methods prevent
+  raw integer leakage.
+- `VariableName` — a validated shell variable name; rejects syntactically invalid names at construction time.
+- `CommandName` — an opaque command identifier.
+
+The discipline is: **never pass raw `String` or primitive types across subsystem boundaries when a
+domain primitive can carry the invariants instead.**
+
 Dependencies
 ---
 
