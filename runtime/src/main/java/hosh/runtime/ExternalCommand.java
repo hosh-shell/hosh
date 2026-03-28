@@ -122,7 +122,7 @@ class ExternalCommand implements CompilerCommand, StateAware {
 	private Map<String, String> env() {
 		var result = new HashMap<String, String>();
 		for (var entry : state.getVariables().entrySet()) {
-			result.put(entry.getKey().name(), entry.getValue());
+			result.put(entry.getKey().name(), entry.getValue().show(Locale.ROOT));
 		}
 		return result;
 	}

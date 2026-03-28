@@ -40,7 +40,7 @@ public interface StateMutator {
 	void mutatePath(List<Path> newPath);
 
 	/** Replaces the current shell variables. */
-	void mutateVariables(Map<VariableName, String> newVariables);
+	void mutateVariables(Map<VariableName, Value> newVariables);
 
 	/** Replaces the registered built-in commands. */
 	void mutateCommands(Map<CommandName, Supplier<Command>> newCommands);

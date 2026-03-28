@@ -29,7 +29,7 @@ import hosh.spi.Keys;
 import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
-import hosh.spi.StateMutator;
+import hosh.spi.Value;
 import hosh.spi.Values;
 import hosh.spi.VariableName;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +84,7 @@ class LambdaCommandTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void presentKeyWithInnerCommandSuccess() {
-		Map<VariableName, String> variables = new HashMap<>();
+		Map<VariableName, Value> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(eq(statement), eq(in), eq(out), eq(err), any(State.class))).willReturn(ExitStatus.success());
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
@@ -100,7 +99,7 @@ class LambdaCommandTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void presentKeyWithInnerCommandError() {
-		Map<VariableName, String> variables = new HashMap<>();
+		Map<VariableName, Value> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(eq(statement), eq(in), eq(out), eq(err), any(State.class))).willReturn(ExitStatus.error());
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());

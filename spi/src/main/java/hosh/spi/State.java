@@ -44,7 +44,7 @@ public interface State {
 	Map<CommandName, Supplier<Command>> getCommands();
 
 	/** Returns the current shell variables as an immutable map. */
-	Map<VariableName, String> getVariables();
+	Map<VariableName, Value> getVariables();
 
 	/** Returns the ordered list of directories searched for external commands. */
 	List<Path> getPath();

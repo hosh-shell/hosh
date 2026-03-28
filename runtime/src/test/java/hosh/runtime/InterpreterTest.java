@@ -116,7 +116,7 @@ class InterpreterTest {
 		given(statement.getArguments()).willReturn(List.of());
 		ExitStatus exitStatus = sut.eval(program, out, err);
 		assertThat(exitStatus).isError();
-		then(stateMutator).should().mutateVariables(Map.of(Interpreter.EXIT_STATUS, "2"));
+		then(stateMutator).should().mutateVariables(Map.of(Interpreter.EXIT_STATUS, Values.ofNumeric(2)));
 	}
 
 	@Test
@@ -171,7 +171,7 @@ class InterpreterTest {
 	@Test
 	void presentVariable() {
 		VariableName variable = VariableName.constant("VARIABLE");
-		given(state.getVariables()).willReturn(Map.of(variable, "1"));
+		given(state.getVariables()).willReturn(Map.of(variable, Values.ofText("1")));
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);

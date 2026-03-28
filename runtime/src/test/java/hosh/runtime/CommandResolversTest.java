@@ -24,10 +24,7 @@
 package hosh.runtime;
 
 import hosh.runtime.CommandResolvers.WindowsCommandResolver;
-import hosh.spi.Command;
-import hosh.spi.CommandName;
-import hosh.spi.State;
-import hosh.spi.VariableName;
+import hosh.spi.*;
 import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -143,7 +140,7 @@ class CommandResolversTest {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
-			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE;.BAT;.CMD"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), Values.ofText(".COM;.EXE;.BAT;.CMD")));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isNotPresent();
 		}
@@ -155,7 +152,7 @@ class CommandResolversTest {
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
-			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE;.BAT;.CMD"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), Values.ofText(".COM;.EXE;.BAT;.CMD")));
 			Optional<Command> result = sut.tryResolve("test");
 			assertThat(result).isPresent();
 		}
@@ -208,7 +205,7 @@ class CommandResolversTest {
 		@Test
 		void findExecutableInPathext() throws IOException {
 			temporaryFolder.newExecutableFile("TEST.EXE");
-			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), Values.ofText(".COM;.EXE")));
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("TEST");
@@ -218,7 +215,7 @@ class CommandResolversTest {
 		@Test
 		void findExecutableNotInPathext() throws IOException {
 			temporaryFolder.newExecutableFile("test.cmd");
-			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), ".COM;.EXE"));
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), Values.ofText(".COM;.EXE")));
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			Optional<Command> result = sut.tryResolve("TEST");

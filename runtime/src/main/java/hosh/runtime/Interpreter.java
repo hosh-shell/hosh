@@ -127,7 +127,7 @@ public class Interpreter {
 	private void store(ExitStatus exitStatus) {
 		Objects.requireNonNull(exitStatus, "exit status cannot be null");
 		var newVariables = new HashMap<>(state.getVariables());
-		newVariables.put(EXIT_STATUS, String.valueOf(exitStatus.value()));
+		newVariables.put(EXIT_STATUS, Values.ofNumeric(exitStatus.value()));
 		stateMutator.mutateVariables(newVariables);
 	}
 
