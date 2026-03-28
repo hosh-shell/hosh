@@ -2,7 +2,7 @@
 
 Human Oriented SHell — an experimental Java shell focused on cross-platform portability, type safety, and usability.
 
-Website: https://hosh-shell.github.io
+Website: <https://hosh-shell.github.io>
 
 ## Project structure
 
@@ -20,18 +20,52 @@ Multi-module Maven project:
 - `modules/history/` — command history
 - `main/` — application entry point (`Hosh.java`), produces the uberjar
 
+## Package map
+
+Root package: `hosh`
+
+- `hosh.spi` — all core types: `Record`, `Key`, `Value` (and subtypes: `Text`, `Number`, `Path`, `Duration`, `Instant`), `Command`, `Channel`, `ExitStatus`, `InputChannel`, `OutputChannel`
+- `hosh.runtime` — shell engine: `Interpreter`, `Supervisor`, `Compiler`, `Parser` (ANTLR4 grammar in `runtime/src/main/antlr4/`)
+- `hosh.runtime.prompt` — prompt rendering
+- `hosh.runtime.completion` — tab completion
+- `hosh.modules.system` — built-in system commands (echo, env, sleep, exit, benchmark, etc.)
+- `hosh.modules.filesystem` — filesystem commands (ls, cd, walk, cp, mv, rm, find, etc.)
+- `hosh.modules.text` — text processing (grep, sort, count, split, join, trim, regex, etc.)
+- `hosh.modules.network` — network commands (http, resolve, etc.)
+- `hosh.modules.terminal` — terminal commands (clear, etc.)
+- `hosh.modules.history` — history command
+
+Each module registers its commands via a `Module` SPI implementation (look for `implements Module`).
+
+## Key classes (start here, don't grep)
+
+| Concern | Class | Location |
+|---|---|---|
+| Entry point | `Hosh` | `main/` |
+| Script parsing | `Compiler`, `Parser` | `runtime/` |
+| ANTLR4 grammar | `Hosh.g4` | `runtime/src/main/antlr4/` |
+| Pipeline execution | `Supervisor` | `runtime/` |
+| Inter-stage data flow | `PipelineChannel` | `runtime/` |
+| Core record type | `Record`, `Records` | `spi/` |
+| Typed values | `Value`, `Keys` | `spi/` |
+| Command interface | `Command` | `spi/` |
+| Channels | `InputChannel`, `OutputChannel` | `spi/` |
+| Module registration | `Module` | `spi/` |
+
 ## Requirements
 
-JDK 25
+JDK 25.
 
 ## Build
 
 Full build (unit + integration + fitness + acceptance tests):
+
 ```
 ./mvnw clean verify
 ```
 
 Quick build (~2× faster, skips slow tests):
+
 ```
 ./mvnw -Pskip-slow-tests clean verify
 ```
@@ -51,6 +85,7 @@ java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar 
 ## Logging
 
 Hosh uses `java.util.logging`. Logging is disabled by default. To enable:
+
 ```
 HOSH_LOG_LEVEL=FINE java -jar main/target/hosh.jar
 ```
@@ -60,11 +95,13 @@ Log events are written to `$HOME/.hosh.log`.
 ## Other useful commands
 
 Mutation testing:
+
 ```
 ./mvnw test-compile org.pitest:pitest-maven:mutationCoverage
 ```
 
 Sonar analysis:
+
 ```
 ./mvnw clean verify sonar:sonar -Psonar -Dsonar.token=MYTOKEN
 ```
@@ -76,10 +113,22 @@ Sonar analysis:
 - Inter-stage data flows through `PipelineChannel` backed by `LinkedTransferQueue`.
 - Strict error handling by default — equivalent to `set -euo pipefail` in bash.
 - Uses Java Platform Module System (`module-info.java` in every module).
+- Each command is a separate class implementing `Command` from `hosh.spi`.
+- To add a new command: create the class in the appropriate module, register it in that module's `Module` implementation.
+
+## Code style
+
+- Java 25, no Kotlin, no Gradle.
+- Zero SonarQube bugs/smells policy.
+- Checkstyle enforced (`checkstyle.xml` at root).
+- Prefer explicit over clever. Fail fast on unhandled cases.
+- No `sun.misc.Unsafe` or internal JDK APIs.
 
 ## Testing
 
-- all features are covered by unit tests
-- tests are written in JUnit5, mockito and assertj
-- all tests have // Given // When // Then sections
-- the instance of the class under test is always called "sut" (system under test)
+- All features are covered by unit tests.
+- Tests are written in JUnit 5, Mockito, and AssertJ.
+- All tests have `// Given` `// When` `// Then` sections.
+- The instance of the class under test is always called `sut` (system under test).
+- Acceptance tests use the built jar and run hosh scripts end-to-end.
+- Mutation testing via PIT (`pitest-maven`).
