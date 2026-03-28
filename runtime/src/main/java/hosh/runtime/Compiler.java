@@ -26,12 +26,14 @@ package hosh.runtime;
 import hosh.spi.Command;
 import hosh.spi.CommandWrapper;
 import hosh.spi.State;
+import hosh.spi.Value;
 import hosh.spi.VariableName;
 import org.antlr.v4.runtime.Token;
 
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static hosh.runtime.antlr4.HoshParser.CommandContext;
@@ -339,11 +341,11 @@ public class Compiler {
 
 		@Override
 		public String resolve(State state) {
-			String value = state.getVariables().get(name);
+			Value value = state.getVariables().get(name);
 			if (value == null) {
 				throw new IllegalStateException(String.format("cannot resolve variable: %s", name.name()));
 			}
-			return value;
+			return value.show(Locale.ROOT);
 		}
 	}
 
@@ -360,7 +362,8 @@ public class Compiler {
 
 		@Override
 		public String resolve(State state) {
-			return state.getVariables().getOrDefault(name, fallback);
+			Value value = state.getVariables().get(name);
+			return value != null ? value.show(Locale.ROOT) : fallback;
 		}
 	}
 

@@ -23,6 +23,8 @@
  */
 package hosh.runtime;
 
+import hosh.spi.Value;
+import hosh.spi.Values;
 import hosh.spi.VariableName;
 
 import java.util.HashMap;
@@ -36,11 +38,11 @@ public class BootstrapVariables {
 
 	// attempt to import system variables as Hosh variables
 	// any invalid name will be logged and skipped
-	public Map<VariableName, String> fromEnv(Map<String, String> env) {
-		var result = new HashMap<VariableName, String>();
+	public Map<VariableName, Value> fromEnv(Map<String, String> env) {
+		var result = new HashMap<VariableName, Value>();
 		for (var entry : env.entrySet()) {
 			Optional<VariableName> variableName = VariableName.from(entry.getKey());
-			variableName.ifPresent(name -> result.put(name, entry.getValue()));
+			variableName.ifPresent(name -> result.put(name, Values.ofText(entry.getValue())));
 		}
 		return result;
 	}

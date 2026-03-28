@@ -223,11 +223,11 @@ public class SystemModule implements Module {
 				err.send(Errors.usage("env"));
 				return ExitStatus.error();
 			}
-			Map<VariableName, String> variables = state.getVariables();
+			Map<VariableName, Value> variables = state.getVariables();
 			for (var entry : variables.entrySet()) {
 				Record record = Records.builder()
 						.entry(Keys.NAME, Values.ofText(entry.getKey().name()))
-						.entry(Keys.VALUE, Values.ofText(entry.getValue()))
+						.entry(Keys.VALUE, entry.getValue())
 						.build();
 				out.send(record);
 			}
@@ -702,7 +702,7 @@ public class SystemModule implements Module {
 			}
 			String value = args.get(1);
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(name.get(), value);
+			newVariables.put(name.get(), Values.ofText(value));
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
@@ -788,7 +788,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(name.get(), value.get());
+			newVariables.put(name.get(), Values.ofText(value.get()));
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
@@ -845,7 +845,7 @@ public class SystemModule implements Module {
 				return ExitStatus.error();
 			}
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(name.get(), value.get());
+			newVariables.put(name.get(), Values.ofText(value.get()));
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}
@@ -944,7 +944,7 @@ public class SystemModule implements Module {
 				}
 			}
 			var newVariables = new HashMap<>(state.getVariables());
-			newVariables.put(name.get(), stringJoiner.toString());
+			newVariables.put(name.get(), Values.ofText(stringJoiner.toString()));
 			stateMutator.mutateVariables(newVariables);
 			return ExitStatus.success();
 		}

@@ -28,6 +28,7 @@ import hosh.spi.Command;
 import hosh.spi.CommandName;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
+import hosh.spi.Value;
 import hosh.spi.VariableName;
 
 import java.nio.file.Path;
@@ -44,7 +45,7 @@ import java.util.function.Supplier;
 public class MutableState implements State, StateMutator {
 
 	// variables
-	private volatile Map<VariableName, String> variables;
+	private volatile Map<VariableName, Value> variables;
 
 	// built-in commands
 	private volatile Map<CommandName, Supplier<Command>> commands;
@@ -77,7 +78,7 @@ public class MutableState implements State, StateMutator {
 	}
 
 	@Override
-	public Map<VariableName, String> getVariables() {
+	public Map<VariableName, Value> getVariables() {
 		return variables;
 	}
 
@@ -107,7 +108,7 @@ public class MutableState implements State, StateMutator {
 	}
 
 	@Override
-	public void mutateVariables(Map<VariableName, String> newVariables) {
+	public void mutateVariables(Map<VariableName, Value> newVariables) {
 		this.variables = Map.copyOf(Objects.requireNonNull(newVariables));
 	}
 

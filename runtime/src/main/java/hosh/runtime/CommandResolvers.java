@@ -27,6 +27,7 @@ import hosh.spi.Command;
 import hosh.spi.CommandName;
 import hosh.spi.LoggerFactory;
 import hosh.spi.State;
+import hosh.spi.Value;
 import hosh.spi.VariableName;
 
 import java.nio.file.Files;
@@ -34,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -166,7 +168,8 @@ public class CommandResolvers {
 
 		@Override
 		public Optional<Command> tryResolve(String commandName) {
-			String[] exts = state.getVariables().getOrDefault(VariableName.constant("PATHEXT"), "").split(";", -1);
+			Value pathextValue = state.getVariables().get(VariableName.constant("PATHEXT"));
+			String[] exts = pathextValue != null ? pathextValue.show(Locale.ROOT).split(";", -1) : new String[]{""};
 			for (String ext : exts) {
 				Optional<Command> resolved = resolver.tryResolve(commandName + ext.strip());
 				if (resolved.isPresent()) {

@@ -23,6 +23,8 @@
  */
 package hosh.runtime;
 
+import hosh.spi.Value;
+import hosh.spi.Values;
 import hosh.spi.VariableName;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +40,7 @@ class BootstrapVariablesTest {
 		Map<String, String> input = Map.of();
 
 		// When
-		Map<VariableName, String> result = new BootstrapVariables().fromEnv(input);
+		Map<VariableName, Value> result = new BootstrapVariables().fromEnv(input);
 
 		// Then
 		assertThat(result)
@@ -52,12 +54,12 @@ class BootstrapVariablesTest {
 		Map<String, String> input = Map.of("FOO", "value");
 
 		// When
-		Map<VariableName, String> result = new BootstrapVariables().fromEnv(input);
+		Map<VariableName, Value> result = new BootstrapVariables().fromEnv(input);
 
 		// Then
 		assertThat(result)
 				.hasSize(1)
-				.containsEntry(VariableName.constant("FOO"), "value")
+				.containsEntry(VariableName.constant("FOO"), Values.ofText("value"))
 		;
 	}
 
@@ -67,7 +69,7 @@ class BootstrapVariablesTest {
 		Map<String, String> input = Map.of("123", "value");
 
 		// When
-		Map<VariableName, String> result = new BootstrapVariables().fromEnv(input);
+		Map<VariableName, Value> result = new BootstrapVariables().fromEnv(input);
 
 		// Then
 		assertThat(result)
@@ -81,7 +83,7 @@ class BootstrapVariablesTest {
 		Map<String, String> input = System.getenv();
 
 		// When
-		Map<VariableName, String> result = new BootstrapVariables().fromEnv(input);
+		Map<VariableName, Value> result = new BootstrapVariables().fromEnv(input);
 
 		// Then
 		assertThat(result)

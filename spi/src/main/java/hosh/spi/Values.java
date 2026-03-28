@@ -23,6 +23,8 @@
  */
 package hosh.spi;
 
+import hosh.doc.Todo;
+
 import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
@@ -48,6 +50,7 @@ import java.util.regex.Pattern;
  * <p>
  * NB: concrete types are not exposed by design.
  */
+@Todo(description = "add Secret, a value that cannot be printed")
 public class Values {
 
 	private Values() {
