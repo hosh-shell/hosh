@@ -54,28 +54,50 @@ class SimpleCommandRegistryTest {
 
 	@Test
 	void oneCommand() {
+		// Given
 		sut.registerCommand(CommandName.constant("foo"), () -> command);
-		assertThat(sut.getCommands()).containsKey(CommandName.constant("foo"));
+
+		// When
+		var commands = sut.getCommands();
+
+		// Then
+		assertThat(commands).containsKey(CommandName.constant("foo"));
 	}
 
 	@Test
 	void oneCommandWithAlias() {
+		// Given
 		sut.registerCommand(CommandName.constant("foo"), () -> command);
 		sut.registerCommand(CommandName.constant("bar"), () -> command);
-		assertThat(sut.getCommands()).containsKeys(CommandName.constant("foo"), CommandName.constant("bar"));
+
+		// When
+		var commands = sut.getCommands();
+
+		// Then
+		assertThat(commands).containsKeys(CommandName.constant("foo"), CommandName.constant("bar"));
 	}
 
 	@Test
 	void twoDifferentCommands() {
+		// Given
 		sut.registerCommand(CommandName.constant("foo"), () -> command);
 		sut.registerCommand(CommandName.constant("bar"), () -> anotherCommand);
-		assertThat(sut.getCommands()).containsKeys(CommandName.constant("foo"), CommandName.constant("bar"));
+
+		// When
+		var commands = sut.getCommands();
+
+		// Then
+		assertThat(commands).containsKeys(CommandName.constant("foo"), CommandName.constant("bar"));
 	}
 
 	@Test
 	void twoTimesSameCommand() {
+		// Given
 		Supplier<Command> commandSupplier = () -> command;
 		sut.registerCommand(CommandName.constant("foo"), commandSupplier);
+
+		// When
+		// Then
 		assertThatThrownBy(() -> sut.registerCommand(CommandName.constant("foo"), () -> anotherCommand))
 				.hasMessage("command with same name already registered: CommandName[foo]")
 				.isInstanceOf(IllegalArgumentException.class);

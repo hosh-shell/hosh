@@ -132,7 +132,12 @@ class SystemModuleTest {
 
 		@Test
 		void noSubCommand() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -143,7 +148,12 @@ class SystemModuleTest {
 
 		@Test
 		void unknownSubCommand() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -154,10 +164,15 @@ class SystemModuleTest {
 
 		@Test
 		void showZeroArg() {
+			// Given
 			Path sbin = Paths.get("/sbin");
 			Path bin = Paths.get("/bin");
 			given(state.getPath()).willReturn(List.of(sbin, bin));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("show"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			InOrder inOrder = Mockito.inOrder(out); // order of paths is important!
@@ -170,7 +185,12 @@ class SystemModuleTest {
 
 		@Test
 		void showOneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("show", "anotherArg"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -181,7 +201,12 @@ class SystemModuleTest {
 
 		@Test
 		void clearZeroArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("clear"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -191,7 +216,12 @@ class SystemModuleTest {
 
 		@Test
 		void clearOneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("clear", "anotherArg"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -202,9 +232,14 @@ class SystemModuleTest {
 
 		@Test
 		void appendOneArg() {
+			// Given
 			Path bin = Paths.get("/bin");
 			willReturn(List.of(bin)).given(state).getPath();
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("append", "/usr/local/bin"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -214,7 +249,12 @@ class SystemModuleTest {
 
 		@Test
 		void appendZeroArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("append"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -225,9 +265,14 @@ class SystemModuleTest {
 
 		@Test
 		void prependOneArg() {
+			// Given
 			Path bin = Paths.get("/bin");
 			willReturn(List.of(bin)).given(state).getPath();
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("prepend", "/usr/local/bin"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -237,7 +282,12 @@ class SystemModuleTest {
 
 		@Test
 		void prependZeroArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("prepend"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -273,7 +323,12 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).hasExitCode(0);
 			then(stateMutator).should().mutateExit(true);
 			then(in).shouldHaveNoInteractions();
@@ -283,7 +338,12 @@ class SystemModuleTest {
 
 		@Test
 		void oneValidArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("21"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).hasExitCode(21);
 			then(stateMutator).should().mutateExit(true);
 			then(in).shouldHaveNoInteractions();
@@ -293,7 +353,12 @@ class SystemModuleTest {
 
 		@Test
 		void oneInvalidArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).hasExitCode(1);
 			then(stateMutator).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
@@ -303,7 +368,12 @@ class SystemModuleTest {
 
 		@Test
 		void twoArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd", "fgh"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).hasExitCode(1);
 			then(stateMutator).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
@@ -341,8 +411,13 @@ class SystemModuleTest {
 
 		@Test
 		void noArgsWithNoEnvVariables() {
+			// Given
 			given(state.getVariables()).willReturn(Collections.emptyMap());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -351,8 +426,17 @@ class SystemModuleTest {
 
 		@Test
 		void noArgsWithSomeEnvVariables() {
+<<<<<<< HEAD
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("HOSH_VERSION"), Values.ofText("1.0")));
+=======
+			// Given
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("HOSH_VERSION"), "1.0"));
+
+			// When
+>>>>>>> e981a540 (switching to //Given//When//Test tests, part 1)
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
@@ -363,7 +447,12 @@ class SystemModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -400,8 +489,13 @@ class SystemModuleTest {
 
 		@Test
 		void specificCommandWithExamples() {
+			// Given
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("true"), True::new));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("true"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
@@ -415,8 +509,13 @@ class SystemModuleTest {
 
 		@Test
 		void specificCommandWithoutExamples() {
+			// Given
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("false"), False::new));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("false"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(records.capture());
@@ -430,7 +529,12 @@ class SystemModuleTest {
 
 		@Test
 		void commandNotFound() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("test"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -439,8 +543,13 @@ class SystemModuleTest {
 
 		@Test
 		void commandWithoutHelpAnnotation() {
+			// Given
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("*"), Star::new));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("*"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -449,8 +558,13 @@ class SystemModuleTest {
 
 		@Test
 		void listAllCommands() {
+			// Given
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("true"), True::new));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(
@@ -460,8 +574,13 @@ class SystemModuleTest {
 
 		@Test
 		void listNoCommands() {
+			// Given
 			given(state.getCommands()).willReturn(Collections.emptyMap());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -470,7 +589,12 @@ class SystemModuleTest {
 
 		@Test
 		void twoArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("test", "aaa"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -530,7 +654,12 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("")));
@@ -539,7 +668,12 @@ class SystemModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("a"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("a")));
@@ -548,7 +682,12 @@ class SystemModuleTest {
 
 		@Test
 		void twoArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("a", "b"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.VALUE, Values.ofText("a b")));

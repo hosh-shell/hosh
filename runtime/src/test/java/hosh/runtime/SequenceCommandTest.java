@@ -71,16 +71,26 @@ class SequenceCommandTest {
 
 	@Test
 	void happyPath() {
+		// Given
 		doReturn(ExitStatus.success()).when(interpreter).eval(first, in, out, err);
 		doReturn(ExitStatus.success()).when(interpreter).eval(second, in, out, err);
+
+		// When
 		ExitStatus result = sut.run(List.of(), in, out, err);
+
+		// Then
 		assertThat(result).isSuccess();
 	}
 
 	@Test
 	void haltOnFirstError() {
+		// Given
 		doReturn(ExitStatus.of(42)).when(interpreter).eval(first, in, out, err);
+
+		// When
 		ExitStatus result = sut.run(List.of(), in, out, err);
+
+		// Then
 		then(interpreter).should(Mockito.never()).eval(second, in, out, err);
 		assertThat(result).hasExitCode(42);
 	}

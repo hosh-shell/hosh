@@ -31,27 +31,43 @@ class ErrorsTest {
 
 	@Test
 	void exceptionWithoutMessage() {
+		// Given
 		Exception npe = new NullPointerException();
+
+		// When
 		Record result = Errors.message(npe);
+
+		// Then
 		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("(no message)")));
 	}
 
 	@Test
 	void exceptionWithMessage() {
+		// Given
 		Exception npe = new IllegalArgumentException("whatever");
+
+		// When
 		Record result = Errors.message(npe);
+
+		// Then
 		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("whatever")));
 	}
 
 	@Test
 	void messageFormat() {
+		// When
 		Record result = Errors.message("value is %d", 1);
+
+		// Then
 		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("value is 1")));
 	}
 
 	@Test
 	void usage() {
+		// When
 		Record result = Errors.usage("cmd [option]");
+
+		// Then
 		assertThat(result).isEqualTo(Records.singleton(Keys.ERROR, Values.ofText("usage: cmd [option]")));
 	}
 }

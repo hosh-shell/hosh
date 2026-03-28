@@ -48,12 +48,18 @@ class ParserTest {
 
 	@Test
 	void lexerError() {
+		// Given - sut is a Parser
+
+		// When / Then
 		assertThatThrownBy(() -> sut.parse("!")).isInstanceOf(ParseError.class)
 				.hasMessage("line 1:0: token recognition error at: '!'");
 	}
 
 	@Test
 	void refuseSpaceInsideVariableExpansion() {
+		// Given - sut is a Parser
+
+		// When / Then
 		assertThatThrownBy(() -> sut.parse("${ EXECUTABLE }")).isInstanceOf(ParseError.class)
 				.hasMessage("line 1:0: token recognition error at: '${ '");
 	}
@@ -61,7 +67,12 @@ class ParserTest {
 	@ParameterizedTest
 	@MethodSource("all")
 	void valid(String line) {
+		// Given - sut is a Parser
+
+		// When
 		ProgramContext parse = sut.parse(line);
+
+		// Then
 		Assertions.assertThat(parse)
 				.as("valid")
 				.isNotNull();

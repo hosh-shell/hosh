@@ -97,7 +97,12 @@ class FileSystemModuleTest {
 
 		@Test
 		void errorTwoOrMoreArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("dir1", "dir2"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -106,8 +111,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void zeroArgsWithEmptyDirectory() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -116,9 +126,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void zeroArgsWithOneDirectory() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			temporaryFolder.newFolder("dir");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
@@ -130,9 +145,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void zeroArgsWithOneFile() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			temporaryFolder.newFile("file");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
@@ -143,10 +163,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void zeroArgsWithOneSymlink() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path file = temporaryFolder.newFile("file");
 			Files.createSymbolicLink(Paths.get(state.getCwd().toString(), "link"), file);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
@@ -161,9 +186,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArgWithRelativeFile() throws IOException {
+			// Given
 			Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "aaa");
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(file.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();

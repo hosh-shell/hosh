@@ -34,6 +34,7 @@ class KeysTest {
 
 	@Test
 	void nullKey() {
+		// When / Then
 		assertThatThrownBy(() -> Keys.of(null))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("name must be not null");
@@ -41,6 +42,7 @@ class KeysTest {
 
 	@Test
 	void emptyKey() {
+		// When / Then
 		assertThatThrownBy(() -> Keys.of(""))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("name must be not blank");
@@ -48,12 +50,14 @@ class KeysTest {
 
 	@Test
 	void asString() {
+		// When / Then
 		assertThat(Keys.of("name"))
 				.hasToString("Key['name']");
 	}
 
 	@Test
 	void equalContract() {
+		// When / Then
 		EqualsVerifier.configure()
 				.forClass(StringKey.class)
 				.verify();
@@ -61,8 +65,11 @@ class KeysTest {
 
 	@Test
 	void compareTo() {
+		// Given
 		Key a = Keys.of("name");
 		Key b = Keys.of("b");
+
+		// Then
 		assertThat(a).isEqualByComparingTo(a);
 		assertThat(a).isNotEqualByComparingTo(b);
 	}

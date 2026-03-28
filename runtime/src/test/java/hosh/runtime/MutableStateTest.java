@@ -34,16 +34,24 @@ class MutableStateTest {
 
 	@Test
 	void asString() {
-		assertThat(new MutableState()).hasToString("MutableState[cwd='',path=[],variables={},commands={}]");
+		// Given
+		MutableState sut = new MutableState();
+
+		// When / Then
+		assertThat(sut).hasToString("MutableState[cwd='',path=[],variables={},commands={}]");
 	}
 
 	@Test
 	void cwdIsAlwaysAbsolute() {
+		// Given
 		MutableState sut = new MutableState();
 		Path path = Paths.get(".");
 		assertThat(path).isRelative();
+
+		// When
 		sut.mutateCwd(path);
-		// transform path to a cwd
+
+		// Then - transform path to a cwd
 		Path cwd = sut.getCwd();
 		assertThat(cwd)
 				.isAbsolute()

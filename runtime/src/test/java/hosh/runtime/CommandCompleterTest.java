@@ -76,19 +76,29 @@ class CommandCompleterTest {
 
 	@Test
 	void emptyPathAndNoBuiltins() {
+		// Given
 		given(state.getPath()).willReturn(List.of());
 		given(parsedLine.wordIndex()).willReturn(0);
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	void builtin() {
+		// Given
 		given(state.getCommands()).willReturn(Map.of(CommandName.constant("cmd"), () -> command));
 		given(parsedLine.wordIndex()).willReturn(0);
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {
@@ -99,13 +109,18 @@ class CommandCompleterTest {
 
 	@Test
 	void builtinOverridesExternal() throws IOException {
+		// Given
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		given(parsedLine.wordIndex()).willReturn(0);
 		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "cmd");
 		assertThat(file.toFile().setExecutable(true, true)).isTrue();
 		given(state.getCommands()).willReturn(Map.of(CommandName.constant("cmd"), () -> command));
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {
@@ -116,21 +131,31 @@ class CommandCompleterTest {
 
 	@Test
 	void pathWithEmptyDir() {
+		// Given
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		given(parsedLine.wordIndex()).willReturn(0);
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	void pathWithExecutable() throws IOException {
+		// Given
 		given(state.getPath()).willReturn(List.of(temporaryFolder.toPath()));
 		given(parsedLine.wordIndex()).willReturn(0);
 		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "cmd");
 		assertThat(file.toFile().setExecutable(true, true)).isTrue();
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {
@@ -141,21 +166,31 @@ class CommandCompleterTest {
 
 	@Test
 	void pathWithExecutableAndNonEmptyLine() throws IOException {
+		// Given
 		given(parsedLine.wordIndex()).willReturn(1);  // skipping autocomplete
 		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "cmd");
 		assertThat(file.toFile().setExecutable(true, true)).isTrue();
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	void skipNonInPathDirectory() throws IOException {
+		// Given
 		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "aaa");
 		given(state.getPath()).willReturn(List.of(file));
 		given(parsedLine.wordIndex()).willReturn(0);
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates).isEmpty();
 	}
 

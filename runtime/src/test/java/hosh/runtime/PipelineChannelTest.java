@@ -54,7 +54,10 @@ class PipelineChannelTest {
 
 	@Test
 	void stopConsumer() throws ExecutionException, InterruptedException {
+		// Given
 		PipelineChannel sut = new PipelineChannel();
+
+		// When
 		Future<?> recv = withExecutor.submit(() -> {
 			Optional<Record> recv1 = sut.recv();
 			assertThat(recv1).contains(record);
@@ -65,18 +68,25 @@ class PipelineChannelTest {
 			sut.send(record);
 			sut.stopConsumer();
 		});
+
+		// Then
 		send.get();
 		recv.get();
 	}
 
 	@Test
 	void sendRecv() throws ExecutionException, InterruptedException {
+		// Given
 		PipelineChannel sut = new PipelineChannel();
+
+		// When
 		Future<?> recv = withExecutor.submit(() -> {
 			Optional<Record> recv1 = sut.recv();
 			assertThat(recv1).contains(record);
 		});
 		Future<?> send = withExecutor.submit(() -> sut.send(record));
+
+		// Then
 		recv.get();
 		send.get();
 	}
@@ -104,9 +114,14 @@ class PipelineChannelTest {
 
 	@Test
 	void recvInterrupted() {
+		// Given
 		PipelineChannel sut = new PipelineChannel();
 		withThread.interrupt();
+
+		// When
 		Optional<Record> recv = sut.recv();
+
+		// Then
 		assertThat(recv).isEmpty();
 	}
 

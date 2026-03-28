@@ -45,38 +45,68 @@ class PathInitializerTest {
 
 	@Test
 	void nullPathVariable() {
+		// Given - sut is a PathInitializer
+
+		// When
 		List<Path> path = sut.initializePath(null);
+
+		// Then
 		assertThat(path).isEmpty();
 	}
 
 	@Test
 	void emptyVariable() {
+		// Given - sut is a PathInitializer
+
+		// When
 		List<Path> path = sut.initializePath("");
+
+		// Then
 		assertThat(path).isEmpty();
 	}
 
 	@Test
 	void pathVariableWithOneElement() {
+		// Given - sut is a PathInitializer
+
+		// When
 		List<Path> path = sut.initializePath("/bin");
+
+		// Then
 		assertThat(path).containsExactly(Path.of("/bin"));
 	}
 
 	@Test
 	void pathVariableWithTwoElements() {
+		// Given - sut is a PathInitializer
+
+		// When
 		List<Path> path = sut.initializePath("/bin" + File.pathSeparator + "/sbin");
+
+		// Then
 		assertThat(path).containsExactly(Path.of("/bin"), Path.of("/sbin"));
 	}
 
 	@Test
 	void pathVariableWithEmptyElement() {
+		// Given - sut is a PathInitializer
+
+		// When
 		List<Path> path = sut.initializePath("/bin" + File.pathSeparator + "   " + File.pathSeparator + "/sbin");
+
+		// Then
 		assertThat(path).containsExactly(Path.of("/bin"), Path.of("/sbin"));
 	}
 
 	@EnabledOnOs(OS.WINDOWS)
 	@Test
 	void pathVariableWithTrailingSpace() {
+		// Given - sut is a PathInitializer
+
+		// When
 		List<Path> path = sut.initializePath("c:/Program Files "); // trailing space
+
+		// Then
 		assertThat(path).containsExactly(Path.of("c:/Program Files"));
 	}
 }

@@ -31,6 +31,7 @@ class AnsiTest {
 
 	@Test
 	void none() {
+		// When / Then
 		assertThat(Ansi.Style.NONE.enable()).isEmpty();
 		assertThat(Ansi.Style.NONE.disable()).isEmpty();
 	}
@@ -38,6 +39,8 @@ class AnsiTest {
 	@Test
 	void redForeground() {
 		// this test sucks...
+
+		// When / Then
 		assertThat(Ansi.Style.FG_RED.enable() +
 				Ansi.Style.FG_RED.disable()).isEqualTo("\u001b[31m\u001b[39m");
 	}

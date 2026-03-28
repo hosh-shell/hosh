@@ -62,36 +62,51 @@ class HoshFormatterTest {
 
 	@Test
 	void severeWithStacktrace() {
+		// Given
 		withTimeZone.changeTo(TimeZone.getTimeZone("Etc/GMT+8"));
 		withThread.renameTo("main");
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
 		given(logRecord.getLevel()).willReturn(Level.SEVERE);
 		given(logRecord.getMessage()).willReturn("message");
 		given(logRecord.getThrown()).willReturn(new StackTraceLess());
+
+		// When
 		String result = sut.format(logRecord);
+
+		// Then
 		String expected = "1969-12-31T16:00:00.000 [SEVERE] [main] - message\nhosh.runtime.HoshFormatterTest$StackTraceLess\n";
 		assertThat(result).isEqualToNormalizingNewlines(expected);
 	}
 
 	@Test
 	void info() {
+		// Given
 		withTimeZone.changeTo(TimeZone.getTimeZone("Etc/GMT+8"));
 		withThread.renameTo("main");
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
 		given(logRecord.getLevel()).willReturn(Level.INFO);
 		given(logRecord.getMessage()).willReturn("message");
+
+		// When
 		String result = sut.format(logRecord);
+
+		// Then
 		assertThat(result).isEqualToNormalizingNewlines("1969-12-31T16:00:00.000 [INFO] [main] - message\n");
 	}
 
 	@Test
 	void skipThreadNameForHttpClient() {
+		// Given
 		withTimeZone.changeTo(TimeZone.getTimeZone("Etc/GMT+8"));
 		given(logRecord.getInstant()).willReturn(Instant.EPOCH);
 		given(logRecord.getLevel()).willReturn(Level.INFO);
 		given(logRecord.getMessage()).willReturn("message");
 		given(logRecord.getLoggerName()).willReturn("jdk.internal.httpclient");
+
+		// When
 		String result = sut.format(logRecord);
+
+		// Then
 		assertThat(result).isEqualToNormalizingNewlines("1969-12-31T16:00:00.000 [INFO] - message\n");
 	}
 

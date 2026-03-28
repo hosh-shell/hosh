@@ -57,15 +57,25 @@ class HoshHighlighterTest {
 
 	@Test
 	void noError() {
+		// Given
 		given(compiler.compile(any())).willReturn(program);
+
+		// When
 		AttributedString attributedString = sut.highlight(lineReader, "current line");
+
+		// Then
 		assertThat(attributedString.styleAt(0)).isEqualTo(AttributedStyle.DEFAULT);
 	}
 
 	@Test
 	void error() {
+		// Given
 		given(compiler.compile(any())).willThrow(new RuntimeException("simulated error"));
+
+		// When
 		AttributedString attributedString = sut.highlight(lineReader, "current line");
+
+		// Then
 		assertThat(attributedString.styleAt(0)).isNotEqualTo(AttributedStyle.DEFAULT); // it is ok to assert that is not default style
 	}
 

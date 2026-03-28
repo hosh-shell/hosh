@@ -59,30 +59,55 @@ class ReplReaderTest {
 
 	@Test
 	void oneLine() {
+		// Given
 		given(promptProvider.provide(state)).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willReturn("1");
-		assertThat(sut.read(state)).hasValue("1");
+
+		// When
+		var result = sut.read(state);
+
+		// Then
+		assertThat(result).hasValue("1");
 	}
 
 	@Test
 	void twoLines() {
+		// Given
 		given(promptProvider.provide(state)).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willReturn("1", "2");
-		assertThat(sut.read(state)).hasValue("1");
-		assertThat(sut.read(state)).hasValue("2");
+
+		// When
+		var first = sut.read(state);
+		var second = sut.read(state);
+
+		// Then
+		assertThat(first).hasValue("1");
+		assertThat(second).hasValue("2");
 	}
 
 	@Test
 	void killsCurrentLineAtINT() {
+		// Given
 		given(promptProvider.provide(state)).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willThrow(new UserInterruptException("simulated INT"));
-		assertThat(sut.read(state)).hasValue("");
+
+		// When
+		var result = sut.read(state);
+
+		// Then
+		assertThat(result).hasValue("");
 	}
 
 	@Test
 	void stopsAtEOF() {
+		// Given
 		given(promptProvider.provide(state)).willReturn("hosh>");
 		given(lineReader.readLine(anyString())).willThrow(new EndOfFileException("simulated EOF"));
-		assertThat(sut.read(state)).isEmpty();
+
+		// When
+		var result = sut.read(state);
+
+		// Then
+		assertThat(result).isEmpty();
 	}
 }
