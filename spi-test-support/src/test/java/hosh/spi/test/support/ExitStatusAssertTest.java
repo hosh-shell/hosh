@@ -34,13 +34,13 @@ class ExitStatusAssertTest {
 	@Test
 	void error() {
 		// Given
-		ExitStatus exitStatus = ExitStatus.of(1);
+		ExitStatus sut = ExitStatus.of(1);
 
 		// When / Then
-		assertThat(exitStatus).isError();
-		assertThat(exitStatus).hasExitCode(1);
+		assertThat(sut).isError();
+		assertThat(sut).hasExitCode(1);
 		try {
-			assertThat(exitStatus).isSuccess();
+			assertThat(sut).isSuccess();
 		} catch (AssertionError e) {
 			// all good
 		}
@@ -49,13 +49,13 @@ class ExitStatusAssertTest {
 	@Test
 	void success() {
 		// Given
-		ExitStatus exitStatus = ExitStatus.of(0);
+		ExitStatus sut = ExitStatus.of(0);
 
 		// When / Then
-		assertThat(exitStatus).isSuccess();
-		assertThat(exitStatus).hasExitCode(0);
+		assertThat(sut).isSuccess();
+		assertThat(sut).hasExitCode(0);
 		try {
-			assertThat(exitStatus).isError();
+			assertThat(sut).isError();
 		} catch (AssertionError e) {
 			// all good
 		}

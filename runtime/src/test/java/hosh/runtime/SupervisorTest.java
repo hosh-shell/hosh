@@ -73,10 +73,10 @@ class SupervisorTest {
 		// Given
 
 		// When
-		ExitStatus exitStatus = sut.waitForAll();
+		ExitStatus result = sut.waitForAll();
 
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 	}
 
 	@Test
@@ -102,10 +102,10 @@ class SupervisorTest {
 		sut.submit(ExitStatus::success);
 
 		// When
-		ExitStatus exitStatus = sut.waitForAll();
+		ExitStatus result = sut.waitForAll();
 
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 	}
 
 	@Test
@@ -115,10 +115,10 @@ class SupervisorTest {
 		sut.submit(ExitStatus::error);
 
 		// When
-		ExitStatus exitStatus = sut.waitForAll();
+		ExitStatus result = sut.waitForAll();
 
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 	}
 
 	@Test
@@ -182,9 +182,9 @@ class SupervisorTest {
 		for (Thread t : threads) {
 			t.join();
 		}
-		ExitStatus exitStatus = sut.waitForAll();
+		ExitStatus result = sut.waitForAll();
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 	}
 
 }

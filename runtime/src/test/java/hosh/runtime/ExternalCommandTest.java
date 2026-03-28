@@ -107,9 +107,9 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus exitStatus = sut.run(Collections.emptyList(), in, out, err);
+		ExitStatus result = sut.run(Collections.emptyList(), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(processFactory).should().create(
 				List.of(executable.toString()),
 				cwd,
@@ -132,9 +132,9 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(processFactory).should().create(
 				List.of(executable.toString(), "file.hosh"),
 				cwd,
@@ -157,9 +157,9 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(processFactory).should().create(
 				List.of(executable.toString(), "file.hosh"),
 				cwd,
@@ -182,9 +182,9 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(processFactory).should().create(
 				List.of(executable.toString(), "file.hosh"),
 				cwd,
@@ -206,9 +206,9 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(in).should(times(1)).recv();
 		then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("test")));
 		then(err).shouldHaveNoInteractions();
@@ -226,9 +226,9 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(in).should(times(1)).recv();
 		then(out).shouldHaveNoInteractions();
 		then(err).should().send(Records.singleton(Keys.TEXT, Values.ofText("test")));
@@ -250,9 +250,9 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualToNormalizingNewlines("aaa 10\n");
 		then(in).should(times(2)).recv();
 		then(out).shouldHaveNoInteractions();
@@ -267,9 +267,9 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated error")));

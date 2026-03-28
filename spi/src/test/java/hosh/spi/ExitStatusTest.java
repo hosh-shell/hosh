@@ -58,12 +58,12 @@ class ExitStatusTest {
 		// (no setup)
 
 		// When
-		ExitStatus exitStatus = ExitStatus.success();
+		ExitStatus result = ExitStatus.success();
 
 		// Then
-		assertThat(exitStatus.value()).isEqualTo(0);
-		assertThat(exitStatus.isSuccess()).isTrue();
-		assertThat(exitStatus.isError()).isFalse();
+		assertThat(result.value()).isEqualTo(0);
+		assertThat(result.isSuccess()).isTrue();
+		assertThat(result.isError()).isFalse();
 	}
 
 	@Test
@@ -72,12 +72,12 @@ class ExitStatusTest {
 		// (no setup)
 
 		// When
-		ExitStatus exitStatus = ExitStatus.error();
+		ExitStatus result = ExitStatus.error();
 
 		// Then
-		assertThat(exitStatus.value()).isEqualTo(1);
-		assertThat(exitStatus.isSuccess()).isFalse();
-		assertThat(exitStatus.isError()).isTrue();
+		assertThat(result.value()).isEqualTo(1);
+		assertThat(result.isSuccess()).isFalse();
+		assertThat(result.isError()).isTrue();
 	}
 
 	@Test

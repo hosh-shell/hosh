@@ -80,10 +80,10 @@ class HistoryModuleTest {
 			given(history.iterator()).willReturn(Collections.emptyListIterator());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -97,10 +97,10 @@ class HistoryModuleTest {
 			given(entry.line()).willReturn("cmd");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.builder()
 					.entry(Keys.TIMESTAMP, Values.ofInstant(Instant.EPOCH))
@@ -114,10 +114,10 @@ class HistoryModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
+			ExitStatus result = sut.run(List.of("whatever"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: history")));

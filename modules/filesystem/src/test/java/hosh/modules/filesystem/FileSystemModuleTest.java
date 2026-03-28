@@ -100,10 +100,10 @@ class FileSystemModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("dir1", "dir2"), in, out, err);
+			ExitStatus result = sut.run(List.of("dir1", "dir2"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: ls [directory]")));
@@ -115,10 +115,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -131,10 +131,10 @@ class FileSystemModuleTest {
 			temporaryFolder.newFolder("dir");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
 					RecordMatcher.of(
@@ -150,10 +150,10 @@ class FileSystemModuleTest {
 			temporaryFolder.newFile("file");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("file")),
@@ -169,10 +169,10 @@ class FileSystemModuleTest {
 			Files.createSymbolicLink(Paths.get(state.getCwd().toString(), "link"), file);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("file")),
@@ -191,10 +191,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(file.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(file.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory: " + file.toAbsolutePath())));
@@ -207,10 +207,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(cwd);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(List.of("."), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -224,10 +224,10 @@ class FileSystemModuleTest {
 			Files.createFile(cwd.resolve("aaa"));
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(cwd.toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(cwd.toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(any());
 			then(err).shouldHaveNoMoreInteractions();
@@ -241,10 +241,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(cwd);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(List.of("."), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
@@ -260,10 +260,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory: " + file)));
@@ -277,10 +277,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(cwd.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(cwd.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
@@ -295,10 +295,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(List.of("."), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
 					Keys.PATH, Values.ofPath(Paths.get("aaa")),
@@ -314,10 +314,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(cwd.toAbsolutePath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(".."), in, out, err);
+			ExitStatus result = sut.run(List.of(".."), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
 					RecordMatcher.of(
@@ -341,10 +341,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("access denied: " + cwd)));
@@ -388,10 +388,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cd directory")));
@@ -403,10 +403,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("asd", "asd"), in, out, err);
+			ExitStatus result = sut.run(List.of("asd", "asd"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cd directory")));
@@ -419,10 +419,10 @@ class FileSystemModuleTest {
 			Path newFolder = temporaryFolder.newFolder("dir");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("dir"), in, out, err);
+			ExitStatus result = sut.run(List.of("dir"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(stateMutator).should().mutateCwd(newFolder.toAbsolutePath());
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -435,10 +435,10 @@ class FileSystemModuleTest {
 			Path newFolder = temporaryFolder.newFolder("dir");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFolder.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFolder.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(stateMutator).should().mutateCwd(newFolder);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -452,10 +452,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(stateMutator).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -496,10 +496,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(temporaryFolder.toPath())));
 			then(err).shouldHaveNoInteractions();
@@ -511,10 +511,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(List.of("asd"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cwd")));
 			then(out).shouldHaveNoInteractions();
@@ -554,10 +554,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("data.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -570,10 +570,10 @@ class FileSystemModuleTest {
 			Files.writeString(newFile, "a 1\nb 2\n", StandardCharsets.UTF_8);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("a 1")));
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("b 2")));
@@ -589,10 +589,10 @@ class FileSystemModuleTest {
 			Files.writeString(newFile, "a 1\n");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("a 1")));
 			then(err).shouldHaveNoMoreInteractions();
@@ -605,10 +605,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not readable file")));
@@ -620,10 +620,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: lines file")));
 			then(out).shouldHaveNoInteractions();
@@ -663,10 +663,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cp file file")));
@@ -678,10 +678,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
+			ExitStatus result = sut.run(List.of("source.txt"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cp file file")));
@@ -696,10 +696,10 @@ class FileSystemModuleTest {
 			Files.delete(target);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			assertThat(source).exists();
 			assertThat(target).exists();
 			then(in).shouldHaveNoInteractions();
@@ -715,10 +715,10 @@ class FileSystemModuleTest {
 			Files.delete(target);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(source.toString(), target.toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(source.toString(), target.toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			assertThat(source).exists();
 			assertThat(target).exists();
 			then(in).shouldHaveNoInteractions();
@@ -760,10 +760,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: mv file file")));
@@ -775,10 +775,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
+			ExitStatus result = sut.run(List.of("source.txt"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: mv file file")));
@@ -793,10 +793,10 @@ class FileSystemModuleTest {
 			Files.delete(target);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			assertThat(source).doesNotExist();
 			assertThat(target).exists();
 			then(in).shouldHaveNoInteractions();
@@ -812,10 +812,10 @@ class FileSystemModuleTest {
 			Files.delete(target);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(source.toAbsolutePath().toString(), target.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(source.toAbsolutePath().toString(), target.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			assertThat(source).doesNotExist();
 			assertThat(target).exists();
 			then(in).shouldHaveNoInteractions();
@@ -857,10 +857,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: rm file")));
@@ -873,10 +873,10 @@ class FileSystemModuleTest {
 			Path target = temporaryFolder.newFile("target.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(target.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(target.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			assertThat(target).doesNotExist();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -889,10 +889,10 @@ class FileSystemModuleTest {
 			Path target = temporaryFolder.newFile("target.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(target.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(target.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			assertThat(target).doesNotExist();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -926,10 +926,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(any()); // not very precise test... to be improved
 			then(err).shouldHaveNoInteractions();
@@ -941,10 +941,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(List.of("asd"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: partitions")));
@@ -984,10 +984,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: walk directory")));
 			then(out).shouldHaveNoInteractions();
@@ -999,10 +999,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(List.of("."), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -1015,10 +1015,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+			ExitStatus result = sut.run(List.of("."), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
@@ -1030,10 +1030,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("path"), in, out, err);
+			ExitStatus result = sut.run(List.of("path"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not found")));
@@ -1045,10 +1045,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
@@ -1060,10 +1060,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("not a directory")));
@@ -1079,10 +1079,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath()); // previous method could fail by UAC and Mockito will throw UnnecessaryStubbingException
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(symlink.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(symlink.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile), Keys.SIZE, Values.ofSize(0)));
 			then(err).shouldHaveNoInteractions();
@@ -1122,10 +1122,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: probe file")));
@@ -1138,10 +1138,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.of("contenttype"), Values.ofText("text/plain")));
 			then(err).shouldHaveNoInteractions();
@@ -1154,10 +1154,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.ppp");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("content type cannot be determined")));
@@ -1197,10 +1197,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: glob pattern")));
@@ -1215,10 +1215,10 @@ class FileSystemModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
+			ExitStatus result = sut.run(List.of("*.java"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(record);
 			then(err).shouldHaveNoInteractions();
@@ -1233,10 +1233,10 @@ class FileSystemModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
+			ExitStatus result = sut.run(List.of("*.java"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(record);
 			then(err).shouldHaveNoInteractions();
@@ -1251,10 +1251,10 @@ class FileSystemModuleTest {
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("*.c"), in, out, err);
+			ExitStatus result = sut.run(List.of("*.c"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -1295,10 +1295,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: symlink source target")));
@@ -1311,12 +1311,12 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString(), "link"), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.getFileName().toString(), "link"), in, out, err);
 
 			// Then
 			Path link = temporaryFolder.toPath().resolve("link");
 			assertThat(link).isSymbolicLink();
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
@@ -1356,10 +1356,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: hardlink source target")));
@@ -1372,11 +1372,11 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString(), "link"), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.getFileName().toString(), "link"), in, out, err);
 
 			// Then
 			Path link = temporaryFolder.toPath().resolve("link");
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			assertThat(link).exists();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1417,10 +1417,10 @@ class FileSystemModuleTest {
 			// (no setup)
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: resolve file")));
@@ -1433,10 +1433,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("file.txt"), in, out, err);
+			ExitStatus result = sut.run(List.of("file.txt"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toAbsolutePath().toRealPath())));
 			then(err).shouldHaveNoInteractions();
@@ -1449,10 +1449,10 @@ class FileSystemModuleTest {
 			Path newFile = temporaryFolder.newFile("file.txt");
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+			ExitStatus result = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toAbsolutePath().toRealPath())));
 			then(err).shouldHaveNoInteractions();
@@ -1466,10 +1466,10 @@ class FileSystemModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("link"), in, out, err);
+			ExitStatus result = sut.run(List.of("link"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toAbsolutePath().toRealPath())));
 			then(err).shouldHaveNoInteractions();

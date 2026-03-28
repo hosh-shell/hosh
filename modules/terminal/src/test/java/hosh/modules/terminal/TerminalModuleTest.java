@@ -80,10 +80,10 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
@@ -97,10 +97,10 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(List.of("asd"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(terminal).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -138,10 +138,10 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
 			then(terminal).shouldHaveNoMoreInteractions();
@@ -155,10 +155,10 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(List.of("asd"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(terminal).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -198,10 +198,10 @@ class TerminalModuleTest {
 			given(terminal.getAttributes()).willReturn(new Attributes());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Mockito.any()); // this test is weak
 			then(err).shouldHaveNoMoreInteractions();
@@ -212,10 +212,10 @@ class TerminalModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			ExitStatus result = sut.run(List.of("asd"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(terminal).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();

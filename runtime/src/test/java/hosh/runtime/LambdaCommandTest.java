@@ -91,10 +91,10 @@ class LambdaCommandTest {
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
 
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		assertThat(variables).isEmpty();
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -111,10 +111,10 @@ class LambdaCommandTest {
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
 
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		assertThat(variables).isEmpty();
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -129,10 +129,10 @@ class LambdaCommandTest {
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.TEXT, Values.ofPath(Path.of("file")))), Optional.empty());
 
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		assertThat(variables).isEmpty();
 		then(in).shouldHaveNoMoreInteractions();
 		then(out).shouldHaveNoInteractions();

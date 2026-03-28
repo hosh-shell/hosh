@@ -116,9 +116,9 @@ class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
 		// When
-		ExitStatus exitStatus = sut.eval(program, out, err);
+		ExitStatus result = sut.eval(program, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(stateMutator).should().mutateVariables(Map.of(Interpreter.EXIT_STATUS, Values.ofNumeric(2)));
 	}
 
@@ -132,9 +132,9 @@ class InterpreterTest {
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
 		// When
-		ExitStatus exitStatus = sut.eval(program, out, err);
+		ExitStatus result = sut.eval(program, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 	}
 
 	@Test
@@ -147,9 +147,9 @@ class InterpreterTest {
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
 		// When
-		ExitStatus exitStatus = sut.eval(program, out, err);
+		ExitStatus result = sut.eval(program, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("(no message provided)"), Keys.LOCATION, Values.ofText("cmd")));
 	}
 
@@ -163,9 +163,9 @@ class InterpreterTest {
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
 		// When
-		ExitStatus exitStatus = sut.eval(program, out, err);
+		ExitStatus result = sut.eval(program, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("simulated error"), Keys.LOCATION, Values.ofText("cmd")));
 	}
 
@@ -193,9 +193,9 @@ class InterpreterTest {
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable(variable)));
 		// When
-		ExitStatus exitStatus = sut.eval(program, out, err);
+		ExitStatus result = sut.eval(program, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -212,9 +212,9 @@ class InterpreterTest {
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable(variableName)));
 		given(statement.getLocation()).willReturn("cmd");
 		// When
-		ExitStatus exitStatus = sut.eval(program, out, err);
+		ExitStatus result = sut.eval(program, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("cannot resolve variable: VARIABLE")));

@@ -83,9 +83,9 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -101,9 +101,9 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.error()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -119,9 +119,9 @@ class PipelineCommandTest {
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.error()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -137,9 +137,9 @@ class PipelineCommandTest {
 		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -155,9 +155,9 @@ class PipelineCommandTest {
 		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
@@ -213,9 +213,9 @@ class PipelineCommandTest {
 		willReturn(downStream).given(consumerProducer).getCommand();
 		willReturn(ExitStatus.success()).given(interpreter).eval(any(), any(), any(), any());
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 	}
 
 	@Test
@@ -231,9 +231,9 @@ class PipelineCommandTest {
 		downStream.setInterpreter(interpreter);
 		given(interpreter.eval(any(), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
-		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(List.of(), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(a).should().pipeline(PipelineCommand.Position.FIRST);
 		then(b).should().pipeline(PipelineCommand.Position.MIDDLE);
 		then(c).should().pipeline(PipelineCommand.Position.LAST);

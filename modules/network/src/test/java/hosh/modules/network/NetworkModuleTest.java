@@ -84,10 +84,10 @@ class NetworkModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(Mockito.any(Record.class));
 			then(err).shouldHaveNoInteractions();
@@ -98,10 +98,10 @@ class NetworkModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
+			ExitStatus result = sut.run(List.of("whatever"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: network")));
@@ -147,10 +147,10 @@ class NetworkModuleTest {
 			// Given
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(List.of(), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: http URL")));
@@ -164,10 +164,10 @@ class NetworkModuleTest {
 			given(response.statusCode()).willReturn(200);
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
+			ExitStatus result = sut.run(List.of("https://example.org"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isSuccess();
+			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
 			then(err).shouldHaveNoInteractions();
@@ -184,10 +184,10 @@ class NetworkModuleTest {
 			given(requestor.send(Mockito.any())).willThrow(new InterruptedException());
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
+			ExitStatus result = sut.run(List.of("https://example.org"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("interrupted")));
@@ -200,10 +200,10 @@ class NetworkModuleTest {
 			given(requestor.send(Mockito.any())).willThrow(new ConnectException("simulated"));
 
 			// When
-			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
+			ExitStatus result = sut.run(List.of("https://example.org"), in, out, err);
 
 			// Then
-			assertThat(exitStatus).isError();
+			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("simulated")));

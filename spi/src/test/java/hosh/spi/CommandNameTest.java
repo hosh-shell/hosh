@@ -71,10 +71,10 @@ class CommandNameTest {
 	})
 	void validCommandNames(String userInput) {
 		// When
-		Optional<CommandName> from = CommandName.from(userInput);
+		Optional<CommandName> result = CommandName.from(userInput);
 
 		// Then
-		assertThat(from).map(CommandName::name).hasValue(userInput);
+		assertThat(result).map(CommandName::name).hasValue(userInput);
 	}
 
 	@ParameterizedTest
@@ -87,10 +87,10 @@ class CommandNameTest {
 	})
 	void invalidCommandNames(String userInput) {
 		// When
-		Optional<CommandName> from = CommandName.from(userInput);
+		Optional<CommandName> result = CommandName.from(userInput);
 
 		// Then
-		assertThat(from).isEmpty();
+		assertThat(result).isEmpty();
 		assertThatThrownBy(() -> CommandName.constant(userInput))
 				.isInstanceOf(IllegalArgumentException.class);
 	}

@@ -71,10 +71,10 @@ class VariableNameTest {
 		// (no setup)
 
 		// When
-		Optional<VariableName> from = VariableName.from(userInput);
+		Optional<VariableName> result = VariableName.from(userInput);
 
 		// Then
-		assertThat(from).map(VariableName::name).hasValue(userInput);
+		assertThat(result).map(VariableName::name).hasValue(userInput);
 	}
 
 	@ParameterizedTest
@@ -95,10 +95,10 @@ class VariableNameTest {
 		// (no setup)
 
 		// When
-		Optional<VariableName> from = VariableName.from(userInput);
+		Optional<VariableName> result = VariableName.from(userInput);
 
 		// Then
-		assertThat(from).isEmpty();
+		assertThat(result).isEmpty();
 		assertThatThrownBy(() -> VariableName.constant(userInput))
 				.isInstanceOf(IllegalArgumentException.class);
 	}
@@ -109,10 +109,10 @@ class VariableNameTest {
 		String userInput = "a".repeat(VariableName.MAX_VARIABLE_LENGTH); // still valid as it is exactly the length
 
 		// When
-		Optional<VariableName> from = VariableName.from(userInput);
+		Optional<VariableName> result = VariableName.from(userInput);
 
 		// Then
-		assertThat(from).map(VariableName::name).hasValue(userInput);
+		assertThat(result).map(VariableName::name).hasValue(userInput);
 	}
 
 	@Test

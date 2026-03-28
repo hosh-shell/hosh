@@ -101,10 +101,10 @@ class CompilerTest {
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("count");
 
 		// When
-		Program program = sut.compile("ls | count");
+		Program result = sut.compile("ls | count");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class));
 	}
@@ -116,11 +116,11 @@ class CompilerTest {
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("grep");
 
 		// When
-		Program program = sut.compile("ls /home | grep /regex/");
+		Program result = sut.compile("ls /home | grep /regex/");
 
 		// Then
-		assertThat(program.getStatements()).hasSize(1);
-		List<Statement> statements = program.getStatements();
+		assertThat(result.getStatements()).hasSize(1);
+		List<Statement> statements = result.getStatements();
 		assertThat(statements)
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -135,10 +135,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
 
 		// When
-		Program program = sut.compile("cd /tmp");
+		Program result = sut.compile("cd /tmp");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
@@ -154,10 +154,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
 
 		// When
-		Program program = sut.compile("cd ${DIR}");
+		Program result = sut.compile("cd ${DIR}");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
@@ -173,10 +173,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
 
 		// When
-		Program program = sut.compile("cd ${DIR!/tmp}");
+		Program result = sut.compile("cd ${DIR!/tmp}");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
@@ -193,10 +193,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
 
 		// When
-		Program program = sut.compile("env");
+		Program result = sut.compile("env");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
@@ -210,10 +210,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
 
 		// When
-		Program program = sut.compile("env --system");
+		Program result = sut.compile("env --system");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
@@ -227,10 +227,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 
 		// When
-		Program program = sut.compile("git commit --amend");
+		Program result = sut.compile("git commit --amend");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
@@ -256,10 +256,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 
 		// When
-		Program program = sut.compile("withTime -t -a { git push }");
+		Program result = sut.compile("withTime -t -a { git push }");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getLocation()).isEqualTo("withTime");
@@ -274,10 +274,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 
 		// When
-		Program program = sut.compile("withTime { withTime { git push } }");
+		Program result = sut.compile("withTime { withTime { git push } }");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> assertThat(statement.getCommand()).isInstanceOf(DefaultCommandDecorator.class));
 	}
@@ -335,10 +335,10 @@ class CompilerTest {
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
 
 		// When
-		Program program = sut.compile("benchmark 50 { ls } | schema");
+		Program result = sut.compile("benchmark 50 { ls } | schema");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getLocation()).isEqualTo("");
@@ -358,10 +358,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
 
 		// When
-		Program program = sut.compile("${JAVA_HOME}/bin/java");
+		Program result = sut.compile("${JAVA_HOME}/bin/java");
 
 		// Then
-		assertThat(program.getStatements()).hasSize(1)
+		assertThat(result.getStatements()).hasSize(1)
 				.first().satisfies(statement -> assertThat(statement.getArguments())
 						.hasSize(0));
 	}
@@ -373,10 +373,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cmd");
 
 		// When
-		Program program = sut.compile("cmd # ls /tmp");
+		Program result = sut.compile("cmd # ls /tmp");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getLocation()).isEqualTo("cmd");
@@ -392,10 +392,10 @@ class CompilerTest {
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cmd");
 
 		// When
-		Program program = sut.compile("#\ncmd");
+		Program result = sut.compile("#\ncmd");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getCommand()).isSameAs(command);
@@ -410,10 +410,10 @@ class CompilerTest {
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
 
 		// When
-		Program program = sut.compile("ls /tmp; schema");
+		Program result = sut.compile("ls /tmp; schema");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getLocation()).isEmpty();
@@ -432,10 +432,10 @@ class CompilerTest {
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
 
 		// When
-		Program program = sut.compile("ls /tmp | schema; ls /tmp | schema");
+		Program result = sut.compile("ls /tmp | schema; ls /tmp | schema");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
 					assertThat(statement.getLocation()).isEmpty();
@@ -451,10 +451,10 @@ class CompilerTest {
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("echo");
 
 		// When
-		Program program = sut.compile("ls | { path -> echo ${path} }");
+		Program result = sut.compile("ls | { path -> echo ${path} }");
 
 		// Then
-		assertThat(program.getStatements())
+		assertThat(result.getStatements())
 				.hasSize(1)
 				.first()
 				.satisfies(statement -> {
@@ -480,10 +480,10 @@ class CompilerTest {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
 
 			// When
-			Program program = sut.compile("echo ''");
+			Program result = sut.compile("echo ''");
 
 			// Then
-			assertThat(program.getStatements())
+			assertThat(result.getStatements())
 					.hasSize(1).first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
@@ -499,10 +499,10 @@ class CompilerTest {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 
 			// When
-			Program program = sut.compile("vim 'file with spaces'");
+			Program result = sut.compile("vim 'file with spaces'");
 
 			// Then
-			assertThat(program.getStatements())
+			assertThat(result.getStatements())
 					.hasSize(1).first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
@@ -518,10 +518,10 @@ class CompilerTest {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
 
 			// When
-			Program program = sut.compile("git '${HOME}${BIN}'");
+			Program result = sut.compile("git '${HOME}${BIN}'");
 
 			// Then
-			assertThat(program.getStatements())
+			assertThat(result.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
@@ -538,10 +538,10 @@ class CompilerTest {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 
 			// When
-			Program program = sut.compile("vim \"\"");
+			Program result = sut.compile("vim \"\"");
 
 			// Then
-			assertThat(program.getStatements())
+			assertThat(result.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
@@ -558,10 +558,10 @@ class CompilerTest {
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
 
 			// When
-			Program program = sut.compile("vim \"file with spaces\"");
+			Program result = sut.compile("vim \"file with spaces\"");
 
 			// Then
-			assertThat(program.getStatements())
+			assertThat(result.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
@@ -579,10 +579,10 @@ class CompilerTest {
 			doReturn(Map.of(VariableName.constant("HOME"), Values.ofText("/home/dfa"))).when(state).getVariables();
 
 			// When
-			Program program = sut.compile("ls \"${HOME}\"");
+			Program result = sut.compile("ls \"${HOME}\"");
 
 			// Then
-			assertThat(program.getStatements())
+			assertThat(result.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
@@ -600,10 +600,10 @@ class CompilerTest {
 			doReturn(Map.of(VariableName.constant("HOME"), Values.ofText("/home/dfa"), VariableName.constant("BIN"), Values.ofText("bin"))).when(state).getVariables();
 
 			// When
-			Program program = sut.compile("ls \"${HOME}/${BIN}\"");
+			Program result = sut.compile("ls \"${HOME}/${BIN}\"");
 
 			// Then
-			assertThat(program.getStatements())
+			assertThat(result.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
@@ -621,10 +621,10 @@ class CompilerTest {
 			doReturn(Map.of(VariableName.constant("HOME"), Values.ofText("/home/dfa"))).when(state).getVariables();
 
 			// When
-			Program program = sut.compile("ls \"${HOME!/home}/${BIN!bin}\"");
+			Program result = sut.compile("ls \"${HOME!/home}/${BIN!bin}\"");
 
 			// Then
-			assertThat(program.getStatements())
+			assertThat(result.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);

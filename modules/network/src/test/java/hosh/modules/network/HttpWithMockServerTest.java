@@ -88,9 +88,9 @@ class HttpWithMockServerTest {
 				);
 		// When
 		String arg = String.format("http://localhost:%d/path", clientAndServer.getLocalPort());
-		ExitStatus exitStatus = sut.run(List.of(arg), in, out, err);
+		ExitStatus result = sut.run(List.of(arg), in, out, err);
 		// Then
-		assertThat(exitStatus).isSuccess();
+		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).should(atLeastOnce()).send(body.capture());
 		then(err).shouldHaveNoInteractions();
@@ -103,9 +103,9 @@ class HttpWithMockServerTest {
 		// no url is expected in the mockserver
 		// When
 		String arg = String.format("http://localhost:%d/not-found", clientAndServer.getLocalPort());
-		ExitStatus exitStatus = sut.run(List.of(arg), in, out, err);
+		ExitStatus result = sut.run(List.of(arg), in, out, err);
 		// Then
-		assertThat(exitStatus).isError();
+		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
 		then(err).shouldHaveNoInteractions();
