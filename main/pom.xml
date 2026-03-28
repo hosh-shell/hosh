@@ -59,6 +59,12 @@
 			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>hosh</groupId>
+			<artifactId>hosh-formats-module</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
+		</dependency>
 		<!-- test classpath -->
 		<dependency>
 			<groupId>hosh</groupId>

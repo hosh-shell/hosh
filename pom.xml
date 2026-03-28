@@ -47,6 +47,7 @@
 		<version.slf4j>2.0.17</version.slf4j>
 		<version.joy-classic>2.1.0</version.joy-classic>
 		<version.jakarta-json-api>2.1.3</version.jakarta-json-api>
+		<version.commons-csv>1.12.0</version.commons-csv>
 		<version.mockserver>5.15.0</version.mockserver>
 	</properties>
 	<modules>
@@ -60,6 +61,7 @@
 		<module>modules/network</module>
 		<module>modules/terminal</module>
 		<module>modules/filesystem</module>
+		<module>modules/formats</module>
 		<module>main</module>
 	</modules>
 	<dependencyManagement>
@@ -161,6 +163,11 @@
 				<groupId>org.leadpony.joy</groupId>
 				<artifactId>joy-classic</artifactId>
 				<version>${version.joy-classic}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>${version.commons-csv}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mock-server</groupId>
