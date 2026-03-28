@@ -17,6 +17,10 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         java: [25]
         architecture: [x64]
+        include:
+          - os: ubuntu-24.04-arm
+            java: 25
+            architecture: aarch64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
