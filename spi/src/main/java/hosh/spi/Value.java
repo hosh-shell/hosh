@@ -23,6 +23,8 @@
  */
 package hosh.spi;
 
+import hosh.doc.Todo;
+
 import java.util.Locale;
 import java.util.Optional;
 
@@ -30,6 +32,7 @@ import java.util.Optional;
  * The value in @{see Record}.
  * NB: all concrete classes implementing this interface should be value objects.
  */
+@Todo(description = "re-evaluate the choice of 2019 of hiding the concrete types... sealed could be better")
 public interface Value extends Comparable<Value> {
 
 	/**
