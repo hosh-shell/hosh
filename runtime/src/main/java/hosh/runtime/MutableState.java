@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
@@ -37,8 +38,8 @@ import java.util.function.Supplier;
 
 /**
  * The state of the shell: it has been modeled as explicit state, in practice this is a global variable.
- * NB: this is a tactical object used during migration to immutable state.
  */
+@Todo(description = "NB: this is a tactical object used during migration to immutable state.")
 public class MutableState implements State, StateMutator {
 
 	// variables
@@ -71,20 +72,17 @@ public class MutableState implements State, StateMutator {
 
 	@Override
 	public Map<String, Supplier<Command>> getCommands() {
-		// defensive programming: creating an unmodifiable list to spot modifications via reference
-		return Map.copyOf(commands);
+		return commands;
 	}
 
 	@Override
 	public Map<VariableName, String> getVariables() {
-		// defensive programming: creating an unmodifiable list to spot modifications via reference
-		return Map.copyOf(variables);
+		return variables;
 	}
 
 	@Override
 	public List<Path> getPath() {
-		// defensive programming: creating an unmodifiable list to spot modifications via reference
-		return List.copyOf(path);
+		return path;
 	}
 
 	@Override
@@ -99,7 +97,7 @@ public class MutableState implements State, StateMutator {
 
 	@Override
 	public void mutatePath(List<Path> newPath) {
-		this.path = Objects.requireNonNull(newPath);
+		this.path = List.copyOf(Objects.requireNonNull(newPath));
 	}
 
 	@Override
@@ -109,12 +107,12 @@ public class MutableState implements State, StateMutator {
 
 	@Override
 	public void mutateVariables(Map<VariableName, String> newVariables) {
-		this.variables = Objects.requireNonNull(newVariables);
+		this.variables = Map.copyOf(Objects.requireNonNull(newVariables));
 	}
 
 	@Override
 	public void mutateCommands(Map<String, Supplier<Command>> newCommands) {
-		this.commands = Objects.requireNonNull(newCommands);
+		this.commands = Map.copyOf(Objects.requireNonNull(newCommands));
 	}
 
 	@Override
