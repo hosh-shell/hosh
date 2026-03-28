@@ -25,6 +25,7 @@ package hosh.runtime;
 
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
@@ -124,10 +125,9 @@ class LambdaCommand implements CompilerCommand, InterpreterAware, StateAware {
 		}
 
 		@Override
-		public Map<String, Supplier<Command>> getCommands() {
+		public Map<CommandName, Supplier<Command>> getCommands() {
 			return delegate.getCommands();
 		}
-
 
 		@Override
 		public List<Path> getPath() {

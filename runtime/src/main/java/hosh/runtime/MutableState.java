@@ -25,6 +25,7 @@ package hosh.runtime;
 
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.State;
 import hosh.spi.StateMutator;
 import hosh.spi.VariableName;
@@ -46,7 +47,7 @@ public class MutableState implements State, StateMutator {
 	private volatile Map<VariableName, String> variables;
 
 	// built-in commands
-	private volatile Map<String, Supplier<Command>> commands;
+	private volatile Map<CommandName, Supplier<Command>> commands;
 
 	// current working directory
 	private volatile Path cwd;
@@ -71,7 +72,7 @@ public class MutableState implements State, StateMutator {
 	}
 
 	@Override
-	public Map<String, Supplier<Command>> getCommands() {
+	public Map<CommandName, Supplier<Command>> getCommands() {
 		return commands;
 	}
 
@@ -111,7 +112,7 @@ public class MutableState implements State, StateMutator {
 	}
 
 	@Override
-	public void mutateCommands(Map<String, Supplier<Command>> newCommands) {
+	public void mutateCommands(Map<CommandName, Supplier<Command>> newCommands) {
 		this.commands = Map.copyOf(Objects.requireNonNull(newCommands));
 	}
 

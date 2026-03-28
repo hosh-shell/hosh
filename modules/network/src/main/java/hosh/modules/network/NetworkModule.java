@@ -28,6 +28,7 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -60,8 +61,8 @@ public class NetworkModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("network", Network::new);
-		registry.registerCommand("http", Http::new);
+		registry.registerCommand(CommandName.constant("network"), Network::new);
+		registry.registerCommand(CommandName.constant("http"), Http::new);
 	}
 
 	@Description("list network interfaces")

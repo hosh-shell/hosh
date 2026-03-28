@@ -27,6 +27,7 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -47,9 +48,9 @@ public class TerminalModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("dump", Dump::new);
-		registry.registerCommand("clear", Clear::new);
-		registry.registerCommand("bell", Bell::new);
+		registry.registerCommand(CommandName.constant("dump"), Dump::new);
+		registry.registerCommand(CommandName.constant("clear"), Clear::new);
+		registry.registerCommand(CommandName.constant("bell"), Bell::new);
 	}
 
 	@Description("dump terminal info")

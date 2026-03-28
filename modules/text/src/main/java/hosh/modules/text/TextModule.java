@@ -28,6 +28,7 @@ import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -66,27 +67,27 @@ public class TextModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("select", Select::new);
-		registry.registerCommand("split", Split::new);
-		registry.registerCommand("join", Join::new);
-		registry.registerCommand("trim", Trim::new);
-		registry.registerCommand("regex", Regex::new);
-		registry.registerCommand("schema", Schema::new);
-		registry.registerCommand("filter", Filter::new);
-		registry.registerCommand("enumerate", Enumerate::new);
-		registry.registerCommand("timestamp", Timestamp::new);
-		registry.registerCommand("distinct", Distinct::new);
-		registry.registerCommand("duplicated", Duplicated::new);
-		registry.registerCommand("sort", Sort::new);
-		registry.registerCommand("take", Take::new);
-		registry.registerCommand("drop", Drop::new);
-		registry.registerCommand("last", Last::new);
-		registry.registerCommand("rand", Rand::new);
-		registry.registerCommand("count", Count::new);
-		registry.registerCommand("sum", Sum::new);
-		registry.registerCommand("freq", Freq::new);
-		registry.registerCommand("min", Min::new);
-		registry.registerCommand("max", Max::new);
+		registry.registerCommand(CommandName.constant("select"), Select::new);
+		registry.registerCommand(CommandName.constant("split"), Split::new);
+		registry.registerCommand(CommandName.constant("join"), Join::new);
+		registry.registerCommand(CommandName.constant("trim"), Trim::new);
+		registry.registerCommand(CommandName.constant("regex"), Regex::new);
+		registry.registerCommand(CommandName.constant("schema"), Schema::new);
+		registry.registerCommand(CommandName.constant("filter"), Filter::new);
+		registry.registerCommand(CommandName.constant("enumerate"), Enumerate::new);
+		registry.registerCommand(CommandName.constant("timestamp"), Timestamp::new);
+		registry.registerCommand(CommandName.constant("distinct"), Distinct::new);
+		registry.registerCommand(CommandName.constant("duplicated"), Duplicated::new);
+		registry.registerCommand(CommandName.constant("sort"), Sort::new);
+		registry.registerCommand(CommandName.constant("take"), Take::new);
+		registry.registerCommand(CommandName.constant("drop"), Drop::new);
+		registry.registerCommand(CommandName.constant("last"), Last::new);
+		registry.registerCommand(CommandName.constant("rand"), Rand::new);
+		registry.registerCommand(CommandName.constant("count"), Count::new);
+		registry.registerCommand(CommandName.constant("sum"), Sum::new);
+		registry.registerCommand(CommandName.constant("freq"), Freq::new);
+		registry.registerCommand(CommandName.constant("min"), Min::new);
+		registry.registerCommand(CommandName.constant("max"), Max::new);
 	}
 
 	@Description("select a subset of keys from a record")

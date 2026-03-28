@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,31 +54,32 @@ class SimpleCommandRegistryTest {
 
 	@Test
 	void oneCommand() {
-		sut.registerCommand("foo", () -> command);
-		assertThat(sut.getCommands()).containsKey("foo");
+		sut.registerCommand(CommandName.constant("foo"), () -> command);
+		assertThat(sut.getCommands()).containsKey(CommandName.constant("foo"));
 	}
 
 	@Test
 	void oneCommandWithAlias() {
-		sut.registerCommand("foo", () -> command);
-		sut.registerCommand("bar", () -> command);
-		assertThat(sut.getCommands()).containsKeys("foo", "bar");
+		sut.registerCommand(CommandName.constant("foo"), () -> command);
+		sut.registerCommand(CommandName.constant("bar"), () -> command);
+		assertThat(sut.getCommands()).containsKeys(CommandName.constant("foo"), CommandName.constant("bar"));
 	}
 
 	@Test
 	void twoDifferentCommands() {
-		sut.registerCommand("foo", () -> command);
-		sut.registerCommand("bar", () -> anotherCommand);
-		assertThat(sut.getCommands()).containsKeys("foo", "bar");
+		sut.registerCommand(CommandName.constant("foo"), () -> command);
+		sut.registerCommand(CommandName.constant("bar"), () -> anotherCommand);
+		assertThat(sut.getCommands()).containsKeys(CommandName.constant("foo"), CommandName.constant("bar"));
 	}
 
 	@Test
 	void twoTimesSameCommand() {
 		Supplier<Command> commandSupplier = () -> command;
-		sut.registerCommand("foo", commandSupplier);
-		assertThatThrownBy(() -> sut.registerCommand("foo", () -> anotherCommand)).hasMessage("command with same name already registered: foo")
+		sut.registerCommand(CommandName.constant("foo"), commandSupplier);
+		assertThatThrownBy(() -> sut.registerCommand(CommandName.constant("foo"), () -> anotherCommand))
+				.hasMessage("command with same name already registered: CommandName[foo]")
 				.isInstanceOf(IllegalArgumentException.class);
 		// make sure first mapping is still in place
-		assertThat(sut.getCommands()).containsEntry("foo", commandSupplier);
+		assertThat(sut.getCommands()).containsEntry(CommandName.constant("foo"), commandSupplier);
 	}
 }

@@ -30,6 +30,7 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.CommandWrapper;
 import hosh.spi.Errors;
@@ -82,22 +83,22 @@ public class FileSystemModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("ls", ListFiles::new);
-		registry.registerCommand("cwd", CurrentWorkingDirectory::new);
-		registry.registerCommand("cd", ChangeDirectory::new);
-		registry.registerCommand("lines", Lines::new);
-		registry.registerCommand("walk", Walk::new);
-		registry.registerCommand("glob", Glob::new);
-		registry.registerCommand("cp", Copy::new);
-		registry.registerCommand("mv", Move::new);
-		registry.registerCommand("rm", Remove::new);
-		registry.registerCommand("partitions", Partitions::new);
-		registry.registerCommand("probe", Probe::new);
-		registry.registerCommand("symlink", Symlink::new);
-		registry.registerCommand("hardlink", Hardlink::new);
-		registry.registerCommand("resolve", Resolve::new);
-		registry.registerCommand("watch", Watch::new);
-		registry.registerCommand("withLock", WithLock::new);
+		registry.registerCommand(CommandName.constant("ls"), ListFiles::new);
+		registry.registerCommand(CommandName.constant("cwd"), CurrentWorkingDirectory::new);
+		registry.registerCommand(CommandName.constant("cd"), ChangeDirectory::new);
+		registry.registerCommand(CommandName.constant("lines"), Lines::new);
+		registry.registerCommand(CommandName.constant("walk"), Walk::new);
+		registry.registerCommand(CommandName.constant("glob"), Glob::new);
+		registry.registerCommand(CommandName.constant("cp"), Copy::new);
+		registry.registerCommand(CommandName.constant("mv"), Move::new);
+		registry.registerCommand(CommandName.constant("rm"), Remove::new);
+		registry.registerCommand(CommandName.constant("partitions"), Partitions::new);
+		registry.registerCommand(CommandName.constant("probe"), Probe::new);
+		registry.registerCommand(CommandName.constant("symlink"), Symlink::new);
+		registry.registerCommand(CommandName.constant("hardlink"), Hardlink::new);
+		registry.registerCommand(CommandName.constant("resolve"), Resolve::new);
+		registry.registerCommand(CommandName.constant("watch"), Watch::new);
+		registry.registerCommand(CommandName.constant("withLock"), WithLock::new);
 	}
 
 	@Description("list files")

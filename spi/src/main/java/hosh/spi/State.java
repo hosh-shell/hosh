@@ -39,7 +39,7 @@ public interface State {
 
 	Path getCwd();
 
-	Map<String, Supplier<Command>> getCommands();
+	Map<CommandName, Supplier<Command>> getCommands();
 
 	Map<VariableName, String> getVariables();
 

@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.LoggerFactory;
 import hosh.spi.State;
 import hosh.spi.VariableName;
@@ -138,7 +139,9 @@ public class CommandResolvers {
 		@Override
 		public Optional<Command> tryResolve(String commandName) {
 			LOGGER.info(() -> String.format("resolving commandName '%s' as built-in", commandName));
-			Supplier<Command> commandSupplier = state.getCommands().get(commandName);
+			Supplier<Command> commandSupplier = CommandName.from(commandName)
+					.map(state.getCommands()::get)
+					.orElse(null);
 			if (commandSupplier == null) {
 				LOGGER.info("  not found");
 				return Optional.empty();

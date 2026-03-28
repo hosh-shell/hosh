@@ -29,6 +29,7 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.spi.Ansi.Style;
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.CommandWrapper;
 import hosh.spi.Errors;
@@ -84,27 +85,27 @@ public class SystemModule implements Module {
 
 	@Override
 	public void initialize(CommandRegistry registry) {
-		registry.registerCommand("path", Path::new);
-		registry.registerCommand("echo", Echo::new);
-		registry.registerCommand("env", Env::new);
-		registry.registerCommand("exit", Exit::new);
-		registry.registerCommand("help", Help::new);
-		registry.registerCommand("sleep", Sleep::new);
-		registry.registerCommand("withTime", WithTime::new);
-		registry.registerCommand("withTimeout", WithTimeout::new);
-		registry.registerCommand("ps", ProcessList::new);
-		registry.registerCommand("kill", KillProcess::new);
-		registry.registerCommand("err", Err::new);
-		registry.registerCommand("benchmark", Benchmark::new);
-		registry.registerCommand("waitSuccess", WaitSuccess::new);
-		registry.registerCommand("sink", Sink::new);
-		registry.registerCommand("set", SetVariable::new);
-		registry.registerCommand("unset", UnsetVariable::new);
-		registry.registerCommand("input", Input::new);
-		registry.registerCommand("secret", Secret::new);
-		registry.registerCommand("confirm", Confirm::new);
-		registry.registerCommand("capture", Capture::new);
-		registry.registerCommand("open", Open::new);
+		registry.registerCommand(CommandName.constant("path"), Path::new);
+		registry.registerCommand(CommandName.constant("echo"), Echo::new);
+		registry.registerCommand(CommandName.constant("env"), Env::new);
+		registry.registerCommand(CommandName.constant("exit"), Exit::new);
+		registry.registerCommand(CommandName.constant("help"), Help::new);
+		registry.registerCommand(CommandName.constant("sleep"), Sleep::new);
+		registry.registerCommand(CommandName.constant("withTime"), WithTime::new);
+		registry.registerCommand(CommandName.constant("withTimeout"), WithTimeout::new);
+		registry.registerCommand(CommandName.constant("ps"), ProcessList::new);
+		registry.registerCommand(CommandName.constant("kill"), KillProcess::new);
+		registry.registerCommand(CommandName.constant("err"), Err::new);
+		registry.registerCommand(CommandName.constant("benchmark"), Benchmark::new);
+		registry.registerCommand(CommandName.constant("waitSuccess"), WaitSuccess::new);
+		registry.registerCommand(CommandName.constant("sink"), Sink::new);
+		registry.registerCommand(CommandName.constant("set"), SetVariable::new);
+		registry.registerCommand(CommandName.constant("unset"), UnsetVariable::new);
+		registry.registerCommand(CommandName.constant("input"), Input::new);
+		registry.registerCommand(CommandName.constant("secret"), Secret::new);
+		registry.registerCommand(CommandName.constant("confirm"), Confirm::new);
+		registry.registerCommand(CommandName.constant("capture"), Capture::new);
+		registry.registerCommand(CommandName.constant("open"), Open::new);
 	}
 
 	@Description("PATH manipulation")
@@ -291,7 +292,7 @@ public class SystemModule implements Module {
 			if (args.isEmpty()) {
 				for (var entry : state.getCommands().entrySet()) {
 					Description description = entry.getValue().get().getClass().getAnnotation(Description.class);
-					String name = entry.getKey();
+					String name = entry.getKey().name();
 					Record record = Records.builder()
 							.entry(Keys.NAME, Values.ofText(name))
 							.entry(Keys.DESCRIPTION, Values.ofText(description.value()))
@@ -301,7 +302,9 @@ public class SystemModule implements Module {
 				return ExitStatus.success();
 			} else if (args.size() == 1) {
 				String commandName = args.getFirst();
-				Supplier<Command> commandSupplier = state.getCommands().get(commandName);
+				Supplier<Command> commandSupplier = CommandName.from(commandName)
+					.map(state.getCommands()::get)
+					.orElse(null);
 				if (commandSupplier == null) {
 					err.send(Errors.message("command not found: %s", commandName));
 					return ExitStatus.error();

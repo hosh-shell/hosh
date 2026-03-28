@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.CommandName;
 import hosh.spi.State;
 import hosh.test.support.TemporaryFolder;
 import org.jline.reader.Candidate;
@@ -84,7 +85,7 @@ class CommandCompleterTest {
 
 	@Test
 	void builtin() {
-		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
+		given(state.getCommands()).willReturn(Map.of(CommandName.constant("cmd"), () -> command));
 		given(parsedLine.wordIndex()).willReturn(0);
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
@@ -102,7 +103,7 @@ class CommandCompleterTest {
 		given(parsedLine.wordIndex()).willReturn(0);
 		Path file = temporaryFolder.newFile(temporaryFolder.toPath(), "cmd");
 		assertThat(file.toFile().setExecutable(true, true)).isTrue();
-		given(state.getCommands()).willReturn(Map.of("cmd", () -> command));
+		given(state.getCommands()).willReturn(Map.of(CommandName.constant("cmd"), () -> command));
 		List<Candidate> candidates = new ArrayList<>();
 		sut.complete(lineReader, parsedLine, candidates);
 		assertThat(candidates)
