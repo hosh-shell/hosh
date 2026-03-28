@@ -62,6 +62,7 @@
 		<module>modules/terminal</module>
 		<module>modules/filesystem</module>
 		<module>modules/formats</module>
+		<module>modules/checksum</module>
 		<module>main</module>
 	</modules>
 	<dependencyManagement>
