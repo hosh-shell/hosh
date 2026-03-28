@@ -1,6 +1,6 @@
 # Hosh
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) 
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/hosh-shell/hosh/workflows/CI/badge.svg?branch:master)](https://github.com/hosh-shell/hosh/actions?query=branch:master)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hosh-shell_hosh&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=hosh-shell_hosh)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=hosh%3Ahosh-parent&metric=coverage)](https://sonarcloud.io/summary/new_code?id=hosh%3Ahosh-parent)
@@ -66,6 +66,5 @@ Build a release with docker:
 
 ## Sponsors
 
-[![JetBrains](https://raw.githubusercontent.com/JetBrains/logos/master/web/jetbrains/jetbrains-variant-2.svg)](https://www.jetbrains.com/?from=hosh)
 [![YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com/java/profiler?from=hosh)
 [![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=hosh%3Ahosh-parent)
