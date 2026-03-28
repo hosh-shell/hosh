@@ -33,13 +33,18 @@ import java.util.function.Supplier;
  */
 public interface StateMutator {
 
+	/** Replaces the current working directory. */
 	void mutateCwd(Path newPath);
 
+	/** Replaces the ordered list of directories searched for external commands. */
 	void mutatePath(List<Path> newPath);
 
+	/** Replaces the current shell variables. */
 	void mutateVariables(Map<VariableName, String> newVariables);
 
+	/** Replaces the registered built-in commands. */
 	void mutateCommands(Map<CommandName, Supplier<Command>> newCommands);
 
+	/** Sets whether the shell should exit after the current command completes. */
 	void mutateExit(boolean newExit);
 }

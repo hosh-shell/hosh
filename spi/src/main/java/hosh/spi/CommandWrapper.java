@@ -29,6 +29,10 @@ package hosh.spi;
  */
 public interface CommandWrapper extends Command {
 
+	/**
+	 * Injects the inner block command before {@link Command#run} is called.
+	 * Called by the interpreter when executing wrapper syntax such as {@code benchmark { cmd }}.
+	 */
 	void setNestedCommand(NestedCommand nestedCommand);
 
 	/**

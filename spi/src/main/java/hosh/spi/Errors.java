@@ -39,10 +39,12 @@ public class Errors {
 		return Records.singleton(Keys.ERROR, Values.ofText(Objects.toString(e.getMessage(), "(no message)")));
 	}
 
+	/** Builds an error record from a printf-style format string and arguments. */
 	public static Record message(String fmt, Object... args) {
 		return Records.singleton(Keys.ERROR, Values.ofText(String.format(fmt, args)));
 	}
 
+	/** Builds a usage-hint error record, prefixing the formatted message with {@code "usage: "}. */
 	@Todo(description = "adding more details (e.g. enum with type of arguments)")
 	public static Record usage(String fmt, Object... args) {
 		return message("usage: " + fmt, args);

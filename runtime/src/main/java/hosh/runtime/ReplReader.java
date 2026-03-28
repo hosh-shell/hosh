@@ -31,6 +31,15 @@ import org.jline.reader.UserInterruptException;
 
 import java.util.Optional;
 
+/**
+ * Reads one line of input from the user in interactive (REPL) mode.
+ * <p>
+ * Delegates to JLine's {@link LineReader} for editing, history navigation, and completion.
+ * A {@link hosh.spi.State}-aware {@link hosh.runtime.prompt.PromptProvider} is called on
+ * each read to produce a fresh prompt string (e.g. including the current git branch).
+ * {@code Ctrl-C} ({@link org.jline.reader.UserInterruptException}) returns an empty line;
+ * {@code Ctrl-D} ({@link org.jline.reader.EndOfFileException}) signals end of input.
+ */
 public class ReplReader {
 
 	private final PromptProvider promptProvider;

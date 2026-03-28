@@ -54,6 +54,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Evaluates {@link Compiler.Program} instances produced by the {@link Compiler}.
+ * <p>
+ * Before each command is executed the interpreter performs dependency injection:
+ * it inspects the command for {@link hosh.spi.StateAware}, {@link hosh.spi.StateMutatorAware},
+ * {@link hosh.spi.LineReaderAware}, {@link hosh.spi.TerminalAware}, {@link hosh.spi.HistoryAware},
+ * {@link hosh.spi.VersionAware}, and {@link InterpreterAware}, and injects the relevant
+ * dependencies before delegating to {@link hosh.spi.Command#run}.
+ * <p>
+ * Top-level program evaluation uses {@link Supervisor} (with SIGINT handling) to manage
+ * the virtual threads spawned by pipeline and sequence commands.
+ * The exit status of the last command is stored in the {@code EXIT_STATUS} shell variable.
+ */
 public class Interpreter {
 
 	// well-known variable name for holding the result of the last command

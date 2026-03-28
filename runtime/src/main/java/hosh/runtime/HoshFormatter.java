@@ -33,6 +33,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+/**
+ * Custom {@link java.util.logging.Formatter} for Hosh log files.
+ * Formats each record as: {@code <ISO timestamp> [LEVEL] [thread] - message}.
+ * The thread name is only included for non-main threads to keep the common case concise.
+ */
 public class HoshFormatter extends Formatter {
 
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS");

@@ -35,6 +35,11 @@ import java.util.EnumSet;
  */
 public interface OutputChannel {
 
+	/**
+	 * Sends a record downstream.
+	 * Implementations may block to apply back-pressure (e.g. {@link hosh.runtime.PipelineChannel})
+	 * or throw a runtime exception to stop a producer that is no longer needed.
+	 */
 	void send(Record record);
 
 	@Experimental(description = "testing send options")

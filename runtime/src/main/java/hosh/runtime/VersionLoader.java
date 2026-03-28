@@ -29,6 +29,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Loads the shell version from the {@code git.properties} resource bundled in the uberjar
+ * by the git-commit-id Maven plugin.
+ * The {@code git.commit.id.describe} property is used as the version string.
+ */
 public class VersionLoader {
 
 	private VersionLoader() {

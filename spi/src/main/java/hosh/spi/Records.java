@@ -33,6 +33,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Factory and implementations for {@link Record}.
+ * <p>
+ * Use {@link #empty()} for a zero-entry record, {@link #singleton} for a single-entry record,
+ * and {@link #builder()} when building records with two or more entries.
+ * The three implementations ({@code Empty}, {@code Singleton}, {@code Generic}) are
+ * internal details; callers should always program to the {@link Record} interface.
+ */
 public class Records {
 
 	private Records() {

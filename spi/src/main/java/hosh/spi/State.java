@@ -37,14 +37,19 @@ import java.util.function.Supplier;
  */
 public interface State {
 
+	/** Returns the current working directory. */
 	Path getCwd();
 
+	/** Returns the registered built-in commands, keyed by name. */
 	Map<CommandName, Supplier<Command>> getCommands();
 
+	/** Returns the current shell variables as an immutable map. */
 	Map<VariableName, String> getVariables();
 
+	/** Returns the ordered list of directories searched for external commands. */
 	List<Path> getPath();
 
+	/** Returns {@code true} if the shell has been asked to exit. */
 	boolean isExit();
 
 }

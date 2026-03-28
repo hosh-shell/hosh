@@ -44,14 +44,19 @@ public interface Record {
      */
     Record prepend(Key key, Value value);
 
+	/** Returns a stream of all keys in insertion order. */
     Stream<Key> keys();
 
+	/** Returns a stream of all values in insertion order. */
     Stream<Value> values();
 
+	/** Returns a stream of all key/value pairs in insertion order. */
     Stream<Entry> entries();
 
+	/** Looks up the value associated with the given key, returning empty if not present. */
     Optional<Value> value(Key key);
 
+	/** Returns the number of key/value pairs in this record. */
     int size();
 
     /**

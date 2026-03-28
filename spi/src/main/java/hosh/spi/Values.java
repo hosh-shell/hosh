@@ -55,18 +55,22 @@ public class Values {
 
 	private static final None NONE = new None();
 
+	/** Returns a singleton value representing the absence of a value (displays as empty string). */
 	public static Value none() {
 		return NONE;
 	}
 
+	/** Returns a value representing the given {@link java.time.Duration}. */
 	public static Value ofDuration(Duration duration) {
 		return new DurationValue(duration);
 	}
 
+	/** Returns a value representing the given {@link java.time.Instant}, displayed in local time. */
 	public static Value ofInstant(Instant instant) {
 		return new InstantValue(instant);
 	}
 
+	/** Returns a value representing the given integer number, formatted with locale-specific grouping. */
 	public static Value ofNumeric(long number) {
 		return new NumericValue(number);
 	}
@@ -85,10 +89,12 @@ public class Values {
 		return new SizeValue(bytes);
 	}
 
+	/** Returns a value representing the given filesystem {@link java.nio.file.Path}. */
 	public static Value ofPath(Path path) {
 		return new PathValue(path);
 	}
 
+	/** Wraps an existing value with an ANSI style so it renders with colour/bold in the terminal. */
 	public static Value withStyle(Value value, Ansi.Style style) {
 		return new StyledValue(value, style);
 	}

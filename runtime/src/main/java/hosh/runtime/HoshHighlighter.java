@@ -34,6 +34,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+/**
+ * JLine {@link Highlighter} that provides real-time syntax feedback in the REPL.
+ * The current input buffer is speculatively compiled; if the {@link Compiler} throws
+ * any exception the entire line is rendered in bold red, giving the user immediate
+ * visual feedback about a syntax error before submitting the command.
+ */
 public class HoshHighlighter implements Highlighter {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();

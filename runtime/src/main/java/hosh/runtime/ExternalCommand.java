@@ -55,7 +55,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-// used for any non-built-in commands (e.g. native commands such as 'vim' or 'ssh')
+/**
+ * Executes a non-built-in (native) command such as {@code vim} or {@code ssh} as a child process.
+ * <p>
+ * Output lines from the process's stdout are forwarded as single-key {@link hosh.spi.Keys#TEXT} records.
+ * When embedded in a pipeline, {@link PipelineCommand.Position} controls whether stdin/stdout
+ * are redirected to/from adjacent pipeline stages.
+ */
 class ExternalCommand implements CompilerCommand, StateAware {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();

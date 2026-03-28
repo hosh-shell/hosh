@@ -30,5 +30,6 @@ import org.jline.reader.History;
  */
 public interface HistoryAware {
 
+	/** Called by the interpreter to inject the JLine {@link History} before {@link Command#run}. */
 	void setHistory(History history);
 }

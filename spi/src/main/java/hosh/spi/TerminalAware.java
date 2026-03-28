@@ -30,5 +30,6 @@ import org.jline.terminal.Terminal;
  */
 public interface TerminalAware {
 
+	/** Called by the interpreter to inject the JLine {@link Terminal} before {@link Command#run}. */
 	void setTerminal(Terminal terminal);
 }

@@ -28,6 +28,10 @@ import hosh.spi.Record;
 
 import java.util.Optional;
 
+/**
+ * An {@link InputChannel} that is always empty — every {@link #recv()} returns {@link java.util.Optional#empty()}.
+ * Used as the input channel for the first stage of a pipeline where no upstream data exists.
+ */
 class NullChannel implements InputChannel {
 
 	@Override
