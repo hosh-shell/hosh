@@ -125,14 +125,14 @@ public class Hosh {
 	private Hosh() {
 	}
 
-	public static void main(String[] args) throws Exception {
+	static void main(String[] args) throws Exception {
 		Version version = VersionLoader.loadVersion();
 		configureLogging();
 		Logger logger = LoggerFactory.forEnclosingClass();
 
 		logger.info(() -> String.format("starting hosh %s", version));
 		ExitStatus exitStatus;
-		try (Terminal terminal = TerminalBuilder.builder().jni(true).jna(false).jansi(false).exec(false).build()) {
+		try (Terminal terminal = TerminalBuilder.builder().ffm(true).jni(true).exec(false).build()) {
 			exitStatus = run(terminal, version, logger, args);
 		}
 		System.exit(exitStatus.value());

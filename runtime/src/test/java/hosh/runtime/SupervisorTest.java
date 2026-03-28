@@ -82,7 +82,7 @@ class SupervisorTest {
 	void handleInterruptions() throws ExecutionException {
 		// Given
 		sut.submit(() -> {
-			Thread.sleep(10_000); // NOSONAR - thread will be interrupted here without waiting 10s
+			Thread.sleep(10_000);
 			return ExitStatus.success();
 		});
 		withThread.interrupt(); // next call to Future.get() will throw InterruptedException
@@ -131,7 +131,7 @@ class SupervisorTest {
 			sutWithTerminal.submit(() -> {
 				taskStarted.countDown();
 				try {
-					Thread.sleep(10_000); // NOSONAR
+					Thread.sleep(10_000);
 				} catch (InterruptedException e) {
 					taskCancelled.countDown();
 					Thread.currentThread().interrupt();

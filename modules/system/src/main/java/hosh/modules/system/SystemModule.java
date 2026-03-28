@@ -663,7 +663,7 @@ public class SystemModule implements Module {
 			return ExitStatus.success();
 		}
 
-		private void blackHole(Record record) { // NOSONAR: by design
+		private void blackHole(Record record) {
 			record.size();
 		}
 
