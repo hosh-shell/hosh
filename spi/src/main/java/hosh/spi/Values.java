@@ -507,7 +507,7 @@ public class Values {
 		}
 	}
 
-	static class BytesValue implements Value {
+	static final class BytesValue implements Value {
 
 		private static final HexFormat HEX_FORMAT = HexFormat.ofDelimiter(":").withLowerCase();
 
@@ -535,7 +535,7 @@ public class Values {
 		}
 
 		@Override
-		public final boolean equals(Object obj) {
+		public boolean equals(Object obj) {
 			if (obj instanceof BytesValue that) {
 				return Arrays.equals(this.bytes, that.bytes);
 			} else {
@@ -544,7 +544,7 @@ public class Values {
 		}
 
 		@Override
-		public final int hashCode() {
+		public int hashCode() {
 			return Arrays.hashCode(bytes);
 		}
 
