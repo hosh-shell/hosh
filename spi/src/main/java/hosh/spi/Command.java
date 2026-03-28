@@ -30,5 +30,14 @@ import java.util.List;
  */
 public interface Command {
 
+	/**
+	 * Executes the command.
+	 *
+	 * @param args zero or more string arguments passed by the user on the command line
+	 * @param in   records arriving from the upstream pipeline stage (empty for source commands)
+	 * @param out  channel for normal output records
+	 * @param err  channel for error/diagnostic records; does not stop execution on its own
+	 * @return {@link ExitStatus#success()} on normal completion, {@link ExitStatus#error()} otherwise
+	 */
 	ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err);
 }

@@ -26,6 +26,11 @@ package hosh.spi;
 import java.lang.StackWalker.Option;
 import java.util.logging.Logger;
 
+/**
+ * Convenience factory for {@link java.util.logging.Logger} instances.
+ * Uses {@link StackWalker} to automatically resolve the caller's class,
+ * so the logger name always matches the enclosing class without hard-coding it.
+ */
 public class LoggerFactory {
 
 	public static Logger forEnclosingClass() {

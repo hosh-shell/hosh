@@ -32,6 +32,11 @@ import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+/**
+ * {@link OutputChannel} that writes records directly to the terminal.
+ * Values are joined with a single space and optionally wrapped in ANSI style codes.
+ * Used as the final sink for standard output and standard error in interactive sessions.
+ */
 public class ConsoleChannel implements OutputChannel {
 
 	private final PrintWriter printWriter;

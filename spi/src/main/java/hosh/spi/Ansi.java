@@ -23,6 +23,13 @@
  */
 package hosh.spi;
 
+/**
+ * ANSI escape-code utilities for terminal styling.
+ * The inner {@link Style} enum covers standard SGR (Select Graphic Rendition) codes
+ * for text decoration, foreground colours, and background colours.
+ * Use {@link Style#enable()} / {@link Style#disable()} to wrap text in the appropriate
+ * CSI sequences; {@link Style#NONE} is a safe no-op for non-interactive output.
+ */
 public class Ansi {
 
 	private Ansi() {

@@ -28,5 +28,6 @@ package hosh.spi;
  */
 public interface VersionAware {
 
+	/** Called by the interpreter to inject the current Hosh {@link Version} before {@link Command#run}. */
 	void setVersion(Version version);
 }

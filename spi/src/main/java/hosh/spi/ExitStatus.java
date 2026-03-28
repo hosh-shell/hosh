@@ -39,18 +39,22 @@ public class ExitStatus {
 		this.value = value;
 	}
 
+	/** Returns the canonical success status (exit code 0). */
 	public static ExitStatus success() {
 		return new ExitStatus(0);
 	}
 
+	/** Returns the canonical error status (exit code 1). */
 	public static ExitStatus error() {
 		return new ExitStatus(1);
 	}
 
+	/** Returns an exit status with the given numeric exit code. */
 	public static ExitStatus of(int value) {
 		return new ExitStatus(value);
 	}
 
+	/** Parses an exit status from a decimal string, returning empty if the string is not a valid integer. */
 	public static Optional<ExitStatus> parse(String str) {
 		try {
 			int value = Integer.parseInt(str, 10);
@@ -60,14 +64,17 @@ public class ExitStatus {
 		}
 	}
 
+	/** Returns {@code true} if the exit code is 0. */
 	public boolean isSuccess() {
 		return value == 0;
 	}
 
+	/** Returns {@code true} if the exit code is non-zero. */
 	public boolean isError() {
 		return value != 0;
 	}
 
+	/** Returns the raw numeric exit code. */
 	public int value() {
 		return value;
 	}

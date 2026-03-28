@@ -27,6 +27,14 @@ import hosh.spi.Command;
 
 import java.util.Optional;
 
+/**
+ * Strategy interface for resolving a command name string into a {@link hosh.spi.Command} instance.
+ * <p>
+ * Multiple resolvers are chained by {@link Compiler} to support built-in commands,
+ * external executables on the PATH, and Windows-specific executable extensions.
+ *
+ * @see CommandResolvers for the concrete implementations
+ */
 public interface CommandResolver {
 
 	Optional<Command> tryResolve(String commandName);

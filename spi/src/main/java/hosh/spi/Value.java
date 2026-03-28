@@ -32,6 +32,10 @@ import java.util.Optional;
  */
 public interface Value extends Comparable<Value> {
 
+	/**
+	 * Returns a human-readable string representation of this value for display in the terminal.
+	 * The locale is used for number and date formatting.
+	 */
 	String show(Locale locale);
 
 	/**

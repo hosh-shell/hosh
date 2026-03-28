@@ -28,5 +28,6 @@ package hosh.spi;
  */
 public interface StateAware {
 
+	/** Called by the interpreter to inject the current shell state before {@link Command#run}. */
 	void setState(State state);
 }

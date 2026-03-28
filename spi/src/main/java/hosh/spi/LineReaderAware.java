@@ -30,5 +30,6 @@ import org.jline.reader.LineReader;
  */
 public interface LineReaderAware {
 
+	/** Called by the interpreter to inject the JLine {@link LineReader} before {@link Command#run}. */
 	void setLineReader(LineReader lineReader);
 }

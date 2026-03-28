@@ -25,6 +25,11 @@ package hosh.spi;
 
 import java.util.function.Supplier;
 
+/**
+ * Used by {@link Module#initialize} to register commands into the shell.
+ * Each command is registered as a {@link java.util.function.Supplier} so that a
+ * fresh instance is created on every invocation.
+ */
 public interface CommandRegistry {
 
 	void registerCommand(CommandName name, Supplier<Command> command);

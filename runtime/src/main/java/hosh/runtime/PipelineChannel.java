@@ -36,6 +36,15 @@ import java.util.Optional;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.logging.Logger;
 
+/**
+ * Connects the producer and consumer stages of a pipeline.
+ * <p>
+ * Backed by a {@link LinkedTransferQueue} for efficient hand-off between virtual threads.
+ * End-of-stream is signalled with a sentinel poison pill record.
+ * When the consumer finishes early (e.g. {@code take 3}), {@link #stopProducer()} sets a flag
+ * that causes the next {@link #send} call to throw {@link ProducerPoisonPill}, unwinding the
+ * producer cleanly without relying on thread interruption.
+ */
 class PipelineChannel implements InputChannel, OutputChannel {
 
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
