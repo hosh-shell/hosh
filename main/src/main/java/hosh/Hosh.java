@@ -132,7 +132,7 @@ public class Hosh {
 
 		logger.info(() -> String.format("starting hosh %s", version));
 		ExitStatus exitStatus;
-		try (Terminal terminal = TerminalBuilder.builder().ffm(true).jni(true).exec(false).build()) {
+		try (Terminal terminal = TerminalBuilder.builder().ffm(true).graphemeCluster(false).build()) {
 			exitStatus = run(terminal, version, logger, args);
 		}
 		System.exit(exitStatus.value());
