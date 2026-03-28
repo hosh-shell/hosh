@@ -41,6 +41,7 @@ public class BootstrapBuiltins {
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 	public BootstrapBuiltins() {
+		// for module boundaries
 	}
 
 	public Map<String, Supplier<Command>> registerAllBuiltins() {
