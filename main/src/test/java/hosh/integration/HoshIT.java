@@ -65,7 +65,7 @@ class HoshIT {
 	final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@AfterEach
-	void beforeEach(TestInfo testInfo) {
+	void afterEach(TestInfo testInfo) {
 		System.out.println(testInfo.getDisplayName());
 	}
 
