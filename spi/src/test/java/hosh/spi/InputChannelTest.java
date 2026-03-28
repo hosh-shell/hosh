@@ -47,32 +47,50 @@ class InputChannelTest {
 
 	@Test
 	void empty() {
+		// Given
 		given(in.recv()).willReturn(Optional.empty());
+
+		// When
 		Iterable<Record> iterable = InputChannel.iterate(in);
+
+		// Then
 		assertThat(iterable).isEmpty();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	void oneRecord() {
+		// Given
 		given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+
+		// When
 		Iterable<Record> iterable = InputChannel.iterate(in);
+
+		// Then
 		assertThat(iterable).containsExactly(record);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	void twoRecords() {
+		// Given
 		given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+
+		// When
 		Iterable<Record> iterable = InputChannel.iterate(in);
+
+		// Then
 		assertThat(iterable).containsExactly(record, record);
 	}
 
 	@Test
 	void throwsNoSuchElementsWhenConsumed() {
+		// Given
 		given(in.recv()).willReturn(Optional.empty());
 		Iterable<Record> iterable = InputChannel.iterate(in);
 		Iterator<Record> iterator = iterable.iterator();
+
+		// When / Then
 		assertThatThrownBy(iterator::next)
 				.isInstanceOf(NoSuchElementException.class);
 	}
@@ -80,8 +98,13 @@ class InputChannelTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void iterationTerminatesOnFirstEmptyResult() {
+		// Given
 		given(in.recv()).willReturn(Optional.empty(), Optional.of(record));
+
+		// When
 		Iterable<Record> iterable = InputChannel.iterate(in);
+
+		// Then
 		assertThat(iterable).isEmpty();
 	}
 }

@@ -59,13 +59,22 @@ class CancellableChannelTest {
 
 	@Test
 	void send() {
+		// Given
+		// (no setup)
+
+		// When
 		sut.send(record);
+
+		// Then
 		then(channel).should().send(record);
 	}
 
 	@Test
 	void sendInterrupted() {
+		// Given
 		withThread.interrupt();
+
+		// When / Then
 		assertThatThrownBy(() -> sut.send(record))
 				.hasMessage("interrupted")
 				.isInstanceOf(CancellationException.class);

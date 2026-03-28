@@ -84,11 +84,16 @@ class LambdaCommandTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void presentKeyWithInnerCommandSuccess() {
+		// Given
 		Map<VariableName, Value> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(eq(statement), eq(in), eq(out), eq(err), any(State.class))).willReturn(ExitStatus.success());
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
+
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+		// Then
 		assertThat(exitStatus).isSuccess();
 		assertThat(variables).isEmpty();
 		then(in).shouldHaveNoMoreInteractions();
@@ -99,11 +104,16 @@ class LambdaCommandTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void presentKeyWithInnerCommandError() {
+		// Given
 		Map<VariableName, Value> variables = new HashMap<>();
 		given(state.getVariables()).willReturn(variables);
 		given(interpreter.eval(eq(statement), eq(in), eq(out), eq(err), any(State.class))).willReturn(ExitStatus.error());
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
+
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+		// Then
 		assertThat(exitStatus).isError();
 		assertThat(variables).isEmpty();
 		then(in).shouldHaveNoMoreInteractions();
@@ -114,9 +124,14 @@ class LambdaCommandTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void missingKey() {
+		// Given
 		Map<String, String> variables = new HashMap<>();
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.TEXT, Values.ofPath(Path.of("file")))), Optional.empty());
+
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+		// Then
 		assertThat(exitStatus).isError();
 		assertThat(variables).isEmpty();
 		then(in).shouldHaveNoMoreInteractions();

@@ -63,18 +63,28 @@ class VariableExpansionCompleterTest {
 
 	@Test
 	void notInExpansion() {
+		// Given
 		given(parsedLine.word()).willReturn("a");
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	void inExpansionMatchingSingle() {
+		// Given
 		given(parsedLine.word()).willReturn("${");
 		given(state.getVariables()).willReturn(Map.of(VariableName.constant("FOO"), Values.ofText("whatever")));
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {
@@ -85,10 +95,15 @@ class VariableExpansionCompleterTest {
 
 	@Test
 	void inExpansionMatchingMultiple() {
+		// Given
 		given(parsedLine.word()).willReturn("${");
 		given(state.getVariables()).willReturn(Map.of(VariableName.constant("FOO"), Values.ofText("whatever"), VariableName.constant("BAR"), Values.ofText("whatever")));
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates)
 				.hasSize(2)
 				.allSatisfy(candidate -> {

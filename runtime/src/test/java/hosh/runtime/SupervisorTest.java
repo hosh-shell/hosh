@@ -69,34 +69,54 @@ class SupervisorTest {
 
 	@Test
 	void noSubmit() throws ExecutionException {
+		// Given
+
+		// When
 		ExitStatus exitStatus = sut.waitForAll();
+
+		// Then
 		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
 	void handleInterruptions() throws ExecutionException {
+		// Given
 		sut.submit(() -> {
 			Thread.sleep(10_000); // NOSONAR - thread will be interrupted here without waiting 10s
 			return ExitStatus.success();
 		});
 		withThread.interrupt(); // next call to Future.get() will throw InterruptedException
+
+		// When
 		ExitStatus waitForAll = sut.waitForAll();
+
+		// Then
 		assertThat(waitForAll).isError();
 	}
 
 	@Test
 	void allSubmitInSuccess() throws ExecutionException {
+		// Given
 		sut.submit(ExitStatus::success);
 		sut.submit(ExitStatus::success);
+
+		// When
 		ExitStatus exitStatus = sut.waitForAll();
+
+		// Then
 		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
 	void oneSubmitInError() throws ExecutionException {
+		// Given
 		sut.submit(ExitStatus::success);
 		sut.submit(ExitStatus::error);
+
+		// When
 		ExitStatus exitStatus = sut.waitForAll();
+
+		// Then
 		assertThat(exitStatus).isError();
 	}
 

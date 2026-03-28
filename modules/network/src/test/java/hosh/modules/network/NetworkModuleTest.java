@@ -81,7 +81,12 @@ class NetworkModuleTest {
 		@Todo(description = "this is a very bland test: let's try to consolidate this command before investing more")
 		@Test
 		void noArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(Mockito.any(Record.class));
@@ -90,7 +95,12 @@ class NetworkModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -134,7 +144,12 @@ class NetworkModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -143,10 +158,15 @@ class NetworkModuleTest {
 
 		@Test
 		void oneArg() throws InterruptedException, IOException {
+			// Given
 			given(requestor.send(request.capture())).willReturn(response);
 			given(response.body()).willReturn(Stream.of("line1"));
 			given(response.statusCode()).willReturn(200);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("line1")));
@@ -160,8 +180,13 @@ class NetworkModuleTest {
 
 		@Test
 		void interrupted() throws InterruptedException, IOException {
+			// Given
 			given(requestor.send(Mockito.any())).willThrow(new InterruptedException());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -171,8 +196,13 @@ class NetworkModuleTest {
 
 		@Test
 		void ioError() throws InterruptedException, IOException {
+			// Given
 			given(requestor.send(Mockito.any())).willThrow(new ConnectException("simulated"));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("https://example.org"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();

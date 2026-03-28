@@ -37,6 +37,11 @@ class TemporaryFolderTest {
 
 	@Test
 	void usage() throws IOException {
+		// Given
+
+		// When
+
+		// Then
 		// must always provide a good base directory
 		assertThat(temporaryFolder.toPath())
 				.isNotNull()

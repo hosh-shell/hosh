@@ -34,43 +34,78 @@ class DurationParsingTest {
 
 	@Test
 	void iso8601FormatUppercase() {
+		// Given
+
+		// When
 		Optional<Duration> result = DurationParsing.parse("PT5S");
+
+		// Then
 		assertThat(result).contains(Duration.ofSeconds(5));
 	}
 
 	@Test
 	void iso8601FormatLowercase() {
+		// Given
+
+		// When
 		Optional<Duration> result = DurationParsing.parse("PT5s");
+
+		// Then
 		assertThat(result).contains(Duration.ofSeconds(5));
 	}
 
 	@Test
 	void ourCustomFormatLowercase() {
+		// Given
+
+		// When
 		Optional<Duration> result = DurationParsing.parse("5s");
+
+		// Then
 		assertThat(result).contains(Duration.ofSeconds(5));
 	}
 
 	@Test
 	void ourCustomFormatUppercase() {
+		// Given
+
+		// When
 		Optional<Duration> result = DurationParsing.parse("5S");
+
+		// Then
 		assertThat(result).contains(Duration.ofSeconds(5));
 	}
 
 	@Test
 	void nullValue() {
+		// Given
+
+		// When
 		Optional<Duration> result = DurationParsing.parse(null);
+
+		// Then
 		assertThat(result).isEmpty();
 	}
 
 	@Test
 	void emptyValue() {
+		// Given
+
+		// When
 		Optional<Duration> result = DurationParsing.parse("");
+
+		// Then
 		assertThat(result).isEmpty();
 	}
 
 	@Test
 	void missingUnit() {
+		// Given
+
+		// When
 		Optional<Duration> result = DurationParsing.parse("5");
+
+		// Then
 		assertThat(result).isEmpty();
 	}
 }

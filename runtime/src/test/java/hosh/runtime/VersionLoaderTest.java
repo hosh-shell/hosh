@@ -34,7 +34,12 @@ class VersionLoaderTest {
 
 	@Test
 	void loadVersionViaGit() throws IOException {
+		// Given
+
+		// When
 		Version result = VersionLoader.loadVersion();
+
+		// Then
 		assertThat(result).isNotNull(); // must be always defined
 	}
 

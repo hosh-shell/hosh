@@ -77,7 +77,12 @@ class TerminalModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
@@ -89,7 +94,12 @@ class TerminalModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
@@ -125,7 +135,12 @@ class TerminalModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(terminal).should().puts(ArgumentMatchers.any());
 			then(terminal).should().flush();
@@ -137,7 +152,12 @@ class TerminalModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
@@ -173,9 +193,14 @@ class TerminalModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
 			given(terminal.getType()).willReturn("xterm");
 			given(terminal.getAttributes()).willReturn(new Attributes());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Mockito.any()); // this test is weak
@@ -184,7 +209,12 @@ class TerminalModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(terminal).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();

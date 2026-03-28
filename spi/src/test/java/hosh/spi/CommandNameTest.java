@@ -38,11 +38,13 @@ class CommandNameTest {
 
 	@Test
 	void equalsContract() {
+		// When / Then
 		EqualsVerifier.forClass(CommandName.class).verify();
 	}
 
 	@Test
 	void asString() {
+		// When / Then
 		assertThat(CommandName.constant("ls")).hasToString("CommandName[ls]");
 	}
 
@@ -62,7 +64,10 @@ class CommandNameTest {
 			"?",
 	})
 	void validCommandNames(String userInput) {
+		// When
 		Optional<CommandName> from = CommandName.from(userInput);
+
+		// Then
 		assertThat(from).map(CommandName::name).hasValue(userInput);
 	}
 
@@ -75,7 +80,10 @@ class CommandNameTest {
 			"cmd name",
 	})
 	void invalidCommandNames(String userInput) {
+		// When
 		Optional<CommandName> from = CommandName.from(userInput);
+
+		// Then
 		assertThat(from).isEmpty();
 		assertThatThrownBy(() -> CommandName.constant(userInput))
 				.isInstanceOf(IllegalArgumentException.class);

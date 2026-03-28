@@ -42,11 +42,17 @@ class NullChannelTest {
 
 	@Test
 	void recv() {
+		// Given - sut is a NullChannel
+
+		// When / Then
 		assertThat(sut.recv()).isEmpty();
 	}
 
 	@Test
 	void asString() {
+		// Given - sut is a NullChannel
+
+		// When / Then
 		assertThat(sut).hasToString("NullChannel[]");
 	}
 }

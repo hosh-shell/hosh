@@ -66,15 +66,26 @@ class AutoTableChannelTest {
 
 	@Test
 	void tableWithNoRecords() {
+		// Given
+		// (no setup)
+
+		// When
 		sut.flush();
+
+		// Then
 		then(out).shouldHaveNoInteractions();
 	}
 
 	@Test
 	void tableWithColumnLongerThanValues() {
+		// Given
 		Record record = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		sut.send(record);
+
+		// When
 		sut.flush();
+
+		// Then
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
 				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
@@ -83,9 +94,14 @@ class AutoTableChannelTest {
 
 	@Test
 	void tableWithColumnShorterThanValues() {
+		// Given
 		Record record = Records.builder().entry(Keys.COUNT, Values.ofNumeric(2)).entry(Keys.TEXT, Values.ofText("aa")).build();
 		sut.send(record);
+
+		// When
 		sut.flush();
+
+		// Then
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
 				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text  "), Ansi.Style.FG_MAGENTA)),
@@ -94,9 +110,14 @@ class AutoTableChannelTest {
 
 	@Test
 	void tableWithNone() {
+		// Given
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		sut.send(record);
+
+		// When
 		sut.flush();
+
+		// Then
 		then(out).should(times(2)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsExactly(
 				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
@@ -105,12 +126,17 @@ class AutoTableChannelTest {
 
 	@Test
 	void nonOverflow() {
+		// Given
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		for (int i = 1; i < AutoTableChannel.OVERFLOW; i++) {
 			sut.send(record);
 		}
 		then(out).should(never()).send(records.capture());
+
+		// When
 		sut.flush();
+
+		// Then
 		then(out).should(times(AutoTableChannel.OVERFLOW)).send(records.capture());
 		Assertions.assertThat(records.getAllValues()).containsOnly(
 				Records.singleton(Keys.TEXT, Values.withStyle(Values.ofText("count  text      "), Ansi.Style.FG_MAGENTA)),
@@ -119,19 +145,29 @@ class AutoTableChannelTest {
 
 	@Test
 	void overflow() {
+		// Given
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
 		for (int i = 1; i <= AutoTableChannel.OVERFLOW + 1; i++) {
 			sut.send(record);
 		}
 		then(out).should(times(AutoTableChannel.OVERFLOW + 1)).send(records.capture());
+
+		// When
 		sut.flush();
+
+		// Then
 		then(out).shouldHaveNoMoreInteractions();
 	}
 
 	@Test
 	void directSend() {
+		// Given
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("whatever")).build();
+
+		// When
 		sut.send(record, EnumSet.of(OutputChannel.Option.DIRECT));
+
+		// Then
 		then(out).should().send(records.capture());
 		sut.flush(); // buffer should be empty now
 		then(out).shouldHaveNoMoreInteractions();

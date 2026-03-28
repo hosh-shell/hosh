@@ -36,17 +36,22 @@ class ExitStatusTest {
 
 	@Test
 	void equalsContract() {
+		// When / Then
 		EqualsVerifier.forClass(ExitStatus.class).verify();
 	}
 
 	@Test
 	void asString() {
+		// When / Then
 		assertThat(ExitStatus.of(42)).hasToString("ExitStatus[value=42]");
 	}
 
 	@Test
 	void success() {
+		// When
 		ExitStatus exitStatus = ExitStatus.success();
+
+		// Then
 		assertThat(exitStatus.value()).isEqualTo(0);
 		assertThat(exitStatus.isSuccess()).isTrue();
 		assertThat(exitStatus.isError()).isFalse();
@@ -54,7 +59,10 @@ class ExitStatusTest {
 
 	@Test
 	void error() {
+		// When
 		ExitStatus exitStatus = ExitStatus.error();
+
+		// Then
 		assertThat(exitStatus.value()).isEqualTo(1);
 		assertThat(exitStatus.isSuccess()).isFalse();
 		assertThat(exitStatus.isError()).isTrue();
@@ -62,6 +70,7 @@ class ExitStatusTest {
 
 	@Test
 	void validLiterals() {
+		// When / Then
 		qt()
 				.forAll(strings().numeric())
 				.check(value -> {
@@ -72,6 +81,7 @@ class ExitStatusTest {
 
 	@Test
 	void invalidLiteral() {
+		// When / Then
 		qt()
 				.forAll(strings().basicLatinAlphabet().ofLengthBetween(0, 10))
 				.assuming(value -> value.matches(".*[a-zA-Z].*"))

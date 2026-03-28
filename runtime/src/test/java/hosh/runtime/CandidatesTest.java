@@ -32,7 +32,13 @@ class CandidatesTest {
 
 	@Test
 	void incomplete() {
+		// Given
+		// (no setup)
+
+		// When
 		Candidate incomplete = Candidates.incomplete("file");
+
+		// Then
 		assertThat(incomplete.value()).isEqualTo("file");
 		assertThat(incomplete.complete()).isFalse();
 		assertThat(incomplete.descr()).isNull();
@@ -40,7 +46,13 @@ class CandidatesTest {
 
 	@Test
 	void complete() {
+		// Given
+		// (no setup)
+
+		// When
 		Candidate complete = Candidates.complete("file");
+
+		// Then
 		assertThat(complete.value()).isEqualTo("file");
 		assertThat(complete.complete()).isTrue();
 		assertThat(complete.descr()).isNull();
@@ -48,7 +60,13 @@ class CandidatesTest {
 
 	@Test
 	void completeWithDescription() {
+		// Given
+		// (no setup)
+
+		// When
 		Candidate complete = Candidates.completeWithDescription("file", "external command");
+
+		// Then
 		assertThat(complete.value()).isEqualTo("file");
 		assertThat(complete.complete()).isTrue();
 		assertThat(complete.descr()).isEqualTo("external command");

@@ -76,8 +76,13 @@ class HistoryModuleTest {
 
 		@Test
 		void noArgsEmptyHistory() {
+			// Given
 			given(history.iterator()).willReturn(Collections.emptyListIterator());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -86,10 +91,15 @@ class HistoryModuleTest {
 
 		@Test
 		void noArgsWithHistory() {
+			// Given
 			given(history.iterator()).willReturn(Collections.singletonList(entry).listIterator());
 			given(entry.time()).willReturn(Instant.EPOCH);
 			given(entry.line()).willReturn("cmd");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.builder()
@@ -101,7 +111,12 @@ class HistoryModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("whatever"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
