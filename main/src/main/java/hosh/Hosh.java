@@ -63,7 +63,7 @@ import hosh.spi.Version;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.jline.reader.History;
@@ -184,8 +184,12 @@ public class Hosh {
 			return ExitStatus.error();
 		}
 		if (commandLine.hasOption('h')) {
-			HelpFormatter helpFormatter = new HelpFormatter();
-			helpFormatter.printHelp("hosh", options);
+			try {
+				HelpFormatter.builder().get().printHelp("hosh", null, options, null, false);
+			} catch (java.io.IOException e) {
+				System.err.println("hosh: " + e.getMessage());
+				return ExitStatus.error();
+			}
 			return ExitStatus.success();
 		}
 		if (commandLine.hasOption('v')) {
