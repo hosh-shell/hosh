@@ -77,7 +77,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.jline</groupId>
-				<artifactId>jline-terminal-jni</artifactId>
+				<artifactId>jline-terminal-ffm</artifactId>
 				<version>${version.jline}</version>
 			</dependency>
 			<dependency>
