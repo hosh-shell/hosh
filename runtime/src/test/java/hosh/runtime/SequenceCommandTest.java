@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
+import hosh.spi.CommandArguments;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
@@ -33,8 +34,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.mockito.BDDMockito.then;
@@ -76,7 +75,7 @@ class SequenceCommandTest {
 		doReturn(ExitStatus.success()).when(interpreter).eval(second, in, out, err);
 
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 		// Then
 		assertThat(result).isSuccess();
@@ -88,7 +87,7 @@ class SequenceCommandTest {
 		doReturn(ExitStatus.of(42)).when(interpreter).eval(first, in, out, err);
 
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 		// Then
 		then(interpreter).should(Mockito.never()).eval(second, in, out, err);

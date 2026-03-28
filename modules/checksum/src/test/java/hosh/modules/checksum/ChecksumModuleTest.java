@@ -25,14 +25,8 @@ package hosh.modules.checksum;
 
 import hosh.modules.checksum.ChecksumModule.FromChecksum;
 import hosh.modules.checksum.ChecksumModule.ToChecksum;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Records;
-import hosh.spi.State;
 import hosh.spi.Values;
-import hosh.test.support.TemporaryFolder;
+import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,10 +39,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.test.support.TemporaryFolder;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -86,12 +86,12 @@ class ChecksumModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: to-checksum MD5|SHA-1|SHA-256|SHA-512 file...")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: to-checksum MD5|SHA-1|SHA-256|SHA-512 file")));
 		}
 
 		@Test
@@ -99,7 +99,7 @@ class ChecksumModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of("CRC32", "file.txt"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("CRC32", "file.txt"), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -111,7 +111,7 @@ class ChecksumModuleTest {
 			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			// When
-			ExitStatus result = sut.run(List.of("SHA-256", "missing.txt"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("SHA-256", "missing.txt"), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -123,7 +123,7 @@ class ChecksumModuleTest {
 			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			// When
-			ExitStatus result = sut.run(List.of("SHA-256", temporaryFolder.toPath().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("SHA-256", temporaryFolder.toPath().toString()), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -137,7 +137,7 @@ class ChecksumModuleTest {
 			Path file = temporaryFolder.newFile("data.txt");
 			Files.writeString(file, "hello", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of("SHA-256", file.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("SHA-256", file.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -156,7 +156,7 @@ class ChecksumModuleTest {
 			Path file = temporaryFolder.newFile("data.txt");
 			Files.writeString(file, "hello", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of("MD5", file.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("MD5", file.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -175,7 +175,7 @@ class ChecksumModuleTest {
 			Path file = temporaryFolder.newFile("data.txt");
 			Files.writeString(file, "hello", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of("SHA-1", file.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("SHA-1", file.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -194,7 +194,7 @@ class ChecksumModuleTest {
 			Path file = temporaryFolder.newFile("data.txt");
 			Files.writeString(file, "hello", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of("SHA-512", file.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("SHA-512", file.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -216,7 +216,7 @@ class ChecksumModuleTest {
 					Optional.of(Records.singleton(Keys.PATH, Values.ofPath(file))),
 					Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of("SHA-256"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("SHA-256"), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).should().send(Records.builder()
@@ -234,7 +234,7 @@ class ChecksumModuleTest {
 					Optional.of(Records.singleton(Keys.of("name"), Values.ofText("alice"))),
 					Optional.empty());
 			// When
-			ExitStatus result = sut.run(List.of("SHA-256"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("SHA-256"), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(out).shouldHaveNoInteractions();
@@ -274,7 +274,7 @@ class ChecksumModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -287,7 +287,7 @@ class ChecksumModuleTest {
 			// Given
 			// (no setup)
 			// When
-			ExitStatus result = sut.run(List.of("a.sha256", "b.sha256"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("a.sha256", "b.sha256"), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -300,7 +300,7 @@ class ChecksumModuleTest {
 			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			// When
-			ExitStatus result = sut.run(List.of("missing.sha256"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("missing.sha256"), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -317,7 +317,7 @@ class ChecksumModuleTest {
 					"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824  data.txt\n",
 					StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(checksumFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(checksumFile.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -339,7 +339,7 @@ class ChecksumModuleTest {
 					"5d41402abc4b2a76b9719d911017c592  data.txt\n",
 					StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(checksumFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(checksumFile.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -361,7 +361,7 @@ class ChecksumModuleTest {
 					"2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824 *data.bin\n",
 					StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(checksumFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(checksumFile.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -383,7 +383,7 @@ class ChecksumModuleTest {
 					"\n2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824  data.txt\n\n",
 					StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(checksumFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(checksumFile.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
@@ -402,7 +402,7 @@ class ChecksumModuleTest {
 			Path checksumFile = temporaryFolder.newFile("bad.sha256");
 			Files.writeString(checksumFile, "this is not a valid checksum line\n", StandardCharsets.UTF_8);
 			// When
-			ExitStatus result = sut.run(List.of(checksumFile.getFileName().toString()), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(checksumFile.getFileName().toString()), in, out, err);
 			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();

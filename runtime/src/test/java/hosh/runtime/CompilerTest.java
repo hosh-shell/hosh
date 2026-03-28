@@ -487,8 +487,8 @@ class CompilerTest {
 					.hasSize(1).first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
-							String resolve = argument.resolve(state);
-							assertThat(resolve).isEqualTo("");
+							var resolve = argument.resolve(state);
+							assertThat(resolve.asString()).isEqualTo("");
 						});
 					});
 		}
@@ -506,8 +506,8 @@ class CompilerTest {
 					.hasSize(1).first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
-							String resolve = argument.resolve(state);
-							assertThat(resolve).isEqualTo("file with spaces");
+							var resolve = argument.resolve(state);
+							assertThat(resolve.asString()).isEqualTo("file with spaces");
 						});
 					});
 		}
@@ -526,8 +526,8 @@ class CompilerTest {
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
-							String resolved = argument.resolve(state);
-							assertThat(resolved).isEqualTo("${HOME}${BIN}");
+							var resolved = argument.resolve(state);
+							assertThat(resolved.asString()).isEqualTo("${HOME}${BIN}");
 						});
 					});
 		}
@@ -546,8 +546,8 @@ class CompilerTest {
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
-							String resolve = argument.resolve(state);
-							assertThat(resolve).isEqualTo("");
+							var resolve = argument.resolve(state);
+							assertThat(resolve.asString()).isEqualTo("");
 						});
 					});
 		}
@@ -566,8 +566,8 @@ class CompilerTest {
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
-							String resolve = argument.resolve(state);
-							assertThat(resolve).isEqualTo("file with spaces");
+							var resolve = argument.resolve(state);
+							assertThat(resolve.asString()).isEqualTo("file with spaces");
 						});
 					});
 		}
@@ -587,8 +587,8 @@ class CompilerTest {
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
-							String resolved = argument.resolve(state);
-							assertThat(resolved).isEqualTo("/home/dfa");
+							var resolved = argument.resolve(state);
+							assertThat(resolved.asString()).isEqualTo("/home/dfa");
 						});
 					});
 		}
@@ -608,8 +608,8 @@ class CompilerTest {
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
-							String resolved = argument.resolve(state);
-							assertThat(resolved).isEqualTo("/home/dfa/bin");
+							var resolved = argument.resolve(state);
+							assertThat(resolved.asString()).isEqualTo("/home/dfa/bin");
 						});
 					});
 		}
@@ -629,8 +629,8 @@ class CompilerTest {
 					.first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
 						assertThat(statement.getArguments()).hasSize(1).first().satisfies(argument -> {
-							String resolved = argument.resolve(state);
-							assertThat(resolved).isEqualTo("/home/dfa/bin");
+							var resolved = argument.resolve(state);
+							assertThat(resolved.asString()).isEqualTo("/home/dfa/bin");
 						});
 					});
 		}

@@ -23,16 +23,8 @@
  */
 package hosh.runtime;
 
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Records;
-import hosh.spi.State;
-import hosh.spi.Value;
-import hosh.spi.Values;
 import hosh.spi.VariableName;
-import org.junit.jupiter.api.BeforeEach;
+import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -45,6 +37,15 @@ import java.util.Map;
 import java.util.Optional;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Records;
+import hosh.spi.State;
+import hosh.spi.Value;
+import hosh.spi.Values;
+import org.junit.jupiter.api.BeforeEach;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -91,7 +92,7 @@ class LambdaCommandTest {
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
 
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 		// Then
 		assertThat(result).isSuccess();
@@ -111,7 +112,7 @@ class LambdaCommandTest {
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(Path.of("file")))), Optional.empty());
 
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 		// Then
 		assertThat(result).isError();
@@ -129,7 +130,7 @@ class LambdaCommandTest {
 		given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.TEXT, Values.ofPath(Path.of("file")))), Optional.empty());
 
 		// When
-		ExitStatus result = sut.run(List.of(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 		// Then
 		assertThat(result).isError();

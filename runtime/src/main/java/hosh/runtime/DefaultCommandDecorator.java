@@ -24,12 +24,11 @@
 package hosh.runtime;
 
 import hosh.runtime.Compiler.Statement;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandWrapper;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.OutputChannel;
-
-import java.util.List;
 
 /**
  * Runtime representation of a wrapper command ({@code cmd { ... }}).
@@ -58,7 +57,7 @@ class DefaultCommandDecorator implements CompilerCommand, InterpreterAware {
 	}
 
 	@Override
-	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+	public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 		// CommandNested is just a way to hide Interpreter and other internals to the modules
 		commandWrapper.setNestedCommand(() -> interpreter.eval(nested, in, out, err));
 		return commandWrapper.run(args, in, out, err);

@@ -25,6 +25,7 @@ package hosh.runtime;
 
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
@@ -81,7 +82,7 @@ class LambdaCommand implements CompilerCommand, InterpreterAware, StateAware {
 
 	@Todo(description = "generalize with a list of keys")
 	@Override
-	public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+	public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 		// at this point key is both a valid variable name and key (key is anyway a superset)
 		Key lambdaParameterKey = Keys.of(key);
 		VariableName variableName = VariableName.constant(key);

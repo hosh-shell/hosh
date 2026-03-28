@@ -23,8 +23,6 @@
  */
 package hosh.spi;
 
-import java.util.List;
-
 /**
  * Command represents a built-in (i.e. ls) or external commands (i.e. vim).
  */
@@ -39,5 +37,5 @@ public interface Command {
 	 * @param err  channel for error/diagnostic records; does not stop execution on its own
 	 * @return {@link ExitStatus#success()} on normal completion, {@link ExitStatus#error()} otherwise
 	 */
-	ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err);
+	ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err);
 }

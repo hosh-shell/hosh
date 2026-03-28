@@ -25,6 +25,7 @@ package hosh.runtime;
 
 import hosh.runtime.ExternalCommand.ProcessFactory;
 import hosh.runtime.PipelineCommand.Position;
+import hosh.spi.CommandArguments;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -107,7 +108,7 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus result = sut.run(Collections.emptyList(), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(processFactory).should().create(
@@ -132,7 +133,7 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of("file.hosh"), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(processFactory).should().create(
@@ -157,7 +158,7 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of("file.hosh"), in, out, err);
 		// Then
 		assertThat(result).isError();
 		then(processFactory).should().create(
@@ -182,7 +183,7 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of("file.hosh"), in, out, err);
 		// Then
 		assertThat(result).isError();
 		then(processFactory).should().create(
@@ -206,7 +207,7 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of("file.hosh"), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(in).should(times(1)).recv();
@@ -226,7 +227,7 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of("file.hosh"), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(in).should(times(1)).recv();
@@ -250,7 +251,7 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of("file.hosh"), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualToNormalizingNewlines("aaa 10\n");
@@ -267,7 +268,7 @@ class ExternalCommandTest {
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
 		// When
-		ExitStatus result = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		ExitStatus result = sut.run(CommandArguments.of("file.hosh"), in, out, err);
 		// Then
 		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();

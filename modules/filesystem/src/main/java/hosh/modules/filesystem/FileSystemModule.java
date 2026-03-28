@@ -30,6 +30,7 @@ import hosh.doc.Examples;
 import hosh.doc.Experimental;
 import hosh.doc.Todo;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.CommandWrapper;
@@ -38,9 +39,7 @@ import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
 import hosh.spi.LoggerFactory;
-import hosh.spi.Module;
 import hosh.spi.OutputChannel;
-import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
@@ -48,6 +47,8 @@ import hosh.spi.StateMutator;
 import hosh.spi.StateMutatorAware;
 import hosh.spi.Value;
 import hosh.spi.Values;
+import hosh.spi.Module;
+import hosh.spi.Record;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -73,7 +74,6 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.function.IntPredicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -118,7 +118,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() > 1) {
 				err.send(Errors.usage("ls [directory]"));
 				return ExitStatus.error();
@@ -126,7 +126,7 @@ public class FileSystemModule implements Module {
 			final Path cwd = state.getCwd();
 			final Path dir;
 			if (args.size() == 1) {
-				dir = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+				dir = args.get(0).asPath(state);
 			} else {
 				dir = cwd;
 			}
@@ -170,7 +170,7 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("cwd"));
 				return ExitStatus.error();
@@ -201,12 +201,12 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("cd directory"));
 				return ExitStatus.error();
 			}
-			Path newCwd = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path newCwd = args.get(0).asPath(state);
 			if (!Files.isDirectory(newCwd)) {
 				err.send(Errors.message("not a directory"));
 				return ExitStatus.error();
@@ -230,12 +230,12 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("lines file"));
 				return ExitStatus.error();
 			}
-			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path source = args.get(0).asPath(state);
 			if (!Files.isRegularFile(source)) {
 				err.send(Errors.message("not readable file"));
 				return ExitStatus.error();
@@ -264,13 +264,13 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("walk directory"));
 				return ExitStatus.error();
 			}
 			try {
-				Path target = followSymlinksRecursively(resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst())));
+				Path target = followSymlinksRecursively(args.get(0).asPath(state));
 				if (!Files.exists(target)) {
 					err.send(Errors.message("not found"));
 					return ExitStatus.error();
@@ -342,12 +342,12 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("glob pattern"));
 				return ExitStatus.error();
 			}
-			String pattern = args.getFirst();
+			String pattern = args.get(0).asString();
 			PathMatcher pathMatcher = state.getCwd().getFileSystem().getPathMatcher("glob:" + pattern);
 			for (Record record : InputChannel.iterate(in)) {
 				record.value(Keys.PATH)
@@ -376,13 +376,13 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("cp file file"));
 				return ExitStatus.error();
 			}
-			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
-			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
+			Path source = args.get(0).asPath(state);
+			Path target = args.get(1).asPath(state);
 			try {
 				Files.copy(source, target);
 				return ExitStatus.success();
@@ -408,13 +408,13 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("mv file file"));
 				return ExitStatus.error();
 			}
-			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
-			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
+			Path source = args.get(0).asPath(state);
+			Path target = args.get(1).asPath(state);
 			try {
 				Files.move(source, target);
 				return ExitStatus.success();
@@ -439,12 +439,12 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("rm file"));
 				return ExitStatus.error();
 			}
-			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path target = args.get(0).asPath(state);
 			try {
 				Files.delete(target);
 				return ExitStatus.success();
@@ -463,7 +463,7 @@ public class FileSystemModule implements Module {
 		private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (!args.isEmpty()) {
 				err.send(Errors.usage("partitions"));
 				return ExitStatus.error();
@@ -503,12 +503,12 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("probe file"));
 				return ExitStatus.error();
 			}
-			Path file = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path file = args.get(0).asPath(state);
 			try {
 				String contentType = Files.probeContentType(file);
 				if (contentType == null) {
@@ -537,13 +537,13 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("symlink source target"));
 				return ExitStatus.error();
 			}
-			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
-			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
+			Path source = args.get(0).asPath(state);
+			Path target = args.get(1).asPath(state);
 			try {
 				Files.createSymbolicLink(target, source);
 				return ExitStatus.success();
@@ -567,13 +567,13 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("hardlink source target"));
 				return ExitStatus.error();
 			}
-			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
-			Path target = resolveAsAbsolutePath(state.getCwd(), Path.of(args.get(1)));
+			Path source = args.get(0).asPath(state);
+			Path target = args.get(1).asPath(state);
 			try {
 				Files.createLink(target, source);
 				return ExitStatus.success();
@@ -598,14 +598,13 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("resolve file"));
 				return ExitStatus.error();
 			}
 			try {
-				Path unresolved = Path.of(args.getFirst());
-				Path partiallyResolved = resolveAsAbsolutePath(state.getCwd(), unresolved);
+				Path partiallyResolved = args.get(0).asPath(state);
 				Path resolved = partiallyResolved.toRealPath();
 				out.send(Records.singleton(Keys.PATH, Values.ofPath(resolved)));
 				return ExitStatus.success();
@@ -637,12 +636,12 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("watch directory"));
 				return ExitStatus.error();
 			}
-			Path dir = state.getCwd().resolve(args.getFirst());
+			Path dir = state.getCwd().resolve(args.get(0).asString());
 			WatchEvent.Kind<?>[] events = {
 					StandardWatchEventKinds.ENTRY_CREATE,
 					StandardWatchEventKinds.ENTRY_DELETE,
@@ -715,12 +714,12 @@ public class FileSystemModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("withLock file { ... }"));
 				return ExitStatus.error();
 			}
-			Path path = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path path = args.get(0).asPath(state);
 			RandomAccessFile randomAccessFile = null;
 			try {
 				randomAccessFile = new RandomAccessFile(path.toFile(), "rw");
@@ -769,14 +768,4 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	private static Path resolveAsAbsolutePath(Path cwd, Path file) {
-		if (file.isAbsolute()) {
-			return normalized(file);
-		}
-		return normalized(cwd.resolve(file));
-	}
-
-	private static Path normalized(Path path) {
-		return path.normalize().toAbsolutePath();
-	}
 }

@@ -23,6 +23,7 @@
  */
 package hosh.spi;
 
+import hosh.doc.Experimental;
 import hosh.doc.Todo;
 
 import java.util.Locale;
@@ -32,7 +33,7 @@ import java.util.Optional;
  * The value in @{see Record}.
  * NB: all concrete classes implementing this interface should be value objects.
  */
-@Todo(description = "re-evaluate the choice of 2019 of hiding the concrete types... sealed could be better")
+@Todo(description = "re-evaluate the choice of 2019 of hiding the concrete types... sealed class is better")
 public interface Value extends Comparable<Value> {
 
 	/**
@@ -42,12 +43,13 @@ public interface Value extends Comparable<Value> {
 	String show(Locale locale);
 
 	/**
-	 * Access to the underlying value. This can be used to convert a value to a more primitive type.
+	 * Access to the underlying value. This can be used to convert a value to the inner representation.
 	 *
 	 * @param type the class representing wanted type
 	 * @param <T>  the wanted type
 	 * @return optionally result value
 	 */
+	@Experimental(description = "not really sure about this")
 	default <T> Optional<T> unwrap(Class<T> type) {
 		return Optional.empty();
 	}
@@ -58,6 +60,8 @@ public interface Value extends Comparable<Value> {
 	 * @param value the value to merge with
 	 * @return optionally a new value holding the result of the merge
 	 */
+	@Deprecated
+	@Todo(description = "this is used once to implement sum()... it is not worth as public method here")
 	default Optional<Value> merge(Value value) {
 		return Optional.empty();
 	}

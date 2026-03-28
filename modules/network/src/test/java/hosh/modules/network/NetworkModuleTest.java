@@ -24,15 +24,8 @@
 package hosh.modules.network;
 
 import hosh.doc.Todo;
-import hosh.spi.ExitStatus;
-import hosh.spi.InputChannel;
-import hosh.spi.Keys;
-import hosh.spi.OutputChannel;
-import hosh.spi.Record;
-import hosh.spi.Records;
-import hosh.spi.Values;
 import hosh.spi.Version;
-import hosh.test.support.WithThread;
+import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -52,6 +45,14 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+import hosh.spi.ExitStatus;
+import hosh.spi.InputChannel;
+import hosh.spi.Keys;
+import hosh.spi.OutputChannel;
+import hosh.spi.Record;
+import hosh.spi.Records;
+import hosh.spi.Values;
+import hosh.test.support.WithThread;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -84,7 +85,7 @@ class NetworkModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -98,7 +99,7 @@ class NetworkModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of("whatever"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("whatever"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -147,7 +148,7 @@ class NetworkModuleTest {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(List.of(), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -164,7 +165,7 @@ class NetworkModuleTest {
 			given(response.statusCode()).willReturn(200);
 
 			// When
-			ExitStatus result = sut.run(List.of("https://example.org"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("https://example.org"), in, out, err);
 
 			// Then
 			assertThat(result).isSuccess();
@@ -184,7 +185,7 @@ class NetworkModuleTest {
 			given(requestor.send(Mockito.any())).willThrow(new InterruptedException());
 
 			// When
-			ExitStatus result = sut.run(List.of("https://example.org"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("https://example.org"), in, out, err);
 
 			// Then
 			assertThat(result).isError();
@@ -200,7 +201,7 @@ class NetworkModuleTest {
 			given(requestor.send(Mockito.any())).willThrow(new ConnectException("simulated"));
 
 			// When
-			ExitStatus result = sut.run(List.of("https://example.org"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of("https://example.org"), in, out, err);
 
 			// Then
 			assertThat(result).isError();

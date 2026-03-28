@@ -24,6 +24,7 @@
 package hosh.runtime;
 
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.ExitStatus;
 import hosh.spi.HistoryAware;
 import hosh.spi.InputChannel;
@@ -46,7 +47,6 @@ import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.terminal.Terminal;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -152,7 +152,7 @@ public class Interpreter {
 	protected ExitStatus eval(Compiler.Statement statement, InputChannel in, OutputChannel out, OutputChannel err, State newState) {
 		Command command = statement.getCommand();
 		inject(command, newState);
-		List<String> resolvedArguments = resolveArguments(newState, statement.getArguments());
+		CommandArguments resolvedArguments = resolveArguments(newState, statement.getArguments());
 		changeCurrentThreadName(statement.getLocation(), resolvedArguments);
 		return command.run(resolvedArguments, in, out, new WithLocation(err, statement.getLocation()));
 	}
@@ -186,19 +186,16 @@ public class Interpreter {
 		}
 	}
 
-	private void changeCurrentThreadName(String commandName, List<String> resolvedArguments) {
-		List<String> commandWithArguments = new ArrayList<>();
-		commandWithArguments.add(commandName);
-		commandWithArguments.addAll(resolvedArguments);
-		String name = String.format("command='%s'", String.join(" ", commandWithArguments));
-		Thread.currentThread().setName(name);
+	private void changeCurrentThreadName(String commandName, CommandArguments resolvedArguments) {
+		String suffix = resolvedArguments.isEmpty() ? "" : " " + String.join(" ", resolvedArguments.stream().map(CommandArguments.CommandArgument::asString).toList());
+		Thread.currentThread().setName(String.format("command='%s'", commandName + suffix));
 	}
 
-	private static List<String> resolveArguments(State state, List<Compiler.Resolvable> arguments) {
-		return arguments
+	private static CommandArguments resolveArguments(State state, List<Compiler.Resolvable> arguments) {
+		return CommandArguments.of(arguments
 				.stream()
 				.map(resolvable -> resolvable.resolve(state))
-				.toList();
+				.toList());
 	}
 
 	private String messageFor(ExecutionException e) {

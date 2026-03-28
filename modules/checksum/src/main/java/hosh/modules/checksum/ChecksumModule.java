@@ -27,18 +27,20 @@ import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
 import hosh.spi.Command;
+import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
 import hosh.spi.CommandRegistry;
 import hosh.spi.Errors;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
-import hosh.spi.Module;
 import hosh.spi.OutputChannel;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.StateAware;
+import hosh.spi.Value;
 import hosh.spi.Values;
+import hosh.spi.Module;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,8 +52,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class ChecksumModule implements Module {
@@ -80,32 +82,33 @@ public class ChecksumModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
-			if (args.isEmpty()) {
-				err.send(Errors.usage("to-checksum MD5|SHA-1|SHA-256|SHA-512 file..."));
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.isEmpty() || args.size() > 2) {
+				err.send(Errors.usage("to-checksum MD5|SHA-1|SHA-256|SHA-512 file"));
 				return ExitStatus.error();
 			}
-			String algorithm = args.getFirst();
+			String algorithm = args.get(0).asString();
 			if (!SUPPORTED_ALGORITHMS.contains(algorithm)) {
 				err.send(Errors.message("unsupported algorithm: %s (supported: %s)", algorithm, SUPPORTED_ALGORITHMS));
 				return ExitStatus.error();
 			}
-			List<String> files = args.subList(1, args.size());
-			if (files.isEmpty()) {
+
+			if (args.size() == 1) {
 				return hashFromPipeline(algorithm, in, out, err);
 			} else {
-				return hashFiles(algorithm, files, out, err);
+				String file = args.get(1).asString();
+				return hashFiles(algorithm, file, out, err);
 			}
 		}
 
 		private ExitStatus hashFromPipeline(String algorithm, InputChannel in, OutputChannel out, OutputChannel err) {
 			for (hosh.spi.Record record : InputChannel.iterate(in)) {
-				var pathValue = record.value(Keys.PATH);
+				Optional<Value> pathValue = record.value(Keys.PATH);
 				if (pathValue.isEmpty()) {
 					err.send(Errors.message("record has no path key, skipping"));
 					continue;
 				}
-				Path file = resolveAsAbsolutePath(state.getCwd(), Path.of(pathValue.get().show(Locale.getDefault())));
+				Path file = state.getCwd().resolve(pathValue.get().unwrap(Path.class).orElseThrow());
 				if (!Files.isRegularFile(file)) {
 					continue;
 				}
@@ -117,21 +120,19 @@ public class ChecksumModule implements Module {
 			return ExitStatus.success();
 		}
 
-		private ExitStatus hashFiles(String algorithm, List<String> files, OutputChannel out, OutputChannel err) {
-			for (String filename : files) {
-				Path file = resolveAsAbsolutePath(state.getCwd(), Path.of(filename));
-				if (!Files.exists(file)) {
-					err.send(Errors.message("file not found: %s", file));
-					return ExitStatus.error();
-				}
-				if (!Files.isRegularFile(file)) {
-					err.send(Errors.message("not a regular file: %s", file));
-					return ExitStatus.error();
-				}
-				ExitStatus status = hashOneFile(algorithm, file, out, err);
-				if (status.isError()) {
-					return status;
-				}
+		private ExitStatus hashFiles(String algorithm, String filename, OutputChannel out, OutputChannel err) {
+			Path file = state.getCwd().resolve(filename);
+			if (!Files.exists(file)) {
+				err.send(Errors.message("file not found: %s", file));
+				return ExitStatus.error();
+			}
+			if (!Files.isRegularFile(file)) {
+				err.send(Errors.message("not a regular file: %s", file));
+				return ExitStatus.error();
+			}
+			ExitStatus status = hashOneFile(algorithm, file, out, err);
+			if (status.isError()) {
+				return status;
 			}
 			return ExitStatus.success();
 		}
@@ -177,12 +178,12 @@ public class ChecksumModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(List<String> args, InputChannel in, OutputChannel out, OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 1) {
 				err.send(Errors.usage("from-checksum file"));
 				return ExitStatus.error();
 			}
-			Path source = resolveAsAbsolutePath(state.getCwd(), Path.of(args.getFirst()));
+			Path source = args.get(0).asPath(state);
 			if (!Files.exists(source)) {
 				err.send(Errors.message("file not found: %s", source));
 				return ExitStatus.error();
@@ -218,7 +219,7 @@ public class ChecksumModule implements Module {
 						err.send(Errors.message("unrecognized hash length %d in line: %s", hash.length(), line));
 						return ExitStatus.error();
 					}
-					Path file = resolveAsAbsolutePath(source.getParent(), Path.of(filename));
+					Path file = source.getParent().resolve(Path.of(filename));
 					out.send(Records.builder()
 							.entry(Keys.PATH, Values.ofPath(file))
 							.entry(Keys.of("algorithm"), Values.ofText(algorithm))
@@ -242,16 +243,5 @@ public class ChecksumModule implements Module {
 			}
 		}
 		return HexFormat.of().formatHex(digest.digest());
-	}
-
-	private static Path resolveAsAbsolutePath(Path cwd, Path file) {
-		if (file.isAbsolute()) {
-			return normalized(file);
-		}
-		return normalized(cwd.resolve(file));
-	}
-
-	private static Path normalized(Path path) {
-		return path.normalize().toAbsolutePath();
 	}
 }
