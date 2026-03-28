@@ -92,45 +92,63 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.6.2</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<createDependencyReducedPom>false</createDependencyReducedPom>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-									<resource>LICENSE.md</resource>
-									<file>../LICENSE.md</file>
-								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-									<resource>README.md</resource>
-									<file>../README.md</file>
-								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
-									<resource>CHANGELOG.md</resource>
-									<file>../CHANGELOG.md</file>
-								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<manifestEntries>
-										<Main-Class>hosh.Hosh</Main-Class>
-									</manifestEntries>
-								</transformer>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 	<profiles>
+		<profile>
+			<id>uberjar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>3.6.2</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<createDependencyReducedPom>false</createDependencyReducedPom>
+									<transformers>
+										<transformer
+												implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer">
+										</transformer>
+										<transformer
+												implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+											<resource>LICENSE.md</resource>
+											<file>../LICENSE.md</file>
+										</transformer>
+										<transformer
+												implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+											<resource>README.md</resource>
+											<file>../README.md</file>
+										</transformer>
+										<transformer
+												implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+											<resource>CHANGELOG.md</resource>
+											<file>../CHANGELOG.md</file>
+										</transformer>
+										<transformer
+												implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+											<manifestEntries>
+												<Main-Class>hosh.Hosh</Main-Class>
+											</manifestEntries>
+										</transformer>
+										<transformer
+												implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+									</transformers>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>native</id>
 			<build>
