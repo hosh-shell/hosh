@@ -93,10 +93,7 @@ class LambdaCommand implements CompilerCommand, InterpreterAware, StateAware {
 			}
 			Value value = lambdaParameter.orElseThrow(IllegalArgumentException::new);
 			// invoke inner command with a new state, with variable overridden
-			Map<VariableName, Value> original = state.getVariables();
-			Map<VariableName, Value> modified = new HashMap<>(original);
-			modified.put(variableName, value);
-			LambdaState newState = new LambdaState(state, Map.copyOf(modified));
+			LambdaState newState = new LambdaState(state, variableName, value);
 			ExitStatus eval = interpreter.eval(statement, in, out, err, newState);
 			if (eval.isError()) {
 				return eval;
@@ -116,9 +113,12 @@ class LambdaCommand implements CompilerCommand, InterpreterAware, StateAware {
 		private final State delegate;
 		private final Map<VariableName, Value> variables;
 
-		private LambdaState(State delegate, Map<VariableName, Value> variables) {
+		private LambdaState(State delegate, VariableName variableName, Value value) {
 			this.delegate = delegate;
-			this.variables = variables;
+			Map<VariableName, Value> original = delegate.getVariables();
+			Map<VariableName, Value> modified = new HashMap<>(original);
+			modified.put(variableName, value);
+			this.variables = modified;
 		}
 
 		@Override
