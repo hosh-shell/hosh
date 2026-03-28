@@ -1,9 +1,12 @@
 # Hosh
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/hosh-shell/hosh/workflows/CI/badge.svg?branch:master)](https://github.com/hosh-shell/hosh/actions?query=branch:master) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hosh%3Ahosh-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=hosh%3Ahosh-parent)
-[![`Coverage`](https://sonarcloud.io/api/project_badges/measure?project=hosh%3Ahosh-parent&metric=coverage)](https://sonarcloud.io/dashboard?id=hosh%3Ahosh-parent)[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4646/badge)](https://bestpractices.coreinfrastructure.org/projects/4646)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) 
+[![CI](https://github.com/hosh-shell/hosh/workflows/CI/badge.svg?branch:master)](https://github.com/hosh-shell/hosh/actions?query=branch:master)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=hosh-shell_hosh&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=hosh-shell_hosh)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=hosh%3Ahosh-parent&metric=coverage)](https://sonarcloud.io/summary/new_code?id=hosh%3Ahosh-parent)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4646/badge)](https://bestpractices.coreinfrastructure.org/projects/4646)
 
-Human Oriented SHell, written in Java.
+**H**uman **O**riented **SH**ell, written in **Java**.
 
 Website: https://hosh-shell.github.io
 
