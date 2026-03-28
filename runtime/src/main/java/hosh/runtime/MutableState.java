@@ -36,6 +36,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 /**
@@ -45,80 +47,80 @@ import java.util.function.Supplier;
 public class MutableState implements State, StateMutator {
 
 	// variables
-	private volatile Map<VariableName, Value> variables;
+	private final AtomicReference<Map<VariableName, Value>> variables;
 
 	// built-in commands
-	private volatile Map<CommandName, Supplier<Command>> commands;
+	private final AtomicReference<Map<CommandName, Supplier<Command>>> commands;
 
 	// current working directory
-	private volatile Path cwd;
+	private final AtomicReference<Path> cwd;
 
-	// where to look for commands (e.g. the "PATH" variable)
-	private volatile List<Path> path;
+	// where to look for external commands (e.g. the "PATH" variable)
+	private final AtomicReference<List<Path>> path;
 
 	// request exit shell before executing next command
-	private volatile boolean exit;
+	private final AtomicBoolean exit;
 
 	public MutableState() {
-		variables = Map.of();
-		commands = Map.of();
-		cwd = Paths.get("");
-		path = List.of();
-		exit = false;
+		variables = new AtomicReference<>(Map.of());
+		commands = new AtomicReference<>(Map.of());
+		cwd = new AtomicReference<>(Paths.get(""));
+		path = new AtomicReference<>(List.of());
+		exit = new AtomicBoolean(false);
 	}
 
 	@Override
 	public Path getCwd() {
-		return cwd;
+		return cwd.get();
 	}
 
 	@Override
 	public Map<CommandName, Supplier<Command>> getCommands() {
-		return commands;
+		return commands.get();
 	}
 
 	@Override
 	public Map<VariableName, Value> getVariables() {
-		return variables;
+		return variables.get();
 	}
 
 	@Override
 	public List<Path> getPath() {
-		return path;
+		return path.get();
 	}
 
 	@Override
 	public boolean isExit() {
-		return exit;
+		return exit.get();
 	}
 
 	@Override
 	public void mutateCwd(Path newPath) {
-		this.cwd = Objects.requireNonNull(newPath).normalize().toAbsolutePath();
+		cwd.set(Objects.requireNonNull(newPath).normalize().toAbsolutePath());
 	}
 
 	@Override
 	public void mutatePath(List<Path> newPath) {
-		this.path = List.copyOf(Objects.requireNonNull(newPath));
+		path.set(List.copyOf(Objects.requireNonNull(newPath)));
 	}
 
 	@Override
 	public void mutateExit(boolean newExit) {
-		this.exit = newExit;
+		exit.set(newExit);
 	}
 
 	@Override
 	public void mutateVariables(Map<VariableName, Value> newVariables) {
-		this.variables = Map.copyOf(Objects.requireNonNull(newVariables));
+		variables.set(Map.copyOf(Objects.requireNonNull(newVariables)));
 	}
 
 	@Override
 	public void mutateCommands(Map<CommandName, Supplier<Command>> newCommands) {
-		this.commands = Map.copyOf(Objects.requireNonNull(newCommands));
+		commands.set(Map.copyOf(Objects.requireNonNull(newCommands)));
 	}
 
 	@Override
 	public String toString() {
-		return String.format("MutableState[cwd='%s',path=%s,variables=%s,commands=%s]", cwd, path, variables, commands);
+		return String.format("MutableState[cwd='%s',path=%s,variables=%s,commands=%s]", cwd.get(), path.get(), variables.get(), commands.get());
 	}
 }
