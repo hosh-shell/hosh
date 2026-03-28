@@ -57,18 +57,26 @@ class ValuesTest {
 
 		@Test
 		void show() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.none().show(Locale.ENGLISH)).isEmpty();
 		}
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.None.class).verify();
 		}
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.none();
 			Value b = Values.ofText("2");
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare None with Text[2]");
@@ -76,23 +84,34 @@ class ValuesTest {
 
 		@Test
 		void compareToNone() {
+			// Given
 			Value v1 = Values.none();
 			Value v2 = Values.none();
+			// When / Then
 			assertThat(v1).usingDefaultComparator().isEqualByComparingTo(v2);
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.none()).hasToString("None");
 		}
 
 		@Test
 		void unwrap() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.none().unwrap(Object.class)).isEmpty();
 		}
 
 		@Test
 		void merge() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.none().merge(Values.ofText("a"))).isNotEmpty();
 			assertThat(Values.none().merge(Values.none())).isEmpty();
 		}
@@ -103,21 +122,33 @@ class ValuesTest {
 
 		@Test
 		void show() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofDuration(Duration.ofMillis(1)).show(Locale.ENGLISH)).isEqualTo("PT0.001S");
 		}
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.DurationValue.class).verify();
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofDuration(Duration.ofMillis(1))).hasToString("Duration[PT0.001S]");
 		}
 
 		@Test
 		void nullDuration() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThatThrownBy(() -> Values.ofDuration(null))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("duration cannot be null");
@@ -125,8 +156,10 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.ofDuration(Duration.ofHours(1));
 			Value b = Values.ofText("2");
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Duration[PT1H] with Text[2]");
@@ -134,9 +167,11 @@ class ValuesTest {
 
 		@Test
 		void compareToSameValueType() {
+			// Given
 			Value a = Values.ofDuration(Duration.ofHours(1));
 			Value b = Values.ofDuration(Duration.ofHours(2));
 			Value c = Values.ofDuration(Duration.ofHours(1));
+			// When / Then
 			assertThat(a.compareTo(b)).isEqualTo(-1);
 			assertThat(b.compareTo(a)).isEqualTo(1);
 			assertThat(a.compareTo(c)).isEqualTo(0);
@@ -151,22 +186,33 @@ class ValuesTest {
 
 		@Test
 		void show() {
+			// Given
 			withTimeZone.changeTo(TimeZone.getTimeZone("Europe/Zurich"));
+			// When / Then
 			assertThat(Values.ofInstant(Instant.EPOCH).show(Locale.ENGLISH)).isEqualTo("1970-01-01T01:00:00");
 		}
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.InstantValue.class).verify();
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofInstant(Instant.EPOCH)).hasToString("Instant[1970-01-01T00:00:00Z]");
 		}
 
 		@Test
 		void nullDuration() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThatThrownBy(() -> Values.ofInstant(null))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("instant cannot be null");
@@ -174,8 +220,10 @@ class ValuesTest {
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.ofInstant(Instant.EPOCH);
 			Value b = Values.ofText("2");
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Instant[1970-01-01T00:00:00Z] with Text[2]");
@@ -187,6 +235,9 @@ class ValuesTest {
 
 		@Test
 		void nullIsReject() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThatThrownBy(() -> Values.ofText(null))
 					.hasMessage("text cannot be null")
 					.isInstanceOf(IllegalArgumentException.class);
@@ -194,24 +245,35 @@ class ValuesTest {
 
 		@Test
 		void show() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofText("aaa").show(Locale.getDefault())).isEqualTo("aaa");
 		}
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.TextValue.class)
 					.verify();
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofText("aaa")).hasToString("Text[aaa]");
 		}
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.ofText("2");
 			Value b = Values.ofDuration(Duration.ofHours(1));
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Text[2] with Duration[PT1H]");
@@ -219,6 +281,9 @@ class ValuesTest {
 
 		@Test
 		void nullText() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThatThrownBy(() -> Values.ofText(null))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("text cannot be null");
@@ -226,7 +291,9 @@ class ValuesTest {
 
 		@Test
 		void unwrap() {
+			// Given
 			Value value = Values.ofText("aaa");
+			// When / Then
 			assertThat(value.unwrap(int.class)).isEmpty();
 			assertThat(value.unwrap(String.class)).hasValue("aaa");
 			assertThat(value.unwrap(CharSequence.class)).hasValue("aaa");
@@ -238,28 +305,42 @@ class ValuesTest {
 
 		@Test
 		void showWithEnglishLocale() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofNumeric(1_000_000).show(Locale.ENGLISH)).isEqualTo("1,000,000");
 		}
 
 		@Test
 		void showWithItalianLocale() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofNumeric(1_000_000).show(Locale.ITALIAN)).isEqualTo("1.000.000");
 		}
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.NumericValue.class).verify();
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofNumeric(1)).hasToString("Numeric[1]");
 		}
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.ofNumeric(42);
 			Value b = Values.ofText("2");
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Numeric[42] with Text[2]");
@@ -267,7 +348,9 @@ class ValuesTest {
 
 		@Test
 		void unwrap() {
+			// Given
 			Value value = Values.ofNumeric(42);
+			// When / Then
 			assertThat(value.unwrap(Integer.class)).isEmpty();
 			assertThat(value.unwrap(Long.class)).isPresent().contains(42L);
 			assertThat(value.unwrap(String.class)).isPresent().contains("42");
@@ -311,25 +394,37 @@ class ValuesTest {
 				"1099511627780,     1TB"
 		})
 		void approximateOnPrint(long bytes, String expectedValue) {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofSize(bytes).show(Locale.US)).isEqualTo(expectedValue);
 		}
 
 		@Test
 		void showWithUkLocale() {
+			// Given
 			long bytes = 1024 * 2 + 1024 / 2;
+			// When
 			String result = Values.ofSize(bytes).show(Locale.UK);
+			// Then
 			assertThat(result).isEqualTo("2.5KB");
 		}
 
 		@Test
 		void showWithItalianLocale() {
+			// Given
 			long bytes = 1024 * 2 + 1024 / 2;
+			// When
 			String result = Values.ofSize(bytes).show(Locale.ITALIAN);
+			// Then
 			assertThat(result).isEqualTo("2,5KB");
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofSize(0L)).hasToString("Size[0B]");
 			assertThat(Values.ofSize(512L)).hasToString("Size[512B]");
 			assertThat(Values.ofSize(1023L)).hasToString("Size[1023B]");
@@ -337,6 +432,9 @@ class ValuesTest {
 
 		@Test
 		void size() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThatThrownBy(() -> Values.ofSize(-1))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("negative size");
@@ -344,13 +442,18 @@ class ValuesTest {
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.SizeValue.class).verify();
 		}
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.ofSize(1000);
 			Value b = Values.ofText("2");
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Size[1000B] with Text[2]");
@@ -358,9 +461,11 @@ class ValuesTest {
 
 		@Test
 		void compareToSameValueType() {
+			// Given
 			Value a = Values.ofSize(100);
 			Value b = Values.ofSize(10);
 			Value c = Values.ofSize(100);
+			// When / Then
 			assertThat(a.compareTo(b)).isEqualTo(1);
 			assertThat(b.compareTo(a)).isEqualTo(-1);
 			assertThat(a.compareTo(c)).isEqualTo(0);
@@ -368,7 +473,9 @@ class ValuesTest {
 
 		@Test
 		void unwrap() {
+			// Given
 			Value value = Values.ofSize(10);
+			// When / Then
 			assertThat(value.unwrap(Long.class)).hasValue(10L);
 			assertThat(value.unwrap(Integer.class)).isEmpty();
 		}
@@ -379,33 +486,46 @@ class ValuesTest {
 
 		@Test
 		void show() {
+			// Given
+			// (no setup)
+			// When
 			String result = Values.ofPath(Paths.get(".")).show(Locale.getDefault());
+			// Then
 			assertThat(result).isEqualTo(".");
 		}
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.PathValue.class).verify();
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofPath(Paths.get("file"))).hasToString("Path[file]");
 		}
 
 		@Test
 		void compareTo() {
+			// Given
 			Value a = Values.ofPath(Paths.get("file"));
 			Value b = Values.ofPath(Paths.get("another_file"));
-
+			// When / Then
 			assertThat(a).isEqualByComparingTo(a);
 			assertThat(a).isNotEqualByComparingTo(b);
 		}
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.ofPath(Paths.get("file"));
 			Value b = Values.ofText("2");
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Path[file] with Text[2]");
@@ -413,6 +533,9 @@ class ValuesTest {
 
 		@Test
 		void nullPath() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThatThrownBy(() -> Values.ofPath(null))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("path cannot be null");
@@ -420,7 +543,9 @@ class ValuesTest {
 
 		@Test
 		void unwrap() {
+			// Given
 			Value path = Values.ofPath(Paths.get("file"));
+			// When / Then
 			assertThat(path.unwrap(Path.class)).hasValue(Paths.get("file"));
 			assertThat(path.unwrap(String.class)).hasValue("file");
 			assertThat(path.unwrap(Integer.class)).isEmpty();
@@ -433,13 +558,19 @@ class ValuesTest {
 
 		@Test
 		void show() {
+			// Given
 			Value value = Values.ofBytes(new byte[]{-1, 1, 127});
+			// When
 			String result = value.show(Locale.getDefault());
+			// Then
 			assertThat(result).isEqualTo("ff:01:7f");
 		}
 
 		@Test
 		void nullValue() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThatThrownBy(() -> Values.ofBytes(null))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("bytes cannot be null");
@@ -447,17 +578,20 @@ class ValuesTest {
 
 		@Test
 		void compareTo() {
+			// Given
 			Value a = Values.ofBytes(new byte[]{-1, -1});
 			Value b = Values.ofBytes(new byte[0]);
-
+			// When / Then
 			assertThat(a).isEqualByComparingTo(a);
 			assertThat(a).isNotEqualByComparingTo(b);
 		}
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.ofBytes(new byte[]{-1, -1});
 			Value b = Values.ofText("2");
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare Bytes[[-1, -1]] with Text[2]");
@@ -465,11 +599,17 @@ class ValuesTest {
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.BytesValue.class).verify();
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.ofBytes(new byte[]{-1, -1})).hasToString("Bytes[[-1, -1]]");
 		}
 
@@ -481,13 +621,19 @@ class ValuesTest {
 
 		@Test
 		void show() {
+			// Given
 			Value value = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
+			// When
 			String result = value.show(Locale.getDefault());
+			// Then
 			assertThat(result).isEqualTo("\u001B[44m1\u001B[49m");
 		}
 
 		@Test
 		void nullValue() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThatThrownBy(() -> Values.withStyle(null, Ansi.Style.BG_BLUE))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("value cannot be null");
@@ -495,7 +641,9 @@ class ValuesTest {
 
 		@Test
 		void nullStyle() {
+			// Given
 			Value text = Values.ofText("text");
+			// When / Then
 			assertThatThrownBy(() -> Values.withStyle(text, null))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("style cannot be null");
@@ -503,16 +651,20 @@ class ValuesTest {
 
 		@Test
 		void compareTo() {
+			// Given
 			Value a = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
 			Value b = Values.withStyle(Values.ofNumeric(2), Ansi.Style.BG_BLUE);
+			// When / Then
 			assertThat(a).isEqualByComparingTo(a);
 			assertThat(a).isNotEqualByComparingTo(b);
 		}
 
 		@Test
 		void compareToAnotherValueType() {
+			// Given
 			Value a = Values.withStyle(Values.ofNumeric(1), Ansi.Style.BG_BLUE);
 			Value b = Values.ofText("2");
+			// When / Then
 			assertThatThrownBy(() -> a.compareTo(b))
 					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessage("cannot compare StyledValue[value=Numeric[1],style='BG_BLUE'] with Text[2]");
@@ -520,17 +672,25 @@ class ValuesTest {
 
 		@Test
 		void equalsContract() {
+			// Given
+			// (no setup)
+			// When / Then
 			EqualsVerifier.forClass(Values.StyledValue.class).verify();
 		}
 
 		@Test
 		void asString() {
+			// Given
+			// (no setup)
+			// When / Then
 			assertThat(Values.withStyle(Values.ofPath(Paths.get("file")), Ansi.Style.FG_RED)).hasToString("StyledValue[value=Path[file],style='FG_RED']");
 		}
 
 		@Test
 		void unwrap() {
+			// Given
 			Value value = Values.withStyle(Values.ofPath(Paths.get(".")), Ansi.Style.FG_RED);
+			// When / Then
 			assertThat(value.unwrap(Path.class)).isPresent();
 			assertThat(value.unwrap(Integer.class)).isEmpty();
 		}
@@ -541,12 +701,16 @@ class ValuesTest {
 
 		@Test
 		void instant() {
+			// Given
+			// (no setup)
+			// When
 			List<Value> sorted = Stream.of(
 							Values.ofInstant(Instant.ofEpochMilli(100)),
 							Values.ofInstant(Instant.ofEpochMilli(-100)),
 							Values.ofInstant(Instant.ofEpochMilli(0)))
 					.sorted()
 					.toList();
+			// Then
 			assertThat(sorted).containsExactly(
 					Values.ofInstant(Instant.ofEpochMilli(-100)),
 					Values.ofInstant(Instant.ofEpochMilli(0)),
@@ -555,12 +719,16 @@ class ValuesTest {
 
 		@Test
 		void numeric() {
+			// Given
+			// (no setup)
+			// When
 			List<Value> sorted = Stream.of(
 							Values.ofNumeric(1),
 							Values.ofNumeric(-1),
 							Values.ofNumeric(0))
 					.sorted()
 					.toList();
+			// Then
 			assertThat(sorted).containsExactly(
 					Values.ofNumeric(-1),
 					Values.ofNumeric(0),
@@ -569,12 +737,16 @@ class ValuesTest {
 
 		@Test
 		void text() {
+			// Given
+			// (no setup)
+			// When
 			List<Value> sorted = Stream.of(
 							Values.ofText("a2"),
 							Values.ofText("a10"),
 							Values.ofText("a1"))
 					.sorted()
 					.toList();
+			// Then
 			assertThat(sorted).containsExactly(
 					Values.ofText("a1"),
 					Values.ofText("a2"),
@@ -583,12 +755,16 @@ class ValuesTest {
 
 		@Test
 		void size() {
+			// Given
+			// (no setup)
+			// When
 			List<Value> sorted = Stream.of(
 							Values.ofSize(1),
 							Values.ofSize(2),
 							Values.ofSize(3))
 					.sorted()
 					.toList();
+			// Then
 			assertThat(sorted).containsExactly(
 					Values.ofSize(1),
 					Values.ofSize(2),
@@ -597,6 +773,9 @@ class ValuesTest {
 
 		@Test
 		void path() {
+			// Given
+			// (no setup)
+			// When
 			List<Value> sorted = Stream.of(
 							Values.ofPath(Paths.get("a10")),
 							Values.ofPath(Paths.get("a1")),
@@ -604,6 +783,7 @@ class ValuesTest {
 							Values.ofPath(Paths.get("a2")))
 					.sorted()
 					.toList();
+			// Then
 			assertThat(sorted).containsExactly(
 					Values.ofPath(Paths.get("a1")),
 					Values.ofPath(Paths.get("a2")),
@@ -613,11 +793,15 @@ class ValuesTest {
 
 		@Test
 		void duration() {
+			// Given
+			// (no setup)
+			// When
 			List<Value> sorted = Stream.of(
 							Values.ofDuration(Duration.ofMillis(1)),
 							Values.ofDuration(Duration.ofMillis(2)))
 					.sorted()
 					.toList();
+			// Then
 			assertThat(sorted).containsExactly(
 					Values.ofDuration(Duration.ofMillis(1)),
 					Values.ofDuration(Duration.ofMillis(2)));
@@ -635,64 +819,91 @@ class ValuesTest {
 
 			@Test
 			void sortLetters() {
+				// Given
 				List<String> input = Arrays.asList("b", "c", "a", "ad", "a");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("a", "a", "ad", "b", "c");
 			}
 
 			@Test
 			void sortIntegers() {
+				// Given
 				List<String> input = Arrays.asList("2", "20", "10", "1");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("1", "2", "10", "20");
 			}
 
 			@Test
 			void sortDoubles() {
+				// Given
 				List<String> input = Arrays.asList("1.0", "1.3", "1.2", "1.1");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("1.0", "1.1", "1.2", "1.3");
 			}
 
 			@Test
 			void sortWithNumberSuffix() {
+				// Given
 				List<String> input = Arrays.asList("foo2", "foo20", "foo10", "foo1");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("foo1", "foo2", "foo10", "foo20");
 			}
 
 			@Test
 			void sortEmpty() {
+				// Given
 				List<String> input = Arrays.asList("", "");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("", "");
 			}
 
 			@Test
 			void sortEquals() {
+				// Given
 				List<String> input = Arrays.asList("a", "a", "a", "a");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("a", "a", "a", "a");
 			}
 
 			@Test
 			void sortDifferentLengths() {
+				// Given
 				List<String> input = Arrays.asList("", "a", "a1a", "a1", "a1aaa", "a1aa");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("", "a", "a1", "a1a", "a1aa", "a1aaa");
 			}
 
 			@Test
 			void sortDates() {
+				// Given
 				List<String> input = Arrays.asList("20180604", "20180603", "20180602", "20180601");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("20180601", "20180602", "20180603", "20180604");
 			}
 
 			@Test
 			void sortMisc() {
+				// Given
 				List<String> input = Arrays.asList("a.1", "1.a", "2.a", "b.1");
+				// When
 				input.sort(sut);
+				// Then
 				assertThat(input).containsExactly("1.a", "2.a", "a.1", "b.1");
 			}
 		}
@@ -704,6 +915,9 @@ class ValuesTest {
 
 			@Test
 			void noneLast() {
+				// Given
+				// (no setup)
+				// When / Then
 				qt().forAll(listOfNumericValuesContainingNone())
 						.checkAssert(candidate -> {
 							candidate.sort(sut);
@@ -719,6 +933,9 @@ class ValuesTest {
 
 			@Test
 			void noneFirst() {
+				// Given
+				// (no setup)
+				// When / Then
 				qt().forAll(listOfNumericValuesContainingNone())
 						.checkAssert(candidate -> {
 							candidate.sort(sut);
@@ -752,9 +969,10 @@ class ValuesTest {
 
 		@Test
 		void mergeNumericValues() {
+			// Given
 			var none = Values.none();
 			var num = Values.ofNumeric(1);
-
+			// When / Then
 			assertThat(none.merge(none)).isEmpty();
 			assertThat(num.merge(num)).hasValue(Values.ofNumeric(2));
 			assertThat(none.merge(num)).hasValue(num);
@@ -764,9 +982,10 @@ class ValuesTest {
 
 		@Test
 		void mergeSizeValues() {
+			// Given
 			var none = Values.none();
 			var size = Values.ofSize(1);
-
+			// When / Then
 			assertThat(none.merge(none)).isEmpty();
 			assertThat(size.merge(size)).hasValue(Values.ofSize(2));
 			assertThat(none.merge(size)).hasValue(size);

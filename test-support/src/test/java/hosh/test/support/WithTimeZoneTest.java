@@ -36,13 +36,26 @@ class WithTimeZoneTest {
 	final WithTimeZone withTimeZone = new WithTimeZone();
 
 	@Test
-	void lifeCycle() {
+	void changeTo_updatesDefaultTimeZone() {
+		// Given
 		TimeZone zurich = TimeZone.getTimeZone("Europe/Zurich");
-		withTimeZone.changeTo(zurich);
-		assertThat(TimeZone.getDefault()).isEqualTo(zurich);
 
+		// When
+		withTimeZone.changeTo(zurich);
+
+		// Then
+		assertThat(TimeZone.getDefault()).isEqualTo(zurich);
+	}
+
+	@Test
+	void changeTo_canBeCalledMultipleTimes() {
+		// Given
 		TimeZone utc = TimeZone.getTimeZone("UTC");
+
+		// When
 		withTimeZone.changeTo(utc);
+
+		// Then
 		assertThat(TimeZone.getDefault()).isEqualTo(utc);
 	}
 }

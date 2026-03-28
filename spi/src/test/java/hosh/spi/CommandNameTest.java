@@ -38,12 +38,18 @@ class CommandNameTest {
 
 	@Test
 	void equalsContract() {
+		// Given
+		// (no setup)
+
 		// When / Then
 		EqualsVerifier.forClass(CommandName.class).verify();
 	}
 
 	@Test
 	void asString() {
+		// Given
+		// (no setup)
+
 		// When / Then
 		assertThat(CommandName.constant("ls")).hasToString("CommandName[ls]");
 	}

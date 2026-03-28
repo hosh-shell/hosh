@@ -38,11 +38,19 @@ class VariableNameTest {
 
 	@Test
 	void equalsContract() {
+		// Given
+		// (no setup)
+
+		// When / Then
 		EqualsVerifier.forClass(VariableName.class).verify();
 	}
 
 	@Test
 	void asString() {
+		// Given
+		// (no setup)
+
+		// When / Then
 		assertThat(VariableName.constant("FOO")).hasToString("VariableName[FOO]");
 	}
 
@@ -59,7 +67,13 @@ class VariableNameTest {
 			"__FOO_BAR__"
 	})
 	void validVariableNames(String userInput) {
+		// Given
+		// (no setup)
+
+		// When
 		Optional<VariableName> from = VariableName.from(userInput);
+
+		// Then
 		assertThat(from).map(VariableName::name).hasValue(userInput);
 	}
 
@@ -77,7 +91,13 @@ class VariableNameTest {
 			"%45",
 	})
 	void invalidVariableNames(String userInput) {
+		// Given
+		// (no setup)
+
+		// When
 		Optional<VariableName> from = VariableName.from(userInput);
+
+		// Then
 		assertThat(from).isEmpty();
 		assertThatThrownBy(() -> VariableName.constant(userInput))
 				.isInstanceOf(IllegalArgumentException.class);
@@ -85,14 +105,22 @@ class VariableNameTest {
 
 	@Test
 	void longVariableName() {
+		// Given
 		String userInput = "a".repeat(VariableName.MAX_VARIABLE_LENGTH); // still valid as it is exactly the length
+
+		// When
 		Optional<VariableName> from = VariableName.from(userInput);
+
+		// Then
 		assertThat(from).map(VariableName::name).hasValue(userInput);
 	}
 
 	@Test
 	void veryLongVariableName() {
+		// Given
 		String userInput = "a".repeat(VariableName.MAX_VARIABLE_LENGTH + 1); // too long
+
+		// When / Then
 		assertThatThrownBy(() -> VariableName.constant(userInput))
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessage("variable name too long");

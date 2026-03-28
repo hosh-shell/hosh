@@ -202,9 +202,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArgWithEmptyDirectory() {
+			// Given
 			Path cwd = temporaryFolder.toPath();
 			given(state.getCwd()).willReturn(cwd);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -213,10 +218,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArgWithNonEmptyDirectory() throws IOException {
+			// Given
 			Path cwd = temporaryFolder.toPath();
 			given(state.getCwd()).willReturn(cwd);
 			Files.createFile(cwd.resolve("aaa"));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(cwd.toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(any());
@@ -225,10 +235,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArgReferringToCwd() throws IOException {
+			// Given
 			Path cwd = temporaryFolder.toPath();
 			Files.createFile(cwd.resolve("aaa"));
 			given(state.getCwd()).willReturn(cwd);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
@@ -239,10 +254,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArgAbsoluteFile() throws IOException {
+			// Given
 			Path cwd = temporaryFolder.toPath();
 			Path file = Files.createFile(cwd.resolve("aaa"));
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(file.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -251,10 +271,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArgAbsoluteDir() throws IOException {
+			// Given
 			Path cwd = temporaryFolder.toPath();
 			Files.createFile(cwd.resolve("aaa"));
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(cwd.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
@@ -265,9 +290,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void listDot() throws IOException {
+			// Given
 			temporaryFolder.newFile("aaa");
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(
@@ -279,9 +309,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void listDotDot() throws IOException {
+			// Given
 			Path cwd = temporaryFolder.newFolder("aaa");
 			given(state.getCwd()).willReturn(cwd.toAbsolutePath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(".."), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
@@ -298,12 +333,17 @@ class FileSystemModuleTest {
 				OS.WINDOWS  // File.setReadable() fails on Windows
 		})
 		void accessDenied() {
+			// Given
 			File cwd = temporaryFolder.toPath().toFile();
 			assertThat(cwd).exists();
 			assertThat(cwd.setReadable(false)).isTrue();
 			assertThat(cwd.setExecutable(false)).isTrue();
 			given(state.getCwd()).willReturn(temporaryFolder.toPath().toAbsolutePath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -344,7 +384,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -353,7 +399,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void twoArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd", "asd"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -362,9 +414,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneDirectoryRelativeArgument() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFolder = temporaryFolder.newFolder("dir");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("dir"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(stateMutator).should().mutateCwd(newFolder.toAbsolutePath());
 			then(in).shouldHaveNoInteractions();
@@ -374,8 +431,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneDirectoryAbsoluteArgument() throws IOException {
+			// Given
 			Path newFolder = temporaryFolder.newFolder("dir");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFolder.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(stateMutator).should().mutateCwd(newFolder);
 			then(in).shouldHaveNoInteractions();
@@ -385,9 +447,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneFileArgument() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("file");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(stateMutator).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveNoInteractions();
@@ -425,8 +492,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(temporaryFolder.toPath())));
@@ -435,7 +507,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: cwd")));
@@ -472,8 +550,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void emptyFile() throws IOException {
+			// Given
 			Path newFile = temporaryFolder.newFile("data.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -482,9 +565,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void nonEmptyFile() throws IOException {
+			// Given
 			Path newFile = temporaryFolder.newFile("data.txt");
 			Files.writeString(newFile, "a 1\nb 2\n", StandardCharsets.UTF_8);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("a 1")));
@@ -495,10 +583,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void nonEmptyFileInCwd() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("data.txt");
 			Files.writeString(newFile, "a 1\n");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("a 1")));
@@ -508,7 +601,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void directory() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -517,7 +616,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: lines file")));
@@ -554,7 +659,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -563,7 +674,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -572,11 +689,16 @@ class FileSystemModuleTest {
 
 		@Test
 		void copyRelativeToRelative() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path source = temporaryFolder.newFile("source.txt");
 			Path target = temporaryFolder.newFile("target.txt");
 			Files.delete(target);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			assertThat(source).exists();
 			assertThat(target).exists();
@@ -587,10 +709,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void copyAbsoluteToAbsolute() throws IOException {
+			// Given
 			Path source = temporaryFolder.newFile("source.txt").toAbsolutePath();
 			Path target = temporaryFolder.newFile("target.txt").toAbsolutePath();
 			Files.delete(target);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(source.toString(), target.toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			assertThat(source).exists();
 			assertThat(target).exists();
@@ -629,7 +756,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -638,7 +771,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("source.txt"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -647,11 +786,16 @@ class FileSystemModuleTest {
 
 		@Test
 		void moveRelativeToRelative() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path source = temporaryFolder.newFile("source.txt");
 			Path target = temporaryFolder.newFile("target.txt");
 			Files.delete(target);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(source.getFileName().toString(), target.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			assertThat(source).doesNotExist();
 			assertThat(target).exists();
@@ -662,10 +806,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void moveAbsoluteToAbsolute() throws IOException {
+			// Given
 			Path source = temporaryFolder.newFile("source.txt");
 			Path target = temporaryFolder.newFile("target.txt");
 			Files.delete(target);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(source.toAbsolutePath().toString(), target.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			assertThat(source).doesNotExist();
 			assertThat(target).exists();
@@ -704,7 +853,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -713,9 +868,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void removeRelative() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path target = temporaryFolder.newFile("target.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(target.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			assertThat(target).doesNotExist();
 			then(in).shouldHaveNoInteractions();
@@ -725,8 +885,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void removeAbsolute() throws IOException {
+			// Given
 			Path target = temporaryFolder.newFile("target.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(target.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			assertThat(target).doesNotExist();
 			then(in).shouldHaveNoInteractions();
@@ -757,7 +922,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void listAllPartitions() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(any()); // not very precise test... to be improved
@@ -766,7 +937,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void tooManyArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -803,7 +980,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: walk directory")));
@@ -812,8 +995,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void emptyRelativeDirectory() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -822,9 +1010,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void nonEmptyRelativeDirectory() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("file.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("."), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
@@ -833,8 +1026,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void nonExistentRelativeDirectory() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("path"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -843,8 +1041,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void nonEmptyAbsoluteDirectory() throws IOException {
+			// Given
 			Path newFile = temporaryFolder.newFile("file.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(temporaryFolder.toPath().toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile.toAbsolutePath()), Keys.SIZE, Values.ofSize(0)));
@@ -853,8 +1056,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void absoluteFile() throws IOException {
+			// Given
 			Path newFile = temporaryFolder.newFile("file.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -863,12 +1071,17 @@ class FileSystemModuleTest {
 
 		@Test
 		void resolveSymlinks() throws IOException {
+			// Given
 			Path newFolder = temporaryFolder.newFolder("folder");
 			Path newFile = temporaryFolder.newFile(newFolder, "file.txt");
 			Path symlink = temporaryFolder.toPath().resolve("symlink");
 			Files.createSymbolicLink(symlink, newFolder);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath()); // previous method could fail by UAC and Mockito will throw UnnecessaryStubbingException
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(symlink.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.PATH, Values.ofPath(newFile), Keys.SIZE, Values.ofSize(0)));
@@ -905,7 +1118,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -914,9 +1133,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void probeKnown() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("file.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.of("contenttype"), Values.ofText("text/plain")));
@@ -925,9 +1149,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void probeUnknown() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("file.ppp");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -964,7 +1193,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -974,10 +1209,15 @@ class FileSystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchRelativePath() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(record);
@@ -987,10 +1227,15 @@ class FileSystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchAbsolutePath() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("/tmp/file.java")));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("*.java"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(record);
@@ -1000,10 +1245,15 @@ class FileSystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void noMatch() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Record record = Records.singleton(Keys.PATH, Values.ofPath(Path.of("file.java")));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("*.c"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).shouldHaveNoInteractions();
@@ -1041,7 +1291,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1050,9 +1306,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void symlinkFile() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("file.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString(), "link"), in, out, err);
+
+			// Then
 			Path link = temporaryFolder.toPath().resolve("link");
 			assertThat(link).isSymbolicLink();
 			assertThat(exitStatus).isSuccess();
@@ -1091,7 +1352,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1100,9 +1367,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void symlinkFile() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("file.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.getFileName().toString(), "link"), in, out, err);
+
+			// Then
 			Path link = temporaryFolder.toPath().resolve("link");
 			assertThat(exitStatus).isSuccess();
 			assertThat(link).exists();
@@ -1141,7 +1413,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1150,9 +1428,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void regularRelative() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("file.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("file.txt"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toAbsolutePath().toRealPath())));
@@ -1161,9 +1444,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void regularAbsolute() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path newFile = temporaryFolder.newFile("file.txt");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(newFile.toAbsolutePath().toString()), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toAbsolutePath().toRealPath())));
@@ -1172,10 +1460,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void symlink() throws IOException {
+			// Given
 			Path newFile = temporaryFolder.newFile("file.txt");
 			Files.createSymbolicLink(temporaryFolder.toPath().resolve("link"), newFile);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("link"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFile.toAbsolutePath().toRealPath())));
@@ -1213,7 +1506,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus result = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1222,7 +1521,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void twoArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus result = sut.run(List.of("a", "b"), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1231,9 +1536,14 @@ class FileSystemModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			sut.setWatchPredicate(count -> false); // exit immediately
+
+			// When
 			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toString()), in, out, err);
+
+			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1244,10 +1554,9 @@ class FileSystemModuleTest {
 		// perhaps a CountDownLatch could be useful to avoid the race condition?
 		@Test
 		void create() throws InterruptedException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-
 			sut.setWatchPredicate(count -> count < 1);
-
 			Thread modifyFileSystem = new Thread(() -> {
 				try {
 					TimeUnit.SECONDS.sleep(2);
@@ -1262,8 +1571,11 @@ class FileSystemModuleTest {
 			});
 			modifyFileSystem.start();
 
+			// When
 			ExitStatus result = sut.run(List.of(temporaryFolder.toPath().toString()), in, out, err);
 			modifyFileSystem.join();
+
+			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
@@ -1313,7 +1625,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus result = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1322,8 +1640,13 @@ class FileSystemModuleTest {
 
 		@Test
 		void cantCreateFile() {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus result = sut.run(List.of("../missing_directory/file.lock"), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1332,10 +1655,15 @@ class FileSystemModuleTest {
 
 		@Test
 		void lock() {
+			// Given
 			ExitStatus nestedExitStatus = ExitStatus.of(42);
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+
+			// When
 			ExitStatus result = sut.run(List.of("file.lock"), in, out, err);
+
+			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
 			// very weak assertions... please improve them!
 			then(in).shouldHaveNoInteractions();

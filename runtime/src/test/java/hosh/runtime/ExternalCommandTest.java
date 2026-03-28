@@ -97,6 +97,7 @@ class ExternalCommandTest {
 
 	@Test
 	void processNoArgs() throws Exception {
+		// Given
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
@@ -105,7 +106,9 @@ class ExternalCommandTest {
 		Path cwd = temporaryFolder.toPath();
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
+		// When
 		ExitStatus exitStatus = sut.run(Collections.emptyList(), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(processFactory).should().create(
 				List.of(executable.toString()),
@@ -119,6 +122,7 @@ class ExternalCommandTest {
 
 	@Test
 	void processWithArgs() throws Exception {
+		// Given
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
@@ -127,7 +131,9 @@ class ExternalCommandTest {
 		Path cwd = temporaryFolder.toPath();
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
+		// When
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(processFactory).should().create(
 				List.of(executable.toString(), "file.hosh"),
@@ -141,6 +147,7 @@ class ExternalCommandTest {
 
 	@Test
 	void processExitsWithError() throws Exception {
+		// Given
 		given(process.waitFor()).willReturn(1);
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
@@ -149,7 +156,9 @@ class ExternalCommandTest {
 		Path cwd = temporaryFolder.toPath();
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
+		// When
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(processFactory).should().create(
 				List.of(executable.toString(), "file.hosh"),
@@ -163,6 +172,7 @@ class ExternalCommandTest {
 
 	@Test
 	void processException() throws Exception {
+		// Given
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willThrow(InterruptedException.class);
 		given(process.getInputStream()).willReturn(InputStream.nullInputStream());
@@ -171,7 +181,9 @@ class ExternalCommandTest {
 		Path cwd = temporaryFolder.toPath();
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
+		// When
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(processFactory).should().create(
 				List.of(executable.toString(), "file.hosh"),
@@ -185,6 +197,7 @@ class ExternalCommandTest {
 
 	@Test
 	void processSendRecordsToOut() throws Exception {
+		// Given
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
@@ -192,7 +205,9 @@ class ExternalCommandTest {
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
+		// When
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).should(times(1)).recv();
 		then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("test")));
@@ -201,6 +216,7 @@ class ExternalCommandTest {
 
 	@Test
 	void processSendRecordsToErr() throws Exception {
+		// Given
 		given(processFactory.create(any(), any(), any(), any())).willReturn(process);
 		given(process.waitFor()).willReturn(0);
 		given(process.getOutputStream()).willReturn(OutputStream.nullOutputStream());
@@ -209,7 +225,9 @@ class ExternalCommandTest {
 		Path cwd = temporaryFolder.toPath();
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
+		// When
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).should(times(1)).recv();
 		then(out).shouldHaveNoInteractions();
@@ -219,6 +237,7 @@ class ExternalCommandTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	void processRecordsFromIn() throws Exception {
+		// Given
 		ByteArrayOutputStream value = new ByteArrayOutputStream();
 		given(in.recv()).willReturn(
 				Optional.of(Records.builder().entry(Keys.PATH, Values.ofText("aaa")).entry(Keys.SIZE, Values.ofNumeric(10)).build()),
@@ -230,7 +249,9 @@ class ExternalCommandTest {
 		given(process.getErrorStream()).willReturn(InputStream.nullInputStream());
 		given(state.getCwd()).willReturn(Paths.get("."));
 		given(state.getVariables()).willReturn(Collections.emptyMap());
+		// When
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		assertThat(value.toString(StandardCharsets.UTF_8)).isEqualToNormalizingNewlines("aaa 10\n");
 		then(in).should(times(2)).recv();
@@ -240,11 +261,14 @@ class ExternalCommandTest {
 
 	@Test
 	void throwsIoException() throws Exception {
+		// Given
 		given(processFactory.create(any(), any(), any(), any())).willThrow(new IOException("simulated error"));
 		Path cwd = temporaryFolder.toPath();
 		given(state.getCwd()).willReturn(cwd);
 		given(state.getVariables()).willReturn(Collections.emptyMap());
+		// When
 		ExitStatus exitStatus = sut.run(Collections.singletonList("file.hosh"), in, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();

@@ -40,8 +40,13 @@ class VersionTest {
 			"v0.1.14-89-ge38fe101-dirty", // git describe without tag and with uncommitted changes
 	})
 	void validVersion(String candidate) {
+		// Given
+		// (no setup)
+
+		// When
 		Version result = new Version(candidate);
 
+		// Then
 		assertThat(result.hoshVersion())
 				.isEqualTo(Values.ofText("hosh " + candidate))
 		;
@@ -57,8 +62,11 @@ class VersionTest {
 			"v1.2.3.4", // too many components
 	})
 	void invalidVersion(String candidate) {
-		var result = assertThatThrownBy(() -> new Version(candidate));
+		// Given
+		// (no setup)
 
+		// When / Then
+		var result = assertThatThrownBy(() -> new Version(candidate));
 		result.isInstanceOf(IllegalArgumentException.class);
 	}
 

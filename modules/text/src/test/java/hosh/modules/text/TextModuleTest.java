@@ -98,8 +98,11 @@ class TextModuleTest {
 		// not a very good test, just checking if rand can be interrupted
 		@Test
 		void interrupt() {
+			// Given
 			withThread.interrupt();
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -108,7 +111,11 @@ class TextModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -139,8 +146,11 @@ class TextModuleTest {
 
 		@Test
 		void empty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -149,7 +159,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -159,9 +173,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void trimMissingKey() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("  abc  "));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.ERROR.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -171,9 +188,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void trimKey() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("  abc  "));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("abc")));
@@ -183,9 +203,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void trimKeyOfDifferentType() {
+			// Given
 			Record record = Records.singleton(Keys.COUNT, Values.ofInstant(Instant.EPOCH));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -215,7 +238,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -224,8 +251,11 @@ class TextModuleTest {
 
 		@Test
 		void empty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -235,9 +265,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void oneValue() {
+			// Given
 			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1")));
@@ -247,9 +280,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void twoValues() {
+			// Given
 			Record record = Records.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.NAME, Values.ofNumeric(2)).build();
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(","), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.TEXT, Values.ofText("1,2")));
@@ -279,7 +315,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -288,8 +328,11 @@ class TextModuleTest {
 
 		@Test
 		void empty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.none()));
@@ -299,9 +342,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void nonMatchingKey() {
+			// Given
 			Record record = Records.singleton(Keys.INDEX, Values.ofSize(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.none()));
@@ -311,9 +357,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyWithSizeValue() {
+			// Given
 			Record record = Records.singleton(Keys.SIZE, Values.ofSize(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(2)));
@@ -323,9 +372,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyWithNumericValue() {
+			// Given
 			Record record = Records.singleton(Keys.COUNT, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("count"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.COUNT, Values.ofNumeric(2)));
@@ -335,10 +387,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyWithSizeValueAndNone() {
+			// Given
 			Record record1 = Records.singleton(Keys.SIZE, Values.none());
 			Record record2 = Records.singleton(Keys.SIZE, Values.ofSize(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.SIZE, Values.ofSize(1)));
@@ -368,7 +423,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -377,8 +436,11 @@ class TextModuleTest {
 
 		@Test
 		void empty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -388,9 +450,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void nonMatchingKey() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -400,9 +465,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyOneRecord() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.VALUE, Values.ofText("aaa"), Keys.COUNT, Values.ofNumeric(1)));
@@ -412,9 +480,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyTwoRecords() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.VALUE, Values.ofText("aaa"), Keys.COUNT, Values.ofNumeric(2)));
@@ -425,9 +496,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyWithNone() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.none());
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(Keys.VALUE, Values.none(), Keys.COUNT, Values.ofNumeric(1)));
@@ -458,7 +532,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -467,8 +545,11 @@ class TextModuleTest {
 
 		@Test
 		void empty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.none()));
@@ -478,9 +559,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void nonMatchingKey() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.none()));
@@ -490,9 +574,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyOneRecord() {
+			// Given
 			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.ofNumeric(1)));
@@ -502,10 +589,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyTwoRecords() {
+			// Given
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.ofNumeric(-10));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.ofNumeric(-10)));
@@ -515,10 +605,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyTwoRecordsWithNone() {
+			// Given
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.none());
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Min.MIN, Values.ofNumeric(10)));
@@ -549,7 +642,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -558,8 +655,11 @@ class TextModuleTest {
 
 		@Test
 		void empty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("text"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.none()));
@@ -569,9 +669,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void nonMatchingKey() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.none()));
@@ -581,9 +684,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyOneRecord() {
+			// Given
 			Record record = Records.singleton(Keys.INDEX, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.ofNumeric(1)));
@@ -593,10 +699,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyTwoRecords() {
+			// Given
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.ofNumeric(-10));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.ofNumeric(10)));
@@ -606,10 +715,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void matchingKeyTwoRecordsWithNone() {
+			// Given
 			Record record1 = Records.singleton(Keys.INDEX, Values.ofNumeric(10));
 			Record record2 = Records.singleton(Keys.INDEX, Values.none());
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.INDEX.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(RecordMatcher.of(TextModule.Max.MAX, Values.ofNumeric(10)));
@@ -641,8 +753,11 @@ class TextModuleTest {
 
 		@Test
 		void empty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -652,8 +767,11 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void noArgs() {
+			// Given
 			given(in.recv()).willReturn(Optional.of(Records.singleton(Keys.NAME, Values.ofNumeric(1))), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.empty());
@@ -663,9 +781,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void oneArgKeepKey() {
+			// Given
 			Record record = Records.singleton(Keys.NAME, Values.ofText("foo"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.NAME.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(record);
@@ -675,9 +796,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void twoArgsIgnoreMissingKeys() {
+			// Given
 			Record record = Records.singleton(Keys.NAME, Values.ofText("foo"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.NAME.name(), Keys.COUNT.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(record);
@@ -707,7 +831,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -716,7 +844,11 @@ class TextModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name()), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -725,8 +857,11 @@ class TextModuleTest {
 
 		@Test
 		void twoArgsNoInput() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), " "), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -736,9 +871,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void twoArgsMatching() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("a b c"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), " "), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(Records.builder()
@@ -772,7 +910,11 @@ class TextModuleTest {
 
 		@Test
 		void zeroArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -781,7 +923,11 @@ class TextModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -790,8 +936,11 @@ class TextModuleTest {
 
 		@Test
 		void twoArgsNoInput() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -801,9 +950,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void twoArgsNonMatching() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText(""));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\\\d+)"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -813,9 +965,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void twoArgsMatching() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("1"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), "(?<id>\\d+)"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).should().send(Records.singleton(Keys.of("id"), Values.ofText("1")));
@@ -825,9 +980,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void twoArgsMissingKey() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("1"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.COUNT.name(), "(?<id>\\d+)"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should(times(2)).recv();
 			then(out).shouldHaveNoInteractions();
@@ -858,9 +1016,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void zeroArg() {
+			// Given
 			Record record = Records.singleton(Keys.COUNT, Values.none()).append(Keys.INDEX, Values.none());
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.of("schema"), Values.ofText("count index")));
@@ -869,7 +1030,11 @@ class TextModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -901,9 +1066,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void twoRecords() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(2)));
@@ -913,9 +1081,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void oneRecord() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(1)));
@@ -924,8 +1095,11 @@ class TextModuleTest {
 
 		@Test
 		void zeroRecords() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.singleton(Keys.COUNT, Values.ofNumeric(0)));
@@ -934,7 +1108,11 @@ class TextModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -966,9 +1144,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void zeroArg() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(Records.builder().entry(Keys.INDEX, Values.ofNumeric(1)).entry(Keys.TEXT, Values.ofText("some data")).build());
@@ -978,7 +1159,11 @@ class TextModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1014,10 +1199,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void zeroArg() {
+			// Given
 			given(clock.instant()).willReturn(Instant.EPOCH);
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(Records.empty()), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(
@@ -1030,7 +1218,11 @@ class TextModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asd"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1062,9 +1254,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void dropZero() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -1074,9 +1269,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void dropOne() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1085,7 +1283,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1095,7 +1297,11 @@ class TextModuleTest {
 
 		@Test
 		void negativeArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("-1"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1125,8 +1331,11 @@ class TextModuleTest {
 
 		@Test
 		void takeZero() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).should().recv();
 			then(out).shouldHaveNoInteractions();
@@ -1136,9 +1345,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void takeExactly() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -1148,9 +1360,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void takeLess() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -1160,10 +1375,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void takeMore() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			Record record2 = Records.singleton(Keys.TEXT, Values.ofText("another value"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("5"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -1174,7 +1392,11 @@ class TextModuleTest {
 
 		@Test
 		void negativeArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("-1"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1183,7 +1405,11 @@ class TextModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(out).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1214,7 +1440,11 @@ class TextModuleTest {
 
 		@Test
 		void lastNoArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1223,7 +1453,11 @@ class TextModuleTest {
 
 		@Test
 		void lastOneInvalidArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("0"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1233,9 +1467,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void lastOneWithOneRecord() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -1245,10 +1482,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void lastOneWithMultipleRecords() {
+			// Given
 			Record data1 = Records.singleton(Keys.TEXT, Values.ofText("data 1"));
 			Record data2 = Records.singleton(Keys.TEXT, Values.ofText("data 2"));
 			given(in.recv()).willReturn(Optional.of(data1), Optional.of(data2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(data2);
@@ -1258,9 +1498,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void lastTwoWithOneRecord() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some data"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("2"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -1292,9 +1535,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void printMatchingLines() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of(Keys.TEXT.name(), ".*string.*"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).should().send(record);
@@ -1304,9 +1550,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void ignoreNonMatchingLines() {
+			// Given
 			Record record = Records.singleton(Keys.TEXT, Values.ofText("some string"));
 			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("key", ".*number.*"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1315,7 +1564,11 @@ class TextModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1325,7 +1578,11 @@ class TextModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("key"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1359,8 +1616,11 @@ class TextModuleTest {
 
 		@Test
 		void empty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1370,10 +1630,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void sortByExistingKey() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1384,11 +1647,14 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void sortByExistingKeyNullLast() {
+			// Given
 			Record record1 = Records.singleton(Keys.SIZE, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record3 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.of(record3), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1399,9 +1665,12 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void sortByNonExistingKey() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("size"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1412,10 +1681,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void sortAscByExistingKey() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name", "asc"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1426,10 +1698,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void sortDescByExistingKey() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofText("bbb"));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofText("aaa"));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name", "desc"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1439,7 +1714,11 @@ class TextModuleTest {
 
 		@Test
 		void invalidDirection() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("ZZZ", "name"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1449,7 +1728,11 @@ class TextModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1459,7 +1742,11 @@ class TextModuleTest {
 
 		@Test
 		void tooManyArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of("asc", "key", "aaa"), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1494,10 +1781,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void missingKey() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("anotherkey"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1508,10 +1798,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void distinctValues() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1522,10 +1815,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void duplicatedValues() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1535,7 +1831,11 @@ class TextModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();
@@ -1570,10 +1870,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void missingKey() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("anotherkey"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1584,10 +1887,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void distinctValues() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(2));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1598,10 +1904,13 @@ class TextModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void duplicatedValues() {
+			// Given
 			Record record1 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			Record record2 = Records.singleton(Keys.NAME, Values.ofNumeric(1));
 			given(in.recv()).willReturn(Optional.of(record1), Optional.of(record2), Optional.empty());
+			// When
 			ExitStatus exitStatus = sut.run(List.of("name"), in, out, err);
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(err).shouldHaveNoMoreInteractions();
@@ -1611,7 +1920,11 @@ class TextModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoMoreInteractions();

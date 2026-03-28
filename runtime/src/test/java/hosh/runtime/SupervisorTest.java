@@ -35,6 +35,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -82,7 +83,7 @@ class SupervisorTest {
 	void handleInterruptions() throws ExecutionException {
 		// Given
 		sut.submit(() -> {
-			Thread.sleep(10_000);
+			Thread.sleep(Duration.ofSeconds(10));
 			return ExitStatus.success();
 		});
 		withThread.interrupt(); // next call to Future.get() will throw InterruptedException
@@ -131,7 +132,7 @@ class SupervisorTest {
 			sutWithTerminal.submit(() -> {
 				taskStarted.countDown();
 				try {
-					Thread.sleep(10_000);
+					Thread.sleep(Duration.ofSeconds(10));
 				} catch (InterruptedException e) {
 					taskCancelled.countDown();
 					Thread.currentThread().interrupt();

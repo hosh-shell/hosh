@@ -109,74 +109,92 @@ class InterpreterTest {
 
 	@Test
 	void storeCommandExitStatus() {
+		// Given
 		given(state.getVariables()).willReturn(Map.of());
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.of(2));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
+		// When
 		ExitStatus exitStatus = sut.eval(program, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(stateMutator).should().mutateVariables(Map.of(Interpreter.EXIT_STATUS, Values.ofNumeric(2)));
 	}
 
 	@Test
 	void handleCancellations() {
+		// Given
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new CancellationException("simulated cancellation"));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
+		// When
 		ExitStatus exitStatus = sut.eval(program, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 	}
 
 	@Test
 	void handleExceptionWithoutMessage() {
+		// Given
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new NullPointerException());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
+		// When
 		ExitStatus exitStatus = sut.eval(program, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("(no message provided)"), Keys.LOCATION, Values.ofText("cmd")));
 	}
 
 	@Test
 	void handleExceptionWithMessage() {
+		// Given
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
 				.willThrow(new IllegalArgumentException("simulated error"));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("cmd");
+		// When
 		ExitStatus exitStatus = sut.eval(program, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(err).should().send(RecordMatcher.of(Keys.ERROR, Values.ofText("simulated error"), Keys.LOCATION, Values.ofText("cmd")));
 	}
 
 	@Test
 	void constantArgument() {
+		// Given
 		given(state.getVariables()).willReturn(Map.of());
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Constant("file")));
+		// When
 		sut.eval(program, out, err);
+		// Then
 		then(command).should().run(Mockito.eq(List.of("file")), Mockito.any(), Mockito.any(), Mockito.any());
 	}
 
 	@Test
 	void presentVariable() {
+		// Given
 		VariableName variable = VariableName.constant("VARIABLE");
 		given(state.getVariables()).willReturn(Map.of(variable, Values.ofText("1")));
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable(variable)));
+		// When
 		ExitStatus exitStatus = sut.eval(program, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -186,13 +204,16 @@ class InterpreterTest {
 
 	@Test
 	void absentVariables() {
+		// Given
 		VariableName variableName = VariableName.constant("VARIABLE");
 		given(state.getVariables()).willReturn(Collections.singletonMap(variableName, null));
 		given(program.getStatements()).willReturn(List.of(statement));
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Variable(variableName)));
 		given(statement.getLocation()).willReturn("cmd");
+		// When
 		ExitStatus exitStatus = sut.eval(program, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -201,22 +222,28 @@ class InterpreterTest {
 
 	@Test
 	void setThreadNameWithArgs() {
+		// Given
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of(new Compiler.Constant("-jar"), new Compiler.Constant("hosh.jar")));
 		given(statement.getLocation()).willReturn("java");
+		// When
 		sut.eval(statement, in, out, err);
+		// Then
 		assertThat(withThread.currentName()).isEqualTo("command='java -jar hosh.jar'");
 		then(err).shouldHaveNoInteractions(); // checking no assertion failures happened
 	}
 
 	@Test
 	void setThreadNameWithoutArgs() {
+		// Given
 		given(command.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(statement.getCommand()).willReturn(command);
 		given(statement.getArguments()).willReturn(List.of());
 		given(statement.getLocation()).willReturn("java");
+		// When
 		sut.eval(statement, in, out, err);
+		// Then
 		assertThat(withThread.currentName()).isEqualTo("command='java'");
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
 	}

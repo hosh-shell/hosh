@@ -33,7 +33,10 @@ class ExitStatusAssertTest {
 
 	@Test
 	void error() {
+		// Given
 		ExitStatus exitStatus = ExitStatus.of(1);
+
+		// When / Then
 		assertThat(exitStatus).isError();
 		assertThat(exitStatus).hasExitCode(1);
 		try {
@@ -45,7 +48,10 @@ class ExitStatusAssertTest {
 
 	@Test
 	void success() {
+		// Given
 		ExitStatus exitStatus = ExitStatus.of(0);
+
+		// When / Then
 		assertThat(exitStatus).isSuccess();
 		assertThat(exitStatus).hasExitCode(0);
 		try {

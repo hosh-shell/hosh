@@ -69,7 +69,7 @@ class KeysTest {
 		Key a = Keys.of("name");
 		Key b = Keys.of("b");
 
-		// Then
+		// When / Then
 		assertThat(a).isEqualByComparingTo(a);
 		assertThat(a).isNotEqualByComparingTo(b);
 	}

@@ -716,8 +716,13 @@ class SystemModuleTest {
 
 		@Test
 		void interrupts() {
+			// Given
 			withThread.interrupt();
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1s"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -726,7 +731,13 @@ class SystemModuleTest {
 
 		@Test
 		void twoArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1", "seconds"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -735,7 +746,13 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -751,7 +768,13 @@ class SystemModuleTest {
 		})
 		@ParameterizedTest
 		void validInput(String input) {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(input), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -768,7 +791,13 @@ class SystemModuleTest {
 		})
 		@ParameterizedTest
 		void sleepWithValidIso8601(String input) {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(input), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -798,7 +827,13 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should(Mockito.atLeastOnce()).send(any());
@@ -807,7 +842,13 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgNumber() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("1"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -837,6 +878,10 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When / Then
 			assertThatThrownBy(() -> sut.run(List.of(), in, out, err))
 					.hasMessage("please do not report: this is a simulated error")
 					.isInstanceOf(NullPointerException.class)
@@ -873,8 +918,13 @@ class SystemModuleTest {
 
 		@Test
 		void consumeEmpty() {
+			// Given
 			given(in.recv()).willReturn(Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -884,8 +934,13 @@ class SystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void consumeAll() {
+			// Given
 			given(in.recv()).willReturn(Optional.of(record), Optional.of(record), Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -919,8 +974,13 @@ class SystemModuleTest {
 
 		@Test
 		void onePositiveArg() {
+			// Given
 			given(nestedCommand.run()).willReturn(ExitStatus.success());
+
+			// When
 			ExitStatus result = sut.run(List.of("10"), in, out, err);
+
+			// Then
 			assertThat(result).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(
@@ -931,7 +991,13 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus result = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -940,7 +1006,13 @@ class SystemModuleTest {
 
 		@Test
 		void oneNonPositiveArg() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus result = sut.run(List.of("0"), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -974,9 +1046,14 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
 			ExitStatus nestedExitStatus = ExitStatus.of(42);
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
+
+			// When
 			ExitStatus result = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
 			then(in).shouldHaveNoInteractions();
 			then(out).should().send(any(Record.class));
@@ -985,7 +1062,13 @@ class SystemModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus result = sut.run(List.of("arg"), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1022,11 +1105,16 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgInterrupted() {
+			// Given
 			Duration timeout = Duration.ofMillis(200);
 			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(10));
 			given(nestedCommand.run()).willAnswer(commandSlowerThanTimeout);
 			withThread.interrupt();
+
+			// When
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+
+			// Then
 			assertThat(withThread.isInterrupted()).isTrue();
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
@@ -1036,11 +1124,16 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgException() {
+			// Given
 			Duration timeout = Duration.ofMillis(200);
 			given(nestedCommand.run()).willAnswer((Answer<ExitStatus>) invocationOnMock -> {
 				throw new NullPointerException("simulated error"); // could happen for a built-in command
 			});
+
+			// When
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1049,10 +1142,15 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgTimeout() {
+			// Given
 			Duration timeout = Duration.ofMillis(200);
 			Answer<ExitStatus> commandSlowerThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.multipliedBy(10));
 			given(nestedCommand.run()).willAnswer(commandSlowerThanTimeout);
+
+			// When
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1061,10 +1159,15 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgNoTimeout() {
+			// Given
 			Duration timeout = Duration.ofMillis(200);
 			Answer<ExitStatus> commandFasterThanTimeout = FakeCommands.sleepThenReturnSuccess(timeout.dividedBy(10));
 			given(nestedCommand.run()).willAnswer(commandFasterThanTimeout);
+
+			// When
 			ExitStatus result = sut.run(List.of(timeout.toString()), in, out, err);
+
+			// Then
 			assertThat(result).isSuccess(); // success means no timeout
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1073,7 +1176,13 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus result = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1111,11 +1220,16 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgInterrupted() {
+			// Given
 			withThread.interrupt();
 			Duration sleep = Duration.ofMillis(200);
 			ExitStatus nestedExitStatus = ExitStatus.error(); // to trigger at least one sleep()
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
+
+			// When
 			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			assertThat(withThread.isInterrupted()).isTrue();
 			then(in).shouldHaveNoInteractions();
@@ -1125,10 +1239,15 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgSuccessAtFirstAttempt() {
+			// Given
 			Duration sleep = Duration.ofMillis(200);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
+
+			// When
 			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+
+			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1137,10 +1256,15 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgSuccessAtSecondAttempt() {
+			// Given
 			Duration sleep = Duration.ofMillis(200);
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willReturn(ExitStatus.error(), nestedExitStatus);
+
+			// When
 			ExitStatus result = sut.run(List.of(sleep.toString()), in, out, err);
+
+			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1150,9 +1274,14 @@ class SystemModuleTest {
 		@Test
 			// testing success at first attempt only in order to avoid 1s wait (default) in unit tests
 		void noArgsSuccessAtFirstAttempt() {
+			// Given
 			ExitStatus nestedExitStatus = ExitStatus.success();
 			given(nestedCommand.run()).willReturn(nestedExitStatus);
+
+			// When
 			ExitStatus result = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(result).isEqualTo(nestedExitStatus);
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1161,7 +1290,13 @@ class SystemModuleTest {
 
 		@Test
 		void twoArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus result = sut.run(List.of("first", "second"), in, out, err);
+
+			// Then
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1199,7 +1334,13 @@ class SystemModuleTest {
 
 		@Test
 		void noArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1209,7 +1350,13 @@ class SystemModuleTest {
 
 		@Test
 		void oneArg() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1219,7 +1366,13 @@ class SystemModuleTest {
 
 		@Test
 		void createNewVariable() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO", "bar"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1229,8 +1382,13 @@ class SystemModuleTest {
 
 		@Test
 		void updatesExistingVariable() {
+			// Given
 			willReturn(Map.of(VariableName.constant("FOO"), "bar")).given(state).getVariables();
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO", "baz"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1240,7 +1398,13 @@ class SystemModuleTest {
 
 		@Test
 		void invalidVariableName() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("${", "baz"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1279,7 +1443,13 @@ class SystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1289,8 +1459,13 @@ class SystemModuleTest {
 
 		@Test
 		void removesExistingBinding() {
+			// Given
 			willReturn(Map.of(VariableName.constant("FOO"), "BAR")).given(state).getVariables();
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1300,8 +1475,13 @@ class SystemModuleTest {
 
 		@Test
 		void doesNothingWhenNotExistingBinding() {
+			// Given
 			willReturn(Map.of(VariableName.constant("FOO"), Values.ofText("BAR"))).given(state).getVariables();
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("BAZ"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1339,7 +1519,13 @@ class SystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1348,7 +1534,13 @@ class SystemModuleTest {
 
 		@Test
 		void nonNumericPid() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1357,8 +1549,13 @@ class SystemModuleTest {
 
 		@Test
 		void numericPidOfNotExistingProcess() {
+			// Given
 			given(processLookup.of(42L)).willReturn(Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1367,9 +1564,14 @@ class SystemModuleTest {
 
 		@Test
 		void numericPidOfExistingProcessWithDestroyFailure() {
+			// Given
 			given(processLookup.of(42L)).willReturn(Optional.of(processHandle));
 			given(processHandle.destroy()).willReturn(false);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1378,9 +1580,14 @@ class SystemModuleTest {
 
 		@Test
 		void numericPidOfExistingProcessWithDestroySuccess() {
+			// Given
 			given(processLookup.of(42L)).willReturn(Optional.of(processHandle));
 			given(processHandle.destroy()).willReturn(true);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("42"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1418,7 +1625,13 @@ class SystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1428,7 +1641,13 @@ class SystemModuleTest {
 
 		@Test
 		void invalidVariableName() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("$AAA"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1438,9 +1657,14 @@ class SystemModuleTest {
 
 		@Test
 		void emptyCapture() {
+			// Given
 			willReturn(Map.of()).given(state).getVariables();
 			given(in.recv()).willReturn(Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1451,11 +1675,16 @@ class SystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void captureOneLine() {
+			// Given
 			willReturn(Map.of()).given(state).getVariables();
 			given(in.recv()).willReturn(
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 					Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1466,12 +1695,17 @@ class SystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void captureTwoLines() {
+			// Given
 			willReturn(Map.of()).given(state).getVariables();
 			given(in.recv()).willReturn(
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
 					Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1509,7 +1743,13 @@ class SystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1518,7 +1758,13 @@ class SystemModuleTest {
 
 		@Test
 		void oneArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("filename"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1527,9 +1773,14 @@ class SystemModuleTest {
 
 		@Test
 		void emptyCapture() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1541,11 +1792,16 @@ class SystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void oneLine() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 					Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1557,12 +1813,17 @@ class SystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void twoLines() throws IOException {
+			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
 					Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "CREATE"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1574,13 +1835,18 @@ class SystemModuleTest {
 		@SuppressWarnings("unchecked")
 		@Test
 		void appendExisting() throws IOException {
+			// Given
 			Path file = temporaryFolder.newFile("filename");
 			Files.write(file, List.of("existing line"), StandardCharsets.UTF_8);
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 					Optional.empty());
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("filename", "WRITE", "APPEND"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoMoreInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1624,7 +1890,13 @@ class SystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1634,7 +1906,13 @@ class SystemModuleTest {
 
 		@Test
 		void invalidVariableName() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("$"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1644,9 +1922,14 @@ class SystemModuleTest {
 
 		@Test
 		void inputNonEmptyString() {
+			// Given
 			willReturn(Map.of()).given(state).getVariables();
 			given(lineReader.readLine(Mockito.eq("input> "))).willReturn("1");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1656,8 +1939,13 @@ class SystemModuleTest {
 
 		@Test
 		void emptyInput() {
+			// Given
 			given(lineReader.readLine(Mockito.eq("input> "))).willThrow(new EndOfFileException("simulated"));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1700,7 +1988,13 @@ class SystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1710,7 +2004,13 @@ class SystemModuleTest {
 
 		@Test
 		void invalidVariableName() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("$"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1720,9 +2020,14 @@ class SystemModuleTest {
 
 		@Test
 		void inputNonEmptyString() {
+			// Given
 			willReturn(Map.of()).given(state).getVariables();
 			given(lineReader.readLine(Mockito.eq('\0'))).willReturn("1");
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1732,9 +2037,14 @@ class SystemModuleTest {
 
 		@Test
 		void emptyInput() {
+			// Given
 			willReturn(Map.of()).given(state).getVariables();
 			given(lineReader.readLine(Mockito.eq('\0'))).willThrow(new EndOfFileException("simulated"));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("FOO"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1770,7 +2080,13 @@ class SystemModuleTest {
 
 		@Test
 		void zeroArgs() {
+			// Given
+			// (no setup)
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1780,8 +2096,13 @@ class SystemModuleTest {
 		@ValueSource(strings = {"yes", "YES", "y", "Y"})
 		@ParameterizedTest
 		void yes(String answer) {
+			// Given
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isSuccess();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1791,8 +2112,13 @@ class SystemModuleTest {
 		@ValueSource(strings = {"no", "NO", "n", "N"})
 		@ParameterizedTest
 		void no(String answer) {
+			// Given
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1802,8 +2128,13 @@ class SystemModuleTest {
 		@ValueSource(strings = {"xx", "aaa", "", "1", "0"})
 		@ParameterizedTest
 		void invalid(String answer) {
+			// Given
 			given(lineReader.readLine("question (Y/N)? ")).willReturn(answer);
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1812,8 +2143,13 @@ class SystemModuleTest {
 
 		@Test
 		void userInterrupt() {
+			// Given
 			given(lineReader.readLine("question (Y/N)? ")).willThrow(new UserInterruptException("simulated"));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
@@ -1822,8 +2158,13 @@ class SystemModuleTest {
 
 		@Test
 		void endOfFile() {
+			// Given
 			given(lineReader.readLine("question (Y/N)? ")).willThrow(new EndOfFileException("simulated"));
+
+			// When
 			ExitStatus exitStatus = sut.run(List.of("question"), in, out, err);
+
+			// Then
 			assertThat(exitStatus).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();

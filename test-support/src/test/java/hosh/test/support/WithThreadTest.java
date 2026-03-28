@@ -35,14 +35,25 @@ class WithThreadTest {
 
 	@Test
 	void threadName() {
+		// Given
+		// (no setup)
+
+		// When
 		withThread.renameTo("super mario");
+
+		// Then
 		assertThat(withThread.currentName()).isEqualTo("super mario");
 	}
 
 	@Test
 	void interrupt() {
+		// Given
 		assertThat(withThread.isInterrupted()).isEqualTo(false);
+
+		// When
 		withThread.interrupt();
+
+		// Then
 		assertThat(withThread.isInterrupted()).isEqualTo(true);
 	}
 }

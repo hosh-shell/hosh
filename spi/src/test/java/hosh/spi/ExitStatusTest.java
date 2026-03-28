@@ -36,18 +36,27 @@ class ExitStatusTest {
 
 	@Test
 	void equalsContract() {
+		// Given
+		// (no setup)
+
 		// When / Then
 		EqualsVerifier.forClass(ExitStatus.class).verify();
 	}
 
 	@Test
 	void asString() {
+		// Given
+		// (no setup)
+
 		// When / Then
 		assertThat(ExitStatus.of(42)).hasToString("ExitStatus[value=42]");
 	}
 
 	@Test
 	void success() {
+		// Given
+		// (no setup)
+
 		// When
 		ExitStatus exitStatus = ExitStatus.success();
 
@@ -59,6 +68,9 @@ class ExitStatusTest {
 
 	@Test
 	void error() {
+		// Given
+		// (no setup)
+
 		// When
 		ExitStatus exitStatus = ExitStatus.error();
 
@@ -70,6 +82,9 @@ class ExitStatusTest {
 
 	@Test
 	void validLiterals() {
+		// Given
+		// (no setup)
+
 		// When / Then
 		qt()
 				.forAll(strings().numeric())
@@ -81,6 +96,9 @@ class ExitStatusTest {
 
 	@Test
 	void invalidLiteral() {
+		// Given
+		// (no setup)
+
 		// When / Then
 		qt()
 				.forAll(strings().basicLatinAlphabet().ofLengthBetween(0, 10))

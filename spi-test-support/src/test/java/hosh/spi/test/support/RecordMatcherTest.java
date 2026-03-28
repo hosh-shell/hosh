@@ -36,19 +36,53 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RecordMatcherTest {
 
 	@Test
-	void usage() {
+	void noMatch_whenRecordIsEmpty() {
+		// Given
 		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
 
-		Record empty = Records.empty();
-		assertThat(sut.matches(empty)).isFalse();
+		// When
+		boolean result = sut.matches(Records.empty());
 
-		Record mario = empty.append(Keys.NAME, Values.ofText("mario"));
-		assertThat(sut.matches(mario)).isTrue();
+		// Then
+		assertThat(result).isFalse();
+	}
 
-		Record marioAndCount = mario.append(Keys.COUNT, Values.ofNumeric(42));
-		assertThat(sut.matches(marioAndCount)).isTrue(); // still true, as the required key/value is still there
+	@Test
+	void match_whenRecordContainsRequiredEntry() {
+		// Given
+		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
+		Record mario = Records.singleton(Keys.NAME, Values.ofText("mario"));
 
-		Record luigi = empty.append(Keys.NAME, Values.ofText("luigi"));
-		assertThat(sut.matches(luigi)).isFalse(); // not matching the required key/value (mario)
+		// When
+		boolean result = sut.matches(mario);
+
+		// Then
+		assertThat(result).isTrue();
+	}
+
+	@Test
+	void match_whenRecordContainsRequiredEntryPlusExtras() {
+		// Given
+		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
+		Record marioAndCount = Records.singleton(Keys.NAME, Values.ofText("mario")).append(Keys.COUNT, Values.ofNumeric(42));
+
+		// When
+		boolean result = sut.matches(marioAndCount);
+
+		// Then
+		assertThat(result).isTrue();
+	}
+
+	@Test
+	void noMatch_whenRequiredEntryHasDifferentValue() {
+		// Given
+		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
+		Record luigi = Records.singleton(Keys.NAME, Values.ofText("luigi"));
+
+		// When
+		boolean result = sut.matches(luigi);
+
+		// Then
+		assertThat(result).isFalse();
 	}
 }

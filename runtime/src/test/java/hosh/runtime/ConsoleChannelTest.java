@@ -59,27 +59,49 @@ class ConsoleChannelTest {
 
 	@Test
 	void empty() {
+		// Given
+		// (no setup)
+
+		// When
 		sut.send(Records.empty());
+
+		// Then
 		then(printWriter).should().println("");
 		then(printWriter).should().flush();
 	}
 
 	@Test
 	void oneValue() {
+		// Given
+		// (no setup)
+
+		// When
 		sut.send(Records.singleton(Keys.NAME, Values.ofText("foo")));
+
+		// Then
 		then(printWriter).should().println("foo");
 		then(printWriter).should().flush();
 	}
 
 	@Test
 	void twoValues() {
+		// Given
+		// (no setup)
+
+		// When
 		sut.send(Records.builder().entry(Keys.NAME, Values.ofText("foo")).entry(Keys.VALUE, Values.ofText("bar")).build());
+
+		// Then
 		then(printWriter).should().println("foo bar");
 		then(printWriter).should().flush();
 	}
 
 	@Test
 	void asString() {
+		// Given
+		// (no setup)
+
+		// When / Then
 		assertThat(sut).hasToString("ConsoleChannel[style=NONE]");
 	}
 }

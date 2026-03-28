@@ -72,107 +72,140 @@ class CommandResolversTest {
 
 		@Test
 		void notFound() {
+			// Given
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(Collections.emptyList());
 			given(state.getCwd()).willReturn(Paths.get("."));
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isEmpty();
 		}
 
 		@Test
 		void builtin() {
+			// Given
 			given(state.getCommands()).willReturn(Map.of(CommandName.constant("test"), () -> command));
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isPresent().hasValue(command);
 		}
 
 		@Test
 		void validAbsolutePath() throws IOException {
+			// Given
 			Path file = temporaryFolder.newExecutableFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
+			// When
 			Optional<Command> result = sut.tryResolve(file.toAbsolutePath().toString());
+			// Then
 			assertThat(result).isPresent();
 		}
 
 		@Test
 		void invalidAbsolutePath() throws IOException {
+			// Given
 			Path file = temporaryFolder.newExecutableFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
+			// When
 			Optional<Command> result = sut.tryResolve(file.toAbsolutePath() + "_invalid");
+			// Then
 			assertThat(result).isEmpty();
 		}
 
 		@Test
 		void invalidDirectory() throws IOException {
+			// Given
 			temporaryFolder.newFolder("test");
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			given(state.getCommands()).willReturn(Collections.emptyMap());
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isEmpty();
 		}
 
 		@DisabledOnOs(OS.WINDOWS)
 		@Test
 		void foundNonExecutableInPath() throws IOException {
+			// Given
 			temporaryFolder.newFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isNotPresent();
 		}
 
 		@Test
 		void foundExecutableInPath() throws IOException {
+			// Given
 			temporaryFolder.newExecutableFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isPresent();
 		}
 
 		@Test
 		@EnabledOnOs(OS.WINDOWS)
 		void notFoundInPathAsSpecifiedByPathExt() throws IOException {
+			// Given
 			temporaryFolder.newExecutableFile("test.vbs");// VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), Values.ofText(".COM;.EXE;.BAT;.CMD")));
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isNotPresent();
 		}
 
 		@Test
 		@EnabledOnOs(OS.WINDOWS)
 		void foundInPathAsSpecifiedByPathExt() throws IOException {
+			// Given
 			temporaryFolder.newExecutableFile("test.exe");// VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), Values.ofText(".COM;.EXE;.BAT;.CMD")));
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isPresent();
 		}
 
 		@Test
 		void foundInCwd() throws IOException {
+			// Given
 			temporaryFolder.newExecutableFile("test");
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
+			// When
 			Optional<Command> result = sut.tryResolve("./test");
+			// Then
 			assertThat(result).isPresent();
 		}
 
 		@Test
 		void notFoundInPath() {
+			// Given
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isEmpty();
 		}
 	}
@@ -196,29 +229,38 @@ class CommandResolversTest {
 
 		@Test
 		void pathExtNotDefined() {
+			// Given
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
+			// When
 			Optional<Command> result = sut.tryResolve("test");
+			// Then
 			assertThat(result).isEmpty();
 		}
 
 		@Test
 		void findExecutableInPathext() throws IOException {
+			// Given
 			temporaryFolder.newExecutableFile("TEST.EXE");
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), Values.ofText(".COM;.EXE")));
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
+			// When
 			Optional<Command> result = sut.tryResolve("TEST");
+			// Then
 			assertThat(result).isNotEmpty();
 		}
 
 		@Test
 		void findExecutableNotInPathext() throws IOException {
+			// Given
 			temporaryFolder.newExecutableFile("test.cmd");
 			given(state.getVariables()).willReturn(Map.of(VariableName.constant("PATHEXT"), Values.ofText(".COM;.EXE")));
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
+			// When
 			Optional<Command> result = sut.tryResolve("TEST");
+			// Then
 			assertThat(result).isEmpty();
 		}
 	}

@@ -55,6 +55,9 @@ class ErrorsTest {
 
 	@Test
 	void messageFormat() {
+		// Given
+		// (no setup)
+
 		// When
 		Record result = Errors.message("value is %d", 1);
 
@@ -64,6 +67,9 @@ class ErrorsTest {
 
 	@Test
 	void usage() {
+		// Given
+		// (no setup)
+
 		// When
 		Record result = Errors.usage("cmd [option]");
 

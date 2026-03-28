@@ -39,16 +39,27 @@ class WithExecutorTest {
 	ExecutorService executorService;
 
 	@Test
-	void usage() {
+	void submit_delegatesToExecutor() {
+		// Given
+		WithExecutor sut = new WithExecutor(executorService);
+		Runnable runnable = () -> System.out.println("test");
+
+		// When
+		sut.submit(runnable);
+
+		// Then
+		then(executorService).should().submit(runnable);
+	}
+
+	@Test
+	void afterAll_shutsDownExecutor() {
+		// Given
 		WithExecutor sut = new WithExecutor(executorService);
 
-		// submit task
-		Runnable runnable = () -> System.out.println("test");
-		sut.submit(runnable);
-		then(executorService).should().submit(runnable);
-
-		// close after usage
+		// When
 		sut.afterAll(null);
+
+		// Then
 		then(executorService).should().shutdown();
 	}
 

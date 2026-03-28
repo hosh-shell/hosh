@@ -73,7 +73,10 @@ class CompilerTest {
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/26", description = "rejected by the compiler")
 	@Test
 	void incompletePipeline() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
+
+		// When / Then
 		assertThatThrownBy(() -> sut.compile("ls | take 2 | "))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1:12: incomplete pipeline near '|'");
@@ -82,6 +85,10 @@ class CompilerTest {
 	@Bug(issue = "https://github.com/dfa1/hosh/issues/42", description = "rejected by the compiler")
 	@Test
 	void extraBraces() {
+		// Given
+		// (no setup)
+
+		// When / Then
 		assertThatThrownBy(() -> sut.compile("withTime { ls } } "))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: unnecessary closing '}'");
@@ -89,9 +96,14 @@ class CompilerTest {
 
 	@Test
 	void pipelineOfCommandsWithoutArguments() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("count");
+
+		// When
 		Program program = sut.compile("ls | count");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> assertThat(statement.getCommand()).isInstanceOf(PipelineCommand.class));
@@ -99,9 +111,14 @@ class CompilerTest {
 
 	@Test
 	void pipelineOfCommandsWithArguments() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("grep");
+
+		// When
 		Program program = sut.compile("ls /home | grep /regex/");
+
+		// Then
 		assertThat(program.getStatements()).hasSize(1);
 		List<Statement> statements = program.getStatements();
 		assertThat(statements)
@@ -114,8 +131,13 @@ class CompilerTest {
 
 	@Test
 	void commandWithConstant() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
+
+		// When
 		Program program = sut.compile("cd /tmp");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -128,8 +150,13 @@ class CompilerTest {
 
 	@Test
 	void commandWithVariable() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
+
+		// When
 		Program program = sut.compile("cd ${DIR}");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -142,8 +169,13 @@ class CompilerTest {
 
 	@Test
 	void commandWithVariableOrFallback() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cd");
+
+		// When
 		Program program = sut.compile("cd ${DIR!/tmp}");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -157,8 +189,13 @@ class CompilerTest {
 
 	@Test
 	void commandWithoutArguments() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
+
+		// When
 		Program program = sut.compile("env");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -169,8 +206,13 @@ class CompilerTest {
 
 	@Test
 	void commandWithArgument() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
+
+		// When
 		Program program = sut.compile("env --system");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -181,8 +223,13 @@ class CompilerTest {
 
 	@Test
 	void commandWithArguments() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+
+		// When
 		Program program = sut.compile("git commit --amend");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -193,7 +240,10 @@ class CompilerTest {
 
 	@Test
 	void commandNotRegisteredInAPipeline() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("env");
+
+		// When / Then
 		assertThatThrownBy(() -> sut.compile("env | env2"))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'env2' unknown command");
@@ -201,9 +251,14 @@ class CompilerTest {
 
 	@Test
 	void wrappedCommand() {
+		// Given
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+
+		// When
 		Program program = sut.compile("withTime -t -a { git push }");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -214,9 +269,14 @@ class CompilerTest {
 
 	@Test
 	void nestedWrappedCommands() {
+		// Given
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+
+		// When
 		Program program = sut.compile("withTime { withTime { git push } }");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> assertThat(statement.getCommand()).isInstanceOf(DefaultCommandDecorator.class));
@@ -224,7 +284,10 @@ class CompilerTest {
 
 	@Test
 	void commandWrapperUsedAsCommand() {
+		// Given
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
+
+		// When / Then
 		assertThatThrownBy(() -> sut.compile("withTime"))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'withTime' is a command wrapper");
@@ -232,7 +295,10 @@ class CompilerTest {
 
 	@Test
 	void emptyCommandWrapper() {
+		// Given
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("withTime");
+
+		// When / Then
 		assertThatThrownBy(() -> sut.compile("withTime { }"))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'withTime' with empty wrapping statement");
@@ -240,8 +306,11 @@ class CompilerTest {
 
 	@Test
 	void commandUsedAsCommandWrapper() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("grep");
+
+		// When / Then
 		assertThatThrownBy(() -> sut.compile("ls { grep pattern } "))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'ls' is not a command wrapper");
@@ -249,7 +318,10 @@ class CompilerTest {
 
 	@Test
 	void unknownCommand() {
+		// Given
 		doReturn(Optional.empty()).when(commandResolver).tryResolve("ls");
+
+		// When / Then
 		assertThatThrownBy(() -> sut.compile("ls { grep pattern }"))
 				.isInstanceOf(CompileError.class)
 				.hasMessage("line 1: 'ls' unknown command wrapper");
@@ -257,10 +329,15 @@ class CompilerTest {
 
 	@Test
 	void commandWrapperAsProducer() {
+		// Given
 		doReturn(Optional.of(commandWrapper)).when(commandResolver).tryResolve("benchmark");
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
+
+		// When
 		Program program = sut.compile("benchmark 50 { ls } | schema");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -277,8 +354,13 @@ class CompilerTest {
 	@Bug(description = "command cannot be dynamic", issue = "https://github.com/dfa1/hosh/issues/63")
 	@Test
 	void commandAsVariableExpansion() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
+
+		// When
 		Program program = sut.compile("${JAVA_HOME}/bin/java");
+
+		// Then
 		assertThat(program.getStatements()).hasSize(1)
 				.first().satisfies(statement -> assertThat(statement.getArguments())
 						.hasSize(0));
@@ -287,8 +369,13 @@ class CompilerTest {
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/112")
 	@Test
 	void commentedOutCommandIsNotCompiled() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cmd");
+
+		// When
 		Program program = sut.compile("cmd # ls /tmp");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -301,8 +388,13 @@ class CompilerTest {
 	@Bug(description = "regression test", issue = "https://github.com/dfa1/hosh/issues/112")
 	@Test
 	void commandAfterCommentBlock() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("cmd");
+
+		// When
 		Program program = sut.compile("#\ncmd");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -313,9 +405,14 @@ class CompilerTest {
 
 	@Test
 	void sequenceOfSimpleCommands() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
+
+		// When
 		Program program = sut.compile("ls /tmp; schema");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -330,9 +427,14 @@ class CompilerTest {
 
 	@Test
 	void sequenceOfPipelines() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("schema");
+
+		// When
 		Program program = sut.compile("ls /tmp | schema; ls /tmp | schema");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first().satisfies(statement -> {
@@ -344,9 +446,14 @@ class CompilerTest {
 
 	@Test
 	void lambda() {
+		// Given
 		doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 		doReturn(Optional.of(anotherCommand)).when(commandResolver).tryResolve("echo");
+
+		// When
 		Program program = sut.compile("ls | { path -> echo ${path} }");
+
+		// Then
 		assertThat(program.getStatements())
 				.hasSize(1)
 				.first()
@@ -369,8 +476,13 @@ class CompilerTest {
 
 		@Test
 		void emptySingleQuotedString() {
+			// Given
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("echo");
+
+			// When
 			Program program = sut.compile("echo ''");
+
+			// Then
 			assertThat(program.getStatements())
 					.hasSize(1).first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
@@ -383,8 +495,13 @@ class CompilerTest {
 
 		@Test
 		void singleQuotedString() {
+			// Given
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
+
+			// When
 			Program program = sut.compile("vim 'file with spaces'");
+
+			// Then
 			assertThat(program.getStatements())
 					.hasSize(1).first().satisfies(statement -> {
 						assertThat(statement.getCommand()).isSameAs(command);
@@ -397,8 +514,13 @@ class CompilerTest {
 
 		@Test
 		void singleQuotedStringWithVariables() {
+			// Given
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("git");
+
+			// When
 			Program program = sut.compile("git '${HOME}${BIN}'");
+
+			// Then
 			assertThat(program.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
@@ -412,8 +534,13 @@ class CompilerTest {
 
 		@Test
 		void emptyDoubleQuotedString() {
+			// Given
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
+
+			// When
 			Program program = sut.compile("vim \"\"");
+
+			// Then
 			assertThat(program.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
@@ -427,8 +554,13 @@ class CompilerTest {
 
 		@Test
 		void doubleQuotedString() {
+			// Given
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("vim");
+
+			// When
 			Program program = sut.compile("vim \"file with spaces\"");
+
+			// Then
 			assertThat(program.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
@@ -442,9 +574,14 @@ class CompilerTest {
 
 		@Test
 		void doubleQuotedStringWithVariable() {
+			// Given
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 			doReturn(Map.of(VariableName.constant("HOME"), Values.ofText("/home/dfa"))).when(state).getVariables();
+
+			// When
 			Program program = sut.compile("ls \"${HOME}\"");
+
+			// Then
 			assertThat(program.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
@@ -458,9 +595,14 @@ class CompilerTest {
 
 		@Test
 		void doubleQuotedStringWithVariables() {
+			// Given
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 			doReturn(Map.of(VariableName.constant("HOME"), Values.ofText("/home/dfa"), VariableName.constant("BIN"), Values.ofText("bin"))).when(state).getVariables();
+
+			// When
 			Program program = sut.compile("ls \"${HOME}/${BIN}\"");
+
+			// Then
 			assertThat(program.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {
@@ -474,9 +616,14 @@ class CompilerTest {
 
 		@Test
 		void doubleQuotedStringWithFallback() {
+			// Given
 			doReturn(Optional.of(command)).when(commandResolver).tryResolve("ls");
 			doReturn(Map.of(VariableName.constant("HOME"), Values.ofText("/home/dfa"))).when(state).getVariables();
+
+			// When
 			Program program = sut.compile("ls \"${HOME!/home}/${BIN!bin}\"");
+
+			// Then
 			assertThat(program.getStatements())
 					.hasSize(1)
 					.first().satisfies(statement -> {

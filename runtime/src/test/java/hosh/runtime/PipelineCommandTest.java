@@ -75,13 +75,16 @@ class PipelineCommandTest {
 
 	@Test
 	void producerAndConsumerSuccess() {
+		// Given
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -90,13 +93,16 @@ class PipelineCommandTest {
 
 	@Test
 	void producerError() {
+		// Given
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		willReturn(ExitStatus.error()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -105,13 +111,16 @@ class PipelineCommandTest {
 
 	@Test
 	void consumerError() {
+		// Given
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.error()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		// Then
 		assertThat(exitStatus).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -120,13 +129,16 @@ class PipelineCommandTest {
 
 	@Test
 	void producerPoisonPill() {
+		// Given
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(producer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -135,13 +147,16 @@ class PipelineCommandTest {
 
 	@Test
 	void consumerPoisonPill() {
+		// Given
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(consumer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
@@ -150,6 +165,7 @@ class PipelineCommandTest {
 
 	@Test
 	void runtimeExceptions() {
+		// Given
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
@@ -157,7 +173,9 @@ class PipelineCommandTest {
 		NullPointerException runtimeException = new NullPointerException("simulated error");
 		willThrow(runtimeException).given(interpreter).eval(eq(consumer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		// When
 		var result = Assertions.assertThatThrownBy(() -> sut.run(List.of(), in, out, err));
+		// Then
 		result
 				.hasNoSuppressedExceptions()
 				.isSameAs(runtimeException);
@@ -165,6 +183,7 @@ class PipelineCommandTest {
 
 	@Test
 	void checkedExceptions() {
+		// Given
 		PipelineCommand sut = new PipelineCommand(producer, consumer);
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
@@ -172,7 +191,9 @@ class PipelineCommandTest {
 		Error error = new OutOfMemoryError("simulated out of memory");
 		willThrow(error).given(interpreter).eval(eq(consumer), any(), any(), any());
 		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		// When
 		var result = Assertions.assertThatThrownBy(() -> sut.run(List.of(), in, out, err));
+		// Then
 		result
 				.hasNoSuppressedExceptions()
 				.isNotSameAs(error)
@@ -182,6 +203,7 @@ class PipelineCommandTest {
 
 	@Test
 	void recursive() {
+		// Given
 		PipelineCommand sut = new PipelineCommand(producer, consumerProducer);
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
@@ -190,12 +212,15 @@ class PipelineCommandTest {
 		downStream.setInterpreter(interpreter);
 		willReturn(downStream).given(consumerProducer).getCommand();
 		willReturn(ExitStatus.success()).given(interpreter).eval(any(), any(), any(), any());
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 	}
 
 	@Test
 	void recursiveWithExternalCommands() {
+		// Given
 		// simulating a | b | c as external commands
 		ExternalCommand a = mock(ExternalCommand.class, "a");
 		ExternalCommand b = mock(ExternalCommand.class, "b");
@@ -205,7 +230,9 @@ class PipelineCommandTest {
 		sut.setInterpreter(interpreter);
 		downStream.setInterpreter(interpreter);
 		given(interpreter.eval(any(), any(), any(), any())).willReturn(ExitStatus.success());
+		// When
 		ExitStatus exitStatus = sut.run(List.of(), in, out, err);
+		// Then
 		assertThat(exitStatus).isSuccess();
 		then(a).should().pipeline(PipelineCommand.Position.FIRST);
 		then(b).should().pipeline(PipelineCommand.Position.MIDDLE);

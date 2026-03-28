@@ -197,12 +197,17 @@ class CommandCompleterTest {
 	@Test
 	@DisabledOnOs(OS.WINDOWS)
 	void ioErrorsAreIgnored() throws IOException {
+		// Given
 		Path bin = temporaryFolder.newFolder("bin");
 		assertTrue(bin.toFile().setReadable(false)); // throws java.nio.file.AccessDeniedException, does not work on windows
 		given(state.getPath()).willReturn(List.of(bin.toAbsolutePath()));
 		given(parsedLine.wordIndex()).willReturn(0);
 		List<Candidate> candidates = new ArrayList<>();
+
+		// When
 		sut.complete(lineReader, parsedLine, candidates);
+
+		// Then
 		assertThat(candidates).isEmpty();
 	}
 }

@@ -31,6 +31,9 @@ class AnsiTest {
 
 	@Test
 	void none() {
+		// Given
+		// (no setup)
+
 		// When / Then
 		assertThat(Ansi.Style.NONE.enable()).isEmpty();
 		assertThat(Ansi.Style.NONE.disable()).isEmpty();
@@ -39,6 +42,9 @@ class AnsiTest {
 	@Test
 	void redForeground() {
 		// this test sucks...
+
+		// Given
+		// (no setup)
 
 		// When / Then
 		assertThat(Ansi.Style.FG_RED.enable() +

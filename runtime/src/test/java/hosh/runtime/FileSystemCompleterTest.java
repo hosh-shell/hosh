@@ -71,29 +71,38 @@ class FileSystemCompleterTest {
 
 	@Test
 	void emptyWordInEmptyDir() {
+		// Given
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
+		// When
 		sut.complete(lineReader, line, candidates);
+		// Then
 		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	void nonEmptyWordInEmptyDir() {
+		// Given
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("aaa");
 		List<Candidate> candidates = new ArrayList<>();
+		// When
 		sut.complete(lineReader, line, candidates);
+		// Then
 		assertThat(candidates).isEmpty();
 	}
 
 	@Test
 	void emptyWordInNonEmptyDir() throws IOException {
+		// Given
 		temporaryFolder.newFile(temporaryFolder.toPath(), "a");
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("");
 		List<Candidate> candidates = new ArrayList<>();
+		// When
 		sut.complete(lineReader, line, candidates);
+		// Then
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {
@@ -105,10 +114,13 @@ class FileSystemCompleterTest {
 	@DisabledOnOs(OS.WINDOWS)
 	@Test
 	void rootDirUnix() {
+		// Given
 		String rootDir = "/";
 		given(line.word()).willReturn(rootDir);
 		List<Candidate> candidates = new ArrayList<>();
+		// When
 		sut.complete(lineReader, line, candidates);
+		// Then
 		assertThat(candidates)
 				.isNotEmpty()
 				.allSatisfy(candidate -> assertThat(candidate.value()).isNotBlank());
@@ -117,10 +129,13 @@ class FileSystemCompleterTest {
 	@EnabledOnOs(OS.WINDOWS)
 	@Test
 	void rootDirWindows() {
+		// Given
 		String rootDir = "c:\\";
 		given(line.word()).willReturn(rootDir);
 		List<Candidate> candidates = new ArrayList<>();
+		// When
 		sut.complete(lineReader, line, candidates);
+		// Then
 		assertThat(candidates)
 				.isNotEmpty()
 				.allSatisfy(candidate -> assertThat(candidate.value()).isNotBlank());
@@ -128,11 +143,14 @@ class FileSystemCompleterTest {
 
 	@Test
 	void absoluteDirWithoutEndingSeparator() throws IOException {
+		// Given
 		Path dir = temporaryFolder.newFolder("dir");
 		Path newFile = temporaryFolder.newFile(dir, "aaa");
 		given(line.word()).willReturn(newFile.getParent().toString());
 		List<Candidate> candidates = new ArrayList<>();
+		// When
 		sut.complete(lineReader, line, candidates);
+		// Then
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {
@@ -143,11 +161,14 @@ class FileSystemCompleterTest {
 
 	@Test
 	void absoluteDirWithEndingSeparator() throws IOException {
+		// Given
 		Path dir = temporaryFolder.newFolder("dir");
 		Path newFile = temporaryFolder.newFile(dir, "aaa");
 		given(line.word()).willReturn(newFile.getParent() + File.separator);
 		List<Candidate> candidates = new ArrayList<>();
+		// When
 		sut.complete(lineReader, line, candidates);
+		// Then
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {
@@ -158,11 +179,14 @@ class FileSystemCompleterTest {
 
 	@Test
 	void partialMatchDirectory() throws IOException {
+		// Given
 		temporaryFolder.newFolder(temporaryFolder.newFolder(temporaryFolder.toPath(), "aaa"), "bbb");
 		given(state.getCwd()).willReturn(temporaryFolder.toPath());
 		given(line.word()).willReturn("aaa" + File.separator + "b");
 		List<Candidate> candidates = new ArrayList<>();
+		// When
 		sut.complete(lineReader, line, candidates);
+		// Then
 		assertThat(candidates)
 				.hasSize(1)
 				.allSatisfy(candidate -> {

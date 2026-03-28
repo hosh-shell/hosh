@@ -36,7 +36,7 @@ class RecordsTest {
 		Record a = Records.singleton(Keys.NAME, Values.ofText("a"));
 		Record b = Records.singleton(Keys.NAME, Values.ofText("a"));
 
-		// Then
+		// When / Then
 		assertThat(a).isEqualTo(b);
 		assertThat(a).hasSameHashCodeAs(b);
 		assertThat(a).hasToString(b.toString());
