@@ -60,8 +60,7 @@ public interface Value extends Comparable<Value> {
 	 * @param value the value to merge with
 	 * @return optionally a new value holding the result of the merge
 	 */
-	@Deprecated
-	@Todo(description = "this is used once to implement sum()... it is not worth as public method here")
+	@Experimental(description = "not really sure about this is used once to implement sum()")
 	default Optional<Value> merge(Value value) {
 		return Optional.empty();
 	}
