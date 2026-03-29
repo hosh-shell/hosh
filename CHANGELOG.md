@@ -9,12 +9,14 @@ Most of the work from v0.2.0 onwards is done in collaboration with [Claude Code]
 
 ## [Unreleased]
 
+Most of the work from v0.2.0 onwards is done in collaboration with [Claude Code](https://claude.ai/code) (Anthropic).
+In general, this is first version that builds on fully enforced Java modules.
+
 ### Added
 
+- CLAUDE.md to guide the coding agent.
 - New `checksum` module with `to-checksum` and `from-checksum` commands
 - New `formats` module with `json` and `csv` commands
-- `CommandName`: typed command name domain primitive (SPI)
-- `CommandArguments`: typed command arguments domain primitive (SPI), replacing raw `List<String>`
 - Linux ARM64 (`ubuntu-24.04-arm`) added to CI build matrix
 - CodeQL security analysis re-enabled in CI
 - Javadoc added to SPI and runtime classes
@@ -23,11 +25,12 @@ Most of the work from v0.2.0 onwards is done in collaboration with [Claude Code]
 
 - JDK 25 is now the minimum requirement
 - Maven upgraded to 3.9.9; JVM flags for native access and `sun.misc.Unsafe` moved to `.mvn/jvm.config`
-- Shell variables changed from `Map<VariableName, String>` to `Map<VariableName, Value>`
 - JLine upgraded from 3.x to 4.0.9, switching to FFM (Foreign Function & Memory API) for terminal I/O
+- Shell variables changed from `Map<VariableName, String>` to `Map<VariableName, Value>`
 - `MutableState`: copy-on-write strategy replaces copy-on-read
+- `CommandName`: typed command name domain primitive (SPI)
+- `CommandArguments`: typed command arguments domain primitive (SPI), replacing raw `List<String>`
 - `Injector` merged into `Interpreter`
-- Uberjar assembly moved to a dedicated Maven profile (`-Puberjar`)
 - Javac warnings promoted to errors (`-Werror`)
 
 ### Fixed
