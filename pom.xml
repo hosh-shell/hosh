@@ -47,7 +47,6 @@
 		<version.archunit>1.4.1</version.archunit>
 		<version.quicktheories>0.26</version.quicktheories>
 		<version.slf4j>2.0.17</version.slf4j>
-		<version.mockserver>5.15.0</version.mockserver>
 	</properties>
 	<modules>
 		<module>test-support</module>
@@ -168,11 +167,6 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-csv</artifactId>
 				<version>${version.commons-csv}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mock-server</groupId>
-				<artifactId>mockserver-junit-jupiter-no-dependencies</artifactId>
-				<version>${version.mockserver}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

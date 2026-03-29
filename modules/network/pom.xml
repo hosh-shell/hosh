@@ -8,6 +8,34 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hosh-network-module</artifactId>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-testCompile</id>
+						<configuration>
+							<compilerArgs combine.children="append">
+								<arg>--add-modules</arg>
+								<arg>jdk.httpserver</arg>
+								<arg>--add-reads</arg>
+								<arg>hosh.modules.network=jdk.httpserver</arg>
+							</compilerArgs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>--add-modules jdk.httpserver --add-reads hosh.modules.network=jdk.httpserver</argLine>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>hosh</groupId>
@@ -55,11 +83,6 @@
 		<dependency>
 			<groupId>org.leadpony.joy</groupId>
 			<artifactId>joy-classic</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mock-server</groupId>
-			<artifactId>mockserver-junit-jupiter-no-dependencies</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

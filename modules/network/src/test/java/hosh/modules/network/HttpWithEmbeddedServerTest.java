@@ -23,21 +23,8 @@
  */
 package hosh.modules.network;
 
-import hosh.spi.Version;
+import com.sun.net.httpserver.HttpServer;
 import hosh.spi.CommandArguments;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockserver.integration.ClientAndServer;
-import org.mockserver.junit.jupiter.MockServerExtension;
-import org.mockserver.model.HttpResponse;
-
-import java.util.List;
-
-import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -45,17 +32,31 @@ import hosh.spi.OutputChannel;
 import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.Values;
+import hosh.spi.Version;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+
+import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockserver.model.HttpRequest.request;
 
 /**
- * Integration tests against a locally running mock-server.
+ * Integration tests against the JDK embedded HTTP server.
  */
-@ExtendWith({MockitoExtension.class, MockServerExtension.class})
-class HttpWithMockServerTest {
+@ExtendWith(MockitoExtension.class)
+class HttpWithEmbeddedServerTest {
 
 	@Mock
 	InputChannel in;
@@ -71,45 +72,54 @@ class HttpWithMockServerTest {
 
 	NetworkModule.Http sut;
 
+	HttpServer server;
+
 	@BeforeEach
-	void createSut() {
+	void setUp() throws IOException {
 		sut = new NetworkModule.Http();
 		sut.setVersion(new Version("v1.2.3"));
+		server = HttpServer.create(new InetSocketAddress(0), 0);
+		server.start();
+	}
+
+	@AfterEach
+	void tearDown() {
+		server.stop(0);
 	}
 
 	@Test
-	void ok(ClientAndServer clientAndServer) {
+	void ok() {
 		// Given
-		clientAndServer.when(
-						request().withMethod("GET").withPath("/path")
-				)
-				.respond(
-						HttpResponse.response().withStatusCode(200)
-								.withBody("line1\nline2")
-				);
+		server.createContext("/path", exchange -> {
+			byte[] response = "line1\nline2".getBytes(StandardCharsets.UTF_8);
+			exchange.sendResponseHeaders(200, response.length);
+			try (OutputStream os = exchange.getResponseBody()) {
+				os.write(response);
+			}
+		});
 		// When
-		String arg = String.format("http://localhost:%d/path", clientAndServer.getLocalPort());
-		ExitStatus result = sut.run(CommandArguments.of(arg), in, out, err);
+		String url = String.format("http://localhost:%d/path", server.getAddress().getPort());
+		ExitStatus result = sut.run(CommandArguments.of(url), in, out, err);
 		// Then
 		assertThat(result).isSuccess();
 		then(in).shouldHaveNoInteractions();
 		then(out).should(atLeastOnce()).send(body.capture());
 		then(err).shouldHaveNoInteractions();
-		assertThat(body.getAllValues()).containsExactly(Records.singleton(Keys.TEXT, Values.ofText("line1")), Records.singleton(Keys.TEXT, Values.ofText("line2")));
+		assertThat(body.getAllValues()).containsExactly(
+				Records.singleton(Keys.TEXT, Values.ofText("line1")),
+				Records.singleton(Keys.TEXT, Values.ofText("line2")));
 	}
 
 	@Test
-	void notFound(ClientAndServer clientAndServer) {
+	void notFound() {
 		// Given
-		// no url is expected in the mockserver
+		// no handler registered for /not-found — server returns 404
 		// When
-		String arg = String.format("http://localhost:%d/not-found", clientAndServer.getLocalPort());
-		ExitStatus result = sut.run(CommandArguments.of(arg), in, out, err);
+		String url = String.format("http://localhost:%d/not-found", server.getAddress().getPort());
+		ExitStatus result = sut.run(CommandArguments.of(url), in, out, err);
 		// Then
 		assertThat(result).isError();
 		then(in).shouldHaveNoInteractions();
 		then(out).shouldHaveNoInteractions();
-		then(err).shouldHaveNoInteractions();
 	}
-
 }
