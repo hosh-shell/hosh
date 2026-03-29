@@ -218,6 +218,7 @@
 						<arg>-Xlint:all</arg>
 						<arg>-Xlint:-requires-automatic</arg>
 						<arg>-Xpkginfo:always</arg>
+						<arg>-Werror</arg>
 					</compilerArgs>
 				</configuration>
 			</plugin>
