@@ -32,12 +32,14 @@
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<argLine /> <!-- defined for when not running with jacoco -->
-		<!-- versions production classpath -->
+		<!-- production classpath -->
 		<version.antlr>4.13.2</version.antlr>
 		<version.commonscli>1.11.0</version.commonscli>
 		<version.jline>4.0.9</version.jline>
-		<!-- versions test classpath -->
+		<version.commons-csv>1.12.0</version.commons-csv>
+		<version.joy-classic>2.1.0</version.joy-classic>
+		<version.jakarta-json-api>2.1.3</version.jakarta-json-api>
+		<!-- test classpath -->
 		<version.junit>5.10.2</version.junit>
 		<version.assertj>3.27.7</version.assertj>
 		<version.mockito>5.23.0</version.mockito>
@@ -45,9 +47,6 @@
 		<version.archunit>1.4.1</version.archunit>
 		<version.quicktheories>0.26</version.quicktheories>
 		<version.slf4j>2.0.17</version.slf4j>
-		<version.joy-classic>2.1.0</version.joy-classic>
-		<version.jakarta-json-api>2.1.3</version.jakarta-json-api>
-		<version.commons-csv>1.12.0</version.commons-csv>
 		<version.mockserver>5.15.0</version.mockserver>
 	</properties>
 	<modules>
