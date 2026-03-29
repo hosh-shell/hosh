@@ -44,6 +44,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
+
 import hosh.spi.ExitStatus;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
@@ -52,6 +53,7 @@ import hosh.spi.Record;
 import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.test.support.TemporaryFolder;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -458,7 +460,9 @@ class FormatsModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path file = temporaryFolder.toPath().resolve("output.json");
 			Record record = Records.builder().entry(Keys.of("name"), Values.ofText("alice")).entry(Keys.of("age"), Values.ofNumeric(30)).build();
-			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv())
+					.willReturn(Optional.of(record))
+					.willReturn(Optional.empty());
 			// When
 			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
@@ -475,7 +479,9 @@ class FormatsModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path file = temporaryFolder.toPath().resolve("output.json");
 			Record record = Records.builder().entry(Keys.of("name"), Values.none()).build();
-			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv())
+					.willReturn(Optional.of(record))
+					.willReturn(Optional.empty());
 			// When
 			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
@@ -486,7 +492,7 @@ class FormatsModuleTest {
 		}
 
 		@Test
-		void relativePathResolvedAgainstCwd() throws IOException {
+		void relativePathResolvedAgainstCwd() {
 			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(Optional.empty());
@@ -574,7 +580,9 @@ class FormatsModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path file = temporaryFolder.toPath().resolve("output.csv");
 			Record record = Records.builder().entry(Keys.of("name"), Values.ofText("alice")).entry(Keys.of("age"), Values.ofNumeric(30)).build();
-			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv())
+					.willReturn(Optional.of(record))
+					.willReturn(Optional.empty());
 			// When
 			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
@@ -591,7 +599,10 @@ class FormatsModuleTest {
 			Path file = temporaryFolder.toPath().resolve("output.csv");
 			Record alice = Records.builder().entry(Keys.of("name"), Values.ofText("alice")).entry(Keys.of("age"), Values.ofNumeric(30)).build();
 			Record bob = Records.builder().entry(Keys.of("name"), Values.ofText("bob")).entry(Keys.of("age"), Values.ofNumeric(25)).build();
-			given(in.recv()).willReturn(Optional.of(alice), Optional.of(bob), Optional.empty());
+			given(in.recv())
+					.willReturn(Optional.of(alice))
+					.willReturn(Optional.of(bob))
+					.willReturn(Optional.empty());
 			// When
 			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
@@ -607,7 +618,9 @@ class FormatsModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path file = temporaryFolder.toPath().resolve("output.csv");
 			Record record = Records.builder().entry(Keys.of("name"), Values.ofText("Smith, Jr.")).build();
-			given(in.recv()).willReturn(Optional.of(record), Optional.empty());
+			given(in.recv())
+					.willReturn(Optional.of(record))
+					.willReturn(Optional.empty());
 			// When
 			ExitStatus result = sut.run(CommandArguments.of(file.toAbsolutePath().toString()), in, out, err);
 			// Then
@@ -618,7 +631,7 @@ class FormatsModuleTest {
 		}
 
 		@Test
-		void relativePathResolvedAgainstCwd() throws IOException {
+		void relativePathResolvedAgainstCwd() {
 			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			given(in.recv()).willReturn(Optional.empty());

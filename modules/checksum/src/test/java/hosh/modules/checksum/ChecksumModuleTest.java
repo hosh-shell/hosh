@@ -212,9 +212,9 @@ class ChecksumModuleTest {
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 			Path file = temporaryFolder.newFile("data.txt");
 			Files.writeString(file, "hello", StandardCharsets.UTF_8);
-			given(in.recv()).willReturn(
-					Optional.of(Records.singleton(Keys.PATH, Values.ofPath(file))),
-					Optional.empty());
+			given(in.recv())
+					.willReturn(Optional.of(Records.singleton(Keys.PATH, Values.ofPath(file))))
+					.willReturn(Optional.empty());
 			// When
 			ExitStatus result = sut.run(CommandArguments.of("SHA-256"), in, out, err);
 			// Then
@@ -230,9 +230,9 @@ class ChecksumModuleTest {
 		@Test
 		void pipelineModeSkipsRecordsWithoutPath() {
 			// Given
-			given(in.recv()).willReturn(
-					Optional.of(Records.singleton(Keys.of("name"), Values.ofText("alice"))),
-					Optional.empty());
+			given(in.recv())
+					.willReturn(Optional.of(Records.singleton(Keys.of("name"), Values.ofText("alice"))))
+					.willReturn(Optional.empty());
 			// When
 			ExitStatus result = sut.run(CommandArguments.of("SHA-256"), in, out, err);
 			// Then
