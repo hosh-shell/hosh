@@ -9,18 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New `checksum` module with `to-checksum` and `from-checksum` commands
+- New `formats` module with `json` and `csv` commands
+- `CommandName`: typed command name domain primitive (SPI)
+- `CommandArguments`: typed command arguments domain primitive (SPI), replacing raw `List<String>`
+- Linux ARM64 (`ubuntu-24.04-arm`) added to CI build matrix
+- CodeQL security analysis re-enabled in CI
+- Javadoc added to SPI and runtime classes
+
 ### Changed
 
 - JDK 25 is now the minimum requirement
 - Maven upgraded to 3.9.9; JVM flags for native access and `sun.misc.Unsafe` moved to `.mvn/jvm.config`
+- Shell variables changed from `Map<VariableName, String>` to `Map<VariableName, Value>`
+- JLine upgraded from 3.x to 4.0.9, switching to FFM (Foreign Function & Memory API) for terminal I/O
+- `MutableState`: copy-on-write strategy replaces copy-on-read
+- `Injector` merged into `Interpreter`
+- Uberjar assembly moved to a dedicated Maven profile (`-Puberjar`)
+- Javac warnings promoted to errors (`-Werror`)
 
 ### Fixed
 
-- Several race conditions across `MutableState` (volatile fields), `LambdaCommand` (synchronized compound mutation), and `AutoTableChannel` (atomic overflow detection)
+- Silent record dropping in `PipelineChannel.send()`
+- Several race conditions across `MutableState` (volatile fields), `LambdaCommand` (synchronized compound mutation and scoping), and `AutoTableChannel` (atomic overflow detection)
+- `WithTimeout`: cancel future on timeout to prevent executor `close()` from hanging
+- `Supervisor`: replaced `ArrayList` with `CopyOnWriteArrayList` for thread-safe listener management
+- `--help` output: removed spurious leading and double spaces
+- Replaced deprecated `HelpFormatter` with `org.apache.commons.cli.help.HelpFormatter`
+- Replaced `jdk.internal.Signal` usage with public JVM API
 
 ### Removed
 
-- dropping maven-gpg-plugin
+- JetBrains annotations dependency dropped
+- `maven-gpg-plugin` dropped
+- MockServer replaced with JDK embedded HTTP server (`jdk.httpserver`) in network integration tests — no more `sun.misc.Unsafe` warnings
 
 ## [v0.2.0] - 2023-12-31
 
