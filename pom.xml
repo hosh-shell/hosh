@@ -35,7 +35,7 @@
 		<!-- production classpath -->
 		<version.antlr>4.13.2</version.antlr>
 		<version.jline>4.0.9</version.jline>
-		<version.commons-csv>1.14.1</version.commons-csv>
+		<version.fastcsv>4.1.1</version.fastcsv>
 		<version.joy-classic>2.1.0</version.joy-classic>
 		<version.jakarta-json-api>2.1.3</version.jakarta-json-api>
 		<!-- test classpath -->
@@ -158,9 +158,9 @@
 				<version>${version.joy-classic}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-csv</artifactId>
-				<version>${version.commons-csv}</version>
+				<groupId>de.siegmar</groupId>
+				<artifactId>fastcsv</artifactId>
+				<version>${version.fastcsv}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

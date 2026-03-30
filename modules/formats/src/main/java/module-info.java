@@ -24,5 +24,5 @@
 module hosh.modules.formats {
 	requires hosh.spi;
 	requires jakarta.json;
-	requires org.apache.commons.csv;
+	requires de.siegmar.fastcsv;
 }

@@ -49,19 +49,16 @@ import jakarta.json.JsonValue;
 import jakarta.json.JsonWriter;
 import jakarta.json.JsonWriterFactory;
 import jakarta.json.stream.JsonGenerator;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
+import de.siegmar.fastcsv.reader.CsvReader;
+import de.siegmar.fastcsv.reader.NamedCsvRecord;
+import de.siegmar.fastcsv.writer.CsvWriter;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -172,17 +169,11 @@ public class FormatsModule implements Module {
 				err.send(Errors.message("not a regular file: %s", source));
 				return ExitStatus.error();
 			}
-			CSVFormat format = CSVFormat.RFC4180.builder()
-					.setHeader()
-					.setSkipHeaderRecord(true)
-					.build();
-			try (Reader reader = Files.newBufferedReader(source, StandardCharsets.UTF_8);
-				 CSVParser parser = format.parse(reader)) {
-				List<String> headers = parser.getHeaderNames();
-				for (CSVRecord record : parser) {
+			try (CsvReader<NamedCsvRecord> csvReader = CsvReader.builder().ofNamedCsvRecord(source)) {
+				for (NamedCsvRecord record : csvReader) {
 					Records.Builder builder = Records.builder();
-					for (String header : headers) {
-						builder.entry(Keys.of(header), Values.ofText(record.get(header)));
+					for (String header : record.getHeader()) {
+						builder.entry(Keys.of(header), Values.ofText(record.getField(header)));
 					}
 					out.send(builder.build());
 				}
@@ -262,16 +253,15 @@ public class FormatsModule implements Module {
 			Path target = args.get(0).asPath(state);
 			Locale locale = Locale.getDefault();
 			boolean headerWritten = false;
-			try (Writer writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8)) {
-				CSVFormat format = CSVFormat.RFC4180;
-				CSVPrinter printer = null;
+			try (CsvWriter csvWriter = CsvWriter.builder().build(target, StandardCharsets.UTF_8)) {
 				for (hosh.spi.Record record : InputChannel.iterate(in)) {
 					if (!headerWritten) {
-						List<String> headers = record.keys().map(hosh.spi.Key::name).toList();
-						printer = format.builder().setHeader(headers.toArray(new String[0])).build().print(writer);
+						String[] headers = record.keys().map(hosh.spi.Key::name).toArray(String[]::new);
+						csvWriter.writeRecord(headers);
 						headerWritten = true;
 					}
-					printer.printRecord(record.values().map(v -> v.show(locale)).toList());
+					String[] values = record.values().map(v -> v.show(locale)).toArray(String[]::new);
+					csvWriter.writeRecord(values);
 				}
 				return ExitStatus.success();
 			} catch (IOException e) {
