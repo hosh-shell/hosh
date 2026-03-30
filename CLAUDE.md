@@ -161,6 +161,7 @@ public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out,
 
 ## Code style
 
+- Use tabs, not whitespaces in both Java and XML (checkstyle will fail).
 - Java 25, no Kotlin, no Gradle.
 - Zero SonarQube bugs/smells policy.
 - Checkstyle enforced (`checkstyle.xml` at root).
