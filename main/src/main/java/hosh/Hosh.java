@@ -60,13 +60,6 @@ import hosh.spi.Records;
 import hosh.spi.State;
 import hosh.spi.Values;
 import hosh.spi.Version;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.help.HelpFormatter;
-import org.apache.commons.cli.help.TextHelpAppendable;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -83,6 +76,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -175,50 +169,42 @@ public class Hosh {
 		interpreter.setLineReader(LineReaderBuilder.builder().terminal(terminal).build());
 		interpreter.setTerminal(terminal);
 		interpreter.setVersion(version);
-		CommandLine commandLine;
-		Options options = createOptions();
-		CommandLineParser parser = new DefaultParser();
-		try {
-			commandLine = parser.parse(options, args);
-		} catch (ParseException e) {
-			System.err.println("hosh: " + e.getMessage());
-			return ExitStatus.error();
-		}
-		if (commandLine.hasOption('h')) {
-			try {
-				TextHelpAppendable appendable = new TextHelpAppendable(System.out);
-				appendable.setLeftPad(0);
-				HelpFormatter fmt = HelpFormatter.builder().setHelpAppendable(appendable).get();
-				fmt.setSyntaxPrefix("usage:");
-				fmt.printHelp("hosh", null, options, null, true);
-			} catch (java.io.IOException e) {
-				System.err.println("hosh: " + e.getMessage());
-				return ExitStatus.error();
+		boolean showHelp = false;
+		boolean showVersion = false;
+		List<String> remainingArgs = new ArrayList<>();
+		for (String arg : args) {
+			switch (arg) {
+				case "-h", "--help" -> showHelp = true;
+				case "-v", "--version" -> showVersion = true;
+				default -> {
+					if (arg.startsWith("-")) {
+						System.err.println("hosh: Unrecognized option: " + arg);
+						return ExitStatus.error();
+					}
+					remainingArgs.add(arg);
+				}
 			}
+		}
+		if (showHelp) {
+			System.out.println("usage: hosh [-h] [-v] [script]");
+			System.out.println("  -h, --help     show help and exit");
+			System.out.println("  -v, --version  show version and exit");
 			return ExitStatus.success();
 		}
-		if (commandLine.hasOption('v')) {
+		if (showVersion) {
 			System.out.println(version.hoshVersion().unwrap(String.class).orElseThrow());
 			return ExitStatus.success();
 		}
-		List<String> remainingArgs = commandLine.getArgList();
 		if (remainingArgs.isEmpty()) {
 			welcome(out, version);
 			return repl(state, terminal, compiler, interpreter, out, err, logger);
 		}
 		if (remainingArgs.size() == 1) {
-			String filePath = args[0];
+			String filePath = remainingArgs.get(0);
 			return script(filePath, compiler, interpreter, out, err, logger);
 		}
 		System.err.println("hosh: too many scripts");
 		return ExitStatus.error();
-	}
-
-	private static Options createOptions() {
-		Options options = new Options();
-		options.addOption("h", "help", false, "show help and exit");
-		options.addOption("v", "version", false, "show version and exit");
-		return options;
 	}
 
 	private static ExitStatus script(String path, Compiler compiler, Interpreter interpreter, OutputChannel out, OutputChannel err, Logger logger) {

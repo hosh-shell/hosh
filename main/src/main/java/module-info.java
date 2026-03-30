@@ -27,8 +27,6 @@ module hosh {
 	requires hosh.runtime;
 	requires hosh.spi;
 
-	requires org.apache.commons.cli;
-
 	requires org.jline.reader;
 	requires org.jline.terminal;
 }
