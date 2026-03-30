@@ -49,6 +49,7 @@ Each module registers its commands via a `Module` SPI implementation (look for `
 | Core record type | `Record`, `Records` | `spi/` |
 | Typed values | `Value`, `Keys` | `spi/` |
 | Command interface | `Command` | `spi/` |
+| Command arguments | `CommandArguments`, `CommandArgument` | `spi/` |
 | Channels | `InputChannel`, `OutputChannel` | `spi/` |
 | Module registration | `Module` | `spi/` |
 
@@ -104,6 +105,48 @@ Sonar analysis:
 
 ```
 ./mvnw clean verify sonar:sonar -Psonar -Dsonar.token=MYTOKEN
+```
+
+## CommandArguments domain primitive
+
+`CommandArguments` (in `hosh.spi`) is the typed wrapper around the list of arguments passed to `Command#run`. Commands must use this — never raw `List<String>`.
+
+### CommandArguments methods
+
+| Method | Description |
+|---|---|
+| `CommandArguments.of(String... values)` | Factory for tests and internal use |
+| `isEmpty()` | True if no arguments were passed |
+| `size()` | Number of arguments |
+| `get(int index)` | Returns the argument at `index`; programming error if out of bounds |
+| `stream()` | Stream over arguments |
+| `iterator()` | Iterable support |
+
+### CommandArgument methods (single argument)
+
+Each element is a `CommandArgument` — a plain string with safe typed accessors. All conversions return `Optional`/`OptionalInt`/`OptionalLong` so callers must handle parse failures explicitly.
+
+| Method | Return type | Description |
+|---|---|---|
+| `asString()` | `String` | Raw string value |
+| `asKey()` | `Key` | Converts to a record key via `Keys.of(value)` |
+| `asLong()` | `OptionalLong` | Parses as `long`; empty if not a valid number |
+| `asInt()` | `OptionalInt` | Parses as `int`; empty if not a valid number |
+| `asDuration()` | `Optional<Duration>` | Parses ISO-8601 duration (with or without `PT` prefix); empty if invalid |
+| `asPath(State state)` | `Path` | Resolves relative to `state.getCwd()`; always returns an absolute, normalized path |
+
+### Usage pattern in a command
+
+```java
+@Override
+public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err, State state) {
+    if (args.size() != 1) {
+        err.send(Records.singleton(Keys.ERROR, Values.ofText("usage: mycommand <arg>")));
+        return ExitStatus.error();
+    }
+    String value = args.get(0).asString();
+    // ...
+}
 ```
 
 ## Key architecture notes
