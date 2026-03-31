@@ -168,6 +168,16 @@ class RecordsTest {
 	}
 
 	@Test
+	void emptyIsCached() {
+		// When
+		Record a = Records.empty();
+		Record b = Records.empty();
+
+		// Then
+		assertThat(a).isSameAs(b);
+	}
+
+	@Test
 	void singleton() {
 		// Given
 		Value name = Values.ofText("a name");

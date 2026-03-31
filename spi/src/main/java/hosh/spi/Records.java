@@ -43,11 +43,13 @@ import java.util.stream.Stream;
  */
 public class Records {
 
+	private static final Empty EMPTY = new Empty();
+
 	private Records() {
 	}
 
 	public static Record empty() {
-		return new Records.Empty();
+		return EMPTY;
 	}
 
 	public static Record singleton(Key key, Value value) {
