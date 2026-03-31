@@ -11,14 +11,15 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hosh-httpserver-module</artifactId>
-
 	<dependencies>
+		<!-- production -->
 		<dependency>
 			<groupId>hosh</groupId>
 			<artifactId>hosh-spi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- test -->
 		<dependency>
 			<groupId>hosh</groupId>
 			<artifactId>hosh-test-support</artifactId>

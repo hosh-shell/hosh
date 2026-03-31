@@ -21,11 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module hosh.modules.httpserver {
-  requires hosh.spi;
-  requires jdk.httpserver;
-  // one day, move also the http client here and rename to "http"
-  requires java.net.http;
+package hosh.test.support;
 
-  provides hosh.spi.Module with hosh.modules.httpserver.HttpServerModule;
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+import java.net.ServerSocket;
+
+public class WithRandomTcpPort implements BeforeEachCallback {
+
+	private int randomTcpPort;
+
+	public int getRandomTcpPort() {
+		return randomTcpPort;
+	}
+
+	@Override
+	public void beforeEach(@NonNull ExtensionContext context) throws Exception {
+		try (ServerSocket serverSocket = new ServerSocket(0)) {
+			randomTcpPort = serverSocket.getLocalPort();
+		}
+		// there is a little risk of another process taking the TCP port before the getRandomTcpPort is called
+		// I think we can live with this... but if you have better ideas, be my guest ;)
+	}
+
 }

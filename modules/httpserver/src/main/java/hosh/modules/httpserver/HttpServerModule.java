@@ -47,11 +47,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.EnumSet;
+import java.util.concurrent.CountDownLatch;
 
 public final class HttpServerModule implements Module {
 
 	private static final int MAX_PORT = 65535;
-	private static final Duration BUSY_WAIT = Duration.ofMillis(100);
 
 	@Override
 	public void initialize(final CommandRegistry registry) {
@@ -68,10 +68,15 @@ public final class HttpServerModule implements Module {
 	public static final class HttpServerCommand implements Command, StateAware {
 
 		private State state;
+		private BusyWait busyWait = new DefaultBusyWait();
 
 		@Override
 		public void setState(State state) {
 			this.state = state;
+		}
+
+		public void setBusyWait(BusyWait busyWait) {
+			this.busyWait = busyWait;
 		}
 
 		@Override
@@ -111,7 +116,7 @@ public final class HttpServerModule implements Module {
 				server.start();
 				final String startMsg = "HTTP server started on http://localhost:" + port + " serving " + directory;
 				out.send(Records.singleton(Keys.TEXT, Values.ofText(startMsg)), EnumSet.of(OutputChannel.Option.DIRECT));
-				busyWait();
+				busyWait.busyWait();
 				return ExitStatus.success();
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -122,11 +127,37 @@ public final class HttpServerModule implements Module {
 			}
 		}
 
-		// there is no other way to keep the server active?
-		private void busyWait() throws InterruptedException {
+	}
+
+	// escamotage to allow unit testing
+	public interface BusyWait {
+
+		void busyWait() throws InterruptedException;
+	}
+
+	public static class DefaultBusyWait implements BusyWait {
+
+		private static final Duration BUSY_WAIT = Duration.ofMillis(100);
+
+		@Override
+		public void busyWait() throws InterruptedException {
 			while (!Thread.currentThread().isInterrupted()) {
 				Thread.sleep(BUSY_WAIT);
 			}
+		}
+	}
+
+	public static class ExternalBusyWait implements BusyWait {
+
+		private final CountDownLatch countDownLatch;
+
+		public ExternalBusyWait(CountDownLatch countDownLatch) {
+			this.countDownLatch = countDownLatch;
+		}
+
+		@Override
+		public void busyWait() throws InterruptedException {
+			countDownLatch.await();
 		}
 	}
 }
