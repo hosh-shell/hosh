@@ -377,6 +377,7 @@ class HttpServerModuleTest {
 		@Test
 		void portWithLeadingZeros() {
 			// Given
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
 			// When
 			ExitStatus result = sut.run(CommandArguments.of("0008080", "/nonexistent"), in, out, err);
