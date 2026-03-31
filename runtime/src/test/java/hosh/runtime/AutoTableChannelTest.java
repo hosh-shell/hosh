@@ -33,6 +33,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -173,13 +175,14 @@ class AutoTableChannelTest {
 		then(out).shouldHaveNoMoreInteractions();
 	}
 
-	@Test
-	void overflowIsTriggeredExactlyOnceUnderConcurrentLoad() throws InterruptedException {
+
+	@ParameterizedTest(name = "overflow check with {0} threads")
+	@ValueSource(ints = {1, 2, 4, 8, 16, 32, 64})
+	void overflowIsTriggeredExactlyOnceUnderConcurrentLoad(int threads) throws InterruptedException {
 		// Given - a thread-safe collector and a channel backed by it
 		List<Record> received = new CopyOnWriteArrayList<>();
 		AutoTableChannel channel = new AutoTableChannel(received::add);
 		Record record = Records.builder().entry(Keys.COUNT, Values.none()).entry(Keys.TEXT, Values.ofText("x")).build();
-		int threads = 4;
 		int recordsPerThread = AutoTableChannel.OVERFLOW;
 		CountDownLatch ready = new CountDownLatch(threads);
 		CountDownLatch go = new CountDownLatch(1);
