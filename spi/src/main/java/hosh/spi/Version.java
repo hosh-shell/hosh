@@ -23,9 +23,12 @@
  */
 package hosh.spi;
 
+import hosh.doc.Todo;
+
 /**
  * Hosh version as immutable and safe value.
  */
+@Todo(description = "this seems a bit excessive, including VersionAware interface")
 public class Version {
 
 	private final String value;

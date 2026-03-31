@@ -28,16 +28,25 @@ import hosh.runtime.Compiler.Statement;
 import hosh.spi.Command;
 import hosh.spi.CommandArguments;
 import hosh.spi.ExitStatus;
+import hosh.spi.HistoryAware;
 import hosh.spi.InputChannel;
 import hosh.spi.Keys;
+import hosh.spi.LineReaderAware;
 import hosh.spi.OutputChannel;
 import hosh.spi.State;
 import hosh.spi.StateAware;
 import hosh.spi.StateMutator;
+import hosh.spi.StateMutatorAware;
+import hosh.spi.TerminalAware;
 import hosh.spi.Values;
 import hosh.spi.VariableName;
+import hosh.spi.Version;
+import hosh.spi.VersionAware;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.test.support.WithThread;
+import org.jline.reader.History;
+import org.jline.reader.LineReader;
+import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,19 +102,35 @@ class InterpreterTest {
 		sut = new Interpreter(state, stateMutator);
 	}
 
+
 	@Test
 	void injectDependencies() {
-		// Given - a command that is also StateAware
+		// Given
+		interface TargetCommand extends Command, StateAware, StateMutatorAware, HistoryAware, LineReaderAware, TerminalAware, VersionAware {
+		}
+		History history = Mockito.mock(History.class);
+		LineReader lineReader = Mockito.mock(LineReader.class);
+		Terminal terminal = Mockito.mock(Terminal.class);
+		Version version = Mockito.mock(Version.class);
+		sut.setHistory(history);
+		sut.setLineReader(lineReader);
+		sut.setTerminal(terminal);
+		sut.setVersion(version);
 		given(state.getVariables()).willReturn(Map.of());
-		StateAwareCommand stateAwareCommand = Mockito.mock(StateAwareCommand.class);
-		given(stateAwareCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
+		TargetCommand targetCommand = Mockito.mock(TargetCommand.class);
+		given(targetCommand.run(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).willReturn(ExitStatus.success());
 		given(program.getStatements()).willReturn(List.of(statement));
-		given(statement.getCommand()).willReturn(stateAwareCommand);
+		given(statement.getCommand()).willReturn(targetCommand);
 		given(statement.getArguments()).willReturn(List.of());
 		// When
 		sut.eval(program, out, err);
 		// Then - state was injected
-		then(stateAwareCommand).should().setState(state);
+		then(targetCommand).should().setState(state);
+		then(targetCommand).should().setStateMutator(stateMutator);
+		then(targetCommand).should().setHistory(history);
+		then(targetCommand).should().setLineReader(lineReader);
+		then(targetCommand).should().setTerminal(terminal);
+		then(targetCommand).should().setVersion(version);
 	}
 
 	@Test
@@ -247,9 +272,5 @@ class InterpreterTest {
 		// Then
 		assertThat(withThread.currentName()).isEqualTo("command='java'");
 		then(err).shouldHaveNoMoreInteractions(); // checking no assertion failures happened
-	}
-
-	// Helper interface for testing injection of StateAware commands
-	interface StateAwareCommand extends Command, StateAware {
 	}
 }
