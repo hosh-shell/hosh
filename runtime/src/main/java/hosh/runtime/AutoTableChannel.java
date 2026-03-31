@@ -56,17 +56,22 @@ import java.util.stream.Collectors;
  */
 public class AutoTableChannel implements OutputChannel {
 
-	public static final int OVERFLOW = 2_000;
+	/**
+	 * Arbitrary number: keep it package private to not promote it as part of the contract.
+	 */
+	static final int OVERFLOW = 2_000;
+
 	private static final Logger LOGGER = LoggerFactory.forEnclosingClass();
 	private static final EnumSet<Option> NONE = EnumSet.noneOf(Option.class);
 	private static final int COLUMN_PADDING = 2;
 	private final OutputChannel outputChannel;
 	private final Queue<Record> records;
-	private final AtomicBoolean overflow = new AtomicBoolean(false);
+	private final AtomicBoolean overflow;
 
 	public AutoTableChannel(OutputChannel outputChannel) {
 		this.outputChannel = outputChannel;
 		this.records = new ConcurrentLinkedDeque<>();
+		this.overflow = new AtomicBoolean(false);
 	}
 
 	@Override
