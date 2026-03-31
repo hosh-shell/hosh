@@ -84,8 +84,13 @@ public class AutoTableChannel implements OutputChannel {
 		records.add(record);
 		if (records.size() >= OVERFLOW && overflow.compareAndSet(false, true)) {
 			LOGGER.fine(() -> "autotable: overflow after " + records.size());
-			// flush and clear our buffer
-			records.forEach(outputChannel::send);
+			// Drain and forward buffered records. Using poll() (destructive) instead of
+			// forEach (non-destructive) so that flush() can safely send any records that
+			// were added to the queue after this drain loop completed.
+			Record r;
+			while ((r = records.poll()) != null) {
+				outputChannel.send(r);
+			}
 		}
 	}
 
@@ -94,6 +99,13 @@ public class AutoTableChannel implements OutputChannel {
 		if (!overflow.get()) {
 			Map<Key, Integer> paddings = calculatePaddings(records);
 			outputTable(outputChannel, records, paddings);
+		} else {
+			// Send any records that were enqueued concurrently with the overflow drain
+			// and were therefore missed by that drain's poll loop.
+			Record r;
+			while ((r = records.poll()) != null) {
+				outputChannel.send(r);
+			}
 		}
 		records.clear();
 		overflow.set(false);
