@@ -26,7 +26,6 @@ package hosh.modules.terminal;
 import hosh.modules.terminal.TerminalModule.Bell;
 import hosh.modules.terminal.TerminalModule.Clear;
 import hosh.modules.terminal.TerminalModule.Dump;
-import hosh.spi.*;
 import hosh.spi.CommandArguments;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,8 +36,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import hosh.spi.ExitStatus;

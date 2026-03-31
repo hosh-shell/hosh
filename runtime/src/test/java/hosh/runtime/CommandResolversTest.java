@@ -24,7 +24,11 @@
 package hosh.runtime;
 
 import hosh.runtime.CommandResolvers.WindowsCommandResolver;
-import hosh.spi.*;
+import hosh.spi.Command;
+import hosh.spi.CommandName;
+import hosh.spi.State;
+import hosh.spi.Values;
+import hosh.spi.VariableName;
 import hosh.test.support.TemporaryFolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -158,7 +162,7 @@ class CommandResolversTest {
 		@EnabledOnOs(OS.WINDOWS)
 		void notFoundInPathAsSpecifiedByPathExt() throws IOException {
 			// Given
-			temporaryFolder.newExecutableFile("test.vbs");// VBS in not PATHEXT
+			temporaryFolder.newExecutableFile("test.vbs"); // VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));
@@ -173,7 +177,7 @@ class CommandResolversTest {
 		@EnabledOnOs(OS.WINDOWS)
 		void foundInPathAsSpecifiedByPathExt() throws IOException {
 			// Given
-			temporaryFolder.newExecutableFile("test.exe");// VBS in not PATHEXT
+			temporaryFolder.newExecutableFile("test.exe"); // VBS in not PATHEXT
 			given(state.getCommands()).willReturn(Collections.emptyMap());
 			given(state.getPath()).willReturn(List.of(temporaryFolder.toPath().toAbsolutePath()));
 			given(state.getCwd()).willReturn(Paths.get("."));

@@ -23,6 +23,7 @@
  */
 package hosh.test.support;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
@@ -38,12 +39,12 @@ public class WithTimeZone implements Extension, BeforeTestExecutionCallback, Aft
 	private TimeZone backup;
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
+	public void beforeTestExecution(@NonNull ExtensionContext context) {
 		backup = TimeZone.getDefault();
 	}
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) {
+	public void afterTestExecution(@NonNull ExtensionContext context) {
 		// restore the previous default to avoid other unit tests to fail
 		TimeZone.setDefault(backup);
 	}

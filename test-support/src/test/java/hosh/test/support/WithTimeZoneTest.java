@@ -36,7 +36,7 @@ class WithTimeZoneTest {
 	final WithTimeZone withTimeZone = new WithTimeZone();
 
 	@Test
-	void changeTo_updatesDefaultTimeZone() {
+	void updatesDefaultTimeZone() {
 		// Given
 		TimeZone zurich = TimeZone.getTimeZone("Europe/Zurich");
 
@@ -48,7 +48,7 @@ class WithTimeZoneTest {
 	}
 
 	@Test
-	void changeTo_canBeCalledMultipleTimes() {
+	void canBeCalledMultipleTimes() {
 		// Given
 		TimeZone utc = TimeZone.getTimeZone("UTC");
 

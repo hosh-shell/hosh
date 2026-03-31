@@ -289,6 +289,7 @@
 							<consoleOutput>true</consoleOutput>
 							<sourceDirectories>
 								<sourceDirectory>src/main/java</sourceDirectory>
+								<sourceDirectory>src/test/java</sourceDirectory>
 							</sourceDirectories>
 							<excludes>**/module-info.java</excludes>
 						</configuration>

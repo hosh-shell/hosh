@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RecordMatcherTest {
 
 	@Test
-	void noMatch_whenRecordIsEmpty() {
+	void whenRecordIsEmpty() {
 		// Given
 		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
 
@@ -48,7 +48,7 @@ class RecordMatcherTest {
 	}
 
 	@Test
-	void match_whenRecordContainsRequiredEntry() {
+	void whenRecordContainsRequiredEntry() {
 		// Given
 		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
 		Record mario = Records.singleton(Keys.NAME, Values.ofText("mario"));
@@ -61,7 +61,7 @@ class RecordMatcherTest {
 	}
 
 	@Test
-	void match_whenRecordContainsRequiredEntryPlusExtras() {
+	void whenRecordContainsRequiredEntryPlusExtras() {
 		// Given
 		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
 		Record marioAndCount = Records.singleton(Keys.NAME, Values.ofText("mario")).append(Keys.COUNT, Values.ofNumeric(42));
@@ -74,7 +74,7 @@ class RecordMatcherTest {
 	}
 
 	@Test
-	void noMatch_whenRequiredEntryHasDifferentValue() {
+	void whenRequiredEntryHasDifferentValue() {
 		// Given
 		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
 		Record luigi = Records.singleton(Keys.NAME, Values.ofText("luigi"));

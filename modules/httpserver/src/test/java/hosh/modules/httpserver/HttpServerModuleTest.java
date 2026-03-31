@@ -40,7 +40,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;

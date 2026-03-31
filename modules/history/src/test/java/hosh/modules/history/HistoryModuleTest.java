@@ -34,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
 import hosh.spi.ExitStatus;

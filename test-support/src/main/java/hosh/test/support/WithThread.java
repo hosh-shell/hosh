@@ -23,6 +23,7 @@
  */
 package hosh.test.support;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
@@ -40,14 +41,14 @@ public class WithThread implements Extension, BeforeTestExecutionCallback, After
 	private String backup;
 
 	@Override
-	public void afterTestExecution(ExtensionContext context) {
+	public void afterTestExecution(@NonNull ExtensionContext context) {
 		Thread.currentThread().setName(backup);
 		boolean interrupted = Thread.interrupted();
 		LOGGER.info("thread %s with interrupted flag=%s".formatted(Thread.currentThread().getName(), interrupted));
 	}
 
 	@Override
-	public void beforeTestExecution(ExtensionContext context) {
+	public void beforeTestExecution(@NonNull ExtensionContext context) {
 		backup = Thread.currentThread().getName();
 	}
 

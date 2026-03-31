@@ -23,6 +23,7 @@
  */
 package hosh.test.support;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
@@ -42,7 +43,7 @@ public class WithExecutor implements AfterAllCallback {
 	}
 
 	@Override
-	public void afterAll(ExtensionContext extensionContext) {
+	public void afterAll(@NonNull ExtensionContext extensionContext) {
 		executorService.shutdown();
 	}
 

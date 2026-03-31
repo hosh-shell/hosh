@@ -39,7 +39,7 @@ class WithExecutorTest {
 	ExecutorService executorService;
 
 	@Test
-	void submit_delegatesToExecutor() {
+	void delegatesToExecutor() {
 		// Given
 		WithExecutor sut = new WithExecutor(executorService);
 		Runnable runnable = () -> System.out.println("test");
@@ -52,7 +52,7 @@ class WithExecutorTest {
 	}
 
 	@Test
-	void afterAll_shutsDownExecutor() {
+	void shutsDownExecutor() {
 		// Given
 		WithExecutor sut = new WithExecutor(executorService);
 
