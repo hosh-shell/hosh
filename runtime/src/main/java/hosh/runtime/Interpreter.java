@@ -23,6 +23,7 @@
  */
 package hosh.runtime;
 
+import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandArguments;
 import hosh.spi.ExitStatus;
@@ -67,6 +68,7 @@ import java.util.logging.Logger;
  * the virtual threads spawned by pipeline and sequence commands.
  * The exit status of the last command is stored in the {@code EXIT_STATUS} shell variable.
  */
+@Todo(description = "dependency injection is a bit clumsy", issue = "https://github.com/hosh-shell/hosh/issues/586")
 public class Interpreter {
 
 	// well-known variable name for holding the result of the last command

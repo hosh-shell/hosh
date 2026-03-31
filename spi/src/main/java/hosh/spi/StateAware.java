@@ -25,6 +25,7 @@ package hosh.spi;
 
 /**
  * Marker interface to inject @{see State} in commands.
+ * See @{@link StateMutatorAware} for write access.
  */
 public interface StateAware {
 

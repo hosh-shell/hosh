@@ -25,6 +25,7 @@ package hosh.test.support;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -36,8 +37,12 @@ import static org.mockito.BDDMockito.then;
 class WithExecutorTest {
 
 	@Mock
+	ExtensionContext extensionContext;
+
+	@Mock
 	ExecutorService executorService;
 
+	@SuppressWarnings("resource")
 	@Test
 	void delegatesToExecutor() {
 		// Given
@@ -51,13 +56,14 @@ class WithExecutorTest {
 		then(executorService).should().submit(runnable);
 	}
 
+	@SuppressWarnings("resource")
 	@Test
 	void shutsDownExecutor() {
 		// Given
 		WithExecutor sut = new WithExecutor(executorService);
 
 		// When
-		sut.afterAll(null);
+		sut.afterAll(extensionContext);
 
 		// Then
 		then(executorService).should().shutdown();

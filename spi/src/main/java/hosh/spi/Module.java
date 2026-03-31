@@ -32,7 +32,6 @@ public interface Module {
 
 	/**
 	 * Registers all commands provided by this module into the given registry.
-	 * Called once during shell bootstrap by {@link hosh.runtime.BootstrapBuiltins}.
 	 */
 	void initialize(CommandRegistry registry);
 }

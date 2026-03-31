@@ -25,9 +25,6 @@ package hosh.spi;
 
 /**
  * Marker interface for commands that need to mutate the shell state.
- * The {@link hosh.runtime.Interpreter} detects this interface at command
- * execution time and injects a {@link StateMutator} before calling {@link Command#run}.
- *
  * @see StateAware for read-only access
  */
 public interface StateMutatorAware {
