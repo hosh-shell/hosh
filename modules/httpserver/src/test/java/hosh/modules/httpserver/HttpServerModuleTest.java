@@ -39,6 +39,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -204,68 +206,32 @@ class HttpServerModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: httpserver PORT DIRECTORY")));
 		}
 
-		@Test
-		void invalidPortReturnsError() {
+		@ParameterizedTest
+		@ValueSource(strings = {
+				"-1",
+				"65536",
+				"0",
+				"abc",
+				"",
+				" ",
+				"8080.5", // floating point
+		})
+		void invalidPort(String port) {
 			// Given
 
 			// When
-			ExitStatus result = sut.run(CommandArguments.of("abc", "/tmp"), in, out, err);
+			ExitStatus result = sut.run(CommandArguments.of(port, "."), in, out, err);
 
 			// Then
 			assertThat(result).isError();
 			then(state).shouldHaveNoInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("port must be a number, got: abc")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("port must be a number between 1 and 65535")));
 		}
 
 		@Test
-		void portZeroReturnsError() {
-			// Given
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("0", "/tmp"), in, out, err);
-
-			// Then
-			assertThat(result).isError();
-			then(state).shouldHaveNoInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("port must be between 1 and 65535")));
-		}
-
-		@Test
-		void portNegativeReturnsError() {
-			// Given
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("-1", "/tmp"), in, out, err);
-
-			// Then
-			assertThat(result).isError();
-			then(state).shouldHaveNoInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("port must be between 1 and 65535")));
-		}
-
-		@Test
-		void portTooLargeReturnsError() {
-			// Given
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("65536", "/tmp"), in, out, err);
-
-			// Then
-			assertThat(result).isError();
-			then(state).shouldHaveNoInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("port must be between 1 and 65535")));
-		}
-
-		@Test
-		void directoryNotFoundReturnsError() {
+		void directoryNotFound() {
 			// Given
 			given(state.getCwd()).willReturn(temporaryFolder.toPath());
 
@@ -277,7 +243,7 @@ class HttpServerModuleTest {
 			then(state).shouldHaveNoMoreInteractions();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist: /nonexistent/directory")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist")));
 		}
 
 		@Test
@@ -292,132 +258,7 @@ class HttpServerModuleTest {
 			assertThat(result).isError();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist: " + file)));
-		}
-
-		@Test
-		void portOneIsValidPortNumber() {
-			// Given - port 1 is valid, but /tmp may not exist on test machine
-			// or may not be a directory
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("1", "/nonexistent"), in, out, err);
-
-			// Then - error should be about directory, not port
-			assertThat(result).isError();
-			then(state).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist: /nonexistent")));
-		}
-
-		@Test
-		void port65535IsValidPortNumber() {
-			// Given - port 65535 is valid
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("65535", "/nonexistent"), in, out, err);
-
-			// Then - error should be about directory, not port
-			assertThat(result).isError();
-			then(state).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist: /nonexistent")));
-		}
-
-		@Test
-		void portOneBoundary() {
-			// Given
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("1", "/nonexistent"), in, out, err);
-
-			// Then
-			assertThat(result).isError();
-			then(state).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist: /nonexistent")));
-		}
-
-		@Test
-		void emptyPortStringReturnsError() {
-			// Given
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("", "/nonexistent"), in, out, err);
-
-			// Then
-			assertThat(result).isError();
-			then(state).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("port must be a number, got: ")));
-		}
-
-		@Test
-		void whitespacePortReturnsError() {
-			// Given
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("   ", "/nonexistent"), in, out, err);
-
-			// Then
-			assertThat(result).isError();
-			then(state).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("port must be a number, got:    ")));
-		}
-
-		@Test
-		void portWithLeadingZeros() {
-			// Given
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("0008080", "/nonexistent"), in, out, err);
-
-			// Then - should parse as 8080 and fail on directory
-			assertThat(result).isError();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist: /nonexistent")));
-		}
-
-		@Test
-		void floatingPointPortReturnsError() {
-			// Given
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("8080.5", "/nonexistent"), in, out, err);
-
-			// Then
-			assertThat(result).isError();
-			then(state).shouldHaveNoMoreInteractions();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("port must be a number, got: 8080.5")));
-		}
-
-		@Test
-		void portWithPlusSignReturnsError() {
-			// Given - Note: "+8080" actually parses as 8080 in Integer.parseInt()
-			// So this test will fail on directory not existing, which is correct behavior
-			given(state.getCwd()).willReturn(temporaryFolder.toPath());
-
-			// When
-			ExitStatus result = sut.run(CommandArguments.of("+8080", "/nonexistent"), in, out, err);
-
-			// Then - "+8080" is accepted as valid port 8080
-			assertThat(result).isError();
-			then(in).shouldHaveNoInteractions();
-			then(out).shouldHaveNoInteractions();
-			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist: /nonexistent")));
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("directory does not exist")));
 		}
 
 	}

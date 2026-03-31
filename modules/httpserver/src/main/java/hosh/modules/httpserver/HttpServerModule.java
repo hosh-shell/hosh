@@ -47,6 +47,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.EnumSet;
+import java.util.OptionalInt;
 import java.util.concurrent.CountDownLatch;
 
 public final class HttpServerModule implements Module {
@@ -80,41 +81,34 @@ public final class HttpServerModule implements Module {
 		}
 
 		@Override
-		public ExitStatus run(final CommandArguments args, final InputChannel in,
-		                      final OutputChannel out, final OutputChannel err) {
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
 			if (args.size() != 2) {
 				err.send(Errors.usage("httpserver PORT DIRECTORY"));
 				return ExitStatus.error();
 			}
 
-			final var portOpt = args.get(0).asInt();
-			if (portOpt.isEmpty()) {
-				err.send(Errors.message("port must be a number, got: %s", args.get(0).asString()));
-				return ExitStatus.error();
-			}
-
-			final int port = portOpt.getAsInt();
-			if (port < 1 || port > MAX_PORT) {
-				err.send(Errors.message("port must be between 1 and " + MAX_PORT));
+			final OptionalInt port = args.get(0).asInt();
+			if (port.isEmpty() || port.getAsInt() < 1 || port.getAsInt() > MAX_PORT) {
+				err.send(Errors.message("port must be a number between 1 and " + MAX_PORT));
 				return ExitStatus.error();
 			}
 
 			final Path directory = args.get(1).asPath(state);
 			if (!Files.isDirectory(directory)) {
-				err.send(Errors.message("directory does not exist: %s", directory));
+				err.send(Errors.message("directory does not exist"));
 				return ExitStatus.error();
 			}
 
 			// starts the servee
 			final var server = SimpleFileServer.createFileServer(
-					new InetSocketAddress(port),
+					new InetSocketAddress(port.orElseThrow()),
 					directory,
 					SimpleFileServer.OutputLevel.INFO
 			);
 
 			try {
 				server.start();
-				final String startMsg = "HTTP server started on http://localhost:" + port + " serving " + directory;
+				final String startMsg = "HTTP server started on http://localhost:" + port.orElseThrow() + " serving " + directory;
 				out.send(Records.singleton(Keys.TEXT, Values.ofText(startMsg)), EnumSet.of(OutputChannel.Option.DIRECT));
 				busyWait.busyWait();
 				return ExitStatus.success();
