@@ -36,6 +36,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RecordMatcherTest {
 
 	@Test
+	void whenRecordIsNull() {
+		// Given
+		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));
+
+		// When
+		boolean result = sut.matches(null);
+
+		// Then
+		assertThat(result).isFalse();
+	}
+
+	@Test
 	void whenRecordIsEmpty() {
 		// Given
 		RecordMatcher sut = new RecordMatcher(List.of(new Record.Entry(Keys.NAME, Values.ofText("mario"))));

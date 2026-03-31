@@ -44,6 +44,11 @@ class ExitStatusAssertTest {
 		} catch (AssertionError e) {
 			// all good
 		}
+		try {
+			assertThat(sut).isEqualTo(0);
+		} catch (AssertionError e) {
+			// all good
+		}
 	}
 
 	@Test
@@ -56,6 +61,11 @@ class ExitStatusAssertTest {
 		assertThat(sut).hasExitCode(0);
 		try {
 			assertThat(sut).isError();
+		} catch (AssertionError e) {
+			// all good
+		}
+		try {
+			assertThat(sut).isEqualTo(1);
 		} catch (AssertionError e) {
 			// all good
 		}

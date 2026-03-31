@@ -200,7 +200,7 @@ public class Hosh {
 			return repl(state, terminal, compiler, interpreter, out, err, logger);
 		}
 		if (remainingArgs.size() == 1) {
-			String filePath = remainingArgs.get(0);
+			String filePath = remainingArgs.getFirst();
 			return script(filePath, compiler, interpreter, out, err, logger);
 		}
 		System.err.println("hosh: too many scripts");
