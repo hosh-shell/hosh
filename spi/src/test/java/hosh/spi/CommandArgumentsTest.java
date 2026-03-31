@@ -666,9 +666,9 @@ class CommandArgumentsTest {
 
 			// Then
 			assertThat(result).isAbsolute();
-			// the runner on github is producing d:/absolute/path/file.txt
-			assertThat(result.toString()).endsWith("/absolute/path/file.txt");
+			// the runner on github is producing d:\absolute\path\file.txt
+			// but on linux/macos is /absolute/path/file.txt
+			assertThat(result).endsWithRaw(Path.of("absolute", "path", "file.txt"));
 		}
-
 	}
 }
