@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UncheckedIOException;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
@@ -299,7 +300,7 @@ public class FileSystemModule implements Module {
 			}
 
 			@Override
-			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+				public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
 				return FileVisitResult.CONTINUE;
 			}
 
@@ -723,8 +724,10 @@ public class FileSystemModule implements Module {
 			RandomAccessFile randomAccessFile = null;
 			try {
 				randomAccessFile = new RandomAccessFile(path.toFile(), "rw");
-				busyWaitForResource(err, randomAccessFile);
-				return nestedCommand.run();
+				FileLock lock = acquireLock(err, randomAccessFile.getChannel());
+				try (lock) {
+					return nestedCommand.run();
+				}
 			} catch (IOException e) {
 				err.send(Errors.message(e));
 				return ExitStatus.error();
@@ -744,13 +747,13 @@ public class FileSystemModule implements Module {
 		}
 
 		@SuppressWarnings("BusyWait")
-		private void busyWaitForResource(OutputChannel err, RandomAccessFile randomAccessFile) throws IOException, InterruptedException {
-			try (FileChannel channel = randomAccessFile.getChannel()) {
-				while (channel.tryLock() == null) {
-					Thread.sleep(BUSY_WAIT.toMillis());
-					err.send(Errors.message("failed to acquire lock, retry in %sms", BUSY_WAIT.toMillis()));
-				}
+		private FileLock acquireLock(OutputChannel err, FileChannel channel) throws IOException, InterruptedException {
+			FileLock lock;
+			while ((lock = channel.tryLock()) == null) {
+				Thread.sleep(BUSY_WAIT.toMillis());
+				err.send(Errors.message("failed to acquire lock, retry in %sms", BUSY_WAIT.toMillis()));
 			}
+			return lock;
 		}
 
 	}
