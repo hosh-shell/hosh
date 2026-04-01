@@ -23,6 +23,7 @@
  */
 package hosh.test.support;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.Extension;
@@ -55,12 +56,12 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	// since this call is used only for tests, it is fine.
 	@SuppressWarnings("squid:S5443")
 	@Override
-	public void beforeEach(ExtensionContext context) throws Exception {
+	public void beforeEach(@NonNull ExtensionContext context) throws Exception {
 		folder = Files.createTempDirectory("hosh-");
 	}
 
 	@Override
-	public void afterEach(ExtensionContext context) {
+	public void afterEach(@NonNull ExtensionContext context) {
 		if (folder == null) {
 			throw new IllegalStateException("folder is still null?");
 		}

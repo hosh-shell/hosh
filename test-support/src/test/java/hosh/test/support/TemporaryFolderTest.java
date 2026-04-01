@@ -24,16 +24,24 @@
 package hosh.test.support;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
 class TemporaryFolderTest {
 
 	@RegisterExtension
 	final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Mock
+	ExtensionContext extensionContext;
 
 	@Test
 	void usage() throws IOException {
@@ -71,7 +79,7 @@ class TemporaryFolderTest {
 		;
 
 		// cleanup
-		temporaryFolder.afterEach(null);
+		temporaryFolder.afterEach(extensionContext);
 		assertThat(temporaryFolder.toPath()).doesNotExist();
 	}
 
