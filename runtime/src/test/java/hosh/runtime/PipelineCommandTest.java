@@ -41,8 +41,6 @@ import hosh.spi.InputChannel;
 import org.assertj.core.api.Assertions;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willReturn;
-import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -81,8 +79,8 @@ class PipelineCommandTest {
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
-		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		given(interpreter.eval(eq(producer), any(), any(), any())).willReturn(ExitStatus.success());
+		given(interpreter.eval(eq(consumer), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
 		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
@@ -99,8 +97,8 @@ class PipelineCommandTest {
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
-		willReturn(ExitStatus.error()).given(interpreter).eval(eq(producer), any(), any(), any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		given(interpreter.eval(eq(producer), any(), any(), any())).willReturn(ExitStatus.error());
+		given(interpreter.eval(eq(consumer), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
 		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
@@ -117,8 +115,8 @@ class PipelineCommandTest {
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
-		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
-		willReturn(ExitStatus.error()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		given(interpreter.eval(eq(producer), any(), any(), any())).willReturn(ExitStatus.success());
+		given(interpreter.eval(eq(consumer), any(), any(), any())).willReturn(ExitStatus.error());
 		// When
 		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
@@ -135,8 +133,8 @@ class PipelineCommandTest {
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
-		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(producer), any(), any(), any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(eq(consumer), any(), any(), any());
+		given(interpreter.eval(eq(producer), any(), any(), any())).willThrow(new ProducerPoisonPill());
+		given(interpreter.eval(eq(consumer), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
 		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
@@ -153,8 +151,8 @@ class PipelineCommandTest {
 		sut.setInterpreter(interpreter);
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
-		willThrow(new ProducerPoisonPill()).given(interpreter).eval(eq(consumer), any(), any(), any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		given(interpreter.eval(eq(consumer), any(), any(), any())).willThrow(new ProducerPoisonPill());
+		given(interpreter.eval(eq(producer), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
 		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then
@@ -172,8 +170,8 @@ class PipelineCommandTest {
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		NullPointerException runtimeException = new NullPointerException("simulated error");
-		willThrow(runtimeException).given(interpreter).eval(eq(consumer), any(), any(), any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		given(interpreter.eval(eq(consumer), any(), any(), any())).willThrow(runtimeException);
+		given(interpreter.eval(eq(producer), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
 		var result = Assertions.assertThatThrownBy(() -> sut.run(CommandArguments.of(), in, out, err));
 		// Then
@@ -190,8 +188,8 @@ class PipelineCommandTest {
 		given(producer.getCommand()).willReturn(command);
 		given(consumer.getCommand()).willReturn(command);
 		Error error = new OutOfMemoryError("simulated out of memory");
-		willThrow(error).given(interpreter).eval(eq(consumer), any(), any(), any());
-		willReturn(ExitStatus.success()).given(interpreter).eval(eq(producer), any(), any(), any());
+		given(interpreter.eval(eq(consumer), any(), any(), any())).willThrow(error);
+		given(interpreter.eval(eq(producer), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
 		var result = Assertions.assertThatThrownBy(() -> sut.run(CommandArguments.of(), in, out, err));
 		// Then
@@ -211,8 +209,8 @@ class PipelineCommandTest {
 		given(consumer.getCommand()).willReturn(command);
 		PipelineCommand downStream = new PipelineCommand(producer, consumer);
 		downStream.setInterpreter(interpreter);
-		willReturn(downStream).given(consumerProducer).getCommand();
-		willReturn(ExitStatus.success()).given(interpreter).eval(any(), any(), any(), any());
+		given(consumerProducer.getCommand()).willReturn(downStream);
+		given(interpreter.eval(any(), any(), any(), any())).willReturn(ExitStatus.success());
 		// When
 		ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
 		// Then

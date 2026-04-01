@@ -99,7 +99,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willReturn;
 
 class SystemModuleTest {
 
@@ -235,7 +234,7 @@ class SystemModuleTest {
 		void appendOneArg() {
 			// Given
 			Path bin = Paths.get("/bin");
-			willReturn(List.of(bin)).given(state).getPath();
+			given(state.getPath()).willReturn(List.of(bin));
 
 			// When
 			ExitStatus result = sut.run(CommandArguments.of("append", "/usr/local/bin"), in, out, err);
@@ -268,7 +267,7 @@ class SystemModuleTest {
 		void prependOneArg() {
 			// Given
 			Path bin = Paths.get("/bin");
-			willReturn(List.of(bin)).given(state).getPath();
+			given(state.getPath()).willReturn(List.of(bin));
 
 			// When
 			ExitStatus result = sut.run(CommandArguments.of("prepend", "/usr/local/bin"), in, out, err);
@@ -1384,7 +1383,7 @@ class SystemModuleTest {
 		@Test
 		void updatesExistingVariable() {
 			// Given
-			willReturn(Map.of(VariableName.constant("FOO"), "bar")).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("FOO"), Values.ofText("bar")));
 
 			// When
 			ExitStatus result = sut.run(CommandArguments.of("FOO", "baz"), in, out, err);
@@ -1461,7 +1460,7 @@ class SystemModuleTest {
 		@Test
 		void removesExistingBinding() {
 			// Given
-			willReturn(Map.of(VariableName.constant("FOO"), "BAR")).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("FOO"), Values.ofText("BAR")));
 
 			// When
 			ExitStatus result = sut.run(CommandArguments.of("FOO"), in, out, err);
@@ -1477,7 +1476,7 @@ class SystemModuleTest {
 		@Test
 		void doesNothingWhenNotExistingBinding() {
 			// Given
-			willReturn(Map.of(VariableName.constant("FOO"), Values.ofText("BAR"))).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of(VariableName.constant("FOO"), Values.ofText("BAR")));
 
 			// When
 			ExitStatus result = sut.run(CommandArguments.of("BAZ"), in, out, err);
@@ -1659,7 +1658,7 @@ class SystemModuleTest {
 		@Test
 		void emptyCapture() {
 			// Given
-			willReturn(Map.of()).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of());
 			given(in.recv()).willReturn(Optional.empty());
 
 			// When
@@ -1677,7 +1676,7 @@ class SystemModuleTest {
 		@Test
 		void captureOneLine() {
 			// Given
-			willReturn(Map.of()).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of());
 			given(in.recv()).willReturn(
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 					Optional.empty());
@@ -1697,7 +1696,7 @@ class SystemModuleTest {
 		@Test
 		void captureTwoLines() {
 			// Given
-			willReturn(Map.of()).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of());
 			given(in.recv()).willReturn(
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("1"))),
 					Optional.of(Records.singleton(Keys.TEXT, Values.ofText("2"))),
@@ -1924,7 +1923,7 @@ class SystemModuleTest {
 		@Test
 		void inputNonEmptyString() {
 			// Given
-			willReturn(Map.of()).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of());
 			given(lineReader.readLine(Mockito.eq("input> "))).willReturn("1");
 
 			// When
@@ -2022,7 +2021,7 @@ class SystemModuleTest {
 		@Test
 		void inputNonEmptyString() {
 			// Given
-			willReturn(Map.of()).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of());
 			given(lineReader.readLine(Mockito.eq('\0'))).willReturn("1");
 
 			// When
@@ -2039,7 +2038,7 @@ class SystemModuleTest {
 		@Test
 		void emptyInput() {
 			// Given
-			willReturn(Map.of()).given(state).getVariables();
+			given(state.getVariables()).willReturn(Map.of());
 			given(lineReader.readLine(Mockito.eq('\0'))).willThrow(new EndOfFileException("simulated"));
 
 			// When

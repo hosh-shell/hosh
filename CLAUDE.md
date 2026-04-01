@@ -174,6 +174,7 @@ public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out,
 - Check always the happy path at minimum.
 - Tests are written in JUnit 5, Mockito, and AssertJ.
 - All tests have `// Given` `// When` `// Then` sections.
+- Use BDDMockito exclusively: always `given(mock.method()).willReturn(value)` — never the `willReturn(value).given(mock).method()` form. Only import `given` and `then` statically from `BDDMockito`; do not import `willReturn` or `willThrow` statically.
 - The instance of the class under test is always called `sut` (system under test).
 - Acceptance tests use the built jar and run hosh scripts end-to-end.
 - Mutation testing via PIT (`pitest-maven`).
