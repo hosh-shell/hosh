@@ -46,6 +46,8 @@
 		<version.archunit>1.4.1</version.archunit>
 		<version.quicktheories>0.26</version.quicktheories>
 		<version.slf4j>2.0.17</version.slf4j>
+		<!-- mockito agent for Java 21+ -->
+		<mockito.agent.path>${settings.localRepository}/org/mockito/mockito-core/${version.mockito}/mockito-core-${version.mockito}.jar</mockito.agent.path>
 	</properties>
 	<modules>
 		<module>test-support</module>
@@ -224,6 +226,7 @@
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<trimStackTrace>false</trimStackTrace>
+					<argLine>-javaagent:${mockito.agent.path}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -240,6 +243,7 @@
 				</executions>
 				<configuration>
 					<trimStackTrace>false</trimStackTrace>
+					<argLine>-javaagent:${mockito.agent.path}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
