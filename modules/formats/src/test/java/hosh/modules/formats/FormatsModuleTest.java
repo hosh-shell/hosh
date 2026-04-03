@@ -27,6 +27,8 @@ import hosh.modules.formats.FormatsModule.FromCsv;
 import hosh.modules.formats.FormatsModule.FromJson;
 import hosh.modules.formats.FormatsModule.ToCsv;
 import hosh.modules.formats.FormatsModule.ToJson;
+import hosh.modules.formats.FormatsModule.FromBase64;
+import hosh.modules.formats.FormatsModule.ToBase64;
 import hosh.spi.Values;
 import hosh.spi.CommandArguments;
 import org.junit.jupiter.api.BeforeEach;
@@ -642,6 +644,215 @@ class FormatsModuleTest {
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();
 			assertThat(temporaryFolder.toPath().resolve("output.csv")).exists();
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	class FromBase64Test {
+
+		@Mock
+		InputChannel in;
+
+		@Mock
+		OutputChannel out;
+
+		@Mock
+		OutputChannel err;
+
+		FromBase64 sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new FromBase64();
+		}
+
+		@Test
+		void missingArg() {
+			// Given
+			// (no setup)
+			// When
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
+			// Then
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: from-base64 key")));
+		}
+
+		@Test
+		void tooManyArgs() {
+			// Given
+			// (no setup)
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("key1", "key2"), in, out, err);
+			// Then
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: from-base64 key")));
+		}
+
+		@Test
+		void decodeBase64() {
+			// Given
+			hosh.spi.Key key = Keys.of("text");
+			hosh.spi.Record input = Records.singleton(key, Values.ofText("SGVsbG8gV29ybGQ="));
+			given(in.recv()).willReturn(Optional.of(input)).willReturn(Optional.empty());
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("text"), in, out, err);
+			// Then
+			assertThat(result).isSuccess();
+			then(out).should().send(Records.singleton(key, Values.ofText("Hello World")));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void decodeEmptyString() {
+			// Given
+			hosh.spi.Key key = Keys.of("text");
+			hosh.spi.Record input = Records.singleton(key, Values.ofText(""));
+			given(in.recv()).willReturn(Optional.of(input)).willReturn(Optional.empty());
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("text"), in, out, err);
+			// Then
+			assertThat(result).isSuccess();
+			then(out).should().send(Records.singleton(key, Values.ofText("")));
+		}
+
+		@Test
+		void invalidBase64() {
+			// Given
+			hosh.spi.Key key = Keys.of("text");
+			hosh.spi.Record input = Records.singleton(key, Values.ofText("!!!invalid!!!"));
+			given(in.recv()).willReturn(Optional.of(input)).willReturn(Optional.empty());
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("text"), in, out, err);
+			// Then
+			assertThat(result).isSuccess();
+			then(err).should().send(org.mockito.ArgumentMatchers.argThat(record ->
+					record.value(Keys.ERROR).isPresent() &&
+					record.value(Keys.ERROR).get().unwrap(String.class).orElse("").contains("invalid base64")
+			));
+		}
+
+		@Test
+		void multipleRecords() {
+			// Given
+			hosh.spi.Key key = Keys.of("data");
+			hosh.spi.Record input1 = Records.singleton(key, Values.ofText("SGVsbG8="));
+			hosh.spi.Record input2 = Records.singleton(key, Values.ofText("V29ybGQ="));
+			given(in.recv()).willReturn(Optional.of(input1)).willReturn(Optional.of(input2)).willReturn(Optional.empty());
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("data"), in, out, err);
+			// Then
+			assertThat(result).isSuccess();
+			then(out).should().send(Records.singleton(key, Values.ofText("Hello")));
+			then(out).should().send(Records.singleton(key, Values.ofText("World")));
+		}
+	}
+
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	class ToBase64Test {
+
+		@Mock
+		InputChannel in;
+
+		@Mock
+		OutputChannel out;
+
+		@Mock
+		OutputChannel err;
+
+		ToBase64 sut;
+
+		@BeforeEach
+		void createSut() {
+			sut = new ToBase64();
+		}
+
+		@Test
+		void missingArg() {
+			// Given
+			// (no setup)
+			// When
+			ExitStatus result = sut.run(CommandArguments.of(), in, out, err);
+			// Then
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: to-base64 key")));
+		}
+
+		@Test
+		void tooManyArgs() {
+			// Given
+			// (no setup)
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("key1", "key2"), in, out, err);
+			// Then
+			assertThat(result).isError();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: to-base64 key")));
+		}
+
+		@Test
+		void encodeBase64() {
+			// Given
+			hosh.spi.Key key = Keys.of("text");
+			hosh.spi.Record input = Records.singleton(key, Values.ofText("Hello World"));
+			given(in.recv()).willReturn(Optional.of(input)).willReturn(Optional.empty());
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("text"), in, out, err);
+			// Then
+			then(out).should().send(Records.singleton(key, Values.ofText("SGVsbG8gV29ybGQ=")));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void encodeEmptyString() {
+			// Given
+			hosh.spi.Key key = Keys.of("text");
+			hosh.spi.Record input = Records.singleton(key, Values.ofText(""));
+			given(in.recv()).willReturn(Optional.of(input)).willReturn(Optional.empty());
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("text"), in, out, err);
+			// Then
+			assertThat(result).isSuccess();
+			then(out).should().send(Records.singleton(key, Values.ofText("")));
+		}
+
+		@Test
+		void multipleRecords() {
+			// Given
+			hosh.spi.Key key = Keys.of("data");
+			hosh.spi.Record input1 = Records.singleton(key, Values.ofText("Hello"));
+			hosh.spi.Record input2 = Records.singleton(key, Values.ofText("World"));
+			given(in.recv()).willReturn(Optional.of(input1)).willReturn(Optional.of(input2)).willReturn(Optional.empty());
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("data"), in, out, err);
+			// Then
+			assertThat(result).isSuccess();
+			then(out).should().send(Records.singleton(key, Values.ofText("SGVsbG8=")));
+			then(out).should().send(Records.singleton(key, Values.ofText("V29ybGQ=")));
+		}
+
+		@Test
+		void encodeSpecialCharacters() {
+			// Given
+			hosh.spi.Key key = Keys.of("text");
+			hosh.spi.Record input = Records.singleton(key, Values.ofText("Hello\nWorld\t!@#$%"));
+			given(in.recv()).willReturn(Optional.of(input)).willReturn(Optional.empty());
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("text"), in, out, err);
+			// Then
+			assertThat(result).isSuccess();
+			then(out).should().send(org.mockito.ArgumentMatchers.argThat(record ->
+					record.value(key).isPresent() &&
+					record.value(key).get().unwrap(String.class).isPresent()
+			));
 		}
 	}
 }

@@ -59,6 +59,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Locale;
 import java.util.Map;
 
@@ -70,6 +71,8 @@ public class FormatsModule implements Module {
 		registry.registerCommand(CommandName.constant("to-json"), ToJson::new);
 		registry.registerCommand(CommandName.constant("from-csv"), FromCsv::new);
 		registry.registerCommand(CommandName.constant("to-csv"), ToCsv::new);
+		registry.registerCommand(CommandName.constant("from-base64"), FromBase64::new);
+		registry.registerCommand(CommandName.constant("to-base64"), ToBase64::new);
 	}
 
 	@Description("parse a JSON file containing an array of objects into records")
@@ -267,6 +270,63 @@ public class FormatsModule implements Module {
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
+		}
+	}
+
+	@Description("decode base64-encoded text from stdin")
+	@Examples({
+			@Example(description = "decode base64 string", command = "echo 'SGVsbG8gV29ybGQ=' | from-base64 text"),
+			@Example(description = "decode and show text", command = "echo 'SGVsbG8gV29ybGQ=' | from-base64 text | sort text"),
+	})
+	public static class FromBase64 implements Command {
+
+		@Override
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Errors.usage("from-base64 key"));
+				return ExitStatus.error();
+			}
+			hosh.spi.Key key = args.get(0).asKey();
+			for (hosh.spi.Record record : InputChannel.iterate(in)) {
+				record.value(key)
+						.flatMap(v -> v.unwrap(String.class))
+						.ifPresent(encoded -> {
+							try {
+								byte[] decoded = Base64.getDecoder().decode(encoded);
+								String decodedText = new String(decoded, StandardCharsets.UTF_8);
+								out.send(Records.singleton(key, Values.ofText(decodedText)));
+							} catch (IllegalArgumentException e) {
+								err.send(Errors.message("invalid base64: %s", e.getMessage()));
+							}
+						}); // side effect
+			}
+			return ExitStatus.success();
+		}
+	}
+
+	@Description("encode text as base64")
+	@Examples({
+			@Example(description = "encode string to base64", command = "echo 'Hello World' | to-base64 text"),
+			@Example(description = "encode and show result", command = "echo 'Hello World' | to-base64 text | sort text"),
+	})
+	public static class ToBase64 implements Command {
+
+		@Override
+		public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out, OutputChannel err) {
+			if (args.size() != 1) {
+				err.send(Errors.usage("to-base64 key"));
+				return ExitStatus.error();
+			}
+			hosh.spi.Key key = args.get(0).asKey();
+			for (hosh.spi.Record record : InputChannel.iterate(in)) {
+				record.value(key)
+						.flatMap(v -> v.unwrap(String.class))
+						.ifPresent(text -> {
+							String encoded = Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8));
+							out.send(Records.singleton(key, Values.ofText(encoded)));
+						}); // side effect
+			}
+			return ExitStatus.success();
 		}
 	}
 
