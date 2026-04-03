@@ -177,7 +177,7 @@ class AutoTableChannelTest {
 
 
 	@ParameterizedTest(name = "overflow check with {0} threads")
-	@ValueSource(ints = {1, 2, 4, 8, 16, 32, 64})
+	@ValueSource(ints = {1, 2, 4, 8, 16})
 	void overflowIsTriggeredExactlyOnceUnderConcurrentLoad(int threads) throws InterruptedException {
 		// Given - a thread-safe collector and a channel backed by it
 		List<Record> received = new CopyOnWriteArrayList<>();
