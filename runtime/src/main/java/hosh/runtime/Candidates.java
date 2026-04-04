@@ -26,7 +26,7 @@ package hosh.runtime;
 import org.jline.reader.Candidate;
 
 /**
- * Facade to simplify creation of JLine candidates.
+ * Static factories to simplify creation of JLine candidates.
  */
 public class Candidates {
 
