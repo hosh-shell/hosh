@@ -31,7 +31,7 @@ import java.util.Optional;
  * <p>
  * It can be used for both from built-in and external commands.
  */
-public class ExitStatus {
+public final class ExitStatus {
 
 	private final int value;
 
@@ -80,7 +80,7 @@ public class ExitStatus {
 	}
 
 	@Override
-	public final boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (obj instanceof ExitStatus that) {
 			return this.value == that.value;
 		} else {
@@ -89,7 +89,7 @@ public class ExitStatus {
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return Objects.hashCode(value);
 	}
 
