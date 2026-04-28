@@ -30,25 +30,26 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.quicktheories.core.Gen;
+import net.jqwik.api.Arbitraries;
+import net.jqwik.api.Arbitrary;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.Provide;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.quicktheories.QuickTheory.qt;
-import static org.quicktheories.generators.SourceDSL.integers;
-import static org.quicktheories.generators.SourceDSL.lists;
 
 class ValuesTest {
 
@@ -913,16 +914,13 @@ class ValuesTest {
 
 			final Comparator<Value> sut = Values.Comparators.noneLast(Comparator.naturalOrder());
 
-			@Test
-			void noneLast() {
+			@Property
+			void noneLast(@ForAll("listOfNumericValuesContainingNone") List<Value> candidate) {
 				// Given
 				// (no setup)
 				// When / Then
-				qt().forAll(listOfNumericValuesContainingNone())
-						.checkAssert(candidate -> {
-							candidate.sort(sut);
-							assertThat(candidate).last().isEqualTo(Values.none());
-						});
+				candidate.sort(sut);
+				assertThat(candidate).last().isEqualTo(Values.none());
 			}
 		}
 
@@ -931,35 +929,30 @@ class ValuesTest {
 
 			final Comparator<Value> sut = Values.Comparators.noneFirst(Comparator.naturalOrder());
 
-			@Test
-			void noneFirst() {
+			@Property
+			void noneFirst(@ForAll("listOfNumericValuesContainingNone") List<Value> candidate) {
 				// Given
 				// (no setup)
 				// When / Then
-				qt().forAll(listOfNumericValuesContainingNone())
-						.checkAssert(candidate -> {
-							candidate.sort(sut);
-							assertThat(candidate).first().isEqualTo(Values.none());
-						});
+				candidate.sort(sut);
+				assertThat(candidate).first().isEqualTo(Values.none());
 			}
 		}
 
-		@SuppressWarnings("squid:S2245")
 		// creates random lists of values with 3 None elements
-		private Gen<List<Value>> listOfNumericValuesContainingNone() {
-			return lists()
-					.of(integers().all().map(Values::ofNumeric))
-					.ofSizeBetween(1, 20)
-					.mutate((base, r) -> {
-						// add None as first element
-						base.addFirst(Values.none());
-						// add None as last element
-						base.add(Values.none());
-						// add one at random position
-						int randomIndex = ThreadLocalRandom.current().nextInt(base.size() + 1);
-						base.add(randomIndex, Values.none());
-						return base;
-					});
+		@Provide
+		Arbitrary<List<Value>> listOfNumericValuesContainingNone() {
+			Arbitrary<List<Value>> numericValues = Arbitraries.integers()
+					.map(Values::ofNumeric)
+					.list().ofMinSize(1).ofMaxSize(20);
+			return numericValues.flatMap(base ->
+					Arbitraries.integers().between(0, base.size() + 2).map(randomIndex -> {
+						List<Value> mutable = new ArrayList<>(base);
+						mutable.addFirst(Values.none());
+						mutable.add(Values.none());
+						mutable.add(Math.min(randomIndex, mutable.size()), Values.none());
+						return mutable;
+					}));
 		}
 
 	}

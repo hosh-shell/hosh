@@ -44,7 +44,7 @@
 		<version.mockito>5.23.0</version.mockito>
 		<version.equalsverifier>4.4.2</version.equalsverifier>
 		<version.archunit>1.4.1</version.archunit>
-		<version.quicktheories>0.26</version.quicktheories>
+		<version.jqwik>1.9.3</version.jqwik>
 		<version.slf4j>2.0.17</version.slf4j>
 		<!-- mockito agent for Java 21+ -->
 		<mockito.agent.path>${settings.localRepository}/org/mockito/mockito-core/${version.mockito}/mockito-core-${version.mockito}.jar</mockito.agent.path>
@@ -141,9 +141,9 @@
 				<version>${version.archunit}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.quicktheories</groupId>
-				<artifactId>quicktheories</artifactId>
-				<version>${version.quicktheories}</version>
+				<groupId>net.jqwik</groupId>
+				<artifactId>jqwik</artifactId>
+				<version>${version.jqwik}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>

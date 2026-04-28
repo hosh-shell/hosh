@@ -23,14 +23,19 @@
  */
 package hosh.spi;
 
+import net.jqwik.api.Arbitraries;
+import net.jqwik.api.Arbitrary;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.Provide;
+import net.jqwik.api.constraints.AlphaChars;
+import net.jqwik.api.constraints.StringLength;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.quicktheories.QuickTheory.qt;
-import static org.quicktheories.generators.SourceDSL.strings;
 
 class ExitStatusTest {
 
@@ -80,32 +85,28 @@ class ExitStatusTest {
 		assertThat(result.isError()).isTrue();
 	}
 
-	@Test
-	void validLiterals() {
+	@Property
+	void validLiterals(@ForAll("integerStrings") String value) {
 		// Given
 		// (no setup)
 
 		// When / Then
-		qt()
-				.forAll(strings().numeric())
-				.check(value -> {
-					Optional<ExitStatus> parsed = ExitStatus.parse(String.valueOf(value));
-					return parsed.isPresent();
-				});
+		Optional<ExitStatus> parsed = ExitStatus.parse(value);
+		assertThat(parsed).isPresent();
 	}
 
-	@Test
-	void invalidLiteral() {
+	@Provide
+	Arbitrary<String> integerStrings() {
+		return Arbitraries.integers().map(Object::toString);
+	}
+
+	@Property
+	void invalidLiteral(@ForAll @AlphaChars @StringLength(min = 1, max = 10) String value) {
 		// Given
 		// (no setup)
 
 		// When / Then
-		qt()
-				.forAll(strings().basicLatinAlphabet().ofLengthBetween(0, 10))
-				.assuming(value -> value.matches(".*[a-zA-Z].*"))
-				.check(value -> {
-					Optional<ExitStatus> parsed = ExitStatus.parse(value);
-					return parsed.isEmpty();
-				});
+		Optional<ExitStatus> parsed = ExitStatus.parse(value);
+		assertThat(parsed).isEmpty();
 	}
 }

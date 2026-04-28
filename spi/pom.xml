@@ -48,8 +48,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.quicktheories</groupId>
-			<artifactId>quicktheories</artifactId>
+			<groupId>net.jqwik</groupId>
+			<artifactId>jqwik</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

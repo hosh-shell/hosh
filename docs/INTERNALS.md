@@ -224,7 +224,7 @@ Dependencies
 - JUnit5 + Mockito + AssertJ + equalsverifier (test only);
 - archunit to enforce fitness functions, e.g. all commands must be documented (test only);
 - pitest for mutation-based testing;
-- quicktheories for property-based testing (test only);
+- jqwik for property-based testing (test only);
 - checkstyle — to prevent unused imports and enforce consistent formatting;
 - mockserver to test HTTP commands (test only);
 - SLF4J — simple binding used (test only);
