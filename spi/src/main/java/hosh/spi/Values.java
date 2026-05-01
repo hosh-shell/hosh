@@ -655,7 +655,9 @@ public class Values {
 				int compareValue = 0;
 				Matcher s1ChunkMatcher = CHUNK.matcher(s1);
 				Matcher s2ChunkMatcher = CHUNK.matcher(s2);
-				while (s1ChunkMatcher.find() && s2ChunkMatcher.find() && compareValue == 0) {
+				boolean s1Has = s1ChunkMatcher.find();
+				boolean s2Has = s2ChunkMatcher.find();
+				while (s1Has && s2Has && compareValue == 0) {
 					String s1ChunkValue = s1ChunkMatcher.group();
 					String s2ChunkValue = s2ChunkMatcher.group();
 					try {
@@ -666,14 +668,24 @@ public class Values {
 						// not a number, use string comparison.
 						compareValue = s1ChunkValue.compareTo(s2ChunkValue);
 					}
+					s1Has = s1ChunkMatcher.find();
+					s2Has = s2ChunkMatcher.find();
 					// if they are equal thus far, but one has more left, it should come after the
 					// one that doesn't.
 					if (compareValue == 0) {
-						if (s1ChunkMatcher.hitEnd() && !s2ChunkMatcher.hitEnd()) {
+						if (!s1Has && s2Has) {
 							compareValue = -1;
-						} else if (!s1ChunkMatcher.hitEnd() && s2ChunkMatcher.hitEnd()) {
+						} else if (s1Has && !s2Has) {
 							compareValue = 1;
 						}
+					}
+				}
+				// if one string had no chunks at all (e.g. empty string), treat it as lesser
+				if (compareValue == 0) {
+					if (s1Has) {
+						compareValue = 1;
+					} else if (s2Has) {
+						compareValue = -1;
 					}
 				}
 				return compareValue;

@@ -45,6 +45,7 @@ import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Assume;
 import net.jqwik.api.ForAll;
+import net.jqwik.api.Group;
 import net.jqwik.api.Property;
 import net.jqwik.api.Provide;
 import net.jqwik.api.constraints.IntRange;
@@ -1943,7 +1944,7 @@ class TextModuleTest {
 		}
 	}
 
-	@Nested
+	@Group
 	class SortPropertyTest {
 
 		@Property
@@ -1961,7 +1962,7 @@ class TextModuleTest {
 		}
 	}
 
-	@Nested
+	@Group
 	class TakeDropPropertyTest {
 
 		@Property

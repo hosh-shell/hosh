@@ -34,6 +34,7 @@ import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Assume;
 import net.jqwik.api.ForAll;
+import net.jqwik.api.Group;
 import net.jqwik.api.Property;
 import net.jqwik.api.Provide;
 import net.jqwik.api.constraints.IntRange;
@@ -813,9 +814,11 @@ class ValuesTest {
 	}
 
 	@Nested
+	@Group
 	class ComparatorsTest {
 
 		@Nested
+		@Group
 		class NaturalSortOrderComparatorTest {
 
 			final Comparator<String> sut = Values.Comparators.naturalSortOrder();
@@ -927,7 +930,7 @@ class ValuesTest {
 			}
 		}
 
-		@Nested
+		@Group
 		class NoneLastTest {
 
 			final Comparator<Value> sut = Values.Comparators.noneLast(Comparator.naturalOrder());
@@ -942,7 +945,7 @@ class ValuesTest {
 			}
 		}
 
-		@Nested
+		@Group
 		class NoneFirstTest {
 
 			final Comparator<Value> sut = Values.Comparators.noneFirst(Comparator.naturalOrder());
@@ -976,6 +979,7 @@ class ValuesTest {
 	}
 
 	@Nested
+	@Group
 	class MergeTest {
 
 		@Test
