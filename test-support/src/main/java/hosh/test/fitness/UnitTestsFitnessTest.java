@@ -31,6 +31,8 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
+import net.jqwik.api.Property;
+import net.jqwik.api.Provide;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +57,9 @@ public abstract class UnitTestsFitnessTest {
 					.should().beAnnotatedWith(Test.class)
 					.orShould().beAnnotatedWith(BeforeEach.class)
 					.orShould().beAnnotatedWith(AfterEach.class)
-					.orShould().beAnnotatedWith(ParameterizedTest.class);
+					.orShould().beAnnotatedWith(ParameterizedTest.class)
+					.orShould().beAnnotatedWith(Property.class)
+					.orShould().beAnnotatedWith(Provide.class);
 
 	@SuppressWarnings("unused")
 	@ArchTag("fitness")

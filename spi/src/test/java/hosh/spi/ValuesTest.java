@@ -32,9 +32,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
+import net.jqwik.api.Assume;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.Provide;
+import net.jqwik.api.constraints.IntRange;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -907,6 +909,22 @@ class ValuesTest {
 				// Then
 				assertThat(input).containsExactly("1.a", "2.a", "a.1", "b.1");
 			}
+
+			@Property
+			void reflexive(@ForAll String s) {
+				assertThat(sut.compare(s, s)).isEqualTo(0);
+			}
+
+			@Property
+			void antisymmetric(@ForAll String a, @ForAll String b) {
+				assertThat(Integer.signum(sut.compare(a, b))).isEqualTo(-Integer.signum(sut.compare(b, a)));
+			}
+
+			@Property
+			void transitive(@ForAll String a, @ForAll String b, @ForAll String c) {
+				Assume.that(sut.compare(a, b) <= 0 && sut.compare(b, c) <= 0);
+				assertThat(sut.compare(a, c)).isLessThanOrEqualTo(0);
+			}
 		}
 
 		@Nested
@@ -983,6 +1001,20 @@ class ValuesTest {
 			assertThat(size.merge(size)).hasValue(Values.ofSize(2));
 			assertThat(none.merge(size)).hasValue(size);
 			assertThat(size.merge(none)).hasValue(size);
+		}
+
+		@Property
+		void numericMergeIsCommutative(@ForAll int a, @ForAll int b) {
+			Value va = Values.ofNumeric(a);
+			Value vb = Values.ofNumeric(b);
+			assertThat(va.merge(vb)).isEqualTo(vb.merge(va));
+		}
+
+		@Property
+		void sizesMergeIsCommutative(@ForAll @IntRange(min = 0) int a, @ForAll @IntRange(min = 0) int b) {
+			Value va = Values.ofSize(a);
+			Value vb = Values.ofSize(b);
+			assertThat(va.merge(vb)).isEqualTo(vb.merge(va));
 		}
 	}
 

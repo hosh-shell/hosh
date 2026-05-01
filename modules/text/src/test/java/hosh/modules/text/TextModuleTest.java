@@ -41,6 +41,13 @@ import hosh.modules.text.TextModule.Timestamp;
 import hosh.modules.text.TextModule.Trim;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.spi.CommandArguments;
+import net.jqwik.api.Arbitrary;
+import net.jqwik.api.Arbitraries;
+import net.jqwik.api.Assume;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.Provide;
+import net.jqwik.api.constraints.IntRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,6 +61,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import static hosh.spi.test.support.ExitStatusAssert.assertThat;
@@ -1931,6 +1941,59 @@ class TextModuleTest {
 			then(err).should().send(Records.singleton(Keys.ERROR, Values.ofText("usage: duplicated key")));
 			then(err).shouldHaveNoMoreInteractions();
 		}
+	}
+
+	@Nested
+	class SortPropertyTest {
+
+		@Property
+		void sortIsIdempotent(@ForAll("textRecordLists") List<Record> input) {
+			Sort sut = new Sort();
+			List<Record> firstSort = runSort(sut, input);
+			List<Record> secondSort = runSort(sut, firstSort);
+			assertThat(firstSort).containsExactlyElementsOf(secondSort);
+		}
+
+		private List<Record> runSort(Sort sut, List<Record> input) {
+			List<Record> result = new ArrayList<>();
+			sut.run(CommandArguments.of("name"), fromList(input), result::add, record -> {});
+			return result;
+		}
+	}
+
+	@Nested
+	class TakeDropPropertyTest {
+
+		@Property
+		void takeAndDropPartitionInput(@ForAll("textRecordLists") List<Record> input,
+				@ForAll @IntRange(min = 0, max = 20) int n) {
+			Assume.that(n <= input.size());
+			Take takeSut = new Take();
+			Drop dropSut = new Drop();
+			OutputChannel noopErr = record -> {};
+
+			List<Record> taken = new ArrayList<>();
+			takeSut.run(CommandArguments.of(String.valueOf(n)), fromList(input), taken::add, noopErr);
+
+			List<Record> dropped = new ArrayList<>();
+			dropSut.run(CommandArguments.of(String.valueOf(n)), fromList(input), dropped::add, noopErr);
+
+			List<Record> combined = new ArrayList<>(taken);
+			combined.addAll(dropped);
+			assertThat(combined).containsExactlyElementsOf(input);
+		}
+	}
+
+	@Provide
+	Arbitrary<List<Record>> textRecordLists() {
+		return Arbitraries.strings().alpha().ofMinLength(0).ofMaxLength(10)
+				.map(s -> Records.singleton(Keys.NAME, Values.ofText(s)))
+				.list().ofMinSize(0).ofMaxSize(20);
+	}
+
+	private static InputChannel fromList(List<Record> records) {
+		Iterator<Record> it = records.iterator();
+		return () -> it.hasNext() ? Optional.of(it.next()) : Optional.empty();
 	}
 
 }
