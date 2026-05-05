@@ -34,7 +34,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- production classpath -->
 		<version.antlr>4.13.2</version.antlr>
-		<version.jline>4.0.14</version.jline>
+		<version.jline>4.0.15</version.jline>
 		<version.fastcsv>4.2.0</version.fastcsv>
 		<version.hardwood>1.0.0.Beta2</version.hardwood>
 		<version.joy-classic>2.1.0</version.joy-classic>
