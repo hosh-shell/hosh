@@ -18,7 +18,7 @@ Run: `java -jar main/target/hosh.jar`
 Debug:
 
 ```bash
-java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar main/target/hosh.jar
+java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:1044 -jar main/target/hosh.jar
 ```
 
 ## Logging
@@ -37,17 +37,21 @@ Log events written to `$HOME/.hosh.log`.
 |---|---|
 | `spi/` | Core abstractions: `Command`, `Channel`, `Record`, `ExitStatus`, `Value` subtypes |
 | `spi-test-support/` | Test helpers for SPI |
-| `test-support/` | JUnit 5 utilities |
+| `test-support/` | JUnit utilities, fitness tests |
 | `runtime/` | Shell engine: `Interpreter`, `Supervisor`, ANTLR4 `Compiler`/`Parser` |
-| `modules/system/` | echo, sleep, withTimeout, benchmark, … |
-| `modules/filesystem/` | ls, cd, walk, cp, mv, rm, find, … |
-| `modules/text/` | grep, sort, count, split, join, trim, regex, … |
-| `modules/network/` | http, resolve, … |
-| `modules/terminal/` | clear, … |
+| `modules/system/` | echo, env, sleep, withTime, withTimeout, benchmark, … |
+| `modules/filesystem/` | ls, cd, walk, glob, cp, mv, rm, resolve, withLock, … |
+| `modules/text/` | filter, sort, count, split, join, trim, regex, schema, take, … |
+| `modules/network/` | http, network |
+| `modules/terminal/` | clear, bell, dump |
 | `modules/history/` | history |
+| `modules/checksum/` | to-checksum, from-checksum |
+| `modules/formats/` | from/to-json, from/to-csv, from/to-base64 |
+| `modules/parquet/` | from-parquet, to-parquet |
+| `modules/httpserver/` | httpserver |
 | `main/` | Entry point `Hosh.java`, produces uberjar |
 
-Root package: `hosh`. Key sub-packages: `hosh.spi`, `hosh.runtime`, `hosh.runtime.prompt`, `hosh.runtime.completion`, `hosh.modules.*`.
+Root package: `hosh`. Key sub-packages: `hosh.spi`, `hosh.runtime`, `hosh.runtime.prompt`, `hosh.modules.*`.
 
 ## Key classes
 
@@ -55,7 +59,7 @@ Root package: `hosh`. Key sub-packages: `hosh.spi`, `hosh.runtime`, `hosh.runtim
 |---|---|---|
 | Entry point | `Hosh` | `main/` |
 | Parsing | `Compiler`, `Parser` | `runtime/` |
-| ANTLR4 grammar | `Hosh.g4` | `runtime/src/main/antlr4/` |
+| ANTLR4 grammar | `HoshLexer.g4`, `HoshParser.g4` | `runtime/src/main/antlr4/hosh/runtime/antlr4/` |
 | Pipeline execution | `Supervisor` | `runtime/` |
 | Inter-stage data | `PipelineChannel` | `runtime/` |
 | Core record type | `Record`, `Records` | `spi/` |
@@ -126,7 +130,7 @@ public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out,
 ## Testing
 
 - All features covered by unit tests. Always check the happy path at minimum.
-- JUnit 5 + Mockito (BDDMockito) + AssertJ.
+- JUnit 6 + Mockito (BDDMockito) + AssertJ.
 - Every test has `// Given` / `// When` / `// Then` sections.
 - Class under test is always named `sut`.
 - Use `BDDMockito` exclusively: `given(mock.method()).willReturn(value)`. Never the reverse form. Only static-import `given` and `then` — not `willReturn`/`willThrow`.
@@ -136,7 +140,7 @@ public ExitStatus run(CommandArguments args, InputChannel in, OutputChannel out,
 
 ## Property-Based Testing (jqwik)
 
-**Known issue:** jqwik 1.9.3 targets JUnit Platform 1.x; project uses JUnit 6 (Platform 6.x). `@Property` tests compile and are structurally correct but the jqwik engine does not execute them at runtime. Track https://github.com/jqwik-team/jqwik/issues for jqwik 2.x.
+jqwik ignores JUnit's `@Nested`: a nested class containing `@Property` methods must be annotated with jqwik's `@Group`, or its properties silently never run.
 
 Write property tests: `@Property` + `@ForAll` for parameters, `@Provide` for custom arbitraries, `Assume.that(...)` for preconditions. See `ValuesTest.java` (spi module) for patterns.
 
