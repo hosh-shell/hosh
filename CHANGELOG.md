@@ -9,7 +9,6 @@ Most of the work from v0.2.0 onwards is done in collaboration with [Claude Code]
 
 ## [Unreleased]
 
-Most of the work from v0.2.0 onwards is done in collaboration with [Claude Code](https://claude.ai/code) (Anthropic).
 In general, this is first version that builds on fully enforced Java modules.
 
 ### Added
