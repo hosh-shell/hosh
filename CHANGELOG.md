@@ -14,7 +14,7 @@ In general, this is first version that builds on fully enforced Java modules.
 
 ### Added
 
-- CLAUDE.md to guide the coding agent.
+- AGENTS.md to guide the coding agent.
 - New `checksum` module with `to-checksum` and `from-checksum` commands
 - New `formats` module with `json` and `csv` commands
 - Linux ARM64 (`ubuntu-24.04-arm`) added to CI build matrix

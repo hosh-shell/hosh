@@ -1,4 +1,4 @@
-# hosh — Claude guidance
+# hosh — agent guidance
 
 Human Oriented SHell: experimental Java shell, typed records, virtual-thread pipelines. Multi-module Maven project (JDK 25).
 
