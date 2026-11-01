@@ -54,7 +54,7 @@
 Requirements: JDK25
 
 ```
-$ ./mvwn clean verify
+$ ./mvnw clean verify
 $ java -jar main/target/hosh.jar
 hosh> echo "hello world!"
 hello world!
