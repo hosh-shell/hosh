@@ -16,6 +16,8 @@ In general, this is first version that builds on fully enforced Java modules.
 - AGENTS.md to guide the coding agent.
 - New `checksum` module with `to-checksum` and `from-checksum` commands
 - New `formats` module with `from-json`, `to-json`, `from-csv`, `to-csv`, `from-base64` and `to-base64` commands
+- New `parquet` module with `from-parquet` and `to-parquet` commands
+- New `httpserver` module with `httpserver` command
 - Linux ARM64 (`ubuntu-24.04-arm`) added to CI build matrix
 - CodeQL security analysis re-enabled in CI
 - Javadoc added to SPI and runtime classes

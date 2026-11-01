@@ -221,7 +221,7 @@ Dependencies
 - Apache Maven 3.9+;
 - ANTLR4;
 - JLine to provide Terminal and History support;
-- JUnit5 + Mockito + AssertJ + equalsverifier (test only);
+- JUnit 6 + Mockito + AssertJ + equalsverifier (test only);
 - archunit to enforce fitness functions, e.g. all commands must be documented (test only);
 - pitest for mutation-based testing;
 - checkstyle — to prevent unused imports and enforce consistent formatting;
