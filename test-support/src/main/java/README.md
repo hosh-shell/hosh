@@ -1,4 +1,4 @@
-This module contains helpers specifically designed for spi classes.
+This module contains JUnit helpers (extensions like `WithTimeZone`, `TemporaryFolder`) and fitness tests.
 
 It should have a module-info.java, like:
 ```

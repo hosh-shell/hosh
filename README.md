@@ -35,6 +35,7 @@
     - built-in commands produce *records with well-defined keys*
     - use `| schema` to inspect available keys
     - interoperability with external commands is achieved by using *single-key record* (with key `text`)
+    - built-in readers/writers for JSON, CSV, Parquet, Base64 and checksums (`from-json`, `to-csv`, `from-parquet`, `to-checksum`, ...)
 - **wrapping commands**, with before/after behavior:
     - `withTime { lines very-big-file.txt | count }` like `time command` in bash
     - `withLock file.lock { command }` run `command` as critical section guarded by `file.lock`
@@ -137,7 +138,7 @@ hosh> git config -l | regex text '(?<key>.+)=(?<value>.+)' | take 2
 key                value
 credential.helper  osxkeychain
 user.name          Davide Angelocola
-hosh> hosh> git config -l | regex text '(?<key>.+)=(?<value>.+)' | take 2 | schema
+hosh> git config -l | regex text '(?<key>.+)=(?<value>.+)' | take 2 | schema
 key value
 key value
 ```
@@ -181,13 +182,13 @@ Quick build (2x faster on my machine):
 
 ### Debug
 
-`$ java -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -jar main/target/hosh.jar`
+`$ java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:1044 -jar main/target/hosh.jar`
 
 ### Logging
 
 Hosh uses `java.util.logging` (to not require additional dependencies). `HOSH_LOG_LEVEL` controls
 logging behaviour according
-to [Level](https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/Level.html). By default,
+to [Level](https://docs.oracle.com/en/java/javase/25/docs/api/java.logging/java/util/logging/Level.html). By default,
 logging is disabled, to enable it:
 
 `$ HOSH_LOG_LEVEL=FINE java -jar main/target/hosh.jar`

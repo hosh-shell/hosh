@@ -225,6 +225,7 @@ Dependencies
 - archunit to enforce fitness functions, e.g. all commands must be documented (test only);
 - pitest for mutation-based testing;
 - checkstyle — to prevent unused imports and enforce consistent formatting;
-- mockserver to test HTTP commands (test only);
 - SLF4J — simple binding used (test only);
-- JOY for JSON (declared as a dependency, not yet wired up).
+- Jakarta JSON API + JOY (implementation) for JSON;
+- FastCSV for CSV;
+- Hardwood for Parquet.

@@ -20,6 +20,6 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Additional information**
- - OS: [e.g. Windows 7, macOS]
- - Java version (e.g. azul 11.0.1)
- - Hosh Version [e.g. 0.1.2]
+ - OS: [e.g. Windows 11, macOS 15]
+ - Java version (e.g. zulu 25.0.1)
+ - Hosh Version [e.g. 0.2.0]
