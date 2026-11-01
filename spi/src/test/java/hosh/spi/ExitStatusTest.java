@@ -23,15 +23,10 @@
  */
 package hosh.spi;
 
-import net.jqwik.api.Arbitraries;
-import net.jqwik.api.Arbitrary;
-import net.jqwik.api.ForAll;
-import net.jqwik.api.Property;
-import net.jqwik.api.Provide;
-import net.jqwik.api.constraints.AlphaChars;
-import net.jqwik.api.constraints.StringLength;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Optional;
 
@@ -85,28 +80,29 @@ class ExitStatusTest {
 		assertThat(result.isError()).isTrue();
 	}
 
-	@Property
-	void validLiterals(@ForAll("integerStrings") String value) {
+	@ParameterizedTest
+	@ValueSource(strings = {"0", "1", "-1", "42", "2147483647", "-2147483648"})
+	void validLiterals(String value) {
 		// Given
 		// (no setup)
 
-		// When / Then
+		// When
 		Optional<ExitStatus> parsed = ExitStatus.parse(value);
+
+		// Then
 		assertThat(parsed).isPresent();
 	}
 
-	@Provide
-	Arbitrary<String> integerStrings() {
-		return Arbitraries.integers().map(Object::toString);
-	}
-
-	@Property
-	void invalidLiteral(@ForAll @AlphaChars @StringLength(min = 1, max = 10) String value) {
+	@ParameterizedTest
+	@ValueSource(strings = {"a", "abc", "Z", "abcdefghij"})
+	void invalidLiteral(String value) {
 		// Given
 		// (no setup)
 
-		// When / Then
+		// When
 		Optional<ExitStatus> parsed = ExitStatus.parse(value);
+
+		// Then
 		assertThat(parsed).isEmpty();
 	}
 }

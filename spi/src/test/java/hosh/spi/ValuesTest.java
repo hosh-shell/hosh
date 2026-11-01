@@ -30,14 +30,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import net.jqwik.api.Arbitraries;
-import net.jqwik.api.Arbitrary;
-import net.jqwik.api.Assume;
-import net.jqwik.api.ForAll;
-import net.jqwik.api.Group;
-import net.jqwik.api.Property;
-import net.jqwik.api.Provide;
-import net.jqwik.api.constraints.IntRange;
+import org.junit.jupiter.params.provider.FieldSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -814,12 +808,15 @@ class ValuesTest {
 	}
 
 	@Nested
-	@Group
 	class ComparatorsTest {
 
 		@Nested
-		@Group
 		class NaturalSortOrderComparatorTest {
+
+			// edge cases for the comparator contract: empty, case, leading zeros, signs, decimals, mixed
+			static final List<String> SAMPLES = List.of(
+					"", " ", "a", "A", "b", "B", "ab", "1", "2", "10", "01", "-1",
+					"1.0", "1.10", "a1", "a2", "a10", "1a", "foo2", "foo10");
 
 			final Comparator<String> sut = Values.Comparators.naturalSortOrder();
 
@@ -913,73 +910,92 @@ class ValuesTest {
 				assertThat(input).containsExactly("1.a", "2.a", "a.1", "b.1");
 			}
 
-			@Property
-			void reflexive(@ForAll String s) {
+			@ParameterizedTest
+			@FieldSource("SAMPLES")
+			void reflexive(String s) {
+				// Given
+				// (no setup)
+				// When / Then
 				assertThat(sut.compare(s, s)).isEqualTo(0);
 			}
 
-			@Property
-			void antisymmetric(@ForAll String a, @ForAll String b) {
-				assertThat(Integer.signum(sut.compare(a, b))).isEqualTo(-Integer.signum(sut.compare(b, a)));
+			@Test
+			void antisymmetric() {
+				// Given
+				// (no setup)
+				// When / Then
+				for (String a : SAMPLES) {
+					for (String b : SAMPLES) {
+						assertThat(Integer.signum(sut.compare(a, b)))
+								.as("compare(%s, %s)", a, b)
+								.isEqualTo(-Integer.signum(sut.compare(b, a)));
+					}
+				}
 			}
 
-			@Property
-			void transitive(@ForAll String a, @ForAll String b, @ForAll String c) {
-				Assume.that(sut.compare(a, b) <= 0 && sut.compare(b, c) <= 0);
-				assertThat(sut.compare(a, c)).isLessThanOrEqualTo(0);
+			@Test
+			void transitive() {
+				// Given
+				// (no setup)
+				// When / Then
+				for (String a : SAMPLES) {
+					for (String b : SAMPLES) {
+						for (String c : SAMPLES) {
+							if (sut.compare(a, b) <= 0 && sut.compare(b, c) <= 0) {
+								assertThat(sut.compare(a, c)).as("compare(%s, %s)", a, c).isLessThanOrEqualTo(0);
+							}
+						}
+					}
+				}
 			}
 		}
 
-		@Group
+		@Nested
 		class NoneLastTest {
 
 			final Comparator<Value> sut = Values.Comparators.noneLast(Comparator.naturalOrder());
 
-			@Property
-			void noneLast(@ForAll("listOfNumericValuesContainingNone") List<Value> candidate) {
+			@ParameterizedTest
+			@ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
+			void noneLast(int noneIndex) {
 				// Given
-				// (no setup)
-				// When / Then
+				List<Value> candidate = listOfNumericValuesContainingNone(noneIndex);
+				// When
 				candidate.sort(sut);
+				// Then
 				assertThat(candidate).last().isEqualTo(Values.none());
 			}
 		}
 
-		@Group
+		@Nested
 		class NoneFirstTest {
 
 			final Comparator<Value> sut = Values.Comparators.noneFirst(Comparator.naturalOrder());
 
-			@Property
-			void noneFirst(@ForAll("listOfNumericValuesContainingNone") List<Value> candidate) {
+			@ParameterizedTest
+			@ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
+			void noneFirst(int noneIndex) {
 				// Given
-				// (no setup)
-				// When / Then
+				List<Value> candidate = listOfNumericValuesContainingNone(noneIndex);
+				// When
 				candidate.sort(sut);
+				// Then
 				assertThat(candidate).first().isEqualTo(Values.none());
 			}
 		}
 
-		// creates random lists of values with 3 None elements
-		@Provide
-		Arbitrary<List<Value>> listOfNumericValuesContainingNone() {
-			Arbitrary<List<Value>> numericValues = Arbitraries.integers()
-					.map(Values::ofNumeric)
-					.list().ofMinSize(1).ofMaxSize(20);
-			return numericValues.flatMap(base ->
-					Arbitraries.integers().between(0, base.size() + 2).map(randomIndex -> {
-						List<Value> mutable = new ArrayList<>(base);
-						mutable.addFirst(Values.none());
-						mutable.add(Values.none());
-						mutable.add(Math.min(randomIndex, mutable.size()), Values.none());
-						return mutable;
-					}));
+		// numeric values with 3 None elements: first, last and at noneIndex
+		private List<Value> listOfNumericValuesContainingNone(int noneIndex) {
+			List<Value> result = new ArrayList<>(List.of(Values.ofNumeric(5), Values.ofNumeric(-3), Values.ofNumeric(0), Values.ofNumeric(7)));
+			result.addFirst(Values.none());
+			result.add(Values.none());
+			result.add(Math.min(noneIndex, result.size()), Values.none());
+			return result;
 		}
 
 	}
 
 	@Nested
-	@Group
 	class MergeTest {
 
 		@Test
@@ -1007,17 +1023,23 @@ class ValuesTest {
 			assertThat(size.merge(none)).hasValue(size);
 		}
 
-		@Property
-		void numericMergeIsCommutative(@ForAll int a, @ForAll int b) {
+		@ParameterizedTest
+		@CsvSource({"0, 0", "1, 2", "-5, 7", "-1, -1", "2147483647, 1", "-2147483648, -1"})
+		void numericMergeIsCommutative(long a, long b) {
+			// Given
 			Value va = Values.ofNumeric(a);
 			Value vb = Values.ofNumeric(b);
+			// When / Then
 			assertThat(va.merge(vb)).isEqualTo(vb.merge(va));
 		}
 
-		@Property
-		void sizesMergeIsCommutative(@ForAll @IntRange(min = 0) int a, @ForAll @IntRange(min = 0) int b) {
+		@ParameterizedTest
+		@CsvSource({"0, 0", "0, 1", "1, 2", "1024, 1048576", "2147483647, 1"})
+		void sizesMergeIsCommutative(long a, long b) {
+			// Given
 			Value va = Values.ofSize(a);
 			Value vb = Values.ofSize(b);
+			// When / Then
 			assertThat(va.merge(vb)).isEqualTo(vb.merge(va));
 		}
 	}

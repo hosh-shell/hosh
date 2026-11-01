@@ -41,19 +41,13 @@ import hosh.modules.text.TextModule.Timestamp;
 import hosh.modules.text.TextModule.Trim;
 import hosh.spi.test.support.RecordMatcher;
 import hosh.spi.CommandArguments;
-import net.jqwik.api.Arbitrary;
-import net.jqwik.api.Arbitraries;
-import net.jqwik.api.Assume;
-import net.jqwik.api.ForAll;
-import net.jqwik.api.Group;
-import net.jqwik.api.Property;
-import net.jqwik.api.Provide;
-import net.jqwik.api.constraints.IntRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.FieldSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -1944,14 +1938,27 @@ class TextModuleTest {
 		}
 	}
 
-	@Group
+	// edge cases: empty input, duplicates, case, empty names
+	static final List<List<String>> NAME_LISTS = List.of(
+			List.of(),
+			List.of("a"),
+			List.of("b", "a"),
+			List.of("x", "x", "y", "x"),
+			List.of("B", "a", "", "b", "A", "a10", "a2"));
+
+	@Nested
 	class SortPropertyTest {
 
-		@Property
-		void sortIsIdempotent(@ForAll("textRecordLists") List<Record> input) {
+		@ParameterizedTest
+		@FieldSource("hosh.modules.text.TextModuleTest#NAME_LISTS")
+		void sortIsIdempotent(List<String> names) {
+			// Given
 			Sort sut = new Sort();
+			List<Record> input = toRecords(names);
+			// When
 			List<Record> firstSort = runSort(sut, input);
 			List<Record> secondSort = runSort(sut, firstSort);
+			// Then
 			assertThat(firstSort).containsExactlyElementsOf(secondSort);
 		}
 
@@ -1962,34 +1969,33 @@ class TextModuleTest {
 		}
 	}
 
-	@Group
+	@Nested
 	class TakeDropPropertyTest {
 
-		@Property
-		void takeAndDropPartitionInput(@ForAll("textRecordLists") List<Record> input,
-				@ForAll @IntRange(min = 0, max = 20) int n) {
-			Assume.that(n <= input.size());
+		@ParameterizedTest
+		@FieldSource("hosh.modules.text.TextModuleTest#NAME_LISTS")
+		void takeAndDropPartitionInput(List<String> names) {
+			// Given
+			List<Record> input = toRecords(names);
 			Take takeSut = new Take();
 			Drop dropSut = new Drop();
 			OutputChannel noopErr = record -> {};
-
-			List<Record> taken = new ArrayList<>();
-			takeSut.run(CommandArguments.of(String.valueOf(n)), fromList(input), taken::add, noopErr);
-
-			List<Record> dropped = new ArrayList<>();
-			dropSut.run(CommandArguments.of(String.valueOf(n)), fromList(input), dropped::add, noopErr);
-
-			List<Record> combined = new ArrayList<>(taken);
-			combined.addAll(dropped);
-			assertThat(combined).containsExactlyElementsOf(input);
+			for (int n = 0; n <= input.size(); n++) {
+				// When
+				List<Record> taken = new ArrayList<>();
+				takeSut.run(CommandArguments.of(String.valueOf(n)), fromList(input), taken::add, noopErr);
+				List<Record> dropped = new ArrayList<>();
+				dropSut.run(CommandArguments.of(String.valueOf(n)), fromList(input), dropped::add, noopErr);
+				// Then
+				List<Record> combined = new ArrayList<>(taken);
+				combined.addAll(dropped);
+				assertThat(combined).as("n=%d", n).containsExactlyElementsOf(input);
+			}
 		}
 	}
 
-	@Provide
-	Arbitrary<List<Record>> textRecordLists() {
-		return Arbitraries.strings().alpha().ofMinLength(0).ofMaxLength(10)
-				.map(s -> Records.singleton(Keys.NAME, Values.ofText(s)))
-				.list().ofMinSize(0).ofMaxSize(20);
+	private List<Record> toRecords(List<String> names) {
+		return names.stream().map(name -> Records.singleton(Keys.NAME, Values.ofText(name))).toList();
 	}
 
 	private static InputChannel fromList(List<Record> records) {
