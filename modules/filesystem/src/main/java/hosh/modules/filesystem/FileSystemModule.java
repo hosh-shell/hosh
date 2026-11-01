@@ -589,7 +589,6 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "add tests for regular files and directories")
 	@Description("resolve to canonical absolute path")
 	@Examples({
 			@Example(command = "resolve ./symlink", description = "resolve symlink to the absolute path"),

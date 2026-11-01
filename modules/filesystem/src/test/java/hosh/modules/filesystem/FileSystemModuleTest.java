@@ -1497,6 +1497,22 @@ class FileSystemModuleTest {
 		}
 
 		@Test
+		void directory() throws IOException {
+			// Given
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Path newFolder = temporaryFolder.newFolder("directory");
+
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("directory"), in, out, err);
+
+			// Then
+			assertThat(result).isSuccess();
+			then(in).shouldHaveNoInteractions();
+			then(out).should().send(Records.singleton(Keys.PATH, Values.ofPath(newFolder.toAbsolutePath().toRealPath())));
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
 		void symlink() throws IOException {
 			// Given
 			Path newFile = temporaryFolder.newFile("file.txt");
