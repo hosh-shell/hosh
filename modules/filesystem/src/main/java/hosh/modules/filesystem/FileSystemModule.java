@@ -361,11 +361,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "test 'cp file directory'")
 	@Description("copy file")
 	@Examples({
 			@Example(command = "cp source.txt target.txt", description = "copy file using current working directory"),
 			@Example(command = "cp /tmp/source.txt /tmp/target.txt", description = "copy file by using absolute path"),
+			@Example(command = "cp source.txt /tmp", description = "copy file into an existing directory"),
 	})
 	public static class Copy implements Command, StateAware {
 
@@ -383,7 +383,7 @@ public class FileSystemModule implements Module {
 				return ExitStatus.error();
 			}
 			Path source = args.get(0).asPath(state);
-			Path target = args.get(1).asPath(state);
+			Path target = intoDirectory(source, args.get(1).asPath(state));
 			try {
 				Files.copy(source, target);
 				return ExitStatus.success();
@@ -393,11 +393,11 @@ public class FileSystemModule implements Module {
 		}
 	}
 
-	@Todo(description = "test 'mv file directory'")
 	@Description("move file")
 	@Examples({
 			@Example(command = "mv source.txt target.txt", description = "move file using current working directory"),
 			@Example(command = "mv /tmp/source.txt /tmp/target.txt", description = "move file by using absolute path"),
+			@Example(command = "mv source.txt /tmp", description = "move file into an existing directory"),
 	})
 	public static class Move implements Command, StateAware {
 
@@ -415,7 +415,7 @@ public class FileSystemModule implements Module {
 				return ExitStatus.error();
 			}
 			Path source = args.get(0).asPath(state);
-			Path target = args.get(1).asPath(state);
+			Path target = intoDirectory(source, args.get(1).asPath(state));
 			try {
 				Files.move(source, target);
 				return ExitStatus.success();
@@ -423,6 +423,11 @@ public class FileSystemModule implements Module {
 				throw new UncheckedIOException(e);
 			}
 		}
+	}
+
+	// like cp/mv in UNIX: an existing directory as target means "into that directory"
+	private static Path intoDirectory(Path source, Path target) {
+		return Files.isDirectory(target) ? target.resolve(source.getFileName()) : target;
 	}
 
 	@Description("remove file")

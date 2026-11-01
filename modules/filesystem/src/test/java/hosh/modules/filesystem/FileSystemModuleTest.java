@@ -708,6 +708,25 @@ class FileSystemModuleTest {
 		}
 
 		@Test
+		void copyIntoDirectory() throws IOException {
+			// Given
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Path source = temporaryFolder.newFile("source.txt");
+			Path directory = temporaryFolder.newFolder("directory");
+
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("source.txt", "directory"), in, out, err);
+
+			// Then
+			assertThat(result).isSuccess();
+			assertThat(source).exists();
+			assertThat(directory.resolve("source.txt")).exists();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
 		void copyAbsoluteToAbsolute() throws IOException {
 			// Given
 			Path source = temporaryFolder.newFile("source.txt").toAbsolutePath();
@@ -799,6 +818,25 @@ class FileSystemModuleTest {
 			assertThat(result).isSuccess();
 			assertThat(source).doesNotExist();
 			assertThat(target).exists();
+			then(in).shouldHaveNoInteractions();
+			then(out).shouldHaveNoInteractions();
+			then(err).shouldHaveNoInteractions();
+		}
+
+		@Test
+		void moveIntoDirectory() throws IOException {
+			// Given
+			given(state.getCwd()).willReturn(temporaryFolder.toPath());
+			Path source = temporaryFolder.newFile("source.txt");
+			Path directory = temporaryFolder.newFolder("directory");
+
+			// When
+			ExitStatus result = sut.run(CommandArguments.of("source.txt", "directory"), in, out, err);
+
+			// Then
+			assertThat(result).isSuccess();
+			assertThat(source).doesNotExist();
+			assertThat(directory.resolve("source.txt")).exists();
 			then(in).shouldHaveNoInteractions();
 			then(out).shouldHaveNoInteractions();
 			then(err).shouldHaveNoInteractions();

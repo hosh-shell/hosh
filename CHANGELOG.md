@@ -36,6 +36,7 @@ In general, this is first version that builds on fully enforced Java modules.
 
 ### Fixed
 
+- `cp file dir` and `mv file dir` now copy/move into an existing directory (like UNIX) instead of failing
 - Silent record dropping in `PipelineChannel.send()`
 - Several race conditions across `MutableState` (volatile fields), `LambdaCommand` (synchronized compound mutation and scoping), and `AutoTableChannel` (atomic overflow detection)
 - `WithTimeout`: cancel future on timeout to prevent executor `close()` from hanging
