@@ -55,6 +55,10 @@ public class TemporaryFolder implements Extension, BeforeEachCallback, AfterEach
 	// Sonar is reporting: "Make sure publicly writable directories are used safely here."
 	// since this call is used only for tests, it is fine.
 	@SuppressWarnings("squid:S5443")
+	public TemporaryFolder() {
+		// explicit constructor for exported package
+	}
+
 	@Override
 	public void beforeEach(@NonNull ExtensionContext context) throws Exception {
 		folder = Files.createTempDirectory("hosh-");

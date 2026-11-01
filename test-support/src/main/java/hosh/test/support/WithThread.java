@@ -40,6 +40,10 @@ public class WithThread implements Extension, BeforeTestExecutionCallback, After
 
 	private String backup;
 
+	public WithThread() {
+		// explicit constructor for exported package
+	}
+
 	@Override
 	public void afterTestExecution(@NonNull ExtensionContext context) {
 		Thread.currentThread().setName(backup);

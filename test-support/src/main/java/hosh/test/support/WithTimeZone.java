@@ -38,6 +38,10 @@ public class WithTimeZone implements Extension, BeforeTestExecutionCallback, Aft
 
 	private TimeZone backup;
 
+	public WithTimeZone() {
+		// explicit constructor for exported package
+	}
+
 	@Override
 	public void beforeTestExecution(@NonNull ExtensionContext context) {
 		backup = TimeZone.getDefault();

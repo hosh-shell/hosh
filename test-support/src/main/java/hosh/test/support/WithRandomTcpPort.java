@@ -33,6 +33,10 @@ public class WithRandomTcpPort implements BeforeEachCallback {
 
 	private int randomTcpPort;
 
+	public WithRandomTcpPort() {
+		// explicit constructor for exported package
+	}
+
 	public int getRandomTcpPort() {
 		return randomTcpPort;
 	}

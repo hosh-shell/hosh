@@ -66,6 +66,10 @@ public abstract class UnitTestsFitnessTest {
 					.areNotStatic().and().areAnnotatedWith(Mock.class)
 					.should(haveAccesses());
 
+	protected UnitTestsFitnessTest() {
+		// explicit constructor for exported package
+	}
+
 	// implementation details
 	private static HaveAccesses haveAccesses() {
 		return new HaveAccesses();
