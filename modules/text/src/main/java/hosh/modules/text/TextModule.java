@@ -26,7 +26,6 @@ package hosh.modules.text;
 import hosh.doc.Description;
 import hosh.doc.Example;
 import hosh.doc.Examples;
-import hosh.doc.Todo;
 import hosh.spi.Command;
 import hosh.spi.CommandArguments;
 import hosh.spi.CommandName;
@@ -718,26 +717,13 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Key key = args.get(0).asKey();
-			Comparator<Value> comparator = Values.Comparators.noneLast(Comparator.naturalOrder());
-			Value min = Values.none();
-			for (Record record : InputChannel.iterate(in)) {
-				Optional<Value> optionalValue = record.value(key);
-				if (optionalValue.isPresent()) {
-					Value current = optionalValue.get();
-					if (min == null) {
-						min = current;
-					} else {
-						min = comparator.compare(current, min) < 0 ? current : min;
-					}
-				}
-			}
+			Value min = greatest(in, key, Values.Comparators.noneLast(Comparator.<Value>naturalOrder()).reversed());
 			out.send(Records.singleton(MIN, min));
 			return ExitStatus.success();
 		}
 
 	}
 
-	@Todo(description = "share implementation with min")
 	@Description("calculate max of value")
 	@Examples({
 			@Example(command = "ps | max pid", description = "calculate max pid"),
@@ -753,23 +739,23 @@ public class TextModule implements Module {
 				return ExitStatus.error();
 			}
 			Key key = args.get(0).asKey();
-			Value max = Values.none();
-			Comparator<Value> comparator = Values.Comparators.noneFirst(Comparator.naturalOrder());
-			for (Record record : InputChannel.iterate(in)) {
-				Optional<Value> optionalValue = record.value(key);
-				if (optionalValue.isPresent()) {
-					Value current = optionalValue.get();
-					if (max == null) {
-						max = current;
-					} else {
-						max = comparator.compare(current, max) > 0 ? current : max;
-					}
-				}
-			}
+			Value max = greatest(in, key, Values.Comparators.noneFirst(Comparator.naturalOrder()));
 			out.send(Records.singleton(MAX, max));
 			return ExitStatus.success();
 		}
 
+	}
+
+	// shared by min and max: the greatest value of key according to comparator, None if there are no values
+	private static Value greatest(InputChannel in, Key key, Comparator<Value> comparator) {
+		Value greatest = Values.none();
+		for (Record record : InputChannel.iterate(in)) {
+			Optional<Value> current = record.value(key);
+			if (current.isPresent() && comparator.compare(current.get(), greatest) > 0) {
+				greatest = current.get();
+			}
+		}
+		return greatest;
 	}
 
 }
