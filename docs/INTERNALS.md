@@ -171,7 +171,7 @@ The prompt is rendered by composing multiple `PromptProvider` implementations in
 - `UserPromptProvider` — appends the current username;
 - `LiteralPromptProvider` — appends a fixed literal string.
 
-`CompositePromptProvider` chains multiple providers together. `StyledPrompt` applies ANSI styling.
+`CompositePromptProvider` chains multiple providers together.
 
 Tab completion
 ---

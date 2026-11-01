@@ -23,7 +23,6 @@
  */
 package hosh.runtime.prompt;
 
-import hosh.doc.Todo;
 import hosh.spi.Ansi;
 import hosh.spi.State;
 
@@ -32,7 +31,6 @@ public class DefaultPromptProvider implements PromptProvider {
 	public DefaultPromptProvider() {
 	}
 
-	@Todo(description = "use StyledPrompt class")
 	@Override
 	public String provide(State state) {
 		return Ansi.Style.FG_GREEN.enable() +
