@@ -34,3 +34,22 @@ jobs:
           cache: 'maven'
       - name: Build project
         run: ./mvnw --batch-mode verify
+
+  sonar:
+    name: sonar
+    # secrets are not available to pull requests from forks
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 25
+          distribution: 'zulu'
+          cache: 'maven'
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./mvnw --batch-mode -Psonar verify sonar:sonar -Dsonar.token="$SONAR_TOKEN"
