@@ -45,7 +45,7 @@
 		<version.mockito>5.23.0</version.mockito>
 		<version.equalsverifier>4.5</version.equalsverifier>
 		<version.archunit>1.4.2</version.archunit>
-		<version.slf4j>2.0.17</version.slf4j>
+		<version.slf4j>2.0.20</version.slf4j>
 		<!-- mockito agent for Java 21+ -->
 		<mockito.agent.path>${settings.localRepository}/org/mockito/mockito-core/${version.mockito}/mockito-core-${version.mockito}.jar</mockito.agent.path>
 	</properties>
